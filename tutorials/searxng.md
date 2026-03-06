@@ -1,7 +1,7 @@
 ---
-title: "Searxng"
+title: "SEARXNG 搜索技能使用教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["SEARXNG", "搜索", "隐私", "OpenClaw"]
 date: 2026-03-06
 ---
 

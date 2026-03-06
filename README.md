@@ -61,12 +61,12 @@
    - 支持 GPT/Claude 对话 + 蓝牙播放
    - 已帮助 500+ 用户成功刷机
 
-2. **[AgentDVR 监控系统](tutorials/agentdvr.md)** 📹
+2. **[AgentDVR 监控系统配置教程](tutorials/agentdvr.md)** 📹
    - 在飞牛 NAS 部署监控
    - 接入萤石云摄像头 RTSP
    - 实时预览 + 移动侦测录像
 
-3. **[多源技术新闻摘要](tutorials/news-digest.md)** 📰
+3. **[多源技术新闻摘要教程](tutorials/news-digest.md)** 📰
    - 每日 05:00 自动抓取 8 个技术媒体
    - 分类生成 Markdown 摘要
    - Telegram 自动推送 + TTS 播报
@@ -144,19 +144,19 @@ docsify serve .
 
 | 教程名称 | 分类 | 难度 | 热度 |
 |----------|------|------|------|
-| [Agent Reach](tutorials/agent-reach.md) | 网络工具 | ⭐⭐ | 🔥 |
-| [CLIProxyAPI](tutorials/cliproxypi-api.md) | 网络工具 | ⭐⭐⭐ | 🔥 |
-| [Cloudflare WARP](tutorials/cloudflare-warp.md) | 网络工具 | ⭐⭐ | ⭐⭐⭐ |
-| [小智 AI 刷机](tutorials/xiaoai-speaker-flash.md) | 智能助手 | ⭐⭐⭐ | 🔥🔥 |
-| [TTS 使用备忘](tutorials/tts-guide.md) | 智能助手 | ⭐⭐ | ⭐⭐⭐ |
-| [MoonTVPlus](tutorials/moontvplus.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
-| [SEARXNG](tutorials/searxng.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
-| [Telegram 教程](tutorials/telegram.md) | 通信平台 | ⭐⭐ | 🔥 |
-| [Gmail 临时邮箱](tutorials/gmail-temp.md) | 通信平台 | ⭐ | ⭐⭐ |
-| [Discourse 论坛](tutorials/discourse.md) | 通信平台 | ⭐⭐⭐ | ⭐⭐⭐ |
-| [AgentDVR 监控](tutorials/agentdvr.md) | 监控自动化 | ⭐⭐⭐ | 🔥 |
-| [新闻摘要系统](tutorials/news-digest.md) | 监控自动化 | ⭐⭐ | 🔥 |
-| [OpenClaw 脚本](tutorials/openclaw-scripts.md) | 监控自动化 | ⭐⭐ | 🔥 |
+| [Agent Reach 全能网络访问工具使用教程](tutorials/agent-reach.md) | 网络工具 | ⭐⭐ | 🔥 |
+| [CLIProxyAPI 代理服务教程](tutorials/cliproxypi-api.md) | 网络工具 | ⭐⭐⭐ | 🔥 |
+| [Cloudflare WARP 安装配置教程](tutorials/cloudflare-warp.md) | 网络工具 | ⭐⭐ | ⭐⭐⭐ |
+| [小爱音箱刷入小智AI教程](tutorials/xiaoai-speaker-flash.md) | 智能助手 | ⭐⭐⭐ | 🔥🔥 |
+| [TTS 文本转语音技能教程](tutorials/tts-guide.md) | 智能助手 | ⭐⭐ | ⭐⭐⭐ |
+| [MoonTVPlus 影音聚合播放器教程](tutorials/moontvplus.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
+| [SEARXNG 搜索技能使用教程](tutorials/searxng.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
+| [Telegram 使用教程](tutorials/telegram.md) | 通信平台 | ⭐⭐ | 🔥 |
+| [Gmail 临时邮箱生成器教程](tutorials/gmail-temp.md) | 通信平台 | ⭐ | ⭐⭐ |
+| [Discourse 论坛搭建部署教程](tutorials/discourse.md) | 通信平台 | ⭐⭐⭐ | ⭐⭐⭐ |
+| [AgentDVR 监控系统配置教程](tutorials/agentdvr.md) | 监控自动化 | ⭐⭐⭐ | 🔥 |
+| [多源技术新闻摘要教程](tutorials/news-digest.md) | 监控自动化 | ⭐⭐ | 🔥 |
+| [OpenClaw 自动化脚本合集](tutorials/openclaw-scripts.md) | 监控自动化 | ⭐⭐ | 🔥 |
 
 </div>
 

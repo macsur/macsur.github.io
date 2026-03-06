@@ -1,7 +1,7 @@
 ---
-title: "News Digest"
+title: "多源技术新闻摘要教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["新闻摘要", "自动化", "RSS", "OpenClaw"]
 date: 2026-03-06
 ---
 

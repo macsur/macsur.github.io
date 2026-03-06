@@ -1,7 +1,7 @@
 ---
-title: "Moontvplus"
+title: "MoonTVPlus 影音聚合播放器教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["MoonTVPlus", "影视", "IPTV", "OpenClaw"]
 date: 2026-03-06
 ---
 

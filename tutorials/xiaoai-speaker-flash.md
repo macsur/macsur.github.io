@@ -1,7 +1,7 @@
 ---
-title: "Xiaoai Speaker Flash"
+title: "小爱音箱刷入小智AI超详细教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["小爱音箱", "小智AI", "刷机", "智能家居", "OpenClaw"]
 date: 2026-03-06
 ---
 

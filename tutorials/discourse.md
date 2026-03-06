@@ -1,7 +1,7 @@
 ---
-title: "Discourse"
+title: "Discourse 论坛搭建部署教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["Discourse", "论坛", "社区", "OpenClaw"]
 date: 2026-03-06
 ---
 

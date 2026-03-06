@@ -1,7 +1,7 @@
 ---
-title: "Tts Guide"
+title: "TTS 文本转语音技能使用教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["TTS", "语音", "文本转语音", "OpenClaw"]
 date: 2026-03-06
 ---
 

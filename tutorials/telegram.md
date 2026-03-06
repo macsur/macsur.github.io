@@ -1,7 +1,7 @@
 ---
-title: "Telegram"
+title: "Telegram 流式预览和推理气泡启用教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["Telegram", "流式预览", "推理气泡", "OpenClaw"]
 date: 2026-03-06
 ---
 

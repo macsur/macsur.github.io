@@ -1,7 +1,7 @@
 ---
-title: "Cliproxypi Api"
+title: "CLIProxyAPI 代理服务教程"
 category: "tutorial"
-tags: ["openclaw", "tutorial"]
+tags: ["CLIProxyAPI", "API代理", "网络", "OpenClaw"]
 date: 2026-03-06
 ---
 
