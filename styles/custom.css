@@ -294,19 +294,35 @@ code, pre, kbd, samp, .code-block {
     margin: 1.5em 0;
     display: block;
     overflow-x: auto;
+    /* 确保表格在小屏幕上可横向滚动 */
+    -webkit-overflow-scrolling: touch;
 }
 
 .markdown-section th,
 .markdown-section td {
-    padding: 0.75em 1em;
+    padding: 0.8em 1.2em;
     border: 1px solid var(--border-color);
     text-align: left;
+    /* 增加最小宽度，防止内容被压缩 */
+    min-width: 120px;
+    word-break: break-word; /* 允许长单词换行 */
+    white-space: normal; /* 不强制单行 */
+}
+
+.markdown-section th:first-child,
+.markdown-section td:first-child {
+    /* 教程名称列加宽 */
+    min-width: 250px;
+    width: 40%;
+    padding: 1em 1.5em; /* 更大的内边距 */
 }
 
 .markdown-section th {
     background: var(--bg-subtle);
     font-weight: 600;
     color: var(--text-primary);
+    position: sticky;
+    top: 0; /* 固定表头 */
 }
 
 .markdown-section tr:nth-child(2n) {
@@ -315,6 +331,39 @@ code, pre, kbd, samp, .code-block {
 
 .markdown-section tr:hover {
     background: var(--theme-light);
+}
+
+/* 移动端表格优化 */
+@media (max-width: 768px) {
+    .markdown-section table {
+        display: block;
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .markdown-section th,
+    .markdown-section td {
+        padding: 0.6em 0.8em;
+        font-size: 0.9em;
+        min-width: 100px;
+    }
+
+    .markdown-section th:first-child,
+    .markdown-section td:first-child {
+        min-width: 200px;
+        width: 50%;
+        padding: 0.8em 1em;
+    }
+
+    /* 横向滚动提示 */
+    .markdown-section table::after {
+        content: "← 左右滑动查看更多 →";
+        display: block;
+        text-align: center;
+        padding: 0.5em;
+        color: var(--text-secondary);
+        font-size: 0.8em;
+    }
 }
 
 /* 水平分割线 */
