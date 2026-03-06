@@ -50,6 +50,10 @@
 
 ## 📚 核心教程推荐
 
+<div class="video-container">
+    <iframe src="https://www.youtube.com/embed/3twTXtuICdE" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
 ### 🥇 最受欢迎
 
 1. **[小爱音箱刷入小智 AI](tutorials/xiaoai-speaker-flash.md)** 🚀

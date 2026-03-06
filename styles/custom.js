@@ -20,15 +20,101 @@ docsify.register('badge', function (hook, vm) {
     });
 });
 
-// 目录增强 - 添加锚点
-docsify.register('toc', function (hook, vm) {
+// 轮播图短代码 [carousel:img1|title|desc,img2|title|desc,...]
+docsify.register('carousel', function (hook, vm) {
     hook.afterEach(function (html) {
-        return html.replace(/<h2([^>]*)>([^<]*)<\/h2>/g, function (match, attrs, content) {
-            var id = content.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5\-]/g, '');
-            return `<h2${attrs} id="${id}">${content}</h2>`;
+        return html.replace(/\[carousel:([^\]]+)\]/g, function (match, itemsStr) {
+            var items = itemsStr.split(',').map(function(item) {
+                var parts = item.split('|');
+                return {
+                    img: parts[0].trim(),
+                    title: parts[1] || '',
+                    desc: parts[2] || ''
+                };
+            });
+
+            var slidesHtml = items.map(function(item, index) {
+                var active = index === 0 ? 'active' : '';
+                var caption = item.title || item.desc ?
+                    `<div class="carousel-caption">
+                        ${item.title ? '<h4>'+item.title+'</h4>' : ''}
+                        ${item.desc ? '<p>'+item.desc+'</p>' : ''}
+                    </div>` : '';
+                return `
+                    <div class="carousel-slide ${active}" data-index="${index}">
+                        <img src="${item.img}" alt="Slide ${index+1}" loading="lazy">
+                        ${caption}
+                    </div>`;
+            }).join('');
+
+            var indicatorsHtml = items.map(function(_, index) {
+                var active = index === 0 ? 'active' : '';
+                return `<div class="carousel-indicator ${active}" data-index="${index}"></div>`;
+            }).join('');
+
+            return `
+                <div class="carousel-container" data-carousel>
+                    ${slidesHtml}
+                    <button class="carousel-control carousel-prev" data-direction="prev">‹</button>
+                    <button class="carousel-control carousel-next" data-direction="next">›</button>
+                    <div class="carousel-indicators">
+                        ${indicatorsHtml}
+                    </div>
+                </div>`;
         });
     });
 });
+
+// 轮播图交互
+(function initCarousel() {
+    document.addEventListener('click', function(e) {
+        var carousel = e.target.closest('[data-carousel]');
+        if (!carousel) return;
+
+        if (e.target.classList.contains('carousel-indicator')) {
+            var index = parseInt(e.target.dataset.index);
+            goToSlide(carousel, index);
+        } else if (e.target.classList.contains('carousel-prev')) {
+            navigateSlide(carousel, -1);
+        } else if (e.target.classList.contains('carousel-next')) {
+            navigateSlide(carousel, 1);
+        }
+    });
+
+    // 自动播放（5秒）
+    setInterval(function() {
+        document.querySelectorAll('[data-carousel]').forEach(function(carousel) {
+            var activeSlide = carousel.querySelector('.carousel-slide.active');
+            if (activeSlide) {
+                var currentIndex = parseInt(activeSlide.dataset.index);
+                var slides = carousel.querySelectorAll('.carousel-slide');
+                var nextIndex = (currentIndex + 1) % slides.length;
+                goToSlide(carousel, nextIndex);
+            }
+        });
+    }, 5000);
+})();
+
+function goToSlide(carousel, index) {
+    var slides = carousel.querySelectorAll('.carousel-slide');
+    var indicators = carousel.querySelectorAll('.carousel-indicator');
+    slides.forEach(function(slide, i) {
+        slide.classList.toggle('active', i === index);
+    });
+    indicators.forEach(function(ind, i) {
+        ind.classList.toggle('active', i === index);
+    });
+}
+
+function navigateSlide(carousel, delta) {
+    var activeSlide = carousel.querySelector('.carousel-slide.active');
+    if (activeSlide) {
+        var currentIndex = parseInt(activeSlide.dataset.index);
+        var slides = carousel.querySelectorAll('.carousel-slide');
+        var nextIndex = (currentIndex + delta + slides.length) % slides.length;
+        goToSlide(carousel, nextIndex);
+    }
+}
 
 // 复制代码
 window.$docsify.copyCode = {
@@ -44,7 +130,6 @@ window.$docsify.search = {
     noData: '😕 没有找到结果',
     depth: 2,
     maxAge: 86400000,
-    // 搜索高亮
     highlight: function (matches, keywords) {
         return matches.map(function (match) {
             var html = match.html
@@ -56,14 +141,12 @@ window.$docsify.search = {
 
 // 移动端侧边栏切换
 (function () {
-    // 创建汉堡菜单按钮
     var menuBtn = document.createElement('button');
     menuBtn.className = 'menu-button';
     menuBtn.innerHTML = '☰';
     menuBtn.setAttribute('aria-label', 'Toggle menu');
     document.body.appendChild(menuBtn);
 
-    // 创建遮罩层
     var overlay = document.createElement('div');
     overlay.className = 'sidebar-overlay';
     document.body.appendChild(overlay);
@@ -86,15 +169,11 @@ window.$docsify.search = {
 
     menuBtn.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
-
-    // ESC 键关闭
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && sidebar.classList.contains('open')) {
             toggleMenu();
         }
     });
-
-    // 响应窗口变化
     window.addEventListener('resize', function () {
         if (window.innerWidth > 768) {
             sidebar.classList.remove('open');
@@ -102,8 +181,6 @@ window.$docsify.search = {
             document.body.style.overflow = '';
         }
     });
-
-    // 点击侧边栏链接后自动关闭（移动端）
     sidebar.addEventListener('click', function (e) {
         if (e.target.tagName === 'A' && window.innerWidth <= 768) {
             setTimeout(toggleMenu, 100);
@@ -111,17 +188,11 @@ window.$docsify.search = {
     });
 })();
 
-// 暗色模式优化：修复代码块色
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.documentElement.style.setProperty('--code-bg', '#161b22');
-}
-
-// 阅读进度条（顶部）
+// 阅读进度条
 (function () {
     var progressBar = document.createElement('div');
     progressBar.style.cssText = 'position:fixed;top:0;left:0;width:0;height:3px;background:var(--theme-color);z-index:9999;transition:width 0.1s;';
     document.body.appendChild(progressBar);
-
     window.addEventListener('scroll', function () {
         var scrollTop = window.scrollY;
         var docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -137,15 +208,9 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
     btn.style.cssText = 'position:fixed;bottom:2rem;right:2rem;width:40px;height:40px;border-radius:50%;background:var(--theme-color);color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:none;align-items:center;justify-content:center;font-size:1.2rem;z-index:1000;transition:all 0.2s;';
     btn.setAttribute('aria-label', 'Back to top');
     document.body.appendChild(btn);
-
     window.addEventListener('scroll', function () {
-        if (window.scrollY > 300) {
-            btn.style.display = 'flex';
-        } else {
-            btn.style.display = 'none';
-        }
+        btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
     });
-
     btn.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
