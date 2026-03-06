@@ -306,11 +306,11 @@ code, pre, kbd, samp, .code-block {
     overflow-wrap: break-word;
 }
 
-/* 教程名称列（第一列） - 足够宽以显示长标题 */
+/* 教程名称列（第一列） - 自适应全宽，占据所有剩余空间 */
 .markdown-section th:first-child,
 .markdown-section td:first-child {
-    width: auto; /* 让内容决定 */
-    min-width: 380px; /* 确保有足够宽度显示长标题 */
+    width: auto; /* 自动填充剩余宽度 */
+    min-width: 0; /* 不设最小宽度限制 */
     max-width: none;
     padding: 1.2em 1.8em;
     font-weight: 500;
@@ -369,9 +369,9 @@ code, pre, kbd, samp, .code-block {
 
     .markdown-section th:first-child,
     .markdown-section td:first-child {
-        /* 第一列宽度自适应，但要足够宽 */
+        /* 第一列宽度自适应（可换行） */
         width: auto !important;
-        min-width: 280px; /* 确保有空间显示长标题 */
+        min-width: 0; /* 移除最小宽度限制 */
         max-width: none !important;
         padding: 1em 1.2em;
         font-weight: 500;
