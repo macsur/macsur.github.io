@@ -350,12 +350,28 @@ code, pre, kbd, samp, .code-block {
         display: block;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        /* 移动端使用自动布局，让内容决定宽度 */
+        table-layout: auto !important;
+    }
+
+    .markdown-section th,
+    .markdown-section td {
+        /* 确保文字换行 */
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        /* 增加内边距提高可读性 */
+        padding: 0.8em 1em;
     }
 
     .markdown-section th:first-child,
     .markdown-section td:first-child {
-        min-width: 250px;
-        width: 60%;
+        /* 第一列宽度自适应，但要足够宽 */
+        width: auto !important;
+        min-width: 280px; /* 确保有空间显示长标题 */
+        max-width: none !important;
+        padding: 1em 1.2em;
+        font-weight: 500;
     }
 
     .markdown-section th:nth-child(2),
@@ -364,10 +380,12 @@ code, pre, kbd, samp, .code-block {
     .markdown-section td:nth-child(3),
     .markdown-section th:nth-child(4),
     .markdown-section td:nth-child(4) {
-        width: 13.3%;
-        min-width: 60px;
-        font-size: 0.85em;
-        padding: 0.6em 0.4em;
+        /* 右侧三列紧凑但可读 */
+        width: 80px !important; /* 固定窄列 */
+        min-width: 70px;
+        text-align: center;
+        padding: 0.7em 0.5em;
+        font-size: 0.9em;
     }
 }
 
