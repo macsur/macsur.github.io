@@ -303,18 +303,38 @@ code, pre, kbd, samp, .code-block {
     padding: 0.8em 1.2em;
     border: 1px solid var(--border-color);
     text-align: left;
-    /* 增加最小宽度，防止内容被压缩 */
-    min-width: 120px;
+    /* 列宽分配 */
+    min-width: 100px;
     word-break: break-word; /* 允许长单词换行 */
     white-space: normal; /* 不强制单行 */
 }
 
+/* 具体列宽控制 */
+.markdown-section th:nth-child(2),
+.markdown-section td:nth-child(2) {
+    width: 15%;
+    min-width: 80px;
+}
+
+.markdown-section th:nth-child(3),
+.markdown-section td:nth-child(3) {
+    width: 15%;
+    min-width: 80px;
+}
+
+.markdown-section th:nth-child(4),
+.markdown-section td:nth-child(4) {
+    width: 15%;
+    min-width: 80px;
+}
+
 .markdown-section th:first-child,
 .markdown-section td:first-child {
-    /* 教程名称列加宽 */
-    min-width: 250px;
-    width: 40%;
-    padding: 1em 1.5em; /* 更大的内边距 */
+    /* 教程名称列大幅加宽 - 显示更多文字 */
+    min-width: 400px;
+    width: 55%;
+    padding: 1.2em 1.8em; /* 更大的内边距 */
+    font-weight: 500;
 }
 
 .markdown-section th {
