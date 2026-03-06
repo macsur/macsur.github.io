@@ -1,0 +1,21 @@
+# 忽略所有父目录的干扰文件
+../*
+!../convert_tutorials.py
+!../convert_tutorials.sh
+!../deploy_agentdvr.sh
+!../flyroot_deploy_agentdvr.sh
+!../scripts/
+
+# 忽略临时文件
+*.aiff
+*.mp3
+*.log
+logs/
+node_modules/
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

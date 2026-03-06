@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacSur 教程文档中心</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+    <link rel="stylesheet" href="styles/custom.css">
+</head>
+<body>
+    <div id="app"></div>
+    <script>
+        window.$docsify = {
+            name: 'MacSur 教程',
+            repo: 'https://github.com/macsur/macsur.github.io',
+            loadSidebar: true,
+            subMaxLevel: 2,
+            themeColor: '#FF6B9D',
+            search: {
+                maxAge: 86400000,
+                paths: 'auto',
+                placeholder: '搜索教程...',
+                noData: '没有找到结果!',
+                depth: 2
+            },
+            copyCode: {
+                buttonText: '复制代码',
+                errorText: '错误',
+                successText: '已复制'
+            },
+            pagination: {
+                previousText: '上一章',
+                nextText: '下一章',
+                crossChapter: true,
+                crossChapterText: true,
+            }
+        }
+    </script>
+    <!-- Docsify v4 -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/copy-code.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/pagination.min.js"></script>
+    <script src="styles/custom.js"></script>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QRSML4TN1N"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-QRSML4TN1N', {
+        page_title: document.title,
+        page_location: window.location.href,
+        cookie_flags: 'SameSite=None;Secure'
+    });
+</script>
+
+<!-- Giscus 评论系统 -->
+<script>
+    // 等待页面加载完成后注入 Giscus
+    document.addEventListener('DOMContentLoaded', function () {
+        // 创建 Giscus 容器
+        var giscusDiv = document.createElement('div');
+        giscusDiv.id = 'giscus-container';
+        giscusDiv.style.textAlign = 'center';
+        giscusDiv.style.margin = '3em 0';
+        giscusDiv.innerHTML = `
+            <h3 style="color: #4a5568; margin-bottom: 1em;">💬 讨论与反馈</h3>
+            <p style="color: #718096; font-size: 0.9em; margin-bottom: 1.5em;">
+                ✨ 欢迎在评论区提问、分享想法！<br>
+                （使用 GitHub 账号登录，基于 GitHub Discussions）
+            </p>
+            <script src="https://giscus.app/client.js"
+                data-repo="macsur/macsur.github.io"
+                data-repo-id="R_kgDO31636357"
+                data-category="Docs"
+                data-category-id="5"
+                data-mapping="pathname"
+                data-strict="0"
+                data-reactions-enabled="1"
+                data-emit-metadata="0"
+                data-input-position="bottom"
+                data-theme="preferred_color_scheme"
+                data-lang="zh-CN"
+                data-origin="https://x.zttz.eu.org"
+                crossorigin="anonymous"
+                async>
+            </script>
+        `;
+        // 插入到页面末尾
+        document.body.appendChild(giscusDiv);
+    });
+</script>
+</body>
+</html>

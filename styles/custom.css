@@ -1,0 +1,208 @@
+/* MacSur 文档站自定义样式 */
+
+:root {
+    --theme-color: #FF6B9D;
+    --sidebar-width: 300px;
+}
+
+/* 侧边栏美化 */
+.sidebar {
+    background: linear-gradient(180deg, #1a202c 0%, #2d3748 100%);
+    color: #e2e8f0;
+}
+
+.sidebar a {
+    color: #cbd5e0;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.sidebar a:hover {
+    color: #fff;
+    border-left-color: var(--theme-color);
+    background: rgba(255, 107, 157, 0.1);
+}
+
+.sidebar a.active {
+    color: #fff;
+    border-left-color: var(--theme-color);
+    background: rgba(255, 107, 157, 0.15);
+}
+
+/* 内容区域 */
+.page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* 标题美化 */
+.markdown-section h1 {
+    border-bottom: 2px solid var(--theme-color);
+    padding-bottom: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+.markdown-section h2 {
+    color: var(--theme-color);
+    margin-top: 2em;
+    border-left: 4px solid var(--theme-color);
+    padding-left: 1em;
+}
+
+.markdown-section h3 {
+    color: #4a5568;
+    margin-top: 1.5em;
+}
+
+/* 引用块 */
+.markdown-section blockquote {
+    border-left: 4px solid var(--theme-color);
+    background: #f7fafc;
+    padding: 1em 1.5em;
+    border-radius: 0 8px 8px 0;
+    margin: 1.5em 0;
+}
+
+.markdown-section blockquote p {
+    margin: 0;
+    color: #4a5568;
+}
+
+/* 代码块 */
+.markdown-section pre {
+    background: #1a202c;
+    border-radius: 8px;
+    padding: 1.5em;
+    overflow-x: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.markdown-section code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.9em;
+}
+
+/* 提示框 */
+.markdown-section .tip,
+.markdown-section .warning,
+.markdown-section .danger {
+    padding: 1em 1.5em;
+    border-radius: 8px;
+    margin: 1.5em 0;
+    border-left: 4px solid;
+}
+
+.markdown-section .tip {
+    background: #f0fff4;
+    border-color: #48bb78;
+    color: #2f855a;
+}
+
+.markdown-section .warning {
+    background: #fffaf0;
+    border-color: #ed8936;
+    color: #c05621;
+}
+
+.markdown-section .danger {
+    background: #fff5f5;
+    border-color: #f56565;
+    color: #c53030;
+}
+
+/* 表格美化 */
+.markdown-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.markdown-section th {
+    background: var(--theme-color);
+    color: #fff;
+    padding: 0.8em 1em;
+    text-align: left;
+    font-weight: 600;
+}
+
+.markdown-section td {
+    padding: 0.8em 1em;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.markdown-section tr:hover {
+    background: #f7fafc;
+}
+
+/* 视频容器 */
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    margin: 1.5em 0;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.video-container iframe,
+.video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 徽章 */
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.75em;
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: 999px;
+    margin: 0.25em;
+}
+
+.badge-new {
+    background: #48bb78;
+    color: #fff;
+}
+
+.badge-hot {
+    background: #f56565;
+    color: #fff;
+}
+
+.badge-update {
+    background: #4299e1;
+    color: #fff;
+}
+
+/* 分页按钮 */
+.pagination .pagination-item {
+    border-radius: 8px;
+    margin: 0.5em;
+    padding: 0.5em 1em;
+    background: #f7fafc;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.pagination .pagination-item:hover {
+    border-color: var(--theme-color);
+    background: rgba(255, 107, 157, 0.1);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: relative;
+    }
+
+    .page {
+        padding: 1em;
+    }
+}
