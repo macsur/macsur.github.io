@@ -292,8 +292,8 @@ code, pre, kbd, samp, .code-block {
     width: 100%;
     border-collapse: collapse;
     margin: 1.5em 0;
-    display: table; /* 保持列对齐 */
-    table-layout: fixed; /* 固定列宽 */
+    display: table;
+    table-layout: auto; /* 自动布局，让 min-width 生效 */
 }
 
 .markdown-section th,
@@ -301,15 +301,17 @@ code, pre, kbd, samp, .code-block {
     padding: 0.8em 1.2em;
     border: 1px solid var(--border-color);
     text-align: left;
-    word-break: break-word; /* 允许长单词换行 */
+    word-break: break-word; /* 强制换行 */
     white-space: normal; /* 不强制单行 */
+    overflow-wrap: break-word;
 }
 
-/* 教程名称列（第一列） - 占据大部分宽度 */
+/* 教程名称列（第一列） - 足够宽以显示长标题 */
 .markdown-section th:first-child,
 .markdown-section td:first-child {
-    width: 70%; /* 占据 70% */
-    min-width: 300px;
+    width: auto; /* 让内容决定 */
+    min-width: 380px; /* 确保有足够宽度显示长标题 */
+    max-width: none;
     padding: 1.2em 1.8em;
     font-weight: 500;
 }
@@ -321,10 +323,11 @@ code, pre, kbd, samp, .code-block {
 .markdown-section td:nth-child(3),
 .markdown-section th:nth-child(4),
 .markdown-section td:nth-child(4) {
-    width: 10%; /* 每列 10% */
-    min-width: 60px;
-    text-align: center; /* 居中对齐 */
-    padding: 0.8em 0.6em; /* 小内边距 */
+    width: 80px; /* 固定窄列 */
+    min-width: 70px;
+    max-width: 100px;
+    text-align: center;
+    padding: 0.8em 0.6em;
     font-size: 0.95em;
 }
 
