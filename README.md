@@ -50,10 +50,6 @@
 
 ## 📚 核心教程推荐
 
-<div class="video-container">
-    <!-- 热门教程视频嵌入位置 -->
-</div>
-
 ### 🥇 最受欢迎
 
 1. **[小爱音箱刷入小智 AI](tutorials/xiaoai-speaker-flash.md)** 🚀
