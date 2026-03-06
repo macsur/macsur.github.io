@@ -144,6 +144,26 @@ code, pre, kbd, samp, .code-block {
         transform: translateX(0);
     }
 
+    /* 折叠屏竖屏模式（外屏） */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 75%;
+            max-width: 240px;
+        }
+
+        .page {
+            padding: 0.8rem !important;
+        }
+
+        .markdown-section h1 {
+            font-size: 1.6em !important;
+        }
+
+        .markdown-section h2 {
+            font-size: 1.3em !important;
+        }
+    }
+
     /* 遮罩层 */
     .sidebar-overlay {
         display: none;
@@ -164,6 +184,107 @@ code, pre, kbd, samp, .code-block {
     .page {
         padding: 1rem !important;
         margin-top: 3rem !important;
+    }
+
+    /* 表格横向滚动优化 */
+    .markdown-section table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .markdown-section th,
+    .markdown-section td {
+        padding: 0.8em 1em;
+        font-size: 0.9em;
+    }
+
+    .markdown-section th:first-child,
+    .markdown-section td:first-child {
+        min-width: 250px;
+        width: auto;
+    }
+
+    .markdown-section th:nth-child(2),
+    .markdown-section td:nth-child(2),
+    .markdown-section th:nth-child(3),
+    .markdown-section td:nth-child(3),
+    .markdown-section th:nth-child(4),
+    .markdown-section td:nth-child(4) {
+        width: 80px;
+        min-width: 70px;
+        font-size: 0.85em;
+        padding: 0.7em 0.5em;
+    }
+}
+
+/* 中等屏幕（折叠屏展开、小平板）768px - 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* 侧边栏调整 */
+    .sidebar {
+        width: 260px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    .page {
+        margin-left: 260px;
+        padding: 2rem 1.5rem;
+        max-width: none;
+    }
+
+    /* 表格优化 - 中等屏幕给更多宽度给标题列 */
+    .markdown-section table {
+        table-layout: auto;
+    }
+
+    .markdown-section th:first-child,
+    .markdown-section td:first-child {
+        min-width: 320px; /* 比手机宽，比桌面窄 */
+        width: auto;
+        padding: 1em 1.5em;
+    }
+
+    .markdown-section th:nth-child(2),
+    .markdown-section td:nth-child(2),
+    .markdown-section th:nth-child(3),
+    .markdown-section td:nth-child(3),
+    .markdown-section th:nth-child(4),
+    .markdown-section td:nth-child(4) {
+        width: 90px; /* 稍宽一点 */
+        min-width: 80px;
+        padding: 0.8em 0.6em;
+        font-size: 0.95em;
+    }
+
+    /* 字体微调 */
+    html {
+        font-size: 16px;
+    }
+
+    .markdown-section {
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    /* 轮播图调整 */
+    .carousel-container {
+        max-width: 100%;
+    }
+
+    /* 按钮大小优化 */
+    .carousel-control {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3em;
+    }
+
+    .menu-button {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.6rem;
     }
 }
 
