@@ -85,7 +85,7 @@ https://id.discourse.com/create-site
 - 邀请首批成员（通过邮件邀请）
 - 设置分类和标签
 
-**论坛即刻上线！** 🎉 您的专属社区地址：`https://您的子域名.discourse.org`
+**论坛即刻上线！** 🎉 您的专属社区地址：`https://zt.discourse.org`
 
 ---
 
