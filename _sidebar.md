@@ -45,6 +45,12 @@
 
 ---
 
+## 📖 站点规范
+
+- [⚙️ 站点配置规范](macsur-docs-site-specs.md)
+
+---
+
 ## 🎨 使用场景
 
 - [💼 工作流优化](scenarios/workflow.md)
