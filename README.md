@@ -21,7 +21,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-15个教程-brightgreen)](https://macsur.github.io)
+[![文档状态](https://img.shields.io/badge/文档-16个教程-brightgreen)](https://macsur.github.io)
 
 </div>
 
@@ -31,7 +31,7 @@
 
 **MacSur** 是一个开源的 macOS 效率工具集合，汇集了 **网络代理、智能助手、媒体服务、自动化脚本** 等 30+ 实用工具。
 
-本项目文档站收录了 **15 个详细教程**，涵盖：
+本项目文档站收录了 **16 个详细教程**，涵盖：
 
 <div align=center>
 
@@ -44,7 +44,7 @@
 | 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
 | 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
 | 🔧 系统工具 | 1 | ⭐⭐ | 🔥 |
-| **总计** | **15** | **简单~难** | **热门** |
+| **总计** | **16** | **简单~难** | **热门** |
 
 </div>
 
@@ -152,7 +152,7 @@ docsify serve .
 
 ---
 
-## 📊 15 个完整教程列表
+## 📊 16 个完整教程列表
 
 <div align=center class="tutorial-list-table-wrapper">
 
@@ -173,6 +173,7 @@ docsify serve .
 | 13 | [AgentDVR 监控系统配置教程](tutorials/agentdvr.md) | 监控自动化 | ⭐⭐⭐ | 🔥 |
 | 14 | [多源技术新闻摘要教程](tutorials/news-digest.md) | 监控自动化 | ⭐⭐ | 🔥 |
 | 15 | [OpenClaw 自动化脚本合集](tutorials/openclaw-scripts.md) | 监控自动化 | ⭐⭐ | 🔥 |
+| 16 | [Arm 飞牛 Docker 安装 OpenClaw 调配详解](tutorials/openclaw-fly-nas-deployment.md) | 系统工具 | ⭐⭐ | 🔥 |
 
 </div>
 
