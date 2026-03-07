@@ -19,6 +19,7 @@
 - [🛠️ Agent Reach - 全能网络访问工具](tutorials/agent-reach.md) \[badge:new]
 - [🔌 CLIProxyAPI - 命令行代理使用指南](tutorials/cliproxypi-api.md)
 - [🌐 Cloudflare WARP - 免费 VPN 配置](tutorials/cloudflare-warp.md)
+- [🔍 SearXNG 对接 OpenClaw 教程](tutorials/searxng-openclaw-integration.md) \[badge:new]
 
 ### 📱 智能助手
 
