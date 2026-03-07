@@ -15,7 +15,9 @@ date: 2026-03-06
 - ✅ **Google 一键登录**：支持 OAuth，无需记忆新密码
 - ✅ **专业级功能**：现代论坛界面、移动端适配、邮件通知、SEO 友好
 - ✅ **自动扩展**：根据流量自动调整资源
+[https://openclaw.discourse.group/](https://openclaw.discourse.group/)
 
+[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)
 ---
 
 ## 📚 什么是 Discourse？
