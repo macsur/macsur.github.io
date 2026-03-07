@@ -17,7 +17,7 @@ date: 2026-03-06
 - ✅ **自动扩展**：根据流量自动调整资源
 [https://openclaw.discourse.group/](https://openclaw.discourse.group/)
 
-[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[zt](https://zt.discourse.group/)
+[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)[Openclaw](https://openclaw.discourse.group)|[Claw](https://Claw.discourse.group/)
 ---
 
 ## 📚 什么是 Discourse？
@@ -29,7 +29,7 @@ Discourse 是**开源的现代论坛软件**，被成千上万社区采用。与
 - 优雅的 Markdown 支持
 - 移动端原生体验
 
-[官方托管服务](https://zt.discourse.group)
+[官方托管服务](https://Claw.discourse.group)
 
 ---
 
@@ -89,7 +89,7 @@ Discourse 官方提供**免费托管**（有限资源），适合：
 
 **论坛即刻上线！** 🎉 您的专属社区地址：
 ```
-https://zt.discourse.org
+https://Claw.discourse.org
 ```
 ---
 
@@ -213,7 +213,7 @@ https://zt.discourse.org
 - 支持外部 S3 存储
 
 ### Q6: 遇到技术问题怎么办？
-- 首先访问 [[Discourse Meta](https://zt.discourse.group)]([https://meta.discourse.org](https://zt.discourse.group)) 搜索解决方案
+- 首先访问 [[Discourse Meta](https://Claw.discourse.group)]([https://meta.discourse.org](https://Claw.discourse.group)) 搜索解决方案
 - 官方文档：https://docs.discourse.org/
 - 付费用户享有优先支持
 
@@ -257,7 +257,7 @@ https://zt.discourse.org
 
 ---
 
-## 🔗 [相关资源](https://zt.discourse.group)
+## 🔗 [相关资源](https://Claw.discourse.group)
 
 - [Discourse 官方托管服务](https://www.discourse.org/)
 - [Discourse Meta 社区](https://meta.discourse.org)
@@ -279,7 +279,7 @@ https://zt.discourse.org
 
 ---
 
-**[恭喜！您现在拥有一个专业的、功能齐全的社区论坛，而且完全免费](https://zt.discourse.group)！** 🎉
+**[恭喜！您现在拥有一个专业的、功能齐全的社区论坛，而且完全免费](https://Claw.discourse.group)！** 🎉
 
 享受与用户互动、分享知识和建设社区的过程吧！
 
