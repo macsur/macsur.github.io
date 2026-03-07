@@ -152,14 +152,20 @@ curl -I "https://s.136222.xyz"
 
 ---
 
-## 对接 Openclaw 的完整信息
+## 参考资料与配置
+
+<div class="grid" markdown>
+
+<div class="col-span-6">
+
+### 📋 对接 OpenClaw 的完整信息
 
 | 项目 | 值 |
 |------|-----|
-| 接口地址 | `https://s.136222.xyz/search` |
-| 请求方式 | `GET` |
-| 参数 | `?q={搜索词}&format=json&language=zh-CN` |
-| 请求头 | `Authorization: Bearer YOUR_TOKEN` |
+| **接口地址** | `https://s.136222.xyz/search` |
+| **请求方式** | `GET` |
+| **参数** | `?q={搜索词}&format=json&language=zh-CN` |
+| **请求头** | `Authorization: Bearer YOUR_TOKEN` |
 
 **示例调用：**
 ```bash
@@ -167,9 +173,11 @@ curl "https://s.136222.xyz/search?q=人工智能&format=json&language=zh-CN" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
----
+</div>
 
-## 常见问题
+<div class="col-span-6">
+
+### ❓ 常见问题
 
 | 问题 | 原因 | 解决 |
 |------|------|------|
@@ -177,3 +185,7 @@ curl "https://s.136222.xyz/search?q=人工智能&format=json&language=zh-CN" \
 | HTTP 502 | Nginx 代理端口与容器端口不匹配 | 确认容器端口映射后检查 `nginx.conf` 的 `proxy_pass` |
 | JSON 返回 403 | `formats` 中未启用 `json` | 在 `settings.yml` 的 `formats` 中添加 `- json` |
 | nginx 命令找不到 | 科技lion的 Nginx 在 Docker 中 | 使用 `docker exec nginx nginx -s reload` |
+
+</div>
+
+</div>
