@@ -491,6 +491,55 @@ code, pre, kbd, samp, .code-block {
         width: 100% !important;
         margin-bottom: 2em;
     }
+
+    /* 教程列表移动端恢复为单行显示，可横向滚动 */
+    .tutorial-list-table {
+        table-layout: auto !important;
+    }
+
+    .tutorial-list-table th,
+    .tutorial-list-table td {
+        width: auto !important;
+        min-width: 60px;
+    }
+}
+
+/* 教程列表表格列宽：序号 5% | 名称 80% | 分类 10% | 难度 5% | 热度 5% */
+.tutorial-list-table-wrapper table th:nth-child(1),
+.tutorial-list-table-wrapper table td:nth-child(1) {
+    width: 5%;
+    min-width: 40px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--theme-color);
+}
+
+.tutorial-list-table-wrapper table th:nth-child(2),
+.tutorial-list-table-wrapper table td:nth-child(2) {
+    width: 80%;
+    min-width: 200px;
+    text-align: left;
+}
+
+.tutorial-list-table-wrapper table th:nth-child(3),
+.tutorial-list-table-wrapper table td:nth-child(3) {
+    width: 10%;
+    min-width: 80px;
+    text-align: center;
+}
+
+.tutorial-list-table-wrapper table th:nth-child(4),
+.tutorial-list-table-wrapper table td:nth-child(4) {
+    width: 5%;
+    min-width: 50px;
+    text-align: center;
+}
+
+.tutorial-list-table-wrapper table th:nth-child(5),
+.tutorial-list-table-wrapper table td:nth-child(5) {
+    width: 5%;
+    min-width: 50px;
+    text-align: center;
 }
 
 /* Docsify Grid 布局支持 */

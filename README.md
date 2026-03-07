@@ -154,7 +154,7 @@ docsify serve .
 
 ## 📊 15 个完整教程列表
 
-<div align=center>
+<div align=center class="tutorial-list-table-wrapper">
 
 | 序号 | 教程名称 | 分类 | 难度 | 热度 |
 |------|----------|------|------|------|
