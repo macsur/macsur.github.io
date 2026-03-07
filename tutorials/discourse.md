@@ -27,7 +27,7 @@ Discourse 是**开源的现代论坛软件**，被成千上万社区采用。与
 - 优雅的 Markdown 支持
 - 移动端原生体验
 
-[官方托管服务：](https://zt.discourse.group)
+[官方托管服务](https://zt.discourse.group)
 
 ---
 
@@ -53,9 +53,9 @@ Discourse 官方提供**免费托管**（有限资源），适合：
 ### 步骤 1：访问注册页面总结来说，Discourse 是一个旨在通过文明讨论来构建社区记忆和知识库的平台，它结合了现代社交网络的交互体验与传统论坛的结构化优势。
 
 我们很快会在网站上概述详细信息，但您现在就可以使用此链接设置一个免费站点 → 
-```
+
 [创建论坛](https://id.discourse.com/create-site)
-```
+
 系统会提示您创建 Discourse ID 帐户或登录（如果您已有帐户），然后输入您站点的名称和选择的域名。就是这样，您新的免费 Discourse 实例将在 2 分钟内准备就绪！
 
 打开：https://zt.discourse.group
