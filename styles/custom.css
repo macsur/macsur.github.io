@@ -504,10 +504,15 @@ code, pre, kbd, samp, .code-block {
     }
 }
 
-/* 教程列表表格列宽：序号 5% | 名称 80% | 分类 10% | 难度 5% | 热度 5% */
+/* 教程列表表格：强制固定布局 5%|80%|10%|5%|5% */
+.tutorial-list-table-wrapper table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
 .tutorial-list-table-wrapper table th:nth-child(1),
 .tutorial-list-table-wrapper table td:nth-child(1) {
-    width: 5%;
+    width: 5% !important;
     min-width: 40px;
     text-align: center;
     font-weight: 600;
@@ -516,28 +521,29 @@ code, pre, kbd, samp, .code-block {
 
 .tutorial-list-table-wrapper table th:nth-child(2),
 .tutorial-list-table-wrapper table td:nth-child(2) {
-    width: 80%;
+    width: 80% !important;
     min-width: 200px;
     text-align: left;
+    word-break: break-word;
 }
 
 .tutorial-list-table-wrapper table th:nth-child(3),
 .tutorial-list-table-wrapper table td:nth-child(3) {
-    width: 10%;
+    width: 10% !important;
     min-width: 80px;
     text-align: center;
 }
 
 .tutorial-list-table-wrapper table th:nth-child(4),
 .tutorial-list-table-wrapper table td:nth-child(4) {
-    width: 5%;
+    width: 5% !important;
     min-width: 50px;
     text-align: center;
 }
 
 .tutorial-list-table-wrapper table th:nth-child(5),
 .tutorial-list-table-wrapper table td:nth-child(5) {
-    width: 5%;
+    width: 5% !important;
     min-width: 50px;
     text-align: center;
 }
