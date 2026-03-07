@@ -58,7 +58,7 @@ Discourse 官方提供**免费托管**（有限资源），适合：
 
 系统会提示您创建 Discourse ID 帐户或登录（如果您已有帐户），然后输入您站点的名称和选择的域名。就是这样，您新的免费 Discourse 实例将在 2 分钟内准备就绪！
 
-打开：https://zt.discourse.group
+打开：[https://id.discourse.com/create-site)](https://id.discourse.com/create-site)
 点击右上角 **"Sign up"**（注册）
 
 ### 步骤 2：使用 Google 账号一键注册
