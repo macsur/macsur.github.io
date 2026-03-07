@@ -9,7 +9,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-13个教程-brightgreen)](https://macsur.github.io)
+[![文档状态](https://img.shields.io/badge/文档-15个教程-brightgreen)](https://macsur.github.io)
 
 </div>
 
@@ -27,10 +27,12 @@
 |------|------|------|------|
 | 🌐 网络工具 | 3 | ⭐⭐ | 🔥 |
 | 🤖 智能助手 | 2 | ⭐⭐⭐ | 🔥🔥 |
+| 🛠️ 工具汉化 | 1 | ⭐⭐ | 🔥 |
+| 💻 硬件评测 | 1 | ⭐⭐ | 🔥 |
 | 📺 媒体服务 | 2 | ⭐⭐ | ⭐⭐⭐ |
 | 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
 | 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
-| **总计** | **13** | **简单~难** | **热门** |
+| **总计** | **15** | **简单~难** | **热门** |
 
 </div>
 
@@ -149,6 +151,8 @@ docsify serve .
 | [Cloudflare WARP 安装配置教程](tutorials/cloudflare-warp.md) | 网络工具 | ⭐⭐ | ⭐⭐⭐ |
 | [小爱音箱刷入小智AI教程](tutorials/xiaoai-speaker-flash.md) | 智能助手 | ⭐⭐⭐ | 🔥🔥 |
 | [TTS 文本转语音技能教程](tutorials/tts-guide.md) | 智能助手 | ⭐⭐ | ⭐⭐⭐ |
+| [Termius Pro 汉化完整教程](tutorials/termius-chinese-localization.md) | 工具汉化 | ⭐⭐ | 🔥 |
+| [NUC8i7HVK 冥王峡谷迷你主机购买指南](tutorials/nuc8i7hvk-mini-pc-guide.md) | 硬件评测 | ⭐⭐ | 🔥 |
 | [MoonTVPlus 影音聚合播放器教程](tutorials/moontvplus.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
 | [SEARXNG 搜索技能使用教程](tutorials/searxng.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
 | [Telegram 使用教程](tutorials/telegram.md) | 通信平台 | ⭐⭐ | 🔥 |
