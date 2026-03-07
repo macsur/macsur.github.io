@@ -10,8 +10,10 @@
 
 ![Intel NUC 冥王峡谷](https://img.youtube.com/vi/C6tpAa66aYU/maxresdefault.jpg)
 
-**📺 视频来源**: [B站up主全面评测](https://www.youtube.com/watch?v=C6tpAa66aYU)  
+**📺 视频来源**: [YouTube 评测](https://www.youtube.com/watch?v=C6tpAa66aYU)  
 **⏱️ 发布时间**: 2026年3月
+
+> **注**：本教程遵循 B 站优先嵌入规则。如果该视频在 B 站有官发或授权版本，建议替换为 B 站嵌入链接以获得更好的国内访问体验。
 
 </div>
 
