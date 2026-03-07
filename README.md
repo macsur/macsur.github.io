@@ -4,7 +4,19 @@
 
 <div align=center>
 
-[![MacSur Logo](https://camo.githubusercontent.com/01a778f54384553a802af4644eadfeafc2f9f5ac4381ed1c26011499c5ad624b/68747470733a2f2f7669612e706c616365686f6c6465722e636f6d2f323030783230302f4646364239442f4646464646463f746578743d4d6163537572)](https://x.zttz.eu.org)
+<a href="https://x.zttz.eu.org" target="_blank" style="text-decoration: none; display: inline-block;">
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+  <!-- 苹果风格的 Apple logo 简化 -->
+  <path d="M25,30 C25,23 29,18 36,18 C42,18 47,21 50,25 L50,12 C46,8 40,6 35,6 C28,6 22,9 19,14 C17,17 16,21 16,25 C16,32 19,37 23,40 L23,48 L15,48 L15,30 L23,30 C23,30 24,28 25,27 C26,29 26,31 25,33 C25,33 25,30 25,30 M40,12 L40,18 L52,18 C57,18 61,21 63,25 C65,29 64,34 61,37 L61,45 L68,45 L68,25 C70,20 68,16 64,13 C60,10 54,9 50,9 C44,9 39,11 36,14 C34,16 33,19 33,23 C33,27 34,30 36,32 C38,34 41,34 43,31 L43,18 L40,12 Z" fill="#333"/>
+  <!-- MacSur 文字 -->
+  <text x="75" y="40" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="600" fill="#2c3e50">Mac</text>
+  <text x="112" y="40" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="600" fill="#3498db">Sur</text>
+  <!-- 装饰点 -->
+  <circle cx="160" cy="25" r="3" fill="#e74c3c"/>
+  <circle cx="168" cy="25" r="3" fill="#f1c40f"/>
+  <circle cx="176" cy="25" r="3" fill="#2ecc71"/>
+</svg>
+</a>
 *🎨 MacSur - 专为 Mac 用户打造的效率工具*
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
