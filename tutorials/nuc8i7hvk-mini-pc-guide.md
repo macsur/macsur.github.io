@@ -608,3 +608,417 @@
 </details>
 
 *（字幕由自动识别生成，仅供情怀参考）*
+
+---
+
+## 💬 视频字幕（中英对照 · 前 200 行）
+
+> *原视频: [Intel NUC 冥王峡谷评测 (YouTube)](https://www.youtube.com/watch?v=C6tpAa66aYU)*  
+> *字幕自动翻译，仅供情怀参考*
+
+<details>
+<summary>📜 展开查看完整中英对照</summary>
+
+> **EN**: Salted fish
+> **ZH**: 咸鱼
+> **EN**: bought 1000 yuan,
+> **ZH**: 买了1000元，
+> **EN**: is a personal seller.
+> **ZH**: 是个人卖家。
+> **EN**: I bought
+> **ZH**: 我买了
+> **EN**: the barebones system without
+> **ZH**: barebones系统，没有
+> **EN**: SSD and memory,
+> **ZH**: SSD和内存，
+> **EN**: but with the original packaging and a 3D printed stand.
+> **ZH**: 但带有原始包装和3D打印支架。
+> **EN**: Check the label on the box
+> **ZH**: 检查盒子上的标签
+> **EN**: serial number
+> **ZH**: 序列号
+> **EN**: The date of manufacture is July 2020
+> **ZH**: 制造日期为2020年7月
+> **EN**: more than five years ago
+> **ZH**: 五年多前
+> **EN**: Out of the box
+> **ZH**: 开箱即用
+> **EN**: there is the iconic skull on the top
+> **ZH**: 顶部有标志性的头骨
+> **EN**: and all the accessories are here
+> **ZH**: 所有配件都在这里
+> **EN**: The 3D printing vertical bracket
+> **ZH**: 3D打印垂直支架
+> **EN**: presented by the VESA back rack
+> **ZH**: 由VESA后架呈现
+> **EN**: of the original power line display is
+> **ZH**: 原始电源线显示器的
+> **EN**: 19.5 volts and 11.8 amperes,
+> **ZH**: 19.5伏和11.8安培，
+> **EN**: with a total power of 230 watts.
+> **ZH**: 总功率为230瓦。
+> **EN**: Look at the small host body
+> **ZH**: 看看小小的宿主身躯
+> **EN**: the appearance is very good
+> **ZH**: 外观非常好
+> **EN**: The top cover and the fuselage are made of plastic.
+> **ZH**: 顶盖和机身由塑料制成。
+> **EN**: Honeycomb raised lines on the left side
+> **ZH**: 蜂窝左侧凸起线条
+> **EN**: frosted and transparent on the right side
+> **ZH**: 右侧磨砂透明
+> **EN**: Let's take
+> **ZH**: 让我们来看看
+> **EN**: a look
+> **ZH**: 一眼
+> **EN**: at
+> **ZH**: 在
+> **EN**: the front panel power switch key SD card slot USB3.1Gen2A port 10GBps USB3.0 A port
+> **ZH**: 前面板电源开关按键SD卡插槽USB3.1Gen2A端口10GBps USB3.0A端口
+> **EN**: supports external power supply in shutdown state.
+> **ZH**: 支持关闭状态下的外部电源。
+> **EN**: HDMI 2.0 interface USB3.1G en2C port
+> **ZH**: HDMI 2.0接口USB3.1G en2C端口
+> **EN**: 10GBps front headset port
+> **ZH**: 10GBps前置耳机端口
+> **EN**: Rear: Board Rear Audio Port 19
+> **ZH**: 后：主板后音频端口19
+> **EN**: Volt Power Interface Dual Lightning Interface Too Heavy,
+> **ZH**: 伏特电源接口双闪电接口太重，
+> **EN**: Almost
+> **ZH**: 几乎
+> **EN**: Dropped
+> **ZH**: 已放弃
+> **EN**: Dual Thunderbolt 3 interface,
+> **ZH**: 双Thunderbolt 3接口，
+> **EN**: dual miniDP interface
+> **ZH**: 双miniDP接口
+> **EN**: and dual gigabit network interface
+> **ZH**: 和双千兆网络接口
+> **EN**: Four USB 3.0 A ports, HDMI 2.0 interfaces,
+> **ZH**: 四个USB 3.0 A端口， HDMI 2.0接口，
+> **EN**: 123456 six external display interfaces,
+> **ZH**: 123456六个外部显示接口，
+> **EN**: which
+> **ZH**: 其中
+> **EN**: is the mini host with
+> **ZH**: 是迷你房东，
+> **EN**: the most external display interfaces
+> **ZH**: 最多的外部显示界面
+> **EN**: I have ever seen
+> **ZH**: 我见过
+> **EN**: Both side of that rear part of
+> **ZH**: 后部的两侧
+> **EN**: the bottom part are provided with air vent,
+> **ZH**: 底部设有通风口，
+> **EN**: Use H2.0 hex screwdriver bit
+> **ZH**: 使用H2.0六角螺丝刀头
+> **EN**: Remove the 6 top cover screws,
+> **ZH**: 拆下6个顶盖螺钉，
+> **EN**: Take
+> **ZH**: 采取
+> **EN**: off the top cover and see this transparent skull.
+> **ZH**: 从顶盖上看到这个透明的头骨。
+> **EN**: To replace the ordinary Phillips screwdriver head
+> **ZH**: 更换普通的十字螺丝刀头
+> **EN**: only need to remove this screw
+> **ZH**: 只需要拆下这个螺丝
+> **EN**: you can remove the top metal cover
+> **ZH**: 您可以取下顶部金属盖
+> **EN**: It is not only a metal shielding cover
+> **ZH**: 它不仅仅是一个金属屏蔽罩
+> **EN**: but also an auxiliary support for heat dissipation
+> **ZH**: 也是散热的辅助支撑
+> **EN**: The power line connected to
+> **ZH**: 电源线连接到
+> **EN**: the motherboard supplies power to the led light effect,
+> **ZH**: 主板为LED灯光效果供电，
+> **EN**: and the thermal pad of nvmeSSD assists in heat dissipation.
+> **ZH**: nvmeSSD的热垫有助于散热。
+> **EN**: Dual DDR4 memory slots now
+> **ZH**: 双DDR4内存插槽
+> **EN**: support up to 3200 MHz with two sets of M.
+> **ZH**: 支持高达3200 MHz的两组M。
+> **EN**: 2PCIe3.0X4 nvme interfaces
+> **ZH**: 2PCIe3.0X4 nvme接口
+> **EN**: Intel AC8265Wifi5 wireless card Install two 16-gigabyte sticks
+> **ZH**: 英特尔AC8265Wifi5无线网卡安装两个16GB棒
+> **EN**: of
+> **ZH**: 的
+> **EN**: 32-gigabyte DDR43 200-megahertz memory into it
+> **ZH**: 32 GB DDR43 200 MHz内存
+> **EN**: Note that this is an old machine.
+> **ZH**: 请注意，这是一台旧机器。
+> **EN**: You need to wipe
+> **ZH**: 您需要擦除
+> **EN**: the memory gold finger clean and use an eraser.
+> **ZH**: 记忆金手指清洁并使用橡皮擦。
+> **EN**: Fast recovery of nvmeSSD with
+> **ZH**: 使用快速恢复nvmeSSD
+> **EN**: one PCIe 3.0X4
+> **ZH**: 一个PCIe 3.0X4
+> **EN**: Look at the original label on the bottom of the small mainframe,
+> **ZH**: 看看小主机底部的原始标签，
+> **EN**: the serial number and production date
+> **ZH**: 序列号和生产日期
+> **EN**: are consistent with the outer packaging.
+> **ZH**: 与外包装一致。
+> **EN**: Hello everyone,
+> **ZH**: 大家好！
+> **EN**: I'm Laobai, and today we're
+> **ZH**: 我是老白，今天我们
+> **EN**: going to test a device with
+> **ZH**: 将使用以下设备测试设备：
+> **EN**: Intel 78809G and AMD Radeon RX VEGAMGH alone.
+> **ZH**: 仅英特尔78809G和AMD Radeon RX VEGAMGH。
+> **EN**: Eight years ago, I planted grass in depth.
+> **ZH**: 八年前，我深深地种了草。
+> **EN**: It's super beautiful.
+> **ZH**: 超级漂亮。
+> **EN**: Small mainframe intelNUC Hades Canyon
+> **ZH**: 小型大型机intelNUC Hades Canyon
+> **EN**: Once the sun did rise in the west,
+> **ZH**: 一旦太阳从西边升起
+> **EN**: intel and its rival AMD
+> **ZH**: 英特尔及其竞争对手AMD
+> **EN**: jointly built this board that
+> **ZH**: 共同建造了这个板，
+> **EN**: packaged CPU and GPU together.
+> **ZH**: 将CPU和GPU打包在一起。
+> **EN**: Eight generations of Core
+> **ZH**: 八代Core
+> **EN**: i7 with 4 cores and 8 threads plus Radeon RX VEGAM alone.
+> **ZH**: i7具有4个内核和8个线程，仅Radeon RX VEGAM。
+> **EN**: This special CPU package is
+> **ZH**: 这个特殊的计划工作站（ CPU ）包是
+> **EN**: only i7 and I5.
+> **ZH**: 只有i7和I5。
+> **EN**: If you look at this complete table,
+> **ZH**: 如果你看一下这张完整的表格，
+> **EN**: you can see that there are four models of
+> **ZH**: 你可以看到有四种模型
+> **EN**: i7 and only one of I5.
+> **ZH**: i7 ， I5中只有一个。
+> **EN**: Our IntelNUC Pluto Canyon uses
+> **ZH**: 我们的IntelNUC Pluto Canyon使用
+> **EN**: two of them,
+> **ZH**: 其中两个，
+> **EN**: the i78809G and the i78705G.
+> **ZH**: i78809G和i78705G。
+> **EN**: The other two i78709G and i78706G are used by
+> **ZH**: 另外两个i78709G和i78706G用于
+> **EN**: the so-called Hades Canyon Youth Edition or the replica of
+> **ZH**: 所谓的哈迪斯峡谷青年版或
+> **EN**: the Shanzhai Machine,
+> **ZH**: 山寨机，
+> **EN**: which is often seen in the idle fish.
+> **ZH**: 这在闲鱼中很常见。
+> **EN**: Of these special CPUs,
+> **ZH**: 在这些特殊的CPU中，
+> **EN**: only the i78809G has unlocked full performance.
+> **ZH**: 只有i78809G解锁了全部性能。
+> **EN**: It can achieve a total power consumption
+> **ZH**: 它可以实现总功耗
+> **EN**: of 100 watts of CPU 50 watts plus GPU 50 watts,
+> **ZH**: 100瓦的CPU 50瓦加上GPU 50瓦，
+> **EN**: releasing 8809 G,
+> **ZH**: 释放8809 G ，
+> **EN**: using 4GB HBM2,
+> **ZH**: 使用4GB HBM2 ，
+> **EN**: and the video memory bandwidth is up to 204 GB per second.
+> **ZH**: 视频内存带宽高达每秒204 GB。
+> **EN**: Close to the bandwidth
+> **ZH**: 靠近带宽
+> **EN**: of the current LPDDR5X's 8 gigahertz shaft memory,
+> **ZH**: 当前LPDDR5X的8千兆赫轴存储器，
+> **EN**: Intel NUC Pluto Canyon 221 * 142 * 39 is only 1.
+> **ZH**: 英特尔NUC Pluto Canyon 221 * 142 * 39仅为1。
+> **EN**: 2 liters,
+> **ZH**: 2升，
+> **EN**: which is very
+> **ZH**: 这非常
+> **EN**: small.
+> **ZH**: 小。
+> **EN**: You should know that in the past
+> **ZH**: 你应该知道，在过去
+> **EN**: in the hands of Intel
+> **ZH**: 掌握在英特尔手中
+> **EN**: the InteNUCENTHUSIAST enthusiast series has only produced four models
+> **ZH**: inteNUCENTHUSIAST爱好者系列仅生产了四款
+> **EN**: namely
+> **ZH**: 即
+> **EN**: Skeleton Canyon and Hades Canyon
+> **ZH**: 骷髅峡谷和哈迪斯峡谷
+> **EN**: Phantom Canyon and Viper Canyon
+> **ZH**: 幻影峡谷和毒蛇峡谷
+> **EN**: Installed six generation i76770HQ,
+> **ZH**: 安装了六代i76770HQ ，
+> **EN**: eight generation i78809G,
+> **ZH**: 八代i78809G ，
+> **EN**: eleven generation i71165G7
+> **ZH**: 十一代i71165G7
+> **EN**: and twelve generation i712700H
+> **ZH**: 和12代i712700H
+> **EN**: Their volume also increases gradually,
+> **ZH**: 它们的体积也逐渐增加，
+> **EN**: From the 0.69 liter of Skeleton Canyon with nuclear display
+> **ZH**: 从0.69升带有核显示屏的骷髅峡谷
+> **EN**: to the 2.5 liter of Viper Canyon with Intel's own display,
+> **ZH**: 到2.5升的Viper Canyon ，配备英特尔自己的显示器，
+> **EN**: the subsequent ROGNUC is also about 3 liters.
+> **ZH**: 随后的ROGNUC也约为3升。
+> **EN**: The real balance of performance and volume,
+> **ZH**: 性能和体积的真正平衡，
+> **EN**: both mini and high performance,
+> **ZH**: 迷你和高性能，
+> **EN**: may be the two Hades Canyon and Phantom Canyon
+> **ZH**: 可能是两个哈迪斯峡谷和幽灵峡谷
+> **EN**: in the middle.
+> **ZH**: 在中间。
+> **EN**: As it happens
+> **ZH**: 碰巧
+> **EN**: I have these two small mainframes now
+> **ZH**: 我现在有这两个小主机
+> **EN**: From the appearance,
+> **ZH**: 从外观上看，
+> **EN**: do you think the Hades Canyon bought for 1000 yuan is beautiful or the Phantom Canyon
+> **ZH**: 你觉得1000元买的哈迪斯峡谷漂亮还是幻影峡谷
+> **EN**: which once cost
+> **ZH**: 曾经花费
+> **EN**: me more than 3000 yuan is beautiful?
+> **ZH**: 我三千多块钱好漂亮吗？
+> **EN**: Back to our Hades Canyon
+> **ZH**: 回到我们的哈迪斯峡谷
+> **EN**: I think he is the most complete generation of NUC
+> **ZH**: 我认为他是NUC最完整的一代
+> **EN**: There is an HDMI port on the front panel.
+> **ZH**: 前面板上有一个HDMI端口。
+> **EN**: This is not a whim.
+> **ZH**: 这不是突发奇想。
+> **EN**: It was launched at the time of the VR craze.
+> **ZH**: 它是在VR热潮时推出的。
+> **EN**: This front HDMI interface
+> **ZH**: 这款前置HDMI接口
+> **EN**: can be used to connect VR display,
+> **ZH**: 可用于连接VR显示器，
+> **EN**: of course, a total of six display
+> **ZH**: 当然，总共有六个显示屏
+> **EN**: interfaces greatly exceed the standard.
+> **ZH**: 接口大大超过了标准。
+> **EN**: The king of stocks can't use six monitors.
+> **ZH**: 股票之王不能使用六个监视器。
+> **EN**: Front and rear dual audio interfaces are highly praised
+> **ZH**: 前后双音频接口备受赞誉
+> **EN**: as well as dual gigabit on-board network ports
+> **ZH**: 以及双千兆板载网络端口
+> **EN**: Other updates since then
+> **ZH**: 此后的其他更新
+> **EN**: including today's ROGNUC
+> **ZH**: 包括今天的ROGNUC
+> **EN**: have only given one
+> **ZH**: 只给过一个
+> **EN**: Hades Canyon is the king of mini console interfaces.
+> **ZH**: Hades Canyon是迷你控制台接口之王。
+> **EN**: Let's take
+> **ZH**: 让我们来看看
+> **EN**: a look at the functional area diagram.
+> **ZH**: 查看功能区域图。
+> **EN**: The six display interfaces are directly connected to the Radeon RX VEGAM.
+> **ZH**: 六个显示接口直接连接到Radeon RX VEGAM。
+> **EN**: The PCIeX8 bus is connected
+> **ZH**: PCIeX8总线已连接
+> **EN**: between the single display and the CPU,
+> **ZH**: 单个显示器和计划工作站（ CPU ）之间，
+> **EN**: which is responsible for the memory and USB 3.1 with 10GB speed,
+> **ZH**: 负责内存和10GB速度的USB 3.1 ，
+> **EN**: as well as the SD card slot.
+> **ZH**: 以及SD卡插槽。
+> **EN**: Other USBA ports The HM175 chipset
+> **ZH**: 其他USBA端口HM175芯片组
+> **EN**: is
+> **ZH**: is
+> **EN**: responsible
+> **ZH**: responsible
+> **EN**: for the nvme network card and sound card, including the Thunderbolt.
+> **ZH**: 适用于NVME网卡和声卡，包括Thunderbolt。
+> **EN**: Seven years ago
+> **ZH**: 七年前
+> **EN**: this beautiful little 8809 G mainframe barebones went on the market for $1,000
+> **ZH**: 这款漂亮的小型8809 G大型机以1000 $的价格上市
+> **EN**: Now the price
+> **ZH**: 现在价格
+> **EN**: of cabbage is only 1000 yuan.
+> **ZH**: 的卷心菜只有1000元。
+> **EN**: The Intel NUC Pluto Canyon small host is equipped
+> **ZH**: 配备英特尔NUC Pluto Canyon小型主机
+> **EN**: with Intel 78809G
+> **ZH**: 搭配英特尔78809G
+> **EN**: with
+> **ZH**: 与
+> **EN**: four cores and eight threads
+> **ZH**: 四个核心和八个线程
+> **EN**: and AMD Radeon RX VEGAMGH
+> **ZH**: 和AMD Radeon RX VEGAMGH
+> **EN**: with 24CU 4G video memory.
+> **ZH**: 配备24CU 4G视频内存。
+> **EN**: Built-in intel HD630 core display, support dual DDR43 200 MHz memory, support dual M.
+> **ZH**: 内置英特尔HD630核心显示屏，支持双DDR43 200MHz内存，支持双M。
+> **EN**: 2PCIe3.0X4 or SATA nvme interface,
+> **ZH**: 2PCIe3.0X4或SATA nvme接口，
+> **EN**: six-screen display output.Dual gigabit network cards plus Wifi5,
+> **ZH**: 六屏显示输出。双千兆网卡加Wifi5 ，
+> **EN**: and dual front
+> **ZH**: 和双正面
+> **EN**: and rear audio ports
+> **ZH**: 和后音频端口
+> **EN**: In the BIOS,
+> **ZH**: 在BIOS中，
+> **EN**: we can see that 32GB of DDR43 200 megabytes of memory
+> **ZH**: 我们可以看到32GB的DDR43 200MB的内存
+> **EN**: has been installed and has been updated to the latest BIOS version of 0067.
+> **ZH**: 已安装，并已更新到0067的最新BIOS版本。
+> **EN**: Fan mode can be set here,
+> **ZH**: 风扇模式可以在这里设置，
+> **EN**: with full preset cool, balanced, silent,
+> **ZH**: 具有完整预设的酷炫、平衡、安静、
+> **EN**: and even fanless mode.It is equivalent to choosing
+> **ZH**: 甚至无风扇模式。这相当于选择
+> **EN**: the size of the noise independently.
+> **ZH**: 噪音的大小。
+> **EN**: We used Cool COOL mode throughout the test
+> **ZH**: 我们在整个测试中使用了Cool Cool模式
+> **EN**: where the CPU
+> **ZH**: 其中计划工作站（ CPU ）
+> **EN**: GPU
+> **ZH**: GPU
+> **EN**: and memory can be overclocked for maximum performance
+> **ZH**: 内存可以超频以实现最大性能
+> **EN**: We didn't overclock this test.
+> **ZH**: 我们没有超频此测试。
+> **EN**: Here, the performance release of the CPU can be set to be balanced
+> **ZH**: 在这里，可以将CPU的性能释放设置为平衡
+> **EN**: at 55 watts,
+> **ZH**: 在55瓦时，
+> **EN**: energy-saving at
+> **ZH**: 在节能
+> **EN**: 45 watts and performance at 65 watts.
+> **ZH**: 45瓦，性能为65瓦。
+> **EN**: We used a performance mode of 65 watts
+> **ZH**: 我们使用了65瓦的性能模式
+> **EN**: for our testing
+> **ZH**: 用于我们的测试
+> **EN**: Here you can set the incoming call to start automatically.
+> **ZH**: 在这里，您可以将来电设置为自动启动。
+> **EN**: Stability is one of our biggest concerns.
+> **ZH**: 稳定性是我们最关心的问题之一。
+> **EN**: When we open the pressure test of
+> **ZH**: 当我们打开压力测试时
+> **EN**: AIDA64 running FPU,
+> **ZH**: 运行FPU的AIDA64 ，
+> **EN**: the CPU runs in a straight line at 65 watts,
+> **ZH**: 计划工作站（ CPU ）以65瓦的功率直线运行，
+> **EN**: the power consumption of the whole machine is about 99 watts,
+> **ZH**: 整台机器的功耗约为99瓦，
+
+</details>
+
