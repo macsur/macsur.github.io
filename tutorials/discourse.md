@@ -27,7 +27,7 @@ Discourse 是**开源的现代论坛软件**，被成千上万社区采用。与
 - 优雅的 Markdown 支持
 - 移动端原生体验
 
-官方托管服务：https://meta.discourse.org
+[官方托管服务：](https://zt.discourse.group)
 
 ---
 
@@ -54,11 +54,11 @@ Discourse 官方提供**免费托管**（有限资源），适合：
 
 我们很快会在网站上概述详细信息，但您现在就可以使用此链接设置一个免费站点 → 
 ```
-https://id.discourse.com/create-site
+[创建论坛](https://id.discourse.com/create-site)
 ```
 系统会提示您创建 Discourse ID 帐户或登录（如果您已有帐户），然后输入您站点的名称和选择的域名。就是这样，您新的免费 Discourse 实例将在 2 分钟内准备就绪！
 
-打开：https://meta.discourse.org  
+打开：https://zt.discourse.group
 点击右上角 **"Sign up"**（注册）
 
 ### 步骤 2：使用 Google 账号一键注册
@@ -211,7 +211,7 @@ https://zt.discourse.org
 - 支持外部 S3 存储
 
 ### Q6: 遇到技术问题怎么办？
-- 首先访问 [Discourse Meta](https://meta.discourse.org) 搜索解决方案
+- 首先访问 [[Discourse Meta](https://zt.discourse.group)]([https://meta.discourse.org](https://zt.discourse.group)) 搜索解决方案
 - 官方文档：https://docs.discourse.org/
 - 付费用户享有优先支持
 
@@ -255,7 +255,7 @@ https://zt.discourse.org
 
 ---
 
-## 🔗 相关资源
+## 🔗 [相关资源](https://zt.discourse.group)
 
 - [Discourse 官方托管服务](https://www.discourse.org/)
 - [Discourse Meta 社区](https://meta.discourse.org)
@@ -277,7 +277,7 @@ https://zt.discourse.org
 
 ---
 
-**恭喜！您现在拥有一个专业的、功能齐全的社区论坛，而且完全免费！** 🎉
+**[恭喜！您现在拥有一个专业的、功能齐全的社区论坛，而且完全免费](https://zt.discourse.group)！** 🎉
 
 享受与用户互动、分享知识和建设社区的过程吧！
 
