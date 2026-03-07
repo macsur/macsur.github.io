@@ -4,7 +4,7 @@
 
 <div align=center>
 
-![MacSur Logo](https://via.placeholder.com/200x200/FF6B9D/FFFFFF?text=MacSur)  
+[![MacSur Logo](https://camo.githubusercontent.com/01a778f54384553a802af4644eadfeafc2f9f5ac4381ed1c26011499c5ad624b/68747470733a2f2f7669612e706c616365686f6c6465722e636f6d2f323030783230302f4646364239442f4646464646463f746578743d4d6163537572)](https://x.zttz.eu.org)
 *🎨 MacSur - 专为 Mac 用户打造的效率工具*
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
