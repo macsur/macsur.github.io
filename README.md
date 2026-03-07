@@ -9,7 +9,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-14个教程-brightgreen)](https://macsur.github.io)
+[![文档状态](https://img.shields.io/badge/文档-15个教程-brightgreen)](https://macsur.github.io)
 
 </div>
 
@@ -19,7 +19,7 @@
 
 **MacSur** 是一个开源的 macOS 效率工具集合，汇集了 **网络代理、智能助手、媒体服务、自动化脚本** 等 30+ 实用工具。
 
-本项目文档站收录了 **14 个详细教程**，涵盖：
+本项目文档站收录了 **15 个详细教程**，涵盖：
 
 <div align=center>
 
@@ -32,7 +32,7 @@
 | 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
 | 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
 | 🔧 系统工具 | 1 | ⭐⭐ | 🔥 |
-| **总计** | **14** | **简单~难** | **热门** |
+| **总计** | **15** | **简单~难** | **热门** |
 
 </div>
 
@@ -140,27 +140,27 @@ docsify serve .
 
 ---
 
-## 📊 14 个完整教程列表
+## 📊 15 个完整教程列表
 
 <div align=center>
 
-| 教程名称 | 分类 | 难度 | 热度 |
-|----------|------|------|------|
-| [Agent Reach 全能网络访问工具使用教程](tutorials/agent-reach.md) | 网络工具 | ⭐⭐ | 🔥 |
-| [CLIProxyAPI 代理服务教程](tutorials/cliproxypi-api.md) | 网络工具 | ⭐⭐⭐ | 🔥 |
-| [Cloudflare WARP 安装配置教程](tutorials/cloudflare-warp.md) | 网络工具 | ⭐⭐ | ⭐⭐⭐ |
-| [小爱音箱刷入小智AI教程](tutorials/xiaoai-speaker-flash.md) | 智能助手 | ⭐⭐⭐ | 🔥🔥 |
-| [TTS 文本转语音技能教程](tutorials/tts-guide.md) | 智能助手 | ⭐⭐ | ⭐⭐⭐ |
-| [Termius Pro 汉化完整教程](tutorials/termius-chinese-localization.md) | 工具汉化 | ⭐⭐ | 🔥 |
-| [MoonTVPlus 影音聚合播放器教程](tutorials/moontvplus.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
-| [SEARXNG 搜索技能使用教程](tutorials/searxng.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
-| [SearXNG 对接 OpenClaw 教程](tutorials/searxng-openclaw-integration.md) | 系统工具 | ⭐⭐ | 🔥 |
-| [Telegram 使用教程](tutorials/telegram.md) | 通信平台 | ⭐⭐ | 🔥 |
-| [Gmail 临时邮箱生成器教程](tutorials/gmail-temp.md) | 通信平台 | ⭐ | ⭐⭐ |
-| [Discourse 论坛搭建部署教程](tutorials/discourse.md) | 通信平台 | ⭐⭐⭐ | ⭐⭐⭐ |
-| [AgentDVR 监控系统配置教程](tutorials/agentdvr.md) | 监控自动化 | ⭐⭐⭐ | 🔥 |
-| [多源技术新闻摘要教程](tutorials/news-digest.md) | 监控自动化 | ⭐⭐ | 🔥 |
-| [OpenClaw 自动化脚本合集](tutorials/openclaw-scripts.md) | 监控自动化 | ⭐⭐ | 🔥 |
+| 序号 | 教程名称 | 分类 | 难度 | 热度 |
+|------|----------|------|------|------|
+| 1 | [Agent Reach 全能网络访问工具使用教程](tutorials/agent-reach.md) | 网络工具 | ⭐⭐ | 🔥 |
+| 2 | [CLIProxyAPI 代理服务教程](tutorials/cliproxypi-api.md) | 网络工具 | ⭐⭐⭐ | 🔥 |
+| 3 | [Cloudflare WARP 安装配置教程](tutorials/cloudflare-warp.md) | 网络工具 | ⭐⭐ | ⭐⭐⭐ |
+| 4 | [小爱音箱刷入小智AI教程](tutorials/xiaoai-speaker-flash.md) | 智能助手 | ⭐⭐⭐ | 🔥🔥 |
+| 5 | [TTS 文本转语音技能教程](tutorials/tts-guide.md) | 智能助手 | ⭐⭐ | ⭐⭐⭐ |
+| 6 | [Termius Pro 汉化完整教程](tutorials/termius-chinese-localization.md) | 工具汉化 | ⭐⭐ | 🔥 |
+| 7 | [MoonTVPlus 影音聚合播放器教程](tutorials/moontvplus.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
+| 8 | [SEARXNG 搜索技能使用教程](tutorials/searxng.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
+| 9 | [SearXNG 对接 OpenClaw 教程](tutorials/searxng-openclaw-integration.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 10 | [Telegram 使用教程](tutorials/telegram.md) | 通信平台 | ⭐⭐ | 🔥 |
+| 11 | [Gmail 临时邮箱生成器教程](tutorials/gmail-temp.md) | 通信平台 | ⭐ | ⭐⭐ |
+| 12 | [Discourse 论坛搭建部署教程](tutorials/discourse.md) | 通信平台 | ⭐⭐⭐ | ⭐⭐⭐ |
+| 13 | [AgentDVR 监控系统配置教程](tutorials/agentdvr.md) | 监控自动化 | ⭐⭐⭐ | 🔥 |
+| 14 | [多源技术新闻摘要教程](tutorials/news-digest.md) | 监控自动化 | ⭐⭐ | 🔥 |
+| 15 | [OpenClaw 自动化脚本合集](tutorials/openclaw-scripts.md) | 监控自动化 | ⭐⭐ | 🔥 |
 
 </div>
 
