@@ -5,6 +5,12 @@
 
 ---
 
+## 教程视频
+
+<iframe width="100%" height="520" src="https://www.youtube.com/embed/pHF7s-oOTx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
 ## 项目简介
 
 RuView 是一个非常硬核的项目：它试图利用 WiFi 信号做人体存在检测、姿态估计、呼吸与心率感知，甚至支持一定程度的穿墙感知。

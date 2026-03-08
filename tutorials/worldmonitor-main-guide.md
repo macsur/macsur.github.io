@@ -5,6 +5,12 @@
 
 ---
 
+## 教程视频
+
+<iframe width="100%" height="520" src="https://www.youtube.com/embed/pHF7s-oOTx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
 ## 项目简介
 
 worldmonitor 是一个非常惊艳的开源项目：它把全球新闻、地缘政治、基础设施、金融与市场信号，做成了一个统一的“态势感知仪表盘”。

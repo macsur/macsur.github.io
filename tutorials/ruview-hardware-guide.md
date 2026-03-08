@@ -5,6 +5,12 @@
 
 ---
 
+## 教程视频
+
+<iframe width="100%" height="520" src="https://www.youtube.com/embed/pHF7s-oOTx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
 ## 为什么 RuView 不是“装上就能用”
 
 因为它依赖的是 **CSI（Channel State Information）**，不是普通 WiFi 联网能力。

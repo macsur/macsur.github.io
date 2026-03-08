@@ -5,6 +5,12 @@
 
 ---
 
+## 教程视频
+
+<iframe width="100%" height="520" src="https://www.youtube.com/embed/pHF7s-oOTx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
 ## 典型应用方向
 
 ### 1. 无摄像头存在检测

@@ -5,6 +5,12 @@
 
 ---
 
+## 教程视频
+
+<iframe width="100%" height="520" src="https://www.youtube.com/embed/pHF7s-oOTx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
 ## 项目简介
 
 CoPaw 是一个面向个人 AI 助手场景的开源项目，定位非常接近 OpenClaw / 类 Agent 助手平台：

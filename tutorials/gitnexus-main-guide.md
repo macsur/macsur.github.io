@@ -5,6 +5,12 @@
 
 ---
 
+## 教程视频
+
+<iframe width="100%" height="520" src="https://www.youtube.com/embed/pHF7s-oOTx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
 ## 项目简介
 
 GitNexus 是一个非常适合 AI 编程时代的项目：它把代码仓库索引成知识图谱，然后通过 Web UI、CLI、MCP 等方式，把“代码结构理解能力”喂给 AI 助手。
