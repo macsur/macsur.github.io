@@ -380,17 +380,33 @@ console.log('✨ MacSur Docs - Custom enhancements loaded');
         if (total > 1) start();
     }
 
+
     function ensureHomepagePortal() {
         var isHome = location.hash === '#/' || location.hash === '' || location.hash === '#';
         var article = document.querySelector('.markdown-section');
         if (!isHome || !article) return;
 
         var existing = article.querySelector('.home-portal');
-        if (!existing) {
-            article.insertAdjacentHTML('afterbegin', buildHomepagePortal());
-            existing = article.querySelector('.home-portal');
+        if (existing) {
+            bindHomeSlider(existing);
+            return;
         }
-        bindHomeSlider(existing);
+
+        // force prepend our portal HTML
+        var portalHTML = buildHomepagePortal();
+        article.insertAdjacentHTML('afterbegin', portalHTML);
+        existing = article.querySelector('.home-portal');
+        if (existing) {
+            bindHomeSlider(existing);
+            // re-scan to bind again later if needed
+        }
+    }
+
+    function scheduleEnsure() {
+        // very aggressive schedule
+        [0, 30, 80, 150, 300, 600, 1000, 2000, 5000].forEach(function(delay){
+            setTimeout(ensureHomepagePortal, delay);
+        });
     }
 
     function scheduleEnsure() {
