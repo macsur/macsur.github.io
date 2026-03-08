@@ -22,6 +22,8 @@
 - [🔍 SearXNG 对接 OpenClaw 教程](tutorials/searxng-openclaw-integration.md) \[badge:new]
 - [🐳 Arm 飞牛 Docker 安装 OpenClaw 调配详解](tutorials/openclaw-fly-nas-deployment.md) \[badge:new]
 - [🧠 OpenClaw 配 GPT-5.4 实战教程](tutorials/openclaw-gpt-5.4-guide.md) \[badge:new]
+- [🐟 飞牛 NAS Docker 版 OpenClaw 切换 GPT-5.4 配置示例](tutorials/openclaw-gpt54-flynas-docker-config.md) \[badge:new]
+- [🧩 OpenClaw + GPT-5.4 + SearXNG + Ollama 完整组合方案](tutorials/openclaw-gpt54-searxng-ollama-stack.md) \[badge:new]
 
 ### 📱 智能助手
 
