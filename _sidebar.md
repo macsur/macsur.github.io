@@ -88,7 +88,6 @@
 
 - [💼 工作流优化](scenarios/workflow.md)
 - [🏠 智能家居集成](scenarios/smarthome.md)
-- [📚 学习资料整理](scenarios/study.md)
 
 ---
 
