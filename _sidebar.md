@@ -25,6 +25,7 @@
 - [🐟 飞牛 NAS Docker 版 OpenClaw 切换 GPT-5.4 配置示例](tutorials/openclaw-gpt54-flynas-docker-config.md) \[badge:new]
 - [🧩 OpenClaw + GPT-5.4 + SearXNG + Ollama 完整组合方案](tutorials/openclaw-gpt54-searxng-ollama-stack.md) \[badge:new]
 - [🤖 飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md) \[badge:new]
+- [💬 飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md) \[badge:new]
 
 ### 📱 智能助手
 
