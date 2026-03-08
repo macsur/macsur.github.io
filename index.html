@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MacSur 教程文档中心</title>
+    <title>OpenClaw / AI 工具未来实验室</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
     <link rel="stylesheet" href="styles/custom.css">
 </head>
@@ -58,37 +58,42 @@
 
 <!-- Giscus 评论系统 -->
 <script>
-    // 等待页面加载完成后注入 Giscus
     document.addEventListener('DOMContentLoaded', function () {
-        // 创建 Giscus 容器
         var giscusDiv = document.createElement('div');
         giscusDiv.id = 'giscus-container';
         giscusDiv.style.textAlign = 'center';
         giscusDiv.style.margin = '3em 0';
-        giscusDiv.innerHTML = `
-            <h3 style="color: #4a5568; margin-bottom: 1em;">💬 讨论与反馈</h3>
-            <p style="color: #718096; font-size: 0.9em; margin-bottom: 1.5em;">
-                ✨ 欢迎在评论区提问、分享想法！<br>
-                （使用 GitHub 账号登录，基于 GitHub Discussions）
-            </p>
-            <script src="https://giscus.app/client.js"
-                data-repo="macsur/macsur.github.io"
-                data-repo-id="R_kgDO31636357"
-                data-category="Docs"
-                data-category-id="5"
-                data-mapping="pathname"
-                data-strict="0"
-                data-reactions-enabled="1"
-                data-emit-metadata="0"
-                data-input-position="bottom"
-                data-theme="preferred_color_scheme"
-                data-lang="zh-CN"
-                data-origin="https://x.zttz.eu.org"
-                crossorigin="anonymous"
-                async>
-            </script>
-        `;
-        // 插入到页面末尾
+
+        var title = document.createElement('h3');
+        title.textContent = '💬 讨论与反馈';
+        title.style.color = '#4a5568';
+        title.style.marginBottom = '1em';
+
+        var desc = document.createElement('p');
+        desc.innerHTML = '✨ 欢迎在评论区提问、分享想法！<br>（使用 GitHub 账号登录，基于 GitHub Discussions）';
+        desc.style.color = '#718096';
+        desc.style.fontSize = '0.9em';
+        desc.style.marginBottom = '1.5em';
+
+        var script = document.createElement('script');
+        script.src = 'https://giscus.app/client.js';
+        script.setAttribute('data-repo', 'macsur/macsur.github.io');
+        script.setAttribute('data-repo-id', 'R_kgDO31636357');
+        script.setAttribute('data-category', 'Docs');
+        script.setAttribute('data-category-id', '5');
+        script.setAttribute('data-mapping', 'pathname');
+        script.setAttribute('data-strict', '0');
+        script.setAttribute('data-reactions-enabled', '1');
+        script.setAttribute('data-emit-metadata', '0');
+        script.setAttribute('data-input-position', 'bottom');
+        script.setAttribute('data-theme', 'preferred_color_scheme');
+        script.setAttribute('data-lang', 'zh-CN');
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        giscusDiv.appendChild(title);
+        giscusDiv.appendChild(desc);
+        giscusDiv.appendChild(script);
         document.body.appendChild(giscusDiv);
     });
 </script>
