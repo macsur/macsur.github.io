@@ -219,9 +219,9 @@ rm -rf ~/.docsify
 ## 📚 下一步
 
 - [配置说明](configuration.md) - 个性化设置
-- [第一个教程](tutorials/agent-reach.md) - 开始学习
-- [常见问题](faq.md) - 快速排错
+- [第一个教程](../tutorials/agent-reach.md) - 开始学习
+- [常见问题](../faq.md) - 快速排错
 
 ---
 
-**如果安装遇到问题，请查看 [FAQ](faq.md) 或提交 [Issue](https://github.com/macsur/macsur.github.io/issues)** 🎯
+**如果安装遇到问题，请查看 [FAQ](../faq.md) 或提交 [Issue](https://github.com/macsur/macsur.github.io/issues)** 🎯

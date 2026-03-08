@@ -19,11 +19,11 @@
 
 | 需求 | 解决方案 | 对应教程 |
 |------|----------|----------|
-| 每日技术资讯 | 多源新闻摘要 + Telegram 推送 | [新闻摘要系统](tutorials/news-digest.md) |
-| 快速搜索 | SEARXNG 自托管搜索引擎 | [SEARXNG 教程](tutorials/searxng.md) |
-| 网络调试 | Agent Reach 全能代理 | [Agent Reach 教程](tutorials/agent-reach.md) |
-| API 测试 | CLIProxyAPI 命令行代理 | [CLIProxyAPI 教程](tutorials/cliproxypi-api.md) |
-| 自动化提醒 | OpenClaw cron 定时任务 | [脚本合集](tutorials/openclaw-scripts.md) |
+| 每日技术资讯 | 多源新闻摘要 + Telegram 推送 | [新闻摘要系统](../tutorials/news-digest.md) |
+| 快速搜索 | SEARXNG 自托管搜索引擎 | [SEARXNG 教程](../tutorials/searxng.md) |
+| 网络调试 | Agent Reach 全能代理 | [Agent Reach 教程](../tutorials/agent-reach.md) |
+| API 测试 | CLIProxyAPI 命令行代理 | [CLIProxyAPI 教程](../tutorials/cliproxypi-api.md) |
+| 自动化提醒 | OpenClaw cron 定时任务 | [脚本合集](../tutorials/openclaw-scripts.md) |
 
 ---
 
@@ -257,10 +257,10 @@ automation:
 ## 🚀 下一步
 
 - 阅读 [智能家居集成](smarthome.md) 场景
-- 查看 [学习资料整理](study.md) 场景
-- 浏览 [全部教程](tutorials/) 挑选感兴趣的内容
+- 查看 [学习资料整理](#) 场景
+- 浏览 [全部教程](../tutorials/) 挑选感兴趣的内容
 
 ---
 
-**立即开始**: 安装 [SEARXNG](tutorials/searxng.md) 或配置 [新闻摘要](tutorials/news-digest.md)  
+**立即开始**: 安装 [SEARXNG](../tutorials/searxng.md) 或配置 [新闻摘要](../tutorials/news-digest.md)  
 **预计耗时**: 1 小时配置，每天节省 2 小时 🎯

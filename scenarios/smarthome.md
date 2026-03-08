@@ -17,10 +17,10 @@
 
 | 组件 | 角色 | 教程链接 |
 |------|------|----------|
-| 🤖 **小智 AI** | 语音交互层 | [小爱音箱刷机](tutorials/xiaoai-speaker-flash.md) |
-| 📺 **AgentDVR** | 监控层 | [监控部署](tutorials/agentdvr.md) |
+| 🤖 **小智 AI** | 语音交互层 | [小爱音箱刷机](../tutorials/xiaoai-speaker-flash.md) |
+| 📺 **AgentDVR** | 监控层 | [监控部署](../tutorials/agentdvr.md) |
 | 🏡 **Home Assistant** | 控制层 | （外部集成） |
-| 📡 **OpenClaw** | 自动化层 | [脚本合集](tutorials/openclaw-scripts.md) |
+| 📡 **OpenClaw** | 自动化层 | [脚本合集](../tutorials/openclaw-scripts.md) |
 
 ---
 
@@ -112,7 +112,7 @@ docker run -d \
 
 #### 1.3 刷机小爱音箱
 
-详细步骤见 [小爱音箱刷机教程](tutorials/xiaoai-speaker-flash.md)。
+详细步骤见 [小爱音箱刷机教程](../tutorials/xiaoai-speaker-flash.md)。
 
 关键命令：
 ```bash
@@ -426,7 +426,7 @@ echo "$(date): User said '$QUERY', AI replied '$RESPONSE'" >> \
 
 **继续阅读**:
 - [工作流优化](workflow.md) - 提升办公效率
-- [学习资料整理](study.md) - 知识管理系统
-- [全部教程](tutorials/) - 按兴趣选择
+- [学习资料整理](#) - 知识管理系统
+- [全部教程](../tutorials/) - 按兴趣选择
 
-🎯 **就从 [小爱音箱刷机](tutorials/xiaoai-speaker-flash.md) 开始吧！**
+🎯 **就从 [小爱音箱刷机](../tutorials/xiaoai-speaker-flash.md) 开始吧！**

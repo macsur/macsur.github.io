@@ -11,7 +11,7 @@ window.$docsify = {
     repo: 'https://github.com/macsur/macsur.github.io', // GitHub 仓库链接
     loadSidebar: true,            // 加载侧边栏
     subMaxLevel: 2,               // 侧边栏显示最大标题级别
-    themeColor: '#FF6B9D',        // 主题颜色（粉红色）
+    themeColor: '#7dd3fc',        // 主题颜色（粉红色）
     // ... 更多配置
 }
 </script>
@@ -52,7 +52,7 @@ macsur-docs/
 ├── scenarios/
 │   ├── workflow.md
 │   ├── smarthome.md
-│   └── study.md
+│   └── （已移除，避免死链接）
 ├── styles/
 │   ├── custom.css          # 自定义样式
 │   └── custom.js           # 自定义脚本
@@ -76,7 +76,7 @@ macsur-docs/
 ```
 
 推荐配色：
-- 🌸 粉色系：`#FF6B9D`
+- 🌸 粉色系：`#7dd3fc`
 - 🌊 蓝色系：`#4299E1`
 - 🌿 绿色系：`#48BB78`
 - 🟣 紫色系：`#9F7AEA`
@@ -180,10 +180,10 @@ sidebar_position: 1
 
 ### 🔧 系统工具
 
-- [🛠️ Agent Reach](tutorials/agent-reach.md) \[badge:new]
+- [🛠️ Agent Reach](../tutorials/agent-reach.md) \[badge:new]
   <!-- 方括号内的 badge 会显示徽章 -->
 
-- [教程2](tutorials/tutorial2.md)
+- [教程2](../tutorials/agent-reach.md)
 ```
 
 排序：按出现的顺序
@@ -303,4 +303,4 @@ F12 → Console，查看 Docsify 错误信息
 
 ---
 
-**下一步**: 开始阅读 [第一个教程](tutorials/agent-reach.md) 🚀
+**下一步**: 开始阅读 [第一个教程](../tutorials/agent-reach.md) 🚀
