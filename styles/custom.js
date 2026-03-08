@@ -217,3 +217,99 @@ window.$docsify.search = {
 })();
 
 console.log('✨ MacSur Docs - Custom enhancements loaded');
+
+
+// 首页门户增强：首屏 Hero + 最新教程轮播 + 视频精选
+(function () {
+    function injectHomepagePortal() {
+        var isHome = location.hash === '#/' || location.hash === '' || location.hash === '#';
+        if (!isHome) return;
+        if (document.querySelector('.home-portal')) return;
+        var article = document.querySelector('.markdown-section');
+        if (!article) return;
+
+        var portal = document.createElement('section');
+        portal.className = 'home-portal';
+        portal.innerHTML = `
+          <div class="home-portal-grid">
+            <div class="home-feature-panel">
+              <div class="home-hero-badges">
+                <span class="home-hero-badge">🚀 持续更新</span>
+                <span class="home-hero-badge">🧠 AI 工具实战</span>
+                <span class="home-hero-badge">🎥 图文 + 视频</span>
+              </div>
+              <h1 class="home-hero-title">OpenClaw / AI 工具未来实验室</h1>
+              <p class="home-hero-desc">这不是单纯的文档索引，而是一座不断更新的 AI 工具实验室首页：有图文教程、有视频入口、有最新项目轮播，也有可以直接上手的部署与实战路线。</p>
+              <div class="home-hero-actions">
+                <a class="home-hero-primary" href="#/tutorials/2026-hot-open-source-ai-projects-navigation">先看 2026 爆款 AI 项目总导航</a>
+                <a class="home-hero-secondary" href="#/tutorials/openclaw-gpt54-searxng-ollama-stack">看 OpenClaw + GPT-5.4 组合方案</a>
+              </div>
+            </div>
+            <div class="home-feature-panel">
+              <h3 class="home-panel-title">为什么首页必须高级</h3>
+              <ul class="home-feature-list">
+                <li>首页要先告诉用户：这里有什么、值不值得看、最新内容在哪。</li>
+                <li>教程站不是文件夹，首屏必须有视觉、有故事、有入口。</li>
+                <li>有图、有视频、有轮播，用户才会觉得这站是活的、在更新的。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="home-video-grid">
+            <div class="home-video-panel home-video-wrap">
+              <h3 class="home-panel-title">🎬 首页精选视频</h3>
+              <iframe src="https://www.youtube.com/embed/pHF7s-oOTx0" title="AI Projects Featured Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="home-video-panel">
+              <h3 class="home-panel-title">📌 精选入口</h3>
+              <div class="home-mini-list">
+                <a class="home-mini-item" href="#/tutorials/copaw-topic-index"><strong>CoPaw 专题封面页</strong><span>个人 AI 助手 / OpenClaw 替代路线</span></a>
+                <a class="home-mini-item" href="#/tutorials/worldmonitor-topic-index"><strong>worldmonitor 专题封面页</strong><span>全球情报监控、地图图层与本地 AI 分析</span></a>
+                <a class="home-mini-item" href="#/tutorials/deer-flow-topic-index"><strong>deer-flow 专题封面页</strong><span>多智能体系统、技能、子代理与执行底座</span></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="home-carousel-panel" style="margin-top:18px;">
+            <h3 class="home-panel-title">🔥 首页轮播：最新 / 最值得先看的教程</h3>
+            <div class="home-carousel-track">
+              <a class="home-card" href="#/tutorials/openclaw-gpt54-searxng-ollama-stack">
+                <div class="home-card-cover" style="background-image:url('https://opengraph.githubassets.com/1/openclaw/openclaw');"></div>
+                <div class="home-card-body">
+                  <div class="home-card-tag">LATEST STACK</div>
+                  <div class="home-card-title">OpenClaw + GPT-5.4 + SearXNG + Ollama 完整组合方案</div>
+                  <div class="home-card-desc">一页看懂模型、搜索、工作流和本地部署组合。</div>
+                </div>
+              </a>
+              <a class="home-card" href="#/tutorials/2026-hot-open-source-ai-projects-navigation">
+                <div class="home-card-cover" style="background-image:url('https://opengraph.githubassets.com/1/agentscope-ai/CoPaw');"></div>
+                <div class="home-card-body">
+                  <div class="home-card-tag">2026 HOT</div>
+                  <div class="home-card-title">5 大爆款开源 AI 项目精选教程导航</div>
+                  <div class="home-card-desc">首页级总入口，适合第一次来到站里的用户先看。</div>
+                </div>
+              </a>
+              <a class="home-card" href="#/tutorials/flynas-openclaw-troubleshooting">
+                <div class="home-card-cover" style="background-image:url('https://opengraph.githubassets.com/1/koala73/worldmonitor');"></div>
+                <div class="home-card-body">
+                  <div class="home-card-tag">NAS PRACTICE</div>
+                  <div class="home-card-title">飞牛 NAS 上 OpenClaw 常见报错排查大全</div>
+                  <div class="home-card-desc">高需求、强实战、最容易带来停留时间的内容。</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        `;
+        article.insertBefore(portal, article.firstChild);
+    }
+
+    function scheduleInject() {
+        setTimeout(injectHomepagePortal, 80);
+        setTimeout(injectHomepagePortal, 300);
+        setTimeout(injectHomepagePortal, 800);
+    }
+
+    window.addEventListener('hashchange', scheduleInject);
+    document.addEventListener('DOMContentLoaded', scheduleInject);
+    scheduleInject();
+})();
