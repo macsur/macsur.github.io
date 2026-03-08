@@ -112,3 +112,23 @@ docker run -p 127.0.0.1:8088:8088 -v copaw-data:/app/working agentscope/copaw:la
 如果你要一句话理解 CoPaw：
 
 > **它像是一个更面向普通用户与多通道接入的个人 AI 助手平台，是 OpenClaw 非常值得比较的替代方案。**
+
+---
+
+## 🔗 继续阅读
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0 8px 0;">
+  <a href="copaw-topic-index.md" style="display:block;padding:14px 16px;border:1px solid #dbeafe;border-radius:14px;background:linear-gradient(180deg,#f8fbff 0%,#eef6ff 100%);text-decoration:none;color:#1e3a8a;">
+    <strong>📘 返回专题页</strong><br>
+    <span style="font-size:0.92em;color:#475569;">继续看同一项目的完整路线</span>
+  </a>
+  <a href="2026-hot-open-source-ai-projects-navigation.md" style="display:block;padding:14px 16px;border:1px solid #ddd6fe;border-radius:14px;background:linear-gradient(180deg,#fbfaff 0%,#f4f0ff 100%);text-decoration:none;color:#5b21b6;">
+    <strong>🧭 返回总导航</strong><br>
+    <span style="font-size:0.92em;color:#475569;">回到 5 大项目专题总入口</span>
+  </a>
+  <a href="copaw-docker-ollama-guide.md" style="display:block;padding:14px 16px;border:1px solid #dcfce7;border-radius:14px;background:linear-gradient(180deg,#f8fff9 0%,#eefdf3 100%);text-decoration:none;color:#166534;">
+    <strong>➡ 下一篇推荐</strong><br>
+    <span style="font-size:0.92em;color:#475569;">CoPaw + Docker + Ollama 部署教程</span>
+  </a>
+</div>
+

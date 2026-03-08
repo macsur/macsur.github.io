@@ -92,3 +92,23 @@ vercel dev
 ## 总结
 
 > **worldmonitor 是那种看一眼就知道“作者下了很大功夫”的项目，完成度非常高。**
+
+---
+
+## 🔗 继续阅读
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0 8px 0;">
+  <a href="worldmonitor-topic-index.md" style="display:block;padding:14px 16px;border:1px solid #dbeafe;border-radius:14px;background:linear-gradient(180deg,#f8fbff 0%,#eef6ff 100%);text-decoration:none;color:#1e3a8a;">
+    <strong>📘 返回专题页</strong><br>
+    <span style="font-size:0.92em;color:#475569;">继续看同一项目的完整路线</span>
+  </a>
+  <a href="2026-hot-open-source-ai-projects-navigation.md" style="display:block;padding:14px 16px;border:1px solid #ddd6fe;border-radius:14px;background:linear-gradient(180deg,#fbfaff 0%,#f4f0ff 100%);text-decoration:none;color:#5b21b6;">
+    <strong>🧭 返回总导航</strong><br>
+    <span style="font-size:0.92em;color:#475569;">回到 5 大项目专题总入口</span>
+  </a>
+  <a href="worldmonitor-local-ollama-guide.md" style="display:block;padding:14px 16px;border:1px solid #dcfce7;border-radius:14px;background:linear-gradient(180deg,#f8fff9 0%,#eefdf3 100%);text-decoration:none;color:#166534;">
+    <strong>➡ 下一篇推荐</strong><br>
+    <span style="font-size:0.92em;color:#475569;">worldmonitor 本地部署与 Ollama 联动教程</span>
+  </a>
+</div>
+
