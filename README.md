@@ -1,305 +1,172 @@
-# 👋 欢迎来到 OpenClaw 教程文档中心
+# ⚡ OpenClaw / AI 工具未来实验室
 
-> **让 Mac 更好用** · 从入门到精通 · 一站式解决方案
+> **x.zttz.eu.org** · 科技感 / 未来感 / 金属感风格的 AI 工具专题文档站
 
-<div align=center>
-
-<a href="https://x.zttz.eu.org" target="_blank" style="text-decoration: none; display: inline-block;">
-<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
-  <!-- 苹果风格的 Apple logo 简化 -->
-  <path d="M25,30 C25,23 29,18 36,18 C42,18 47,21 50,25 L50,12 C46,8 40,6 35,6 C28,6 22,9 19,14 C17,17 16,21 16,25 C16,32 19,37 23,40 L23,48 L15,48 L15,30 L23,30 C23,30 24,28 25,27 C26,29 26,31 25,33 C25,33 25,30 25,30 M40,12 L40,18 L52,18 C57,18 61,21 63,25 C65,29 64,34 61,37 L61,45 L68,45 L68,25 C70,20 68,16 64,13 C60,10 54,9 50,9 C44,9 39,11 36,14 C34,16 33,19 33,23 C33,27 34,30 36,32 C38,34 41,34 43,31 L43,18 L40,12 Z" fill="#333"/>
-  <!-- MacSur 文字 -->
-  <text x="75" y="40" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="600" fill="#2c3e50">Mac</text>
-  <text x="112" y="40" font-family="SF Pro Display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="600" fill="#3498db">Sur</text>
-  <!-- 装饰点 -->
-  <circle cx="160" cy="25" r="3" fill="#e74c3c"/>
-  <circle cx="168" cy="25" r="3" fill="#f1c40f"/>
-  <circle cx="176" cy="25" r="3" fill="#2ecc71"/>
-</svg>
-</a>
-*🎨 MacSur - 专为 Mac 用户打造的效率工具*
-
-[![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-44个教程-brightgreen)](https://macsur.github.io)
-
+<div class="hero-metal">
+  <div class="hero-badge">FUTURE SYSTEMS / AI TOOLING / OPEN SOURCE INTELLIGENCE</div>
+  <h1>面向 2026 的开源 AI 工具专题库</h1>
+  <p>
+    从 <strong>OpenClaw</strong>、<strong>飞牛 NAS</strong>、<strong>多智能体</strong>、<strong>本地模型</strong> 到
+    <strong>OSINT 情报系统</strong>、<strong>代码知识图谱</strong>、<strong>WiFi 感知</strong>，
+    这里不是普通文档列表，而是一座持续进化的 AI 工具实验站。
+  </p>
+  <div class="hero-actions">
+    <a href="#/tutorials/2026-hot-open-source-ai-projects-navigation" class="hero-btn hero-btn-primary">🚀 进入 2026 热门项目导航</a>
+    <a href="#/tutorials/openclaw-gpt-5.4-guide" class="hero-btn hero-btn-secondary">🧠 查看 OpenClaw 实战专题</a>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-card">
+      <div class="hero-card-label">教程总量</div>
+      <div class="hero-card-value">44</div>
+      <div class="hero-card-desc">持续更新中</div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-label">专题方向</div>
+      <div class="hero-card-value">8+</div>
+      <div class="hero-card-desc">OpenClaw / Agent / OSINT / 本地AI</div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-label">项目专题</div>
+      <div class="hero-card-value">5</div>
+      <div class="hero-card-desc">CoPaw / RuView / worldmonitor / GitNexus / deer-flow</div>
+    </div>
+  </div>
 </div>
 
 ---
 
-## 📖 关于 MacSur
+## 🛰️ 站点定位
 
-**MacSur** 是一个开源的 macOS 效率工具集合，汇集了 **网络代理、智能助手、媒体服务、自动化脚本** 等 30+ 实用工具。
+这不是传统意义上的“软件安装文档”。
 
-本项目文档站收录了 **44 个详细教程**，涵盖：
+这里更偏向：
 
-<div align=center>
+- **开源 AI 工具精选专题库**
+- **OpenClaw / 飞牛 NAS / 本地模型实战基地**
+- **多智能体 / OSINT / 自动化工作流实验场**
 
-| 类别 | 数量 | 难度 | 热度 |
-|------|------|------|------|
-| 🌐 网络工具 | 3 | ⭐⭐ | 🔥 |
-| 🤖 智能助手 | 2 | ⭐⭐⭐ | 🔥🔥 |
-| 🛠️ 工具汉化 | 1 | ⭐⭐ | 🔥 |
-| 📺 媒体服务 | 2 | ⭐⭐ | ⭐⭐⭐ |
-| 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
-| 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
-| 🔧 系统工具 | 1 | ⭐⭐ | 🔥 |
-| **总计** | **44** | **简单~难** | **热门** |
+如果你想找的是：
 
+- 真正能部署的 AI 工具
+- 有落地价值的开源项目
+- 本地 AI、Agent、自动化、情报分析的组合路线
+
+那这个站就是为你准备的。
+
+---
+
+## 🔥 热门入口
+
+<div class="portal-grid">
+  <a class="portal-card" href="#/tutorials/2026-hot-open-source-ai-projects-navigation">
+    <div class="portal-title">2026 爆款开源 AI 项目导航</div>
+    <div class="portal-desc">5 大热门项目 × 15 篇核心教程 × 5 个专题封面页</div>
+  </a>
+  <a class="portal-card" href="#/tutorials/openclaw-fly-nas-deployment">
+    <div class="portal-title">飞牛 NAS + OpenClaw 专题</div>
+    <div class="portal-desc">部署、模型切换、多通道、Ollama 联动、安全加固一条龙</div>
+  </a>
+  <a class="portal-card" href="#/tutorials/worldmonitor-topic-index">
+    <div class="portal-title">worldmonitor 全球情报系统</div>
+    <div class="portal-desc">地图、新闻、风险评分、AI 简报、本地 Ollama 组合方案</div>
+  </a>
+  <a class="portal-card" href="#/tutorials/gitnexus-topic-index">
+    <div class="portal-title">GitNexus 知识图谱编程专题</div>
+    <div class="portal-desc">让 Claude Code / Cursor / MCP 更懂你的大型代码仓库</div>
+  </a>
 </div>
 
 ---
 
-## 🎯 适合谁？
+## 🌌 核心专题矩阵
 
-| 人群 | 收获 |
-|------|------|
-| 👨‍💻 **开发者** | 网络调试、API 代理、自动化脚本 |
-| 🏠 **智能家居控** | 小爱音箱刷机、Home Assistant 集成 |
-| 🎵 **音乐爱好者** | 高品质蓝牙播放、TTS 语音播报 |
-| 📚 **效率控** | 多源新闻抓取、自动化提醒 |
-| 🔧 **技术爱好者** | Docker 部署、NAS 监控系统 |
-
----
-
-## 📚 核心教程推荐
-
-<div class="video-container">
-    <iframe src="https://www.youtube.com/embed/3twTXtuICdE" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div>
-
-### 🥇 最受欢迎
-
-1. **[小爱音箱刷入小智 AI](tutorials/xiaoai-speaker-flash.md)** 🚀
-   - 将普通音箱变身为 ChatGPT 语音助手
-   - 支持 GPT/Claude 对话 + 蓝牙播放
-   - 已帮助 500+ 用户成功刷机
-
-2. **[AgentDVR 监控系统配置教程](tutorials/agentdvr.md)** 📹
-   - 在飞牛 NAS 部署监控
-   - 接入萤石云摄像头 RTSP
-   - 实时预览 + 移动侦测录像
-
-3. **[多源技术新闻摘要教程](tutorials/news-digest.md)** 📰
-   - 每日 05:00 自动抓取 8 个技术媒体
-   - 分类生成 Markdown 摘要
-   - Telegram 自动推送 + TTS 播报
+| 专题 | 方向 | 适合谁 | 入口 |
+|------|------|--------|------|
+| OpenClaw / 飞牛 NAS | 本地 Agent、Docker、消息通道 | 想搭个人 AI 助手的人 | [进入专题](tutorials/openclaw-fly-nas-deployment.md) |
+| 2026 热门项目精选 | 开源 AI 项目总导航 | 想快速抓住重点项目的人 | [进入专题](tutorials/2026-hot-open-source-ai-projects-navigation.md) |
+| CoPaw | 个人 AI 助手替代路线 | 想比较 OpenClaw 替代方案的人 | [进入专题](tutorials/copaw-topic-index.md) |
+| RuView | WiFi 感知 / 无摄像头检测 | 喜欢硬核黑科技的人 | [进入专题](tutorials/ruview-topic-index.md) |
+| worldmonitor | 全球情报 / OSINT / 地图 | 做研究、情报、宏观观察的人 | [进入专题](tutorials/worldmonitor-topic-index.md) |
+| GitNexus | 代码知识图谱 / MCP | 高频 AI 编程用户 | [进入专题](tutorials/gitnexus-topic-index.md) |
+| deer-flow | 多智能体 / Super Agent | 想搭复杂 Agent 平台的人 | [进入专题](tutorials/deer-flow-topic-index.md) |
 
 ---
 
-## 🎯 使用场景
+## 🧭 推荐阅读路线
 
-不知道从哪开始？按场景选择：
+### 路线 A：你想搭自己的 AI 助手
+1. [Arm 飞牛 Docker 安装 OpenClaw 调配详解](tutorials/openclaw-fly-nas-deployment.md)
+2. [OpenClaw 配 GPT-5.4 实战教程](tutorials/openclaw-gpt-5.4-guide.md)
+3. [飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md)
+4. [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md)
 
-<div align=center>
+### 路线 B：你想看 2026 最值得折腾的 AI 开源项目
+1. [2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md)
+2. [CoPaw 专题封面页](tutorials/copaw-topic-index.md)
+3. [worldmonitor 专题封面页](tutorials/worldmonitor-topic-index.md)
+4. [GitNexus 专题封面页](tutorials/gitnexus-topic-index.md)
+5. [deer-flow 专题封面页](tutorials/deer-flow-topic-index.md)
 
-| 场景 | 推荐路径 | 预计耗时 |
-|------|----------|----------|
-| [💼 工作效率提升](scenarios/workflow.md) | 网络工具 + 新闻摘要 + 自动化 | 1h 配置 |
-| [🏠 智能家居集成](scenarios/smarthome.md) | 小爱音箱 + AgentDVR + Home Assistant | 3-4h 部署 |
-| [📺 自托管媒体服务](scenarios/media-server.md) | SEARXNG + MoonTVPlus | 2-3h 配置 |
-
-</div>
-
-**👉 先看看 [使用场景](scenarios/workflow.md) 快速找到适合你的方案！**
+### 路线 C：你想搭更硬核的未来工具链
+1. [RuView 专题封面页](tutorials/ruview-topic-index.md)
+2. [worldmonitor 本地部署与 Ollama 联动教程](tutorials/worldmonitor-local-ollama-guide.md)
+3. [GitNexus + MCP + Claude Code / Cursor 使用教程](tutorials/gitnexus-mcp-guide.md)
+4. [deer-flow 技能系统与子代理机制详解](tutorials/deer-flow-skills-subagents-guide.md)
 
 ---
 
-## 🎨 站点功能
+## 🧪 这个站里有什么
 
-<div align=center>
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| 🔍 **全文搜索** | ✅ | 支持标题/内容检索，自动索引 |
-| 💬 **评论系统** | ✅ | Giscus (GitHub Discussions) |
-| 📊 **访问统计** | ✅ | Google Analytics 4 集成 |
-| 📱 **移动端** | ✅ | 完美适配手机/平板 |
-| 🌙 **暗色模式** | ✅ | 自动跟随系统设置 |
-| 🎬 **视频嵌入** | ✅ | YouTube/Bilibili 一键嵌入 |
-| 🚀 **极速加载** | ✅ | 纯静态，无数据库 |
-
+<div class="metal-stats">
+  <div class="metal-stat">
+    <span class="metal-stat-number">44</span>
+    <span class="metal-stat-label">篇教程</span>
+  </div>
+  <div class="metal-stat">
+    <span class="metal-stat-number">15</span>
+    <span class="metal-stat-label">项目教程</span>
+  </div>
+  <div class="metal-stat">
+    <span class="metal-stat-number">5</span>
+    <span class="metal-stat-label">专题封面页</span>
+  </div>
+  <div class="metal-stat">
+    <span class="metal-stat-number">1</span>
+    <span class="metal-stat-label">总导航页</span>
+  </div>
 </div>
 
 ---
 
-## 📦 快速开始
+## ✨ 站点特性
 
-### 1️⃣ 浏览教程
-
-```bash
-# 侧边栏导航
-左侧目录 → 选择感兴趣的分类 → 点击开始学习
-```
-
-### 2️⃣ 搜索功能
-
-右上角搜索框：
-- 🔍 全文检索（标题 + 内容）
-- 🏷️ 标签过滤（支持 `tag:技巧` 语法）
-- 📅 按日期排序
-
-### 3️⃣ 离线阅读
-
-```bash
-# 使用 Docsify CLI 本地预览
-npm i -g docsify-cli
-cd /Users/ttnk/.openclaw/workspace/macsur-docs
-docsify serve .
-
-# 浏览器打开 http://localhost:3000
-```
+- **Docsify 驱动**：纯静态、轻量、易维护
+- **自定义域名**：`https://x.zttz.eu.org`
+- **全文搜索**：快速检索项目与教程
+- **Giscus 评论**：支持 GitHub Discussions 讨论
+- **GA4 统计**：观察访问与阅读行为
+- **视频嵌入**：教程视频可直接观看
+- **项目速览卡片**：每篇新专题都有快速判断模块
+- **未来风视觉**：深空、金属、冷蓝科技感首页
 
 ---
 
-## 📊 44 个完整教程列表
+## 🚀 从这里开始
 
-<div align=center class="tutorial-list-table-wrapper">
+如果你不想犹豫，直接从这三个入口选一个：
 
-| 序号 | 教程名称 | 分类 | 难度 | 热度 |
-|------|----------|------|------|------|
-| 1 | [Agent Reach 全能网络访问工具使用教程](tutorials/agent-reach.md) | 网络工具 | ⭐⭐ | 🔥 |
-| 2 | [CLIProxyAPI 代理服务教程](tutorials/cliproxypi-api.md) | 网络工具 | ⭐⭐⭐ | 🔥 |
-| 3 | [Cloudflare WARP 安装配置教程](tutorials/cloudflare-warp.md) | 网络工具 | ⭐⭐ | ⭐⭐⭐ |
-| 4 | [小爱音箱刷入小智AI教程](tutorials/xiaoai-speaker-flash.md) | 智能助手 | ⭐⭐⭐ | 🔥🔥 |
-| 5 | [TTS 文本转语音技能教程](tutorials/tts-guide.md) | 智能助手 | ⭐⭐ | ⭐⭐⭐ |
-| 6 | [Termius Pro 汉化完整教程](tutorials/termius-chinese-localization.md) | 工具汉化 | ⭐⭐ | 🔥 |
-| 7 | [MoonTVPlus 影音聚合播放器教程](tutorials/moontvplus.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
-| 8 | [SEARXNG 搜索技能使用教程](tutorials/searxng.md) | 媒体服务 | ⭐⭐ | ⭐⭐⭐ |
-| 9 | [SearXNG 对接 OpenClaw 教程](tutorials/searxng-openclaw-integration.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 10 | [Telegram 使用教程](tutorials/telegram.md) | 通信平台 | ⭐⭐ | 🔥 |
-| 11 | [Gmail 临时邮箱生成器教程](tutorials/gmail-temp.md) | 通信平台 | ⭐ | ⭐⭐ |
-| 12 | [Discourse 论坛搭建部署教程](tutorials/discourse.md) | 通信平台 | ⭐⭐⭐ | ⭐⭐⭐ |
-| 13 | [AgentDVR 监控系统配置教程](tutorials/agentdvr.md) | 监控自动化 | ⭐⭐⭐ | 🔥 |
-| 14 | [多源技术新闻摘要教程](tutorials/news-digest.md) | 监控自动化 | ⭐⭐ | 🔥 |
-| 15 | [OpenClaw 自动化脚本合集](tutorials/openclaw-scripts.md) | 监控自动化 | ⭐⭐ | 🔥 |
-| 16 | [Arm 飞牛 Docker 安装 OpenClaw 调配详解](tutorials/openclaw-fly-nas-deployment.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 17 | [OpenClaw 配 GPT-5.4 实战教程](tutorials/openclaw-gpt-5.4-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
-| 18 | [飞牛 NAS Docker 版 OpenClaw 切换 GPT-5.4 配置示例](tutorials/openclaw-gpt54-flynas-docker-config.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 19 | [OpenClaw + GPT-5.4 + SearXNG + Ollama 完整组合方案](tutorials/openclaw-gpt54-searxng-ollama-stack.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 20 | [飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
-| 21 | [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 22 | [飞牛 NAS 上 OpenClaw 常见报错排查大全](tutorials/flynas-openclaw-troubleshooting.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 23 | [飞牛 NAS 上 OpenClaw 安全加固与公网访问教程](tutorials/flynas-openclaw-security-public-access.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 24 | [CoPaw 全面上手教程：阿里系 OpenClaw 替代方案实战](tutorials/copaw-main-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
-| 25 | [CoPaw + Docker + Ollama 部署教程](tutorials/copaw-docker-ollama-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 26 | [CoPaw 多通道与技能系统扩展阅读](tutorials/copaw-channels-skills-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 27 | [RuView 全面体验教程：WiFi 感知人体活动的黑科技项目](tutorials/ruview-main-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 28 | [RuView 硬件路线与 CSI 感知原理详解](tutorials/ruview-hardware-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥 |
-| 29 | [RuView 能做什么：安防、康养、存在检测与无摄像头感知场景](tutorials/ruview-use-cases-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 30 | [worldmonitor 全面教程：实时全球情报监控系统上手](tutorials/worldmonitor-main-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
-| 31 | [worldmonitor 本地部署与 Ollama 联动教程](tutorials/worldmonitor-local-ollama-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 32 | [worldmonitor 地图图层、AI 简报与情报分析扩展阅读](tutorials/worldmonitor-map-intelligence-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 33 | [GitNexus 全面教程：把代码仓库变成知识图谱](tutorials/gitnexus-main-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
-| 34 | [GitNexus + MCP + Claude Code / Cursor 使用教程](tutorials/gitnexus-mcp-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 35 | [GitNexus Web UI 与图谱探索扩展阅读](tutorials/gitnexus-webui-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 36 | [deer-flow 全面教程：字节跳动多智能体框架实战入门](tutorials/deer-flow-main-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
-| 37 | [deer-flow 技能系统与子代理机制详解](tutorials/deer-flow-skills-subagents-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥 |
-| 38 | [deer-flow 消息通道、沙箱执行与部署扩展阅读](tutorials/deer-flow-channels-sandbox-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
-| 39 | [2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md) | 系统工具 | ⭐ | 🔥🔥🔥 |
-| 40 | [CoPaw 专题封面页](tutorials/copaw-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
-| 41 | [RuView 专题封面页](tutorials/ruview-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
-| 42 | [worldmonitor 专题封面页](tutorials/worldmonitor-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
-| 43 | [GitNexus 专题封面页](tutorials/gitnexus-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
-| 44 | [deer-flow 专题封面页](tutorials/deer-flow-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
-
-</div>
+- [进入 OpenClaw / 飞牛 NAS 专题](tutorials/openclaw-fly-nas-deployment.md)
+- [进入 2026 热门开源 AI 项目导航](tutorials/2026-hot-open-source-ai-projects-navigation.md)
+- [进入 worldmonitor 全球情报专题](tutorials/worldmonitor-topic-index.md)
 
 ---
 
-## 🛠️ 技术栈
+## 💬 反馈与讨论
 
-<div align=center>
+如果你有想继续扩展的方向，比如：
 
-![Docsify](https://img.shields.io/badge/Docsify-4.x-blue?logo=docsify&logoColor=white)
-![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-333?logo=github&logoColor=white)
-![GA4](https://img.shields.io/badge/Analytics-GA4-green?logo=googleanalytics&logoColor=white)
-![Giscus](https://img.shields.io/badge/Comments-Giscus-ff69b4?logo=github&logoColor=white)
+- 更多 OpenClaw / CoPaw / deer-flow 教程
+- 更多本地 AI 与 NAS 项目
+- 更多 OSINT / 情报 / 自动化工具精选
 
-</div>
-
----
-
-## 🆘 常见问题
-
-### ❓ 教程全部免费吗？
-
-✅ **是的！** 所有内容 CC BY-NC-SA 4.0，完全免费。
-
----
-
-### ❓ 我需要什么基础？
-
-每个教程标注了难度等级：
-- ⭐ 新手友好，只需浏览器
-- ⭐⭐ 需基本命令行知识
-- ⭐⭐⭐ 需有 Docker/网络配置经验
-
----
-
-### ❓ 遇到问题怎么办？
-
-1. 查看 [FAQ](faq.md) 常见问题
-2. 在教程底部评论区提问
-3. 提交 [GitHub Issue](https://github.com/macsur/macsur.github.io/issues)
-
----
-
-## 🤝 贡献指南
-
-我们欢迎社区贡献！
-
-### 如何参与
-
-- 📝 **撰写教程**：Fork 本仓库，创建 `tutorials/xxx.md`
-- 🐛 **报告问题**：提交 Issue，描述清晰
-- 💡 **提出建议**：开启 Discussions
-- 🌟 **点个 Star**：支持我们持续更新
-
-### 内容规范
-
-- ✅ 使用中文 Markdown
-- ✅ 包含完整步骤和代码
-- ✅ 提供故障排查章节
-- ✅ 遵守 CC BY-NC-SA 4.0 协议
-
----
-
-## 📞 联系方式
-
-| 渠道 | 链接 |
-|------|------|
-| 🐙 GitHub | [@macsur](https://github.com/macsur) |
-| 📧 Email | hi@macsur.io |
-| 💬 Telegram | [加入群组](https://t.me/macsur_chat) |
-| 🐦 Twitter | [@macsur_io](https://twitter.com/macsur_io) |
-
----
-
-## 📄 开源协议
-
-本教程采用 **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)** 协议
-
-- ✅ **署名**：必须注明原作者
-- ✅ **非商业**：不得用于商业用途
-- ✅ **相同方式共享**：修改后需相同协议开源
-- ❌ **无限制**：不可移除版权声明
-
----
-
-<div align=center>
-
-## ⭐ 如果觉得有帮助，请点个 Star！
-
-您的支持是我们更新的最大动力 💪
-
-[![Star](https://img.shields.io/github/stars/macsur/macsur.github.io?style=for-the-badge&logo=github)](https://github.com/macsur/macsur.github.io/stargazers)
-
-**Made with ❤️ by MacSur Team**  
-© 2025 MacSur. All rights reserved.
-
-</div>
-
----
-
-> 🎯 **下一步**：从左侧目录或 [热门教程](tutorials/xiaoai-speaker-flash.md) 开始学习吧！
+都可以直接在评论区或者 GitHub Discussions 里继续提。这个站本来就是要持续长大的。
