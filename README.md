@@ -21,7 +21,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-21个教程-brightgreen)](https://macsur.github.io)
+[![文档状态](https://img.shields.io/badge/文档-23个教程-brightgreen)](https://macsur.github.io)
 
 </div>
 
@@ -31,7 +31,7 @@
 
 **MacSur** 是一个开源的 macOS 效率工具集合，汇集了 **网络代理、智能助手、媒体服务、自动化脚本** 等 30+ 实用工具。
 
-本项目文档站收录了 **21 个详细教程**，涵盖：
+本项目文档站收录了 **23 个详细教程**，涵盖：
 
 <div align=center>
 
@@ -44,7 +44,7 @@
 | 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
 | 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
 | 🔧 系统工具 | 1 | ⭐⭐ | 🔥 |
-| **总计** | **21** | **简单~难** | **热门** |
+| **总计** | **23** | **简单~难** | **热门** |
 
 </div>
 
@@ -152,7 +152,7 @@ docsify serve .
 
 ---
 
-## 📊 21 个完整教程列表
+## 📊 23 个完整教程列表
 
 <div align=center class="tutorial-list-table-wrapper">
 
@@ -179,6 +179,8 @@ docsify serve .
 | 19 | [OpenClaw + GPT-5.4 + SearXNG + Ollama 完整组合方案](tutorials/openclaw-gpt54-searxng-ollama-stack.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
 | 20 | [飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
 | 21 | [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
+| 22 | [飞牛 NAS 上 OpenClaw 常见报错排查大全](tutorials/flynas-openclaw-troubleshooting.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
+| 23 | [飞牛 NAS 上 OpenClaw 安全加固与公网访问教程](tutorials/flynas-openclaw-security-public-access.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
 
 </div>
 
