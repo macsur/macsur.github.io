@@ -113,13 +113,18 @@
 3. [GitNexus + MCP + Claude Code / Cursor 使用教程](tutorials/gitnexus-mcp-guide.md)
 4. [deer-flow 技能系统与子代理机制详解](tutorials/deer-flow-skills-subagents-guide.md)
 
+### 路线 D：你想掌握 OpenClaw 多 Agent 架构
+1. [OpenClaw 多 Agent 配置入门](tutorials/OpenClaw多Agent配置入门.md)
+2. [OpenClaw 高级 Agent 工作流编排](tutorials/OpenClaw高级Agent工作流编排.md)
+3. [实战：用 OpenClaw 多 Agent 构建智能助手系统](tutorials/实战用OpenClaw多Agent构建智能助手系统.md)
+
 ---
 
 ## 🧪 这个站里有什么
 
 <div class="metal-stats">
   <div class="metal-stat">
-    <span class="metal-stat-number">44</span>
+    <span class="metal-stat-number">47</span>
     <span class="metal-stat-label">篇教程</span>
   </div>
   <div class="metal-stat">

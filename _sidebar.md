@@ -54,6 +54,12 @@
 - [🛠️ 飞牛 NAS 上 OpenClaw 常见报错排查大全](tutorials/flynas-openclaw-troubleshooting.md) \[badge:new]
 - [🔒 飞牛 NAS 上 OpenClaw 安全加固与公网访问教程](tutorials/flynas-openclaw-security-public-access.md) \[badge:new]
 
+### 🤖 OpenClaw 多 Agent 进阶
+
+- [🤖 OpenClaw 多 Agent 配置入门](tutorials/OpenClaw多Agent配置入门.md) \[badge:new]
+- [🔄 OpenClaw 高级 Agent 工作流编排](tutorials/OpenClaw高级Agent工作流编排.md) \[badge:new]
+- [🏗️ 实战：用 OpenClaw 多 Agent 构建智能助手系统](tutorials/实战用OpenClaw多Agent构建智能助手系统.md) \[badge:new]
+
 ### 📱 智能助手
 
 - [🎧 小爱音箱刷入小智 AI 详细教程](tutorials/xiaoai-speaker-flash.md) \[badge:hot]
