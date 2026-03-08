@@ -16,6 +16,14 @@
 
 - [🔥 2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md) \[badge:new]
 
+### 🌟 项目专题
+
+- [🗂️ CoPaw 专题封面页](tutorials/copaw-topic-index.md) \[badge:new]
+- [📡 RuView 专题封面页](tutorials/ruview-topic-index.md) \[badge:new]
+- [🌍 worldmonitor 专题封面页](tutorials/worldmonitor-topic-index.md) \[badge:new]
+- [🧠 GitNexus 专题封面页](tutorials/gitnexus-topic-index.md) \[badge:new]
+- [🦌 deer-flow 专题封面页](tutorials/deer-flow-topic-index.md) \[badge:new]
+
 ### 🔧 系统工具
 
 - [🗂️ CoPaw 全面上手教程：阿里系 OpenClaw 替代方案实战](tutorials/copaw-main-guide.md) \[badge:new]

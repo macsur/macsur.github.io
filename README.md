@@ -21,7 +21,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-39个教程-brightgreen)](https://macsur.github.io)
+[![文档状态](https://img.shields.io/badge/文档-44个教程-brightgreen)](https://macsur.github.io)
 
 </div>
 
@@ -31,7 +31,7 @@
 
 **MacSur** 是一个开源的 macOS 效率工具集合，汇集了 **网络代理、智能助手、媒体服务、自动化脚本** 等 30+ 实用工具。
 
-本项目文档站收录了 **39 个详细教程**，涵盖：
+本项目文档站收录了 **44 个详细教程**，涵盖：
 
 <div align=center>
 
@@ -44,7 +44,7 @@
 | 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
 | 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
 | 🔧 系统工具 | 1 | ⭐⭐ | 🔥 |
-| **总计** | **39** | **简单~难** | **热门** |
+| **总计** | **44** | **简单~难** | **热门** |
 
 </div>
 
@@ -152,7 +152,7 @@ docsify serve .
 
 ---
 
-## 📊 39 个完整教程列表
+## 📊 44 个完整教程列表
 
 <div align=center class="tutorial-list-table-wrapper">
 
@@ -197,6 +197,11 @@ docsify serve .
 | 37 | [deer-flow 技能系统与子代理机制详解](tutorials/deer-flow-skills-subagents-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥 |
 | 38 | [deer-flow 消息通道、沙箱执行与部署扩展阅读](tutorials/deer-flow-channels-sandbox-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
 | 39 | [2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md) | 系统工具 | ⭐ | 🔥🔥🔥 |
+| 40 | [CoPaw 专题封面页](tutorials/copaw-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
+| 41 | [RuView 专题封面页](tutorials/ruview-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
+| 42 | [worldmonitor 专题封面页](tutorials/worldmonitor-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
+| 43 | [GitNexus 专题封面页](tutorials/gitnexus-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
+| 44 | [deer-flow 专题封面页](tutorials/deer-flow-topic-index.md) | 系统工具 | ⭐ | 🔥🔥 |
 
 </div>
 
