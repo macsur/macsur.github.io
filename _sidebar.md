@@ -16,6 +16,21 @@
 
 ### 🔧 系统工具
 
+- [🗂️ CoPaw 全面上手教程：阿里系 OpenClaw 替代方案实战](tutorials/copaw-main-guide.md) \[badge:new]
+- [🐳 CoPaw + Docker + Ollama 部署教程](tutorials/copaw-docker-ollama-guide.md) \[badge:new]
+- [🧩 CoPaw 多通道与技能系统扩展阅读](tutorials/copaw-channels-skills-guide.md) \[badge:new]
+- [📡 RuView 全面体验教程：WiFi 感知人体活动的黑科技项目](tutorials/ruview-main-guide.md) \[badge:new]
+- [📶 RuView 硬件路线与 CSI 感知原理详解](tutorials/ruview-hardware-guide.md) \[badge:new]
+- [🏥 RuView 能做什么：安防、康养、存在检测与无摄像头感知场景](tutorials/ruview-use-cases-guide.md) \[badge:new]
+- [🌍 worldmonitor 全面教程：实时全球情报监控系统上手](tutorials/worldmonitor-main-guide.md) \[badge:new]
+- [🖥️ worldmonitor 本地部署与 Ollama 联动教程](tutorials/worldmonitor-local-ollama-guide.md) \[badge:new]
+- [🗺️ worldmonitor 地图图层、AI 简报与情报分析扩展阅读](tutorials/worldmonitor-map-intelligence-guide.md) \[badge:new]
+- [🧠 GitNexus 全面教程：把代码仓库变成知识图谱](tutorials/gitnexus-main-guide.md) \[badge:new]
+- [🔌 GitNexus + MCP + Claude Code / Cursor 使用教程](tutorials/gitnexus-mcp-guide.md) \[badge:new]
+- [🕸️ GitNexus Web UI 与图谱探索扩展阅读](tutorials/gitnexus-webui-guide.md) \[badge:new]
+- [🦌 deer-flow 全面教程：字节跳动多智能体框架实战入门](tutorials/deer-flow-main-guide.md) \[badge:new]
+- [🧰 deer-flow 技能系统与子代理机制详解](tutorials/deer-flow-skills-subagents-guide.md) \[badge:new]
+- [📦 deer-flow 消息通道、沙箱执行与部署扩展阅读](tutorials/deer-flow-channels-sandbox-guide.md) \[badge:new]
 - [🛠️ Agent Reach - 全能网络访问工具](tutorials/agent-reach.md) \[badge:new]
 - [🔌 CLIProxyAPI - 命令行代理使用指南](tutorials/cliproxypi-api.md)
 - [🌐 Cloudflare WARP - 免费 VPN 配置](tutorials/cloudflare-warp.md)

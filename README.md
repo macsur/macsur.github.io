@@ -21,7 +21,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/macsur/macsur.github.io?style=social)](https://github.com/macsur/macsur.github.io/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![文档状态](https://img.shields.io/badge/文档-23个教程-brightgreen)](https://macsur.github.io)
+[![文档状态](https://img.shields.io/badge/文档-38个教程-brightgreen)](https://macsur.github.io)
 
 </div>
 
@@ -31,7 +31,7 @@
 
 **MacSur** 是一个开源的 macOS 效率工具集合，汇集了 **网络代理、智能助手、媒体服务、自动化脚本** 等 30+ 实用工具。
 
-本项目文档站收录了 **23 个详细教程**，涵盖：
+本项目文档站收录了 **38 个详细教程**，涵盖：
 
 <div align=center>
 
@@ -44,7 +44,7 @@
 | 💬 通信平台 | 3 | ⭐⭐ | ⭐⭐⭐ |
 | 🎯 监控自动化 | 3 | ⭐⭐⭐ | 🔥 |
 | 🔧 系统工具 | 1 | ⭐⭐ | 🔥 |
-| **总计** | **23** | **简单~难** | **热门** |
+| **总计** | **38** | **简单~难** | **热门** |
 
 </div>
 
@@ -152,7 +152,7 @@ docsify serve .
 
 ---
 
-## 📊 23 个完整教程列表
+## 📊 38 个完整教程列表
 
 <div align=center class="tutorial-list-table-wrapper">
 
@@ -181,6 +181,21 @@ docsify serve .
 | 21 | [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
 | 22 | [飞牛 NAS 上 OpenClaw 常见报错排查大全](tutorials/flynas-openclaw-troubleshooting.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
 | 23 | [飞牛 NAS 上 OpenClaw 安全加固与公网访问教程](tutorials/flynas-openclaw-security-public-access.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
+| 24 | [CoPaw 全面上手教程：阿里系 OpenClaw 替代方案实战](tutorials/copaw-main-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
+| 25 | [CoPaw + Docker + Ollama 部署教程](tutorials/copaw-docker-ollama-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 26 | [CoPaw 多通道与技能系统扩展阅读](tutorials/copaw-channels-skills-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 27 | [RuView 全面体验教程：WiFi 感知人体活动的黑科技项目](tutorials/ruview-main-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
+| 28 | [RuView 硬件路线与 CSI 感知原理详解](tutorials/ruview-hardware-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥 |
+| 29 | [RuView 能做什么：安防、康养、存在检测与无摄像头感知场景](tutorials/ruview-use-cases-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 30 | [worldmonitor 全面教程：实时全球情报监控系统上手](tutorials/worldmonitor-main-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
+| 31 | [worldmonitor 本地部署与 Ollama 联动教程](tutorials/worldmonitor-local-ollama-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 32 | [worldmonitor 地图图层、AI 简报与情报分析扩展阅读](tutorials/worldmonitor-map-intelligence-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 33 | [GitNexus 全面教程：把代码仓库变成知识图谱](tutorials/gitnexus-main-guide.md) | 系统工具 | ⭐⭐ | 🔥🔥 |
+| 34 | [GitNexus + MCP + Claude Code / Cursor 使用教程](tutorials/gitnexus-mcp-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
+| 35 | [GitNexus Web UI 与图谱探索扩展阅读](tutorials/gitnexus-webui-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
+| 36 | [deer-flow 全面教程：字节跳动多智能体框架实战入门](tutorials/deer-flow-main-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥🔥 |
+| 37 | [deer-flow 技能系统与子代理机制详解](tutorials/deer-flow-skills-subagents-guide.md) | 系统工具 | ⭐⭐⭐ | 🔥 |
+| 38 | [deer-flow 消息通道、沙箱执行与部署扩展阅读](tutorials/deer-flow-channels-sandbox-guide.md) | 系统工具 | ⭐⭐ | 🔥 |
 
 </div>
 
