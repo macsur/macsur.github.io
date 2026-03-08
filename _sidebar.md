@@ -14,6 +14,8 @@
 
 ## 📚 完整教程
 
+- [🔥 2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md) \[badge:new]
+
 ### 🔧 系统工具
 
 - [🗂️ CoPaw 全面上手教程：阿里系 OpenClaw 替代方案实战](tutorials/copaw-main-guide.md) \[badge:new]

@@ -5,6 +5,19 @@
 
 ---
 
+## 项目速览卡片
+
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0 22px 0;">
+  <div style="border:1px solid #e5e7eb;border-radius:14px;padding:14px;background:#ffffff;"><strong>项目名称：</strong>CoPaw</div>
+  <div style="border:1px solid #e5e7eb;border-radius:14px;padding:14px;background:#ffffff;"><strong>项目类型：</strong>本地部署 / Ollama 联动</div>
+  <div style="border:1px solid #e5e7eb;border-radius:14px;padding:14px;background:#ffffff;"><strong>上手难度：</strong>⭐⭐</div>
+  <div style="border:1px solid #e5e7eb;border-radius:14px;padding:14px;background:#ffffff;"><strong>推荐部署：</strong>Docker</div>
+  <div style="border:1px solid #e5e7eb;border-radius:14px;padding:14px;background:#ffffff;"><strong>适合人群：</strong>想本地化运行 CoPaw 的人</div>
+  <div style="border:1px solid #e5e7eb;border-radius:14px;padding:14px;background:#ffffff;"><strong>推荐指数：</strong>8.7/10</div>
+</div>
+
+---
+
 ## 🎬 教程视频速览
 
 > 建议先看 3~5 分钟视频快速建立整体印象，再继续阅读下方图文教程，理解会更顺。
