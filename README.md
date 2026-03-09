@@ -104,14 +104,16 @@
 3. [阿里云 OpenClaw 网关配置排障与 HTTPS 反代修复实战](tutorials/openclaw-aliyun-gateway-troubleshooting.md)
 4. [OpenClaw 阿里云服务器运维备忘录](tutorials/openclaw-aliyun-ops-memo.md)
 5. [OpenClaw 阿里云服务器运维脚本使用说明](tutorials/openclaw-aliyun-ops-script.md)
-6. [飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md)
-7. [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md)
+6. [OpenClaw 阿里云一键远程脚本使用说明](tutorials/remote-openclaw-aliyun-script.md)
+7. [飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md)
+8. [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md)
 
 ### 路线 E：你在阿里云上折腾 OpenClaw，想快速救火
 1. [阿里云 OpenClaw 网关配置排障与 HTTPS 反代修复实战](tutorials/openclaw-aliyun-gateway-troubleshooting.md)
 2. [OpenClaw 阿里云服务器运维备忘录](tutorials/openclaw-aliyun-ops-memo.md)
 3. [OpenClaw 阿里云服务器运维脚本使用说明](tutorials/openclaw-aliyun-ops-script.md)
-4. [OpenClaw 配 GPT-5.4 实战教程](tutorials/openclaw-gpt-5.4-guide.md)
+4. [OpenClaw 阿里云一键远程脚本使用说明](tutorials/remote-openclaw-aliyun-script.md)
+5. [OpenClaw 配 GPT-5.4 实战教程](tutorials/openclaw-gpt-5.4-guide.md)
 
 ### 路线 B：你想看 2026 最值得折腾的 AI 开源项目
 1. [2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md)
