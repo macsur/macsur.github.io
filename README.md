@@ -82,6 +82,37 @@
 
 ---
 
+## ☁️ 阿里云 OpenClaw 专题位
+
+<div class="aliyun-feature-wrap">
+  <a class="aliyun-feature-hero" href="#/tutorials/openclaw-aliyun-gateway-troubleshooting">
+    <div class="aliyun-feature-badge">REAL SERVER / TROUBLESHOOTING / HTTPS / GATEWAY</div>
+    <h3>阿里云 OpenClaw 真实救火专题</h3>
+    <p>不是纸上谈兵，是在真实服务器上一路排查出来的：多份配置冲突、11251 端口、随机 basePath、Nginx 反代、Let's Encrypt 证书、GPT-5.4 默认模型恢复，全都踩了一遍，也全都写清楚了。</p>
+    <span class="aliyun-feature-cta">立即进入专题 →</span>
+  </a>
+
+  <div class="aliyun-feature-grid">
+    <a class="aliyun-feature-card" href="#/tutorials/openclaw-aliyun-gateway-troubleshooting">
+      <span class="aliyun-card-kicker">排障实战</span>
+      <strong>阿里云 OpenClaw 网关配置排障与 HTTPS 反代修复实战</strong>
+      <span>从“为什么 404 / 为什么起不来 / 为什么证书不对”一路排到最终恢复。</span>
+    </a>
+    <a class="aliyun-feature-card" href="#/tutorials/openclaw-aliyun-ops-memo">
+      <span class="aliyun-card-kicker">运维备忘录</span>
+      <strong>OpenClaw 阿里云服务器运维备忘录</strong>
+      <span>把生效配置、端口、basePath、token、证书检查和重启流程浓缩成一页。</span>
+    </a>
+    <a class="aliyun-feature-card" href="#/tutorials/remote-openclaw-aliyun-script">
+      <span class="aliyun-card-kicker">一键脚本</span>
+      <strong>OpenClaw 阿里云一键远程脚本使用说明</strong>
+      <span>在本地 Mac 直接 SSH 到服务器执行 status / restart / doctor / cert，不用反复手敲。</span>
+    </a>
+  </div>
+</div>
+
+---
+
 ## 🌌 核心专题矩阵
 
 | 专题 | 方向 | 适合谁 | 入口 |
@@ -139,7 +170,7 @@
 
 <div class="metal-stats">
   <div class="metal-stat">
-    <span class="metal-stat-number">50</span>
+    <span class="metal-stat-number">51</span>
     <span class="metal-stat-label">篇教程</span>
   </div>
   <div class="metal-stat">
