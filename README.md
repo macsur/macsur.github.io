@@ -74,6 +74,10 @@
     <div class="portal-title">GitNexus 知识图谱编程专题</div>
     <div class="portal-desc">让 Claude Code / Cursor / MCP 更懂你的大型代码仓库</div>
   </a>
+  <a class="portal-card" href="#/tutorials/openclaw-aliyun-gateway-troubleshooting">
+    <div class="portal-title">阿里云 OpenClaw 网关排障专题</div>
+    <div class="portal-desc">真实服务器实战：配置定位、11251、basePath、Nginx 反代、HTTPS 证书一次讲透</div>
+  </a>
 </div>
 
 ---
@@ -103,6 +107,12 @@
 6. [飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md)
 7. [飞牛 NAS 上 OpenClaw + QQ 机器人 / 飞书 / Telegram 多通道接入教程](tutorials/flynas-openclaw-multi-channel-guide.md)
 
+### 路线 E：你在阿里云上折腾 OpenClaw，想快速救火
+1. [阿里云 OpenClaw 网关配置排障与 HTTPS 反代修复实战](tutorials/openclaw-aliyun-gateway-troubleshooting.md)
+2. [OpenClaw 阿里云服务器运维备忘录](tutorials/openclaw-aliyun-ops-memo.md)
+3. [OpenClaw 阿里云服务器运维脚本使用说明](tutorials/openclaw-aliyun-ops-script.md)
+4. [OpenClaw 配 GPT-5.4 实战教程](tutorials/openclaw-gpt-5.4-guide.md)
+
 ### 路线 B：你想看 2026 最值得折腾的 AI 开源项目
 1. [2026 爆款开源 AI 项目精选教程导航](tutorials/2026-hot-open-source-ai-projects-navigation.md)
 2. [CoPaw 专题封面页](tutorials/copaw-topic-index.md)
@@ -127,7 +137,7 @@
 
 <div class="metal-stats">
   <div class="metal-stat">
-    <span class="metal-stat-number">47</span>
+    <span class="metal-stat-number">50</span>
     <span class="metal-stat-label">篇教程</span>
   </div>
   <div class="metal-stat">
@@ -161,9 +171,10 @@
 
 ## 🚀 从这里开始
 
-如果你不想犹豫，直接从这三个入口选一个：
+如果你不想犹豫，直接从这四个入口选一个：
 
 - [进入 OpenClaw / 飞牛 NAS 专题](tutorials/openclaw-fly-nas-deployment.md)
+- [进入阿里云 OpenClaw 网关排障专题](tutorials/openclaw-aliyun-gateway-troubleshooting.md)
 - [进入 2026 热门开源 AI 项目导航](tutorials/2026-hot-open-source-ai-projects-navigation.md)
 - [进入 worldmonitor 全球情报专题](tutorials/worldmonitor-topic-index.md)
 
