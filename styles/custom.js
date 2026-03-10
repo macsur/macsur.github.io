@@ -238,6 +238,10 @@ console.log('✨ MacSur Docs - Custom enhancements loaded');
                   <a class="home-hero-primary" href="#/tutorials/2026-hot-open-source-ai-projects-navigation">先看 2026 爆款 AI 项目总导航</a>
                   <a class="home-hero-secondary" href="#/tutorials/openclaw-gpt54-searxng-ollama-stack">看 OpenClaw + GPT-5.4 组合方案</a>
                 </div>
+                <form class="home-search-bar" onsubmit="event.preventDefault();var q=this.querySelector('input').value.trim();if(q)window.open('https://s.136222.xyz/?q='+encodeURIComponent(q),'_blank');">
+                  <input type="text" placeholder="🔍 搜索站内教程 / 全网 AI 工具…" aria-label="站内搜索" />
+                  <button type="submit">搜索</button>
+                </form>
               </div>
               <div class="home-feature-panel">
                 <h3 class="home-panel-title">为什么首页必须高级</h3>

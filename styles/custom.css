@@ -1069,3 +1069,55 @@ code, pre, kbd, samp, .code-block {
     font-size:1.12rem;
   }
 }
+
+/* ===== SearXNG 首页搜索框 ===== */
+.home-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 18px;
+    width: 100%;
+    max-width: 540px;
+    background: rgba(13, 21, 38, 0.85);
+    border: 1px solid rgba(125, 211, 252, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(14, 165, 233, 0.10);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.home-search-bar:focus-within {
+    border-color: rgba(125, 211, 252, 0.65);
+    box-shadow: 0 4px 32px rgba(14, 165, 233, 0.22);
+}
+.home-search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 11px 16px;
+    font-size: 0.97rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    min-width: 0;
+}
+.home-search-bar input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+.home-search-bar button {
+    background: linear-gradient(135deg, rgba(56,189,248,0.85), rgba(14,165,233,0.75));
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 11px 22px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    transition: background 0.2s, opacity 0.2s;
+    white-space: nowrap;
+}
+.home-search-bar button:hover {
+    background: linear-gradient(135deg, rgba(56,189,248,1), rgba(14,165,233,1));
+    opacity: 0.92;
+}
