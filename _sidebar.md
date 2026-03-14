@@ -31,6 +31,7 @@
 - [📌 OpenAI Token 专题通道（目录）](tutorials/openai-token/README.md) \[badge:new]
 - [01｜临时邮箱被封？3 步用域名邮箱绕过风控（Cloudflare 收信 + Python 自动注册）](tutorials/openai-token/01-cloudflare-domain-email-auto-openai-register.md) \[badge:new]
 - [02｜Cloudflare 最简收信配置（只收验证码，10 分钟跑通）](tutorials/openai-token/02-cloudflare-email-routing-minimal-receive-only.md) \[badge:new]
+- [03｜Token 安全与轮换（怎么存、怎么撤销、怎么避免误提交）](tutorials/openai-token/03-token-security-rotation.md) \[badge:new]
 
 - [🗂️ CoPaw 全面上手教程：阿里系 OpenClaw 替代方案实战](tutorials/copaw-main-guide.md) \[badge:new]
 - [🐳 CoPaw + Docker + Ollama 部署教程](tutorials/copaw-docker-ollama-guide.md) \[badge:new]

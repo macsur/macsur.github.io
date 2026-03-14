@@ -5,4 +5,5 @@
 ## 教程列表
 - [01｜临时邮箱被封？3 步用域名邮箱绕过风控（Cloudflare 收信 + Python 自动注册）](01-cloudflare-domain-email-auto-openai-register.md)
 - [02｜Cloudflare 最简收信配置（只收验证码，10 分钟跑通）](02-cloudflare-email-routing-minimal-receive-only.md)
+- [03｜Token 安全与轮换（怎么存、怎么撤销、怎么避免误提交）](03-token-security-rotation.md)
 
