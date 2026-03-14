@@ -4,11 +4,16 @@ on:
   push:
     branches: [ main ]
 
+# Prevent infinite loops: ignore commits created by this workflow itself
+# (it uses commit message prefix: "chore: bump DOCSIFY_ASSET_VER")
+
 permissions:
   contents: write
 
 jobs:
   bump:
+    # If the latest commit is already a bump commit, skip to avoid self-trigger loop
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER') && !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER to') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
