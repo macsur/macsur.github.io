@@ -1,0 +1,55 @@
+name: Mirror to Gitee
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-to-gitee-main
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    # Prevent running on automated bump commits to reduce noise (optional)
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER') && !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER to') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror main -> Gitee (force)
+        env:
+          GITEE_USERNAME: ${{ secrets.GITEE_USERNAME }}
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          GITEE_REPO: ${{ secrets.GITEE_REPO }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GITEE_USERNAME}" ] || [ -z "${GITEE_TOKEN}" ] || [ -z "${GITEE_REPO}" ]; then
+            echo "Missing required secrets: GITEE_USERNAME / GITEE_TOKEN / GITEE_REPO"
+            exit 1
+          fi
+
+          # Never print token
+          echo "::add-mask::${GITEE_TOKEN}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Add gitee remote with token auth
+          GITEE_URL="https://${GITEE_USERNAME}:${GITEE_TOKEN}@gitee.com/${GITEE_REPO}.git"
+
+          git remote remove gitee 2>/dev/null || true
+          git remote add gitee "${GITEE_URL}"
+
+          # Force mirror the main branch
+          git push --force gitee main:main
+
+          # (Optional) mirror tags too
+          git push --force gitee --tags
