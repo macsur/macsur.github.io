@@ -91,6 +91,10 @@
 - [📧 Gmail 临时邮箱生成器](tutorials/gmail-temp.md)
 - [📢 Discourse - 免费搭建论坛](tutorials/discourse.md)
 
+### 🧭 站点运维
+
+- [📌 x.zttz.eu.org 站点运维规则（Runbook）](scenarios/site-ops-runbook.md) \[badge:new]
+
 ### 🎯 监控与自动化
 
 - [📹 AgentDVR - 飞牛 NAS 监控部署](tutorials/agentdvr.md)
