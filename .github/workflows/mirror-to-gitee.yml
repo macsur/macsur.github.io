@@ -14,7 +14,9 @@ concurrency:
 jobs:
   mirror:
     # Prevent running on automated bump commits to reduce noise (optional)
-    if: ${{ !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER') && !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER to') }}
+    if: >-
+      ${{ !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER')
+          && !startsWith(github.event.head_commit.message, 'chore: bump DOCSIFY_ASSET_VER to') }}
     runs-on: ubuntu-latest
 
     steps:
