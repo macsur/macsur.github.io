@@ -44,11 +44,28 @@
     el.textContent = msg || '';
   }
 
-  function renderAnswer(text){
+  function renderAnswer(text, sources){
     const out = document.getElementById('ask-out');
     if (!out) return;
-    // simple markdown-ish rendering: keep it safe
-    out.innerHTML = '<pre style="white-space:pre-wrap;word-break:break-word;">'+esc(text||'')+'</pre>';
+
+    const answerHtml = '<pre style="white-space:pre-wrap;word-break:break-word;">'+esc(text||'')+'</pre>';
+
+    let sourcesHtml = '';
+    if (Array.isArray(sources) && sources.length) {
+      const items = sources.map(s => {
+        const title = (s && (s.title || s.name || s.url)) || 'source';
+        const url = (s && s.url) || '';
+        const snippet = (s && s.snippet) || '';
+        const safeTitle = esc(title);
+        const safeUrl = esc(url);
+        const safeSnippet = esc(snippet);
+        const link = url ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeTitle}</a>` : safeTitle;
+        return `<li style="margin:6px 0;">${link}${snippet ? `<div style=\"opacity:.85;font-size:12px;line-height:1.4;margin-top:2px;\">${safeSnippet}</div>` : ''}</li>`;
+      }).join('');
+      sourcesHtml = `<h3 style="margin:14px 0 6px;">Sources</h3><ol style="padding-left:18px;">${items}</ol>`;
+    }
+
+    out.innerHTML = answerHtml + sourcesHtml;
   }
 
   async function run(){
@@ -61,7 +78,7 @@
     if (!q.trim()) { setStatus('请输入问题。'); return; }
 
     setStatus('请求中…');
-    renderAnswer('');
+    renderAnswer('', []);
 
     const ctl = new AbortController();
     const t = setTimeout(() => ctl.abort(), Math.max(5, timeoutSec) * 1000);
@@ -87,7 +104,7 @@
       if (ct.includes('application/json')) {
         const data = await r.json();
         setStatus('OK');
-        renderAnswer(data.answer || JSON.stringify(data, null, 2));
+        renderAnswer(data.answer || JSON.stringify(data, null, 2), data.sources || []);
       } else {
         const text = await r.text();
         setStatus('OK（非JSON响应：'+ct+'）');
@@ -112,6 +129,8 @@
   setTimeout(wire, 0);
 })();
 </script>
+
+> 如果你点了“提问”但页面看起来没变化：请打开浏览器开发者工具（F12）查看 Console/Network，通常是 token 为空或被浏览器插件拦截。
 
 <style>
 .ask-box{border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin:12px 0;background:#fff;}
