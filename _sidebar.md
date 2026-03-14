@@ -26,6 +26,8 @@
 
 ### 🔧 系统工具
 
+- [🤖 Ask：搜索 + AI 总结（/ask）](tools/ask.md) \[badge:new]
+
 ### 🔑 OpenAI Token 专题通道
 
 - [📌 OpenAI Token 专题通道（目录）](tutorials/openai-token/README.md) \[badge:new]
