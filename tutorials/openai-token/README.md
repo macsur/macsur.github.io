@@ -3,5 +3,6 @@
 这里专门收纳：OpenAI 注册、Token 获取/管理、安全、风控避坑、通道接入等相关教程。
 
 ## 教程列表
-- [01｜临时邮箱被封？用域名邮箱 + Cloudflare 收信 + Python 脚本自动注册（含避坑）](01-cloudflare-domain-email-auto-openai-register.md)
+- [01｜临时邮箱被封？3 步用域名邮箱绕过风控（Cloudflare 收信 + Python 自动注册）](01-cloudflare-domain-email-auto-openai-register.md)
+- [02｜Cloudflare 最简收信配置（只收验证码，10 分钟跑通）](02-cloudflare-email-routing-minimal-receive-only.md)
 
