@@ -1,69 +1,135 @@
 // Docsify 自定义插件 - GitHub 风格增强
+// NOTE: Docsify 正确插件写法是 window.$docsify.plugins 注入，而不是 docsify.register
 
-// 视频嵌入
-docsify.register('video', function (hook, vm) {
-    hook.afterEach(function (html) {
-        return html.replace(/\[video\](https?:\/\/[^\]]+)\[ Video ID: (\w+) \]/g, function (match, url, id) {
-            return `<div class="video-container">
-                <iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>
-            </div>`;
-        });
-    });
-});
+(function () {
+    // 确保 $docsify 存在
+    window.$docsify = window.$docsify || {};
 
-// 徽章
-docsify.register('badge', function (hook, vm) {
-    hook.afterEach(function (html) {
-        return html.replace(/\[badge:(new|hot|update)\](.+?)\[/g, function (match, type, text) {
-            return `<span class="badge badge-${type}">${text}</span>`;
-        });
-    });
-});
-
-// 轮播图短代码 [carousel:img1|title|desc,img2|title|desc,...]
-docsify.register('carousel', function (hook, vm) {
-    hook.afterEach(function (html) {
-        return html.replace(/\[carousel:([^\]]+)\]/g, function (match, itemsStr) {
-            var items = itemsStr.split(',').map(function(item) {
-                var parts = item.split('|');
-                return {
-                    img: parts[0].trim(),
-                    title: parts[1] || '',
-                    desc: parts[2] || ''
-                };
+    // 1) Markdown → HTML 的短代码替换（video / badge / carousel）
+    function shortcodesPlugin(hook, vm) {
+        hook.afterEach(function (html) {
+            // [video]https://... [ Video ID: xxxx ]
+            html = html.replace(/\[video\](https?:\/\/[^\]]+)\[ Video ID: (\w+) \]/g, function (match, url, id) {
+                return `<div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>
+                </div>`;
             });
 
-            var slidesHtml = items.map(function(item, index) {
-                var active = index === 0 ? 'active' : '';
-                var caption = item.title || item.desc ?
-                    `<div class="carousel-caption">
-                        ${item.title ? '<h4>'+item.title+'</h4>' : ''}
-                        ${item.desc ? '<p>'+item.desc+'</p>' : ''}
-                    </div>` : '';
+            // [badge:new]Text[
+            html = html.replace(/\[badge:(new|hot|update)\](.+?)\[/g, function (match, type, text) {
+                return `<span class="badge badge-${type}">${text}</span>`;
+            });
+
+            // [carousel:img|title|desc,img|title|desc]
+            html = html.replace(/\[carousel:([^\]]+)\]/g, function (match, itemsStr) {
+                var items = itemsStr.split(',').map(function (item) {
+                    var parts = item.split('|');
+                    return {
+                        img: (parts[0] || '').trim(),
+                        title: parts[1] || '',
+                        desc: parts[2] || ''
+                    };
+                }).filter(function (x) { return !!x.img; });
+
+                if (!items.length) return '';
+
+                var slidesHtml = items.map(function (item, index) {
+                    var active = index === 0 ? 'active' : '';
+                    var caption = (item.title || item.desc)
+                        ? `<div class="carousel-caption">
+                            ${item.title ? '<h4>' + item.title + '</h4>' : ''}
+                            ${item.desc ? '<p>' + item.desc + '</p>' : ''}
+                        </div>`
+                        : '';
+                    return `
+                        <div class="carousel-slide ${active}" data-index="${index}">
+                            <img src="${item.img}" alt="Slide ${index + 1}" loading="lazy">
+                            ${caption}
+                        </div>`;
+                }).join('');
+
+                var indicatorsHtml = items.map(function (_, index) {
+                    var active = index === 0 ? 'active' : '';
+                    return `<div class="carousel-indicator ${active}" data-index="${index}"></div>`;
+                }).join('');
+
                 return `
-                    <div class="carousel-slide ${active}" data-index="${index}">
-                        <img src="${item.img}" alt="Slide ${index+1}" loading="lazy">
-                        ${caption}
+                    <div class="carousel-container" data-carousel>
+                        ${slidesHtml}
+                        <button class="carousel-control carousel-prev" data-direction="prev">‹</button>
+                        <button class="carousel-control carousel-next" data-direction="next">›</button>
+                        <div class="carousel-indicators">
+                            ${indicatorsHtml}
+                        </div>
                     </div>`;
-            }).join('');
+            });
 
-            var indicatorsHtml = items.map(function(_, index) {
-                var active = index === 0 ? 'active' : '';
-                return `<div class="carousel-indicator ${active}" data-index="${index}"></div>`;
-            }).join('');
-
-            return `
-                <div class="carousel-container" data-carousel>
-                    ${slidesHtml}
-                    <button class="carousel-control carousel-prev" data-direction="prev">‹</button>
-                    <button class="carousel-control carousel-next" data-direction="next">›</button>
-                    <div class="carousel-indicators">
-                        ${indicatorsHtml}
-                    </div>
-                </div>`;
+            return html;
         });
-    });
-});
+    }
+
+    // 2) 渲染完成后挂载轮播交互（每次页面切换都要重新绑定/刷新）
+    function carouselRuntimePlugin(hook, vm) {
+        hook.doneEach(function () {
+            // click delegate
+            document.addEventListener('click', function (e) {
+                var carousel = e.target && e.target.closest ? e.target.closest('[data-carousel]') : null;
+                if (!carousel) return;
+
+                if (e.target.classList.contains('carousel-indicator')) {
+                    var index = parseInt(e.target.dataset.index);
+                    goToSlide(carousel, index);
+                } else if (e.target.classList.contains('carousel-prev')) {
+                    navigateSlide(carousel, -1);
+                } else if (e.target.classList.contains('carousel-next')) {
+                    navigateSlide(carousel, 1);
+                }
+            }, { passive: true });
+
+            // auto play
+            if (!window.__macsurCarouselTimer) {
+                window.__macsurCarouselTimer = setInterval(function () {
+                    document.querySelectorAll('[data-carousel]').forEach(function (carousel) {
+                        var activeSlide = carousel.querySelector('.carousel-slide.active');
+                        if (!activeSlide) return;
+                        var currentIndex = parseInt(activeSlide.dataset.index);
+                        var slides = carousel.querySelectorAll('.carousel-slide');
+                        if (!slides.length) return;
+                        var nextIndex = (currentIndex + 1) % slides.length;
+                        goToSlide(carousel, nextIndex);
+                    });
+                }, 5000);
+            }
+        });
+    }
+
+    function goToSlide(carousel, index) {
+        var slides = carousel.querySelectorAll('.carousel-slide');
+        var indicators = carousel.querySelectorAll('.carousel-indicator');
+        slides.forEach(function (slide, i) {
+            slide.classList.toggle('active', i === index);
+        });
+        indicators.forEach(function (ind, i) {
+            ind.classList.toggle('active', i === index);
+        });
+    }
+
+    function navigateSlide(carousel, delta) {
+        var activeSlide = carousel.querySelector('.carousel-slide.active');
+        if (!activeSlide) return;
+        var currentIndex = parseInt(activeSlide.dataset.index);
+        var slides = carousel.querySelectorAll('.carousel-slide');
+        if (!slides.length) return;
+        var nextIndex = (currentIndex + delta + slides.length) % slides.length;
+        goToSlide(carousel, nextIndex);
+    }
+
+    // 注入插件
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat([
+        shortcodesPlugin,
+        carouselRuntimePlugin
+    ]);
+})();
 
 // 轮播图交互
 (function initCarousel() {
