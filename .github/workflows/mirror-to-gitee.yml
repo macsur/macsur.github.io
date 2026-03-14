@@ -30,6 +30,7 @@ jobs:
           GITEE_USERNAME: ${{ secrets.GITEE_USERNAME }}
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
           GITEE_REPO: ${{ secrets.GITEE_REPO }}
+          GITEE_SAFE_EMAIL: ${{ secrets.GITEE_SAFE_EMAIL }}
         run: |
           set -euo pipefail
 
@@ -44,14 +45,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Rewrite author/committer emails to avoid Gitee rejecting hidden/noreply emails.
+          # This will change commit hashes on Gitee (content stays identical).
+          SAFE_EMAIL="${GITEE_SAFE_EMAIL:-8610708@qq.com}"
+          echo "Rewriting commit emails to: ${SAFE_EMAIL}"
+
+          git filter-branch -f --env-filter "
+            export GIT_AUTHOR_EMAIL='${SAFE_EMAIL}';
+            export GIT_COMMITTER_EMAIL='${SAFE_EMAIL}';
+          " -- --all
+
           # Add gitee remote with token auth
           GITEE_URL="https://${GITEE_USERNAME}:${GITEE_TOKEN}@gitee.com/${GITEE_REPO}.git"
 
           git remote remove gitee 2>/dev/null || true
           git remote add gitee "${GITEE_URL}"
 
-          # Force mirror the main branch
+          # Force push rewritten history
           git push --force gitee main:main
-
-          # (Optional) mirror tags too
           git push --force gitee --tags
