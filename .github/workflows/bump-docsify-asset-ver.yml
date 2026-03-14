@@ -1,0 +1,48 @@
+name: Bump DOCSIFY_ASSET_VER
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set version
+        id: ver
+        run: |
+          VER="$(date -u +'%Y%m%d-%H%M')"
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+
+      - name: Patch index.html
+        run: |
+          VER='${{ steps.ver.outputs.ver }}'
+          # Replace only the DOCSIFY_ASSET_VER line
+          perl -0777 -i -pe "s/window\.DOCSIFY_ASSET_VER\s*=\s*'[^']*'/window.DOCSIFY_ASSET_VER = '$VER'/g" index.html
+
+          # Keep script/style query params aligned with DOCSIFY_ASSET_VER
+          perl -0777 -i -pe "s/(unpkg\.com\/docsify@4\?v=)[^\"']+/$1$VER/g" index.html
+          perl -0777 -i -pe "s/(unpkg\.com\/docsify@4\/lib\/plugins\/search\.min\.js\?v=)[^\"']+/$1$VER/g" index.html
+          perl -0777 -i -pe "s/(unpkg\.com\/docsify@4\/lib\/plugins\/copy-code\.min\.js\?v=)[^\"']+/$1$VER/g" index.html
+          perl -0777 -i -pe "s/(unpkg\.com\/docsify@4\/lib\/plugins\/pagination\.min\.js\?v=)[^\"']+/$1$VER/g" index.html
+          perl -0777 -i -pe "s/(styles\/custom\.js\?v=)[^\"']+/$1$VER/g" index.html
+          perl -0777 -i -pe "s/(unpkg\.com\/docsify@4\/lib\/themes\/vue\.css\?v=)[^\"']+/$1$VER/g" index.html
+
+      - name: Commit & push if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "chore: bump DOCSIFY_ASSET_VER to ${{ steps.ver.outputs.ver }}"
+          git push
