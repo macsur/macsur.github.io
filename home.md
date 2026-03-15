@@ -115,14 +115,35 @@
 
 .neo-grid{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:12px;margin:14px 0 6px;}
 @media (max-width: 980px){.neo-grid{grid-template-columns:1fr;}}
-.neo-card{display:block;padding:14px;border-radius:16px;border:1px solid rgba(17,24,39,.10);background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.86));box-shadow:0 14px 40px rgba(17,24,39,.08);text-decoration:none;color:#111827;}
-.neo-card:hover{transform:translateY(-2px);box-shadow:0 18px 55px rgba(17,24,39,.14);}
+.neo-card{display:block;padding:14px;border-radius:18px;
+  /* glass + highlight border */
+  border:1px solid rgba(255,255,255,.22);
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.20),
+    inset 0 1px 0 rgba(255,255,255,.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-decoration:none;
+  color:#e6eef8;
+}
+.neo-card::before{content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;
+  background: radial-gradient(600px 160px at 20% 0%, rgba(125,211,252,.22), transparent 60%),
+              radial-gradient(520px 180px at 100% 30%, rgba(99,102,241,.18), transparent 65%);
+  opacity:.9;
+}
+.neo-card{position:relative;overflow:hidden;}
+.neo-card:hover{transform:translateY(-3px);
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
 
 /* scroll-in animation (paired with styles/home-anim.js) */
 .neo-anim{opacity:0;transform: translateY(10px);transition: opacity .55s ease, transform .65s cubic-bezier(.2,.8,.2,1);will-change: opacity, transform;}
 .neo-anim.neo-anim--in{opacity:1;transform: translateY(0);}
-.neo-card__kicker{font-size:12px;color:rgba(17,24,39,.65);}
-.neo-card__title{font-size:16px;font-weight:700;margin:6px 0 6px;}
-.neo-card__desc{font-size:13px;line-height:1.6;color:rgba(17,24,39,.78);margin:0 0 10px;}
-.neo-card__footer{font-size:12px;color:rgba(99,102,241,.95);font-weight:600;}
+.neo-card__kicker{font-size:12px;color:rgba(230,238,248,.72);}
+.neo-card__title{font-size:16px;font-weight:720;margin:6px 0 6px;letter-spacing:.2px;}
+.neo-card__desc{font-size:13px;line-height:1.7;color:rgba(230,238,248,.78);margin:0 0 10px;}
+.neo-card__footer{font-size:12px;color:rgba(125,211,252,.95);font-weight:650;}
 </style>
