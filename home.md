@@ -54,16 +54,39 @@
 
 <style>
 /* Neo-ish cover for Docsify (no inline JS; CSP-friendly) */
-.neo-hero{position:relative;margin:10px 0 18px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background: radial-gradient(1200px 500px at 20% 0%, rgba(99,102,241,.25), transparent 60%), radial-gradient(900px 500px at 90% 30%, rgba(16,185,129,.18), transparent 55%), linear-gradient(180deg, rgba(17,24,39,.92), rgba(17,24,39,.72));box-shadow: 0 18px 60px rgba(0,0,0,.22);overflow:hidden;}
-.neo-hero__inner{padding:10px 14px;color:#f9fafb;}
-.neo-hero__badge{display:inline-block;font-size:12px;letter-spacing:.4px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);backdrop-filter: blur(10px);}
-.neo-hero__title{margin:12px 0 6px;font-size:34px;line-height:1.15;}
-.neo-hero__desc{margin:0 0 14px;color:rgba(249,250,251,.82);font-size:15px;max-width:58ch;}
+.neo-hero{position:relative;margin:10px 0 18px;padding:18px;border-radius:22px;border:1px solid rgba(255,255,255,.16);
+  background: radial-gradient(1200px 600px at 10% 0%, rgba(99,102,241,.28), transparent 62%),
+              radial-gradient(900px 520px at 92% 18%, rgba(16,185,129,.20), transparent 58%),
+              radial-gradient(700px 420px at 50% 110%, rgba(236,72,153,.12), transparent 60%),
+              linear-gradient(180deg, rgba(17,24,39,.92), rgba(17,24,39,.70));
+  box-shadow: 0 18px 60px rgba(0,0,0,.22);
+  overflow:hidden;
+}
+/* floating glow blobs */
+.neo-hero::before,.neo-hero::after{content:"";position:absolute;inset:auto;pointer-events:none;filter: blur(30px);opacity:.55;}
+.neo-hero::before{width:380px;height:380px;left:-120px;top:-140px;background:radial-gradient(circle at 30% 30%, rgba(99,102,241,.9), transparent 60%);animation: neoFloat 8s ease-in-out infinite;}
+.neo-hero::after{width:340px;height:340px;right:-120px;top:-120px;background:radial-gradient(circle at 30% 30%, rgba(16,185,129,.75), transparent 62%);animation: neoFloat2 10s ease-in-out infinite;}
+@keyframes neoFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,26px) scale(1.05)}}
+@keyframes neoFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-22px,18px) scale(1.06)}}
+
+.neo-hero__inner{position:relative;padding:12px 16px;color:#f9fafb;}
+.neo-hero__badge{display:inline-block;font-size:12px;letter-spacing:.5px;padding:6px 10px;border-radius:999px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+}
+.neo-hero__title{margin:12px 0 6px;font-size:36px;line-height:1.12;letter-spacing:.3px;}
+.neo-hero__desc{margin:0 0 14px;color:rgba(249,250,251,.84);font-size:15px;max-width:62ch;}
 .neo-hero__cta{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 10px;}
-.neo-btn{display:inline-block;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f9fafb;text-decoration:none;}
+.neo-btn{display:inline-block;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:#f9fafb;text-decoration:none;
+  box-shadow: 0 12px 35px rgba(0,0,0,.20);
+}
 .neo-btn:hover{background:rgba(255,255,255,.10)}
-.neo-btn--primary{background:rgba(99,102,241,.25);border-color:rgba(99,102,241,.35)}
-.neo-btn--primary:hover{background:rgba(99,102,241,.33)}
+.neo-btn--primary{background:linear-gradient(135deg, rgba(99,102,241,.40), rgba(236,72,153,.22));border-color:rgba(99,102,241,.38)}
+.neo-btn--primary:hover{background:linear-gradient(135deg, rgba(99,102,241,.50), rgba(236,72,153,.28))}
 .neo-hero__meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;color:rgba(249,250,251,.72);font-size:12px;}
 .neo-hero__meta span{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
 
