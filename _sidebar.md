@@ -18,6 +18,8 @@
 
 ### 🌟 项目专题
 
+- [📚 hello-Claw 别院专栏](tutorials/hello-claw/README.md) \[badge:new]
+
 - [🗂️ CoPaw 专题封面页](tutorials/copaw-topic-index.md) \[badge:new]
 - [📡 RuView 专题封面页](tutorials/ruview-topic-index.md) \[badge:new]
 - [🌍 worldmonitor 专题封面页](tutorials/worldmonitor-topic-index.md) \[badge:new]
