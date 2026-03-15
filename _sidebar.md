@@ -6,6 +6,7 @@
 
 ## 🚀 快速开始
 
+- [🏠 封面页（Neo 风格）](home.md) \[badge:new]
 - [📖 项目介绍](README.md)
 - [⚡ 安装指南](quick-start/installation.md)
 - [🔧 配置说明](quick-start/configuration.md)
