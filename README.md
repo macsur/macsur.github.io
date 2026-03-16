@@ -1,3 +1,176 @@
+<!-- OPENCLAW_TUTORIAL_START -->
+# OpenClaw 配置规则与教程 - (macOS M2 Mini)
+
+> [!CAUTION]
+> **本机 macOS 安装的是英文版 `openclaw`，不是中文版 `openclaw-cn`。所有命令一律使用 `openclaw`！**
+
+> [!IMPORTANT]
+> **本文为公开版（已脱敏）**：所有 `API Key / Token / Password` 均已替换为 `***`。
+> 
+> 推荐做法：把密钥放进 **环境变量** 或 **本机私有配置文件**（不要提交到 Git）。
+
+---
+
+## 一、配置文件位置
+
+```bash
+~/.openclaw/openclaw.json
+```
+
+---
+
+## 二、模型别名规则
+
+OpenClaw 使用 **`提供商名/模型ID`** 的格式来引用模型。
+
+### Provider ① `api136222`
+
+| 字段 | 值 |
+|------|-----|
+| Base URL | `https://cli.136222.xyz/v1` |
+| API 类型 | `openai-responses` |
+| API Key | `***` |
+
+**可用模型别名：**
+
+| 别名 | 说明 |
+|------|------|
+| `api136222/cli-api` | CLI API 通用模型 |
+| `api136222/gpt-5.2` | GPT-5.2 |
+| `api136222/gpt-5` | GPT-5 |
+| `api136222/gpt-5-codex` | GPT-5 Codex |
+| `api136222/gpt-5-codex-mini` | GPT-5 Codex Mini |
+| `api136222/gpt-5.1` | GPT-5.1 |
+| `api136222/gpt-5.1-codex` | GPT-5.1 Codex |
+| `api136222/gpt-5.1-codex-mini` | GPT-5.1 Codex Mini |
+| `api136222/gpt-5.1-codex-max` | GPT-5.1 Codex Max |
+| `api136222/gpt-5.2-codex` | GPT-5.2 Codex |
+
+---
+
+### Provider ② `gptgrok`
+
+| 字段 | 值 |
+|------|-----|
+| Base URL | `https://openai.good.hidns.vip/v1` |
+| API 类型 | `openai-completions` |
+| API Key | `***` |
+
+**可用模型别名：**
+
+| 别名 | 说明 |
+|------|------|
+| `gptgrok/gpt5.4` | ⭐ **当前默认主模型** |
+| `gptgrok/gpt-5.3-codex` | GPT-5.3 Codex |
+| `gptgrok/gpt-5.2` | GPT-5.2 |
+| `gptgrok/gpt-5.2-codex` | GPT-5.2 Codex |
+| `gptgrok/grok-imagine-1.0` | Grok 图像生成 |
+| `gptgrok/grok-4.20-beta` | Grok 4.20 Beta |
+| `gptgrok/grok-imagine-1.0-edit` | Grok 图像编辑 |
+| `gptgrok/grok-4.1-thinking` | Grok 4.1 思维链 |
+| `gptgrok/grok-4.1-expert` | Grok 4.1 专家 |
+| `gptgrok/grok-imagine-1.0-video` | Grok 视频生成 |
+| `gptgrok/grok-4.1-mini` | Grok 4.1 Mini |
+
+---
+
+## 三、当前模型优先级（Failover 顺序）
+
+```text
+主模型 → gptgrok/gpt5.4
+  ↓ 失败时依次尝试：
+  1. gptgrok/gpt-5.3-codex
+  2. gptgrok/gpt-5.2
+  3. gptgrok/gpt-5.2-codex
+  4. gptgrok/grok-4.20-beta
+  5. gptgrok/grok-4.1-thinking
+  6. gptgrok/grok-4.1-expert
+  7. gptgrok/grok-4.1-mini
+  8. api136222/cli-api        ← 跨 Provider 备选
+  9. api136222/gpt-5.2
+ 10. api136222/gpt-5
+ 11. api136222/gpt-5-codex
+ 12. api136222/gpt-5-codex-mini
+ 13. api136222/gpt-5.1
+ 14. api136222/gpt-5.1-codex
+ 15. api136222/gpt-5.1-codex-mini
+ 16. api136222/gpt-5.1-codex-max
+ 17. api136222/gpt-5.2-codex
+```
+
+---
+
+## 四、如何切换默认模型
+
+编辑 `~/.openclaw/openclaw.json` 中 `agents.defaults.model.primary` 字段：
+
+```json
+"agents": {
+  "defaults": {
+    "model": {
+      "primary": "gptgrok/gpt5.4",
+      "fallbacks": ["..."]
+    }
+  }
+}
+```
+
+> 修改后需重启 OpenClaw 才能生效。
+
+---
+
+## 五、Telegram Bot 配置要点
+
+```json
+"channels": {
+  "telegram": {
+    "enabled": true,
+    "dmPolicy": "open",
+    "allowFrom": ["*"],
+    "botToken": "***",
+    "groupPolicy": "open"
+  }
+}
+```
+
+```json
+"messages": {
+  "ackReactionScope": "all"
+}
+```
+
+> [!CAUTION]
+> 如果 `dmPolicy` 设为 `"open"` 而不添加 `allowFrom: ["*"]`，OpenClaw 将无法启动！
+
+---
+
+## 六、重启 OpenClaw 步骤
+
+```bash
+# 1) 查找进程
+ps aux | grep openclaw | grep -v grep
+
+# 2) 终止旧进程
+kill <PID>
+
+# 3) 启动新进程
+nohup openclaw &>/dev/null &
+
+# 4) 确认运行
+ps aux | grep openclaw | grep -v grep
+```
+
+---
+
+## 附：密钥与配置管理（建议）
+
+- **不要**把 `sk-...` 之类 API Key 写进公开仓库。
+- 建议把密钥放在：
+  - 私有 `.env`（加入 `.gitignore`）
+  - 或系统环境变量（systemd `Environment=` / `EnvironmentFile=`）
+  - 或私有配置文件（仅本机可读，权限 `chmod 600`）
+<!-- OPENCLAW_TUTORIAL_END -->
+
 # ⚡ OpenClaw / AI 工具未来实验室
 
 > **x.zttz.eu.org** · 科技感 / 未来感 / 金属感风格的 AI 工具专题文档站
