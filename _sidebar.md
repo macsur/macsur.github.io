@@ -67,6 +67,7 @@
 - [🧾 OpenClaw 阿里云服务器运维备忘录](tutorials/openclaw-aliyun-ops-memo.md) \[badge:new]
 - [🧰 OpenClaw 阿里云服务器运维脚本使用说明](tutorials/openclaw-aliyun-ops-script.md) \[badge:new]
 - [🛰️ OpenClaw 阿里云一键远程脚本使用说明](tutorials/remote-openclaw-aliyun-script.md) \[badge:new]
+- [🧪 autoresearch 全面教程：让 AI 自己做 AI 研究](tutorials/autoresearch-main-guide.md) \[badge:new]
 - [🐟 飞牛 NAS Docker 版 OpenClaw 切换 GPT-5.4 配置示例](tutorials/openclaw-gpt54-flynas-docker-config.md) \[badge:new]
 - [🧩 OpenClaw + GPT-5.4 + SearXNG + Ollama 完整组合方案](tutorials/openclaw-gpt54-searxng-ollama-stack.md) \[badge:new]
 - [🤖 飞牛 NAS 上 Ollama + OpenClaw 联动实战教程](tutorials/flynas-ollama-openclaw-integration.md) \[badge:new]
