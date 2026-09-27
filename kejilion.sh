@@ -1,8 +1,6 @@
 #!/bin/bash
 sh_v="4.5.10"
 
-# 记录脚本所在目录绝对路径，避免函数内 cd 后相对路径失效
-KJ_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 gl_hui='\e[37m'
 gl_hong='\033[31m'
@@ -13,15 +11,6 @@ gl_bai='\033[0m'
 gl_zi='\033[35m'
 gl_kjlan='\033[96m'
 
-# 兼容 macOS / BSD / Alpine 缺失 timeout 命令的情况
-if ! command -v timeout >/dev/null 2>&1; then
-	timeout() {
-		if [[ "$1" =~ ^[0-9]+[sSmMhHdD]?$ ]]; then
-			shift
-		fi
-		"$@"
-	}
-fi
 
 canshu="default"
 permission_granted="false"
@@ -241,8 +230,8 @@ UserLicenseAgreement() {
 
 	if [ "$user_input" = "y" ] || [ "$user_input" = "Y" ]; then
 		send_stats "许可同意"
-		[ -f ~/kejilion.sh ] && sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh 2>/dev/null
-		[ -f /usr/local/bin/k ] && sed -i 's/^permission_granted="false"/permission_granted="true"/' /usr/local/bin/k 2>/dev/null
+		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh
+		sed -i 's/^permission_granted="false"/permission_granted="true"/' /usr/local/bin/k
 	else
 		send_stats "许可拒绝"
 		clear
@@ -21381,21 +21370,23 @@ refresh_apps_catalog() {
 	local apps_dir="$HOME/apps"
 	local apps_remote="${gh_proxy}github.com/kejilion/apps.git"
 
-	if [ ! -d "$apps_dir" ]; then
-		timeout 25s git clone --depth=1 "$apps_remote" "$apps_dir" >/dev/null 2>&1 || {
-			mkdir -p "$apps_dir" 2>/dev/null || true
-		}
-	elif [ -d "$apps_dir/.git" ]; then
-		# 已有仓库时，后台异步更新最新配置，前台 0 延迟秒开
-		(timeout 15s git -C "$apps_dir" pull --ff-only "$apps_remote" main >/dev/null 2>&1 &)
+	install git || return 1
+	if [ -e "$apps_dir" ] && [ ! -d "$apps_dir/.git" ]; then
+		echo -e "${gl_hong}错误: ${gl_bai}${apps_dir} 已存在但不是应用市场 Git 仓库，拒绝覆盖。"
+		return 1
 	fi
+	if [ ! -d "$apps_dir/.git" ]; then
+		timeout 30s git clone --depth=1 "$apps_remote" "$apps_dir" || {
+			echo -e "${gl_hong}应用列表下载失败，拒绝使用不完整配置。${gl_bai}"
+			return 1
+		}
+		return 0
+	fi
+	# 已有仓库时，后台异步更新最新配置，前台 0 延迟秒开
+	(timeout 15s git -C "$apps_dir" pull --ff-only "$apps_remote" main >/dev/null 2>&1 &)
 	return 0
 }
 
-# ==============================================================================
-# Kejilion 内置应用市场手风琴分类模块 (原生内置)
-# ==============================================================================
-# 定义分类列表: 分类ID:快捷键:分类名称
 linux_panel() {
 
 local sub_choice="$1"
@@ -25373,22 +25364,20 @@ done
 
 
 
-
-
 # ==============================================================================
-# 11+ 分类折叠应用市场模块 (智能手风琴视图)
-# 采用纯样式 0 开销折叠、J1~J... 自动排序序号与一键极速安装
+# 11+ 应用市场 [分类折叠] 模块 (智能手风琴视图)
+# 采用纯样式 0 开销折叠、A1~J* 分类专属代号与一键极速安装
 # ==============================================================================
 CATEGORY_LIST=(
-  "panel:A:🖥️  服务器运维与面板:14"
+  "panel:A:🖥️  服务器运维与面板:11"
   "ai:B:🤖 人工智能与大模型:14"
-  "monitor:C:📊 探针监控与运维告警:9"
-  "storage:D:🗄️  私有网盘与文件存储:10"
-  "network:E:🌐 网络代理与穿透组网:11"
-  "media:F:🎬 影音媒体与下载娱乐:10"
-  "office:G:📝 协作办公与知识库:11"
-  "social:H:💬 即时通讯与社交媒体:6"
-  "tools:I:🛠️  远程工具与实用套件:14"
+  "monitor:C:📊 探针监控与运维告警:11"
+  "storage:D:🗄️  私有网盘与文件存储:14"
+  "network:E:🌐 网络代理与穿透组网:15"
+  "media:F:🎬 影音媒体与下载娱乐:14"
+  "office:G:📝 协作办公与知识库:13"
+  "social:H:💬 即时通讯与社交媒体:7"
+  "tools:I:🛠️  远程工具与实用套件:19"
   "custom:J:📦 自定义与第三方应用:0"
 )
 
@@ -25649,7 +25638,7 @@ render_accordion_apps_menu() {
             local cid="" ckey="" cname="" ccount=""
             IFS=':' read -r cid ckey cname ccount <<< "$item"
 
-            # 关键修正：J 分类数量动态反映实际自定义应用款数！
+            # 动态获取自定义应用款数
             if [ "$cid" = "custom" ]; then
                 ccount="${#CUSTOM_APPS[@]}"
             fi
@@ -25658,7 +25647,8 @@ render_accordion_apps_menu() {
                 echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
                 echo -e "${gl_hui}  ┌───────────────────────────────────────────────────────────────────${gl_bai}"
 
-                # 仅对展开的目标分类遍历其包含的软件，纯 Bash 内置拆分，0 子进程！
+                # 展开内置分类：输出专属代号 [A1]、[A2]... 并附带原应用编号
+                local item_idx=1
                 for entry in "${BUILTIN_APPS[@]}"; do
                     local aid="" aname="" acat="" astar="" aalias="" adesc=""
                     IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
@@ -25672,14 +25662,19 @@ render_accordion_apps_menu() {
                         local star_badge=""
                         [ -n "$astar" ] && star_badge="${gl_huang}★${gl_bai}"
 
+                        local tag="${ckey}${item_idx}"
                         local num_prefix=""
-                        num_prefix=$(printf "${gl_kjlan}  │ ${gl_bai}[%3d] " "$aid")
+                        num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$tag")
                         local status_badge=""
                         if [ "$is_inst" -eq 1 ]; then
                             status_badge="${gl_lv}[已安装]${gl_bai}"
                         fi
 
-                        printf "%b%-34s %b %b\n" "$num_prefix" "$aname$star_badge" "$status_badge" "${gl_hui}$adesc${gl_bai}"
+                        local orig_id_str
+                        orig_id_str=$(printf "${gl_hui}#%-3s${gl_bai}" "$aid")
+
+                        printf "%b%-30s %b %b %b\n" "$num_prefix" "$aname$star_badge" "$orig_id_str" "$status_badge" "${gl_hui}$adesc${gl_bai}"
+                        item_idx=$((item_idx + 1))
                     fi
                 done
 
@@ -25695,7 +25690,7 @@ render_accordion_apps_menu() {
                             local j_tag="J${j_idx}"
                             local num_prefix=""
                             num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$j_tag")
-                            printf "%b%-28s %b\n" "$num_prefix" "$aname" "${gl_hui}$adesc${gl_bai}"
+                            printf "%b%-34s %b\n" "$num_prefix" "$aname" "${gl_hui}$adesc${gl_bai}"
                             j_idx=$((j_idx + 1))
                         done
                     fi
@@ -25703,16 +25698,16 @@ render_accordion_apps_menu() {
 
                 echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
             else
-                # 关键优化：未展开分类瞬间输出纯折叠样式行，不跑任何内部循环，0 延迟！
+                # 未展开分类瞬间输出纯折叠样式行，0 延迟秒开
                 echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
             fi
         done
 
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
         echo -e "${gl_bai}分类控制: [${gl_huang}A~J${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
-        echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}BAK${gl_bai}] 备份全部  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
+        echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}11${gl_bai}] 经典平铺  [${gl_huang}BAK${gl_bai}] 备份  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_huang}提示: 输入 A~J 查看分类；输入数字(如 36, 57)或编号(如 J1, J2)直接开始安装！${gl_bai}"
+        echo -e "${gl_huang}提示: 输入 A~J 查看分类；输入专属代号(如 A1, B3, J1)或原编号(如 1, 57)直接安装！${gl_bai}"
 
         read -e -p "请输入你的选择: " user_input
         [ -z "$user_input" ] && continue
@@ -25722,25 +25717,62 @@ render_accordion_apps_menu() {
         local lower_input
         lower_input=$(echo "$user_input" | tr '[:upper:]' '[:lower:]')
 
-        # 1. 优先匹配 J1, J2, J3... 自定义序号快速安装
-        if [[ "$upper_input" =~ ^J([0-9]+)$ ]]; then
-            local j_num="${BASH_REMATCH[1]}"
-            local j_idx=$((j_num - 1))
-            if [ "$j_idx" -ge 0 ] && [ "$j_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
-                local t_entry="${CUSTOM_APPS[$j_idx]}"
-                local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
-                IFS='|' read -r t_aid t_aname t_acat t_astar t_alias t_adesc t_conf <<< "$t_entry"
-                SELECTED_APP_ACTION="$t_alias"
-                SELECTED_CUSTOM_CONF="$t_conf"
-                return 0
+        # 1. 匹配分类专属代号 (A1~A*, B1~B*, ..., J1~J* 等)
+        if [[ "$upper_input" =~ ^([A-J])([0-9]+)$ ]]; then
+            local cat_key="${BASH_REMATCH[1]}"
+            local item_num="${BASH_REMATCH[2]}"
+            local item_idx=$((item_num - 1))
+
+            if [ "$cat_key" = "J" ]; then
+                # 自定义分类
+                if [ "$item_idx" -ge 0 ] && [ "$item_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
+                    local t_entry="${CUSTOM_APPS[$item_idx]}"
+                    local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
+                    IFS='|' read -r t_aid t_aname t_acat t_astar t_alias t_adesc t_conf <<< "$t_entry"
+                    SELECTED_APP_ACTION="$t_alias"
+                    SELECTED_CUSTOM_CONF="$t_conf"
+                    return 0
+                else
+                    echo -e "${gl_hong}错误: 自定义应用编号 J${item_num} 无效 (当前可用范围: J1 ~ J${#CUSTOM_APPS[@]})${gl_bai}"
+                    sleep 1.5
+                    continue
+                fi
             else
-                echo -e "${gl_hong}错误: 自定义应用编号 J${j_num} 无效 (当前可用范围: J1 ~ J${#CUSTOM_APPS[@]})${gl_bai}"
-                sleep 1.5
-                continue
+                # 内置分类 (A ~ I)
+                local target_cid
+                target_cid=$(get_cid_by_key "$cat_key")
+                local cur_idx=0
+                local matched_aid=""
+                for entry in "${BUILTIN_APPS[@]}"; do
+                    local b_aid="" b_name="" b_cat="" rest=""
+                    IFS='|' read -r b_aid b_name b_cat rest <<< "$entry"
+                    if [ "$b_cat" = "$target_cid" ]; then
+                        cur_idx=$((cur_idx + 1))
+                        if [ "$cur_idx" -eq "$item_num" ]; then
+                            matched_aid="$b_aid"
+                            break
+                        fi
+                    fi
+                done
+
+                if [ -n "$matched_aid" ]; then
+                    SELECTED_APP_ACTION="$matched_aid"
+                    return 0
+                else
+                    echo -e "${gl_hong}错误: 分类 [${cat_key}] 编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${cur_idx})${gl_bai}"
+                    sleep 1.5
+                    continue
+                fi
             fi
         fi
 
-        # 2. 匹配单字母分类快捷键 (A~J / a~j)
+        # 2. 匹配原数字编号直接安装 (如 1, 36, 57 等，自由取舍，二者同时有效)
+        if [[ "$user_input" =~ ^[0-9]+$ ]]; then
+            SELECTED_APP_ACTION="$user_input"
+            return 0
+        fi
+
+        # 3. 匹配单字母分类快捷键 (A~J / a~j) 展开/折叠分类
         local matched_cid
         matched_cid=$(get_cid_by_key "$upper_input")
         if [ -n "$matched_cid" ]; then
@@ -25748,7 +25780,7 @@ render_accordion_apps_menu() {
             continue
         fi
 
-        # 3. 匹配分类英文全称直接展开 (如 ai, panel, monitor 等)
+        # 4. 匹配分类英文全称直接展开 (如 ai, panel, monitor 等)
         case "$lower_input" in
             panel|ai|monitor|storage|network|media|office|social|tools|custom)
                 toggle_cat_expanded "$lower_input"
@@ -25756,10 +25788,14 @@ render_accordion_apps_menu() {
                 ;;
         esac
 
-        # 4. 全局快捷操作
+        # 5. 全局快捷操作
         case "$lower_input" in
             0)
                 SELECTED_APP_ACTION="0"
+                return 0
+                ;;
+            11|orig|classic)
+                SELECTED_APP_ACTION="11"
                 return 0
                 ;;
             all|\*)
@@ -25791,12 +25827,6 @@ render_accordion_apps_menu() {
                 return 0
                 ;;
             *)
-                # 数字直接安装内置应用
-                if [[ "$user_input" =~ ^[0-9]+$ ]]; then
-                    SELECTED_APP_ACTION="$user_input"
-                    return 0
-                fi
-
                 # 其它按键传给应用管理器处理
                 SELECTED_APP_ACTION="$user_input"
                 return 0
@@ -26004,6 +26034,41 @@ WIZARD_EOF
     echo -e "${gl_lv}✅ 成功创建自定义应用配置文件: $app_dir/$wiz_id.conf${gl_bai}"
     echo -e "您可以在该分类（$cat_display）下直接看到并管理它！"
     read -e -p "按回车键继续..." _dummy
+}
+
+linux_panel_accordion() {
+    local target_app=""
+    while true; do
+        render_accordion_apps_menu
+        target_app="$SELECTED_APP_ACTION"
+        [ -z "$target_app" ] && break
+
+        case "$target_app" in
+            0)
+                break
+                ;;
+            11|orig|classic)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel
+                fi
+                ;;
+            b|bak|backup)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel "b"
+                fi
+                ;;
+            r|rst|restore)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel "r"
+                fi
+                ;;
+            *)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel "$target_app"
+                fi
+                ;;
+        esac
+    done
 }
 
 linux_panel_accordion() {
