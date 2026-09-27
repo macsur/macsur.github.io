@@ -21385,11 +21385,9 @@ refresh_apps_catalog() {
 		}
 		return 0
 	fi
-	if ! timeout 30s git -C "$apps_dir" pull --ff-only "$apps_remote" main; then
-		echo -e "${gl_hong}应用列表更新失败，拒绝继续使用可能过期的配置。${gl_bai}"
-		echo "请检查网络或 ${apps_dir} 中的本地修改后重试。"
-		return 1
-	fi
+	# 已有仓库时，后台异步更新最新配置，前台 0 延迟秒开
+	(timeout 15s git -C "$apps_dir" pull --ff-only "$apps_remote" main >/dev/null 2>&1 &)
+	return 0
 }
 
 # ==============================================================================
@@ -21397,16 +21395,16 @@ refresh_apps_catalog() {
 # ==============================================================================
 # 定义分类列表: 分类ID:快捷键:分类名称
 CATEGORY_LIST=(
-  "panel:A:🖥️  服务器运维与面板"
-  "ai:B:🤖 人工智能与大模型"
-  "monitor:C:📊 探针监控与运维告警"
-  "storage:D:🗄️  私有网盘与文件存储"
-  "network:E:🌐 网络代理与穿透组网"
-  "media:F:🎬 影音媒体与下载娱乐"
-  "office:G:📝 协作办公与知识库"
-  "social:H:💬 即时通讯与社交媒体"
-  "tools:I:🛠️  远程工具与实用套件"
-  "custom:J:📦 自定义与第三方应用"
+  "panel:A:🖥️  服务器运维与面板:14"
+  "ai:B:🤖 人工智能与大模型:14"
+  "monitor:C:📊 探针监控与运维告警:9"
+  "storage:D:🗄️  私有网盘与文件存储:10"
+  "network:E:🌐 网络代理与穿透组网:11"
+  "media:F:🎬 影音媒体与下载娱乐:10"
+  "office:G:📝 协作办公与知识库:11"
+  "social:H:💬 即时通讯与社交媒体:6"
+  "tools:I:🛠️  远程工具与实用套件:14"
+  "custom:J:📦 自定义与第三方应用:0"
 )
 
 # 展开状态记录字符串 (空格分隔的已展开分类ID，初始为空代表全折叠)
@@ -21439,9 +21437,8 @@ collapse_all_cats() {
 get_cat_name() {
     local target="$1"
     for item in "${CATEGORY_LIST[@]}"; do
-        local cid="" ckey="" cname=""
-        cid=$(echo "$item" | cut -d':' -f1)
-        cname=$(echo "$item" | cut -d':' -f3)
+        local cid="" ckey="" cname="" ccount=""
+        IFS=':' read -r cid ckey cname ccount <<< "$item"
         if [ "$cid" = "$target" ]; then
             echo "$cname"
             return 0
@@ -21453,9 +21450,8 @@ get_cat_name() {
 get_cid_by_key() {
     local upper_k="$1"
     for item in "${CATEGORY_LIST[@]}"; do
-        local cid="" ckey=""
-        cid=$(echo "$item" | cut -d':' -f1)
-        ckey=$(echo "$item" | cut -d':' -f2)
+        local cid="" ckey="" cname="" ccount=""
+        IFS=':' read -r cid ckey cname ccount <<< "$item"
         if [ "$ckey" = "$upper_k" ]; then
             echo "$cid"
             return 0
@@ -21646,65 +21642,21 @@ render_accordion_apps_menu() {
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
 
         for item in "${CATEGORY_LIST[@]}"; do
-            local cid="" ckey="" cname=""
-            cid=$(echo "$item" | cut -d':' -f1)
-            ckey=$(echo "$item" | cut -d':' -f2)
-            cname=$(echo "$item" | cut -d':' -f3)
-
-            # 统计当前分类数量与已安装数量
-            local total=0
-            local inst=0
-            for entry in "${BUILTIN_APPS[@]}"; do
-                local acat="" aid=""
-                acat=$(echo "$entry" | cut -d'|' -f3)
-                aid=$(echo "$entry" | cut -d'|' -f1)
-                if [ "$acat" = "$cid" ]; then
-                    total=$((total + 1))
-                    if [ -n "$app_installed" ] && echo "$app_installed" | grep -qx "$aid" 2>/dev/null; then
-                        inst=$((inst + 1))
-                    fi
-                fi
-            done
-
-            for entry in "${CUSTOM_APPS[@]}"; do
-                local acat="" aid=""
-                acat=$(echo "$entry" | cut -d'|' -f3)
-                aid=$(echo "$entry" | cut -d'|' -f1)
-                if [ "$acat" = "$cid" ]; then
-                    total=$((total + 1))
-                    if [ -n "$app_installed" ] && echo "$app_installed" | grep -qx "$aid" 2>/dev/null; then
-                        inst=$((inst + 1))
-                    fi
-                fi
-            done
-
-            if [ "$cid" = "custom" ] && [ "$total" -eq 0 ]; then
-                continue
-            fi
-
-            local inst_badge=""
-            if [ "$inst" -gt 0 ]; then
-                inst_badge=" ${gl_lv}[已装 $inst/$total]${gl_bai}"
-            else
-                inst_badge=" ${gl_hui}[$total 款]${gl_bai}"
-            fi
+            local cid="" ckey="" cname="" ccount=""
+            IFS=':' read -r cid ckey cname ccount <<< "$item"
 
             if is_cat_expanded "$cid"; then
-                echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname$inst_badge"
+                echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
                 echo -e "${gl_hui}  ┌───────────────────────────────────────────────────────────────────${gl_bai}"
 
+                # 仅对展开的目标分类遍历其包含的软件，纯 Bash 内置拆分，0 子进程！
                 for entry in "${BUILTIN_APPS[@]}"; do
                     local aid="" aname="" acat="" astar="" aalias="" adesc=""
-                    aid=$(echo "$entry" | cut -d'|' -f1)
-                    aname=$(echo "$entry" | cut -d'|' -f2)
-                    acat=$(echo "$entry" | cut -d'|' -f3)
-                    astar=$(echo "$entry" | cut -d'|' -f4)
-                    aalias=$(echo "$entry" | cut -d'|' -f5)
-                    adesc=$(echo "$entry" | cut -d'|' -f6)
+                    IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
 
                     if [ "$acat" = "$cid" ]; then
                         local is_inst=0
-                        if [ -n "$app_installed" ] && echo "$app_installed" | grep -qx "$aid" 2>/dev/null; then
+                        if [ -n "$app_installed" ] && [[ " $app_installed " == *" $aid "* ]]; then
                             is_inst=1
                         fi
 
@@ -21722,33 +21674,21 @@ render_accordion_apps_menu() {
                     fi
                 done
 
-                for entry in "${CUSTOM_APPS[@]}"; do
-                    local aid="" aname="" acat="" astar="" aalias="" adesc=""
-                    aid=$(echo "$entry" | cut -d'|' -f1)
-                    aname=$(echo "$entry" | cut -d'|' -f2)
-                    acat=$(echo "$entry" | cut -d'|' -f3)
-                    astar=$(echo "$entry" | cut -d'|' -f4)
-                    aalias=$(echo "$entry" | cut -d'|' -f5)
-                    adesc=$(echo "$entry" | cut -d'|' -f6)
-
-                    if [ "$acat" = "$cid" ]; then
-                        local is_inst=0
-                        if [ -n "$app_installed" ] && echo "$app_installed" | grep -qx "$aid" 2>/dev/null; then
-                            is_inst=1
-                        fi
+                # 若是自定义分类，遍历输出自定义应用
+                if [ "$cid" = "custom" ] && [ "${#CUSTOM_APPS[@]}" -gt 0 ]; then
+                    for entry in "${CUSTOM_APPS[@]}"; do
+                        local aid="" aname="" acat="" astar="" aalias="" adesc=""
+                        IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
                         local num_prefix=""
                         num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-6s]${gl_bai} " "$aid")
-                        local status_badge=""
-                        if [ "$is_inst" -eq 1 ]; then
-                            status_badge="${gl_lv}[已安装]${gl_bai}"
-                        fi
-                        printf "%b%-32s %b %b\n" "$num_prefix" "$aname" "$status_badge" "${gl_hui}$adesc${gl_bai}"
-                    fi
-                done
+                        printf "%b%-32s %b\n" "$num_prefix" "$aname" "${gl_hui}$adesc${gl_bai}"
+                    done
+                fi
 
                 echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
             else
-                echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${gl_bai}$cname$inst_badge"
+                # 关键优化：未展开分类瞬间输出纯折叠样式行，不跑任何内部循环，0 延迟！
+                echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
             fi
         done
 
