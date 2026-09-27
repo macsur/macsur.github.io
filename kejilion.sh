@@ -147,6 +147,7 @@ run_command() {
 
 
 canshu_v6() {
+	[ -f ~/kejilion.sh ] || return 0
 	if grep -q '^canshu="V6"' /usr/local/bin/k > /dev/null 2>&1; then
 		sed -i 's/^canshu="default"/canshu="V6"/' ~/kejilion.sh
 	elif grep -q '^canshu="V6"' ~/kejilion.sh.bak > /dev/null 2>&1; then
@@ -156,6 +157,7 @@ canshu_v6() {
 
 
 CheckFirstRun_true() {
+	[ -f ~/kejilion.sh ] || return 0
 	if grep -q '^permission_granted="true"' /usr/local/bin/k > /dev/null 2>&1; then
 		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh
 	elif grep -q '^permission_granted="true"' ~/kejilion.sh.bak > /dev/null 2>&1; then
@@ -191,7 +193,7 @@ send_stats() {
 
 
 yinsiyuanquan2() {
-
+[ -f ~/kejilion.sh ] || return 0
 if grep -q '^ENABLE_STATS="false"' /usr/local/bin/k > /dev/null 2>&1; then
 	sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/kejilion.sh
 elif grep -q '^ENABLE_STATS="false"' ~/kejilion.sh.bak > /dev/null 2>&1; then
@@ -203,19 +205,36 @@ fi
 
 
 if ! kpanel_protocol_active; then
-	canshu_v6
-	CheckFirstRun_true
-	yinsiyuanquan2
+	# 确保 ~/kejilion.sh 实体文件落盘（兼容本地执行与远程管道 curl 执行）
+	if [ -f "./kejilion.sh" ]; then
+		cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1
+	elif [ -f "${BASH_SOURCE[0]}" ] && [ "${BASH_SOURCE[0]}" != "$0" ] && [ -s "${BASH_SOURCE[0]}" ]; then
+		cp -f "${BASH_SOURCE[0]}" ~/kejilion.sh > /dev/null 2>&1
+	elif [ ! -f ~/kejilion.sh ]; then
+		# 远程管道执行且无本地缓存时，自动拉取落盘一份
+		curl -sSL --max-time 15 "https://x.zttz.eu.org/kejilion.sh" -o ~/kejilion.sh 2>/dev/null || \
+		curl -sSL --max-time 15 "${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh" -o ~/kejilion.sh 2>/dev/null
+	fi
+	chmod +x ~/kejilion.sh > /dev/null 2>&1 || true
+
+	# 部署快捷命令 k
+	if [ -f ~/kejilion.sh ]; then
+		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
+		ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+	fi
+
+	# 部署 apps_manager.sh
+	if [ -f "${KJ_SCRIPT_DIR:-.}/apps_manager.sh" ]; then
+		cp -f "${KJ_SCRIPT_DIR:-.}/apps_manager.sh" /usr/local/bin/apps_manager.sh > /dev/null 2>&1
+	fi
 
 	sed -i '/^alias k=/d' ~/.bashrc > /dev/null 2>&1
 	sed -i '/^alias k=/d' ~/.profile > /dev/null 2>&1
 	sed -i '/^alias k=/d' ~/.bash_profile > /dev/null 2>&1
-	cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1
-	cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-	ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
-	if [ -f "${KJ_SCRIPT_DIR:-.}/apps_manager.sh" ]; then
-		cp -f "${KJ_SCRIPT_DIR:-.}/apps_manager.sh" /usr/local/bin/apps_manager.sh > /dev/null 2>&1
-	fi
+
+	canshu_v6
+	CheckFirstRun_true
+	yinsiyuanquan2
 fi
 
 
@@ -238,8 +257,8 @@ UserLicenseAgreement() {
 
 	if [ "$user_input" = "y" ] || [ "$user_input" = "Y" ]; then
 		send_stats "许可同意"
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' /usr/local/bin/k
+		[ -f ~/kejilion.sh ] && sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh
+		[ -f /usr/local/bin/k ] && sed -i 's/^permission_granted="false"/permission_granted="true"/' /usr/local/bin/k
 	else
 		send_stats "许可拒绝"
 		clear
