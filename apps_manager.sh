@@ -644,3 +644,39 @@ WIZARD_EOF
     echo -e "您可以在该分类（$cat_display）下直接看到并管理它！"
     read -e -p "按回车键继续..." _dummy
 }
+
+linux_panel_accordion() {
+    local target_app=""
+    while true; do
+        render_accordion_apps_menu
+        target_app="$SELECTED_APP_ACTION"
+        [ -z "$target_app" ] && break
+
+        case "$target_app" in
+            0)
+                break
+                ;;
+            11|orig|classic)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel
+                fi
+                ;;
+            b|bak|backup)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel "b"
+                fi
+                ;;
+            r|rst|restore)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel "r"
+                fi
+                ;;
+            *)
+                if command -v linux_panel >/dev/null 2>&1; then
+                    linux_panel "$target_app"
+                fi
+                ;;
+        esac
+    done
+}
+
