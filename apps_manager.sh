@@ -212,6 +212,9 @@ load_custom_apps() {
     local scanned_files=()
 
     local dirs=("$HOME/apps" "${KJ_SCRIPT_DIR:-}/apps" "$(dirname "$0")/apps" "./apps")
+
+    # 搜集所有存在的 .conf 文件
+    local found_confs=()
     for d in "${dirs[@]}"; do
         [ -d "$d" ] || continue
         for conf in "$d"/*.conf; do
@@ -222,31 +225,47 @@ load_custom_apps() {
                 continue
             fi
             scanned_files+=("$bname")
-
-            local app_id="$bname"
-            local app_name=""
-            local app_category="custom"
-            local app_text=""
-            local app_star=""
-
-            app_id=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_id=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d '"' | tr -d "'" | tr -d ' ')
-            [ -z "$app_id" ] && app_id="$bname"
-            app_name=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-            [ -z "$app_name" ] && app_name="$app_id"
-            local cat_temp
-            cat_temp=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d '"' | tr -d "'" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
-            if [ -n "$cat_temp" ]; then
-                case "$cat_temp" in
-                    panel|ai|monitor|storage|network|media|office|social|tools|custom)
-                        app_category="$cat_temp"
-                        ;;
-                esac
-            fi
-            app_text=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2 | tr -d '"' | tr -d "'")
-            [ -n "$app_text" ] && [ ${#app_text} -gt 36 ] && app_text="${app_text:0:36}..."
-
-            CUSTOM_APPS+=("$app_id|$app_name|$app_category|$app_star|$bname|$app_text")
+            found_confs+=("$conf")
         done
+    done
+
+    # 按照文件名升序排序，使 J1, J2... 顺序稳定固定
+    local sorted_confs=()
+    if [ "${#found_confs[@]}" -gt 0 ]; then
+        while IFS= read -r line; do
+            [ -n "$line" ] && sorted_confs+=("$line")
+        done < <(printf '%s\n' "${found_confs[@]}" | sort -f)
+    fi
+
+    for conf in "${sorted_confs[@]}"; do
+        local bname
+        bname=$(basename "$conf" .conf)
+        local app_id="$bname"
+        local app_name=""
+        local app_category="custom"
+        local app_text=""
+        local app_star=""
+
+        app_id=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_id=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+        [ -z "$app_id" ] && app_id="$bname"
+
+        app_name=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | sed -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*$//')
+        [ -z "$app_name" ] && app_name="$app_id"
+
+        local cat_temp
+        cat_temp=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+        if [ -n "$cat_temp" ]; then
+            case "$cat_temp" in
+                panel|ai|monitor|storage|network|media|office|social|tools|custom)
+                    app_category="$cat_temp"
+                    ;;
+            esac
+        fi
+
+        app_text=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | sed -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*$//')
+        [ -n "$app_text" ] && [ ${#app_text} -gt 36 ] && app_text="${app_text:0:36}..."
+
+        CUSTOM_APPS+=("$app_id|$app_name|$app_category|$app_star|$bname|$app_text|$conf")
     done
 }
 
@@ -268,6 +287,11 @@ render_accordion_apps_menu() {
         for item in "${CATEGORY_LIST[@]}"; do
             local cid="" ckey="" cname="" ccount=""
             IFS=':' read -r cid ckey cname ccount <<< "$item"
+
+            # 关键修正：J 分类数量动态反映实际自定义应用款数！
+            if [ "$cid" = "custom" ]; then
+                ccount="${#CUSTOM_APPS[@]}"
+            fi
 
             if is_cat_expanded "$cid"; then
                 echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
@@ -298,15 +322,22 @@ render_accordion_apps_menu() {
                     fi
                 done
 
-                # 若是自定义分类，遍历输出自定义应用
-                if [ "$cid" = "custom" ] && [ "${#CUSTOM_APPS[@]}" -gt 0 ]; then
-                    for entry in "${CUSTOM_APPS[@]}"; do
-                        local aid="" aname="" acat="" astar="" aalias="" adesc=""
-                        IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
-                        local num_prefix=""
-                        num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-6s]${gl_bai} " "$aid")
-                        printf "%b%-32s %b\n" "$num_prefix" "$aname" "${gl_hui}$adesc${gl_bai}"
-                    done
+                # 若是自定义分类，自动生成 [J1]、[J2] 顺序序号并展示
+                if [ "$cid" = "custom" ]; then
+                    if [ "${#CUSTOM_APPS[@]}" -eq 0 ]; then
+                        echo -e "${gl_hui}  │ (暂未检测到自定义应用。可按 [+] 添加或将 .conf 放入 ~/apps 目录)${gl_bai}"
+                    else
+                        local j_idx=1
+                        for entry in "${CUSTOM_APPS[@]}"; do
+                            local aid="" aname="" acat="" astar="" aalias="" adesc="" aconf=""
+                            IFS='|' read -r aid aname acat astar aalias adesc aconf <<< "$entry"
+                            local j_tag="J${j_idx}"
+                            local num_prefix=""
+                            num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$j_tag")
+                            printf "%b%-28s %b\n" "$num_prefix" "$aname" "${gl_hui}$adesc${gl_bai}"
+                            j_idx=$((j_idx + 1))
+                        done
+                    fi
                 fi
 
                 echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
@@ -320,25 +351,43 @@ render_accordion_apps_menu() {
         echo -e "${gl_bai}分类控制: [${gl_huang}A~J${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
         echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}BAK${gl_bai}] 备份全部  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_huang}提示: 直接输入应用编号(如 36, 57)安装，或输入 A~J / 分类名查看软件列表！${gl_bai}"
+        echo -e "${gl_huang}提示: 输入 A~J 查看分类；输入数字(如 36, 57)或编号(如 J1, J2)直接开始安装！${gl_bai}"
 
         read -e -p "请输入你的选择: " user_input
         [ -z "$user_input" ] && continue
 
+        local upper_input
+        upper_input=$(echo "$user_input" | tr '[:lower:]' '[:upper:]')
         local lower_input
         lower_input=$(echo "$user_input" | tr '[:upper:]' '[:lower:]')
 
-        # 优先匹配分类快捷键 (A~J / a~j)
-        local upper_key
-        upper_key=$(echo "$user_input" | tr '[:lower:]' '[:upper:]')
+        # 1. 优先匹配 J1, J2, J3... 自定义序号快速安装
+        if [[ "$upper_input" =~ ^J([0-9]+)$ ]]; then
+            local j_num="${BASH_REMATCH[1]}"
+            local j_idx=$((j_num - 1))
+            if [ "$j_idx" -ge 0 ] && [ "$j_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
+                local t_entry="${CUSTOM_APPS[$j_idx]}"
+                local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
+                IFS='|' read -r t_aid t_aname t_acat t_astar t_alias t_adesc t_conf <<< "$t_entry"
+                SELECTED_APP_ACTION="$t_alias"
+                SELECTED_CUSTOM_CONF="$t_conf"
+                return 0
+            else
+                echo -e "${gl_hong}错误: 自定义应用编号 J${j_num} 无效 (当前可用范围: J1 ~ J${#CUSTOM_APPS[@]})${gl_bai}"
+                sleep 1.5
+                continue
+            fi
+        fi
+
+        # 2. 匹配单字母分类快捷键 (A~J / a~j)
         local matched_cid
-        matched_cid=$(get_cid_by_key "$upper_key")
+        matched_cid=$(get_cid_by_key "$upper_input")
         if [ -n "$matched_cid" ]; then
             toggle_cat_expanded "$matched_cid"
             continue
         fi
 
-        # 匹配分类英文名直接展开 (如 ai, panel, monitor 等)
+        # 3. 匹配分类英文全称直接展开 (如 ai, panel, monitor 等)
         case "$lower_input" in
             panel|ai|monitor|storage|network|media|office|social|tools|custom)
                 toggle_cat_expanded "$lower_input"
@@ -346,6 +395,7 @@ render_accordion_apps_menu() {
                 ;;
         esac
 
+        # 4. 全局快捷操作
         case "$lower_input" in
             0)
                 SELECTED_APP_ACTION="0"
@@ -380,11 +430,13 @@ render_accordion_apps_menu() {
                 return 0
                 ;;
             *)
+                # 数字直接安装内置应用
                 if [[ "$user_input" =~ ^[0-9]+$ ]]; then
                     SELECTED_APP_ACTION="$user_input"
                     return 0
                 fi
 
+                # 其它按键传给应用管理器处理
                 SELECTED_APP_ACTION="$user_input"
                 return 0
                 ;;
