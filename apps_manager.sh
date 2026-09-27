@@ -698,24 +698,17 @@ linux_panel_accordion() {
                 break
                 ;;
             11|orig|classic)
-                if command -v linux_panel >/dev/null 2>&1; then
-                    linux_panel
-                fi
+                CALL_FROM_ACCORDION=1 linux_panel
                 ;;
             b|bak|backup)
-                if command -v linux_panel >/dev/null 2>&1; then
-                    linux_panel "b"
-                fi
+                CALL_FROM_ACCORDION=1 linux_panel "b"
                 ;;
             r|rst|restore)
-                if command -v linux_panel >/dev/null 2>&1; then
-                    linux_panel "r"
-                fi
+                CALL_FROM_ACCORDION=1 linux_panel "r"
                 ;;
             *)
-                if command -v linux_panel >/dev/null 2>&1; then
-                    linux_panel "$target_app"
-                fi
+                # 带着用户选择的应用ID直接调用原生安装管理引擎，执行完毕或退出后精准返回本手风琴菜单
+                CALL_FROM_ACCORDION=1 linux_panel "$target_app"
                 ;;
         esac
     done
