@@ -1623,7 +1623,7 @@ install_ldnmp() {
 	  cd /home/web && docker compose up -d
 	  sleep 1
   	  crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-  	  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+  	  (crontab -l 2>/dev/null; echo '0 6 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
 
 	  fix_phpfpm_conf php
 	  fix_phpfpm_conf php74
@@ -1669,7 +1669,7 @@ install_certbot() {
 	kpanel_web_upgrade_certificate_renewal || return 1
 
 	check_crontab_installed
-	local cron_job="0 0 * * * ~/auto_cert_renewal.sh"
+	local cron_job="0 6 * * * ~/auto_cert_renewal.sh"
 	crontab -l 2>/dev/null | grep -vF "$cron_job" | crontab -
 	(crontab -l 2>/dev/null; echo "$cron_job") | crontab -
 	echo "续签任务已更新"
@@ -2355,7 +2355,7 @@ nginx_upgrade() {
   docker images --filter=reference="${ldnmp_pods}*" -q | xargs docker rmi > /dev/null 2>&1
   docker compose up -d --force-recreate $ldnmp_pods
   crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+  (crontab -l 2>/dev/null; echo '0 6 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
   docker exec nginx chown -R nginx:nginx /var/www/html
   docker exec nginx mkdir -p /var/cache/nginx/proxy
   docker exec nginx mkdir -p /var/cache/nginx/fastcgi
@@ -30638,10 +30638,10 @@ kpanel_network_operations_traffic_status() {
 	start_count="$(grep -Fxc '# kejilion traffic shutdown start' "$cron_path")"
 	end_count="$(grep -Fxc '# kejilion traffic shutdown end' "$cron_path")"
 	invocation_count="$(grep -Fxc "* * * * * $script_path" "$cron_path")"
-	reset_line_count="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/p' "$cron_path" | grep -Ec '^0 1 ([1-9]|[12][0-9]|3[01]) \* \* reboot$')"
+	reset_line_count="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/p' "$cron_path" | grep -Ec '^0 [16] ([1-9]|[12][0-9]|3[01]) \* \* reboot$')"
 	if [ "$enabled" = true ] && [ "$rx_threshold" -gt 0 ] && [ "$tx_threshold" -gt 0 ] &&
 		[ "$start_count" -eq 1 ] && [ "$end_count" -eq 1 ] && [ "$invocation_count" -eq 1 ] && [ "$reset_line_count" -eq 1 ]; then
-		reset_day="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/s/^0 1 \([0-9][0-9]*\) \* \* reboot$/\1/p' "$cron_path")"
+		reset_day="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/s/^0 [16] \([0-9][0-9]*\) \* \* reboot$/\1/p' "$cron_path")"
 		if [[ "$reset_day" =~ ^([1-9]|[12][0-9]|3[01])$ ]]; then
 			health=ready
 		else
@@ -30701,7 +30701,7 @@ kpanel_network_operations_build_cron() {
 		{
 			printf '%s\n' '# kejilion traffic shutdown start'
 			printf '* * * * * %s\n' "$script_path"
-			printf '0 1 %s * * reboot\n' "$reset_day"
+			printf '0 6 %s * * reboot\n' "$reset_day"
 			printf '%s\n' '# kejilion traffic shutdown end'
 		} >> "$target" || return 1
 	fi
@@ -33558,7 +33558,7 @@ while true; do
 
 			check_crontab_installed
 			(crontab -l | grep -v "kejilion.sh") | crontab -
-			(crontab -l 2>/dev/null; echo "$(shuf -i 0-59 -n 1) 2 * * * bash -c '$SH_Update_task'") | crontab -
+			(crontab -l 2>/dev/null; echo "0 6 * * * bash -c '$SH_Update_task'") | crontab -
 			echo -e "${gl_lv}自动更新已开启，每天凌晨2点脚本会自动更新！${gl_bai}"
 			send_stats "开启脚本自动更新"
 			break_end
