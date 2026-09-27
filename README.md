@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./logo.png" width="130" height="130" alt="Linux生态园 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
+<img src="./logo.png" width="130" height="130" alt="生态圈 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
 
-# 🌟 Linux生态园 · 现代化运维与开源应用中心
+# 🌟 生态圈 · 现代化运维与开源应用中心
 
 [![Website](https://img.shields.io/badge/官网主页-x.zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://x.zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
@@ -23,7 +23,7 @@
 
 ## 🚀 极速一键安装
 
-无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux生态园**：
+无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **生态圈**：
 
 ```bash
 bash <(curl -sL https://x.zttz.eu.org/x.sh)
@@ -86,7 +86,7 @@ bash <(curl -sL https://x.zttz.eu.org/x.sh)
 安装完成后，无需层层翻找菜单，直接在终端执行快捷子命令即可秒级直达：
 
 ```bash
-k               # 呼出 Linux生态园 主控制面板
+k               # 呼出 生态圈 主控制面板
 k app           # 直接进入经典平铺应用市场
 k app+          # 打开增强版 11+. 应用市场 [分类折叠]
 k app 57        # 一键极速部署 DeepSeek AI 大模型
@@ -117,5 +117,5 @@ k update        # 无缝检测并更新工具箱至最新版本
 ---
 
 <div align="center">
-  <sub>Linux生态园 · 让 Linux 运维与开源自建变得前所未有的简单与优雅 ❤️</sub>
+  <sub>生态圈 · 让 Linux 运维与开源自建变得前所未有的简单与优雅 ❤️</sub>
 </div>
