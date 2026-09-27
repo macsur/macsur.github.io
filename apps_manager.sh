@@ -29,6 +29,7 @@ CATEGORY_LIST=(
   "social:H:💬 即时通讯与社交媒体:7"
   "tools:I:🛠️  远程工具与实用套件:19"
   "custom:J:📦 自定义与第三方应用:0"
+  "github:K:🌟 [Github乐园] 热门开源TOP10:10"
 )
 
 # 展开状态记录字符串 (空格分隔的已展开分类ID，初始为空代表全折叠)
@@ -51,7 +52,7 @@ toggle_cat_expanded() {
 }
 
 expand_all_cats() {
-    EXPANDED_CATEGORIES="panel ai monitor storage network media office social tools custom"
+    EXPANDED_CATEGORIES="panel ai monitor storage network media office social tools custom github"
 }
 
 collapse_all_cats() {
@@ -86,6 +87,16 @@ get_cid_by_key() {
 
 # 内置 118 个软件的标准数据库 (id|name|category|star|aliases|desc)
 BUILTIN_APPS=(
+  "201|DeepSeek-V3/R1 顶尖开源大模型|github|★|deepseek|全球瞩目的划时代开源大语言模型与超强推理架构。" \
+  "202|Ollama 本地大模型极速运行引擎|github|★|ollama|一键在本地或 VPS 运行 DeepSeek、Llama3 等大模型。" \
+  "203|Open WebUI 全能私有化 AI 交互平台|github|★|open-webui|媲美 ChatGPT 的自托管多模型 Web 界面。" \
+  "204|Dokploy 轻量开源自托管 PaaS 运维平台|github|★|dokploy|下一代轻量级 PaaS 应用平台，一键管理容器应用与数据库。" \
+  "205|Uptime Kuma 高颜值自托管探针监控|github|★|uptime-kuma|高颜值探针监控，支持 90+ 告警通知与公开状态页。" \
+  "206|RustDesk 开源全平台远程桌面中继|github|★|rustdesk|开源远程桌面客户端与自建中继服务，端到端高强度加密安全可控。" \
+  "207|Immich 高性能私有云相册与视频备份|github|★|immich|自主可控的极速相册备份方案，内置隐私 AI 识别与人脸聚合。" \
+  "208|n8n 智能自动化与 AI Agent 流程编排|github|★|n8n|可视化拖拽自动化工作流，原生构建私有 AI Agent 智能体。" \
+  "209|Lobe Chat 现代多模态开源大模型聊天框架|github|★|lobe-chat|极致现代化设计，支持语音、视觉多模态与丰富插件市场。" \
+  "210|Code-Server 浏览器云端全功能 VS Code|github|★|code-server|在远程服务器运行 VS Code，浏览器即开即写。" \
   "1|宝塔面板官方版|panel||bt|baota|" \
   "2|aaPanel宝塔国际版|panel||aapanel|" \
   "3|1Panel新一代管理面板|panel||1p|1panel|" \
@@ -256,7 +267,7 @@ load_custom_apps() {
         cat_temp=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
         if [ -n "$cat_temp" ]; then
             case "$cat_temp" in
-                panel|ai|monitor|storage|network|media|office|social|tools|custom)
+                panel|ai|monitor|storage|network|media|office|social|tools|custom|github)
                     app_category="$cat_temp"
                     ;;
             esac
@@ -354,10 +365,10 @@ render_accordion_apps_menu() {
         done
 
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_bai}分类控制: [${gl_huang}A~J${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
+        echo -e "${gl_bai}分类控制: [${gl_huang}A~K${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
         echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}11${gl_bai}] 经典平铺  [${gl_huang}BAK${gl_bai}] 备份  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_huang}提示: 输入 A~J 查看分类；输入专属代号(如 A1, B3, J1)或原编号(如 1, 57)直接安装！${gl_bai}"
+        echo -e "${gl_huang}提示: 输入 A~K 查看分类；输入专属代号(如 A1, K1, J1)或原编号(如 1, 57)直接安装！${gl_bai}"
 
         read -e -p "请输入你的选择: " user_input
         [ -z "$user_input" ] && continue
@@ -368,12 +379,36 @@ render_accordion_apps_menu() {
         lower_input=$(echo "$user_input" | tr '[:upper:]' '[:lower:]')
 
         # 1. 匹配分类专属代号 (A1~A*, B1~B*, ..., J1~J* 等)
-        if [[ "$upper_input" =~ ^([A-J])([0-9]+)$ ]]; then
+        if [[ "$upper_input" =~ ^([A-K])([0-9]+)$ ]]; then
             local cat_key="${BASH_REMATCH[1]}"
             local item_num="${BASH_REMATCH[2]}"
             local item_idx=$((item_num - 1))
 
-            if [ "$cat_key" = "J" ]; then
+            if [ "$cat_key" = "K" ]; then
+                # 🌟 [Github乐园] TOP 10 专属快捷安装映射
+                case "$item_num" in
+                    1)  SELECTED_APP_ACTION="57" ; return 0 ;; # DeepSeek
+                    2)  SELECTED_APP_ACTION="56" ; return 0 ;; # Ollama
+                    3)  SELECTED_APP_ACTION="58" ; return 0 ;; # OpenWebUI
+                    4)  
+                        echo -e "\n${gl_huang}正在启动 Dokploy 轻量 PaaS 官方安装向导...\n${gl_bai}"
+                        curl -sSL https://dokploy.com/setup.sh | sh
+                        read -e -p "按回车键返回手风琴应用市场..." _dummy
+                        continue
+                        ;;
+                    5)  SELECTED_APP_ACTION="18" ; return 0 ;; # Uptime Kuma
+                    6)  SELECTED_APP_ACTION="35" ; return 0 ;; # RustDesk
+                    7)  SELECTED_APP_ACTION="30" ; return 0 ;; # Immich
+                    8)  SELECTED_APP_ACTION="88" ; return 0 ;; # n8n
+                    9)  SELECTED_APP_ACTION="59" ; return 0 ;; # Lobe Chat
+                    10) SELECTED_APP_ACTION="63" ; return 0 ;; # Code-Server
+                    *)
+                        echo -e "${gl_hong}错误: Github乐园序号 K${item_num} 无效 (当前可用范围: K1 ~ K10)${gl_bai}"
+                        sleep 1.5
+                        continue
+                        ;;
+                esac
+            elif [ "$cat_key" = "J" ]; then
                 # 自定义分类
                 if [ "$item_idx" -ge 0 ] && [ "$item_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
                     local t_entry="${CUSTOM_APPS[$item_idx]}"
