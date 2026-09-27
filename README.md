@@ -1,0 +1,121 @@
+<div align="center">
+
+<img src="./logo.png" width="130" height="130" alt="Linux生态园 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
+
+# 🌟 Linux生态园 · 现代化运维与开源应用中心
+
+[![Website](https://img.shields.io/badge/官网主页-x.zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://x.zttz.eu.org)
+[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-GPLv3-amber?style=for-the-badge)](./LICENSE)
+
+<p align="center">
+  <b>面向 Linux 极客的现代化应用生态大厅与全周期运维工具箱</b><br>
+  涵盖 128+ 精选容器化应用、手风琴智能折叠分类市场、GitHub Trending 当日热榜自动汉化同步、BBRv3 极限网络加速与纯净系统自愈部署。
+</p>
+
+[🌐 访问官方主站](https://x.zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 11-分类折叠市场](#-11-应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
+
+---
+
+</div>
+
+## 🚀 极速一键安装
+
+无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux生态园**：
+
+```bash
+bash <(curl -sL https://x.zttz.eu.org/x.sh)
+```
+
+> **💡 贴心自愈特性**：
+> - 自动检测并完成环境依赖自举，在 `/usr/local/bin/k` 创建全局快捷别名；
+> - 以后在任何路径只需输入 `k` 即可瞬间呼出主控面板，输入 `k app` 或 `k app+` 秒进应用市场。
+
+---
+
+## 🌟 核心精华特色
+
+### 1. 🚀 [Github乐园] · 每日官方趋势榜 TOP 10 自动汉化同步
+- **100% 真实同步**：直接从 GitHub 官方趋势榜（`github.com/trending`）每日定时抓取全球星标增速最快的前 10 大开源神作；
+- **智能全中文转译**：接入自动化翻译引擎与开源领域专业术语库，将英文项目名、核心定位及深度特性介绍一键润色为高质感地道中文；
+- **火焰指标高亮**：实时呈现当日暴增星标（如 `🔥 +2,608 今日新增`）、开发语言色块、总 Stars、总 Forks 与一键克隆安装指令；
+- **双端联动体验**：网页端提供流光卡片展示，服务器终端输入 `k app+` 按 `K` 键亦可直接直达。
+
+---
+
+### 2. 🗂️ 11+. 应用市场 · 手风琴智能分类折叠
+- **分类折叠，告别滚屏**：彻底终结原版 118+ 应用平铺滚屏的繁琐体验，引入全新手风琴折叠交互；
+- **独占展开机制**：展开新分类时自动智能折叠上一个分类，保持终端始终清爽极简；
+- **A ~ K 专属字母代号**：为各大分类应用赋予专属排序编号（如 `A1` 宝塔、`B1` DeepSeek、`K1` 今日榜首），支持按键直选安装；
+- **双向无缝兼容**：既支持输入 `A1`、`B3`、`K1`，也支持原版数字编号（如 `1`、`57`），二者同时生效，自由取舍；
+- **精准闭环退出**：进入任意应用安装向导退出后，**100% 精准回到当前 11+ 分类折叠菜单**，绝不跳转打乱浏览节奏。
+
+---
+
+### 3. 🖥️ 11 大核心分类矩阵与 128+ 精选开源服务
+
+| 分类键 | 分类名称与核心定位 | 收录数量 | 代表性开源应用举例 |
+| :---: | :--- | :---: | :--- |
+| **[A]** | **🖥️ 服务器运维与面板** | 11 款 | 宝塔面板、aaPanel 国际版、1Panel 新一代面板、AMH、PVE、JumpServer 等 |
+| **[B]** | **🤖 人工智能与大模型** | 14 款 | DeepSeek-V3/R1、Ollama、OpenWebUI、Dify、RAGFlow、Hermes 等 |
+| **[C]** | **📊 探针监控与运维告警** | 11 款 | 哪吒探针、Uptime Kuma、Prometheus+Grafana、Speedtest、网站补货监控等 |
+| **[D]** | **🗄️ 私有网盘与文件存储** | 14 款 | Cloudreve、Nextcloud、PhotoPrism、SFTPGo、简单图床、Pingvin 等 |
+| **[E]** | **🌐 网络代理与穿透组网** | 15 款 | NginxProxyManager、雷池 WAF、FRP (服务端/客户端)、ddns-go、99CDN 等 |
+| **[F]** | **🎬 影音媒体与下载娱乐** | 14 款 | qBittorrent 离线下载、Emby 影音中心、Navidrome 音乐库、yt-dlp 等 |
+| **[G]** | **📝 协作办公与知识库** | 13 款 | OnlyOffice 在线协作、Memos 网页备忘录、Stirling-PDF、Draw.io 绘图等 |
+| **[H]** | **💬 即时通讯与社交媒体** | 7 款 | RocketChat 团队通讯、Poste.io 邮件服务、Sun-Panel 导航、极简朋友圈等 |
+| **[I]** | **🛠️ 远程工具与实用套件** | 19 款 | RustDesk 自建中继、Ubuntu 远程桌面、Bitwarden 密码库、IT-Tools 工具箱等 |
+| **[J]** | **📦 自定义与第三方应用** | 动态扩展 | 支持读取本地 `~/apps/*.conf`，自动按 `J1`、`J2`... 编号并极速安装 |
+| **[K]** | **🌟 [Github乐园] 热门开源TOP10** | 10 款 | 紧随全球开源趋势，今日星标增长最猛的 TOP 10 顶流神作 |
+
+---
+
+### 4. ⚡ 现代化 Linux 运维基座与系统调优
+
+- **BBRv3 极致拥塞调优**：内置最新 Google BBRv3 内核算法与 TCP 协议栈调优，显著降低丢包率与网络延迟；
+- **全方位垃圾清理**：一键彻底清理系统缓存、旧内核、无效依赖与日志垃圾，扩展 SWAP 虚拟内存；
+- **Docker 容器全生命周期管理**：自动解决端口冲突检测、版本升级、日志轮转与一键跨机打包迁移；
+- **安全加固体系**：集成 Fail2ban 暴力破解防御、SSH 密钥导入与安全强化、iptables 端口精准放行。
+
+---
+
+## ⚡ 常用快捷指令速查
+
+安装完成后，无需层层翻找菜单，直接在终端执行快捷子命令即可秒级直达：
+
+```bash
+k               # 呼出 Linux生态园 主控制面板
+k app           # 直接进入经典平铺应用市场
+k app+          # 打开增强版 11+. 应用市场 [分类折叠]
+k app 57        # 一键极速部署 DeepSeek AI 大模型
+k bbr3          # 安装并开启最新 BBRv3 网络极限加速
+k clean         # 一键深度清理服务器缓存与旧冗余内核
+k dd            # 纯净版官方 Linux 系统一键重装
+k backup        # 全自动打包备份全部 Docker 容器与数据库
+k update        # 无缝检测并更新工具箱至最新版本
+```
+
+---
+
+## 🛠️ 自动化流水线与代码工程
+
+- **前端技术栈**：采用 **Next.js 14 (App Router)** + **Tailwind CSS** 构建，全静态导出（SSG）极速秒开；
+- **自动化同步引擎**：包含官方源码自动同步脚本 `sync_upstream.sh` 与 `sync_upstream.js`，可平滑跟进上游更新并保持分类折叠特性零冲突；
+- **每日热榜抓取器**：`fetch_github_trending.js` 自动抓取 GitHub 官方趋势榜，智能翻译后即时渲染；
+- **高颜值视觉系统**：配备专属圆形机甲猫咪 Logo、标准 180×180 Apple Touch Icon 与 Favicon 图标集。
+
+---
+
+## 🔗 相关链接
+
+- **主页域名**：[https://x.zttz.eu.org](https://x.zttz.eu.org)
+- **GitHub 源码仓库**：[https://github.com/macsur/macsur.github.io](https://github.com/macsur/macsur.github.io)
+- **上游官方项目**：[kejilion/sh](https://github.com/kejilion/sh)
+
+---
+
+<div align="center">
+  <sub>Linux生态园 · 让 Linux 运维与开源自建变得前所未有的简单与优雅 ❤️</sub>
+</div>
