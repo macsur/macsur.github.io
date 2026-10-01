@@ -12,6 +12,7 @@
 - 在仓库根目录运行
 """
 import datetime
+import glob
 import html as htmlmod
 import json
 import os
@@ -150,6 +151,10 @@ def tag_for(rank):
     return f"TOP {rank} 趋势"
 
 
+def stars_today_str(today):
+    return f"+{today} 今日新增" if today else "🔥 社区火爆"
+
+
 def fetch(url):
     last = None
     for i in range(3):
@@ -179,7 +184,7 @@ def parse(page):
         if desc_m:
             desc = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", desc_m.group(1))).strip()
         lang_m = re.search(r'itemprop="programmingLanguage"[^>]*>([^<]+)<', a)
-        lang = lang_m.group(1).strip() if lang_m else ""
+        lang = lang_m.group(1).strip() if lang_m else "Markdown / Shell"
         color_m = re.search(r'repo-language-color"[^>]*style="background-color:\s*([^;"]+)', a)
         color = color_m.group(1).strip() if color_m else "#8b949e"
         stars_m = re.search(r'/stargazers"[^>]*>.*?</svg>\s*([\d,\.kKmM]+)', a, re.S)
@@ -187,7 +192,7 @@ def parse(page):
         forks_m = re.search(r'/forks"[^>]*>.*?</svg>\s*([\d,\.kKmM]+)', a, re.S)
         forks = forks_m.group(1).strip() if forks_m else "-"
         today_m = re.search(r"([\d,]+)\s+stars today", a)
-        today = today_m.group(1) if today_m else "0"
+        today = today_m.group(1) if today_m else None
         repos.append({
             "owner": owner, "repo": repo, "desc": desc, "lang": lang,
             "color": color, "stars": stars, "forks": forks, "today": today,
@@ -207,11 +212,9 @@ def build_card(rank, r):
     badge = BADGE_CLASS.get(rank, BADGE_DEFAULT)
     tag_style = TAG_STYLE.get(rank, TAG_DEFAULT_STYLE)
     tag_badge = f'<span class="{tag_style}">{tag_for(rank)}</span>'
-    lang_span = ""
-    if r["lang"]:
-        lang_span = (f'<span class="flex items-center space-x-1.5">'
-                     f'<span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color:{esc(r["color"])}"></span>'
-                     f'<span class="font-medium text-slate-300">{esc(r["lang"])}</span></span>')
+    lang_span = (f'<span class="flex items-center space-x-1.5">'
+                 f'<span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color:{esc(r["color"])}"></span>'
+                 f'<span class="font-medium text-slate-300">{esc(r["lang"])}</span></span>')
     title_raw, desc_raw = localize(
         r["repo"], r["desc"] or "暂无详细描述，点击前往 GitHub 探索项目源码。")
     title, desc = esc(title_raw), esc(desc_raw)
@@ -227,7 +230,7 @@ def build_card(rank, r):
         f"</div></div>"
         f'<div class="flex items-center space-x-1.5 shrink-0">'
         f'<span class="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30 shadow-sm animate-pulse">'
-        f'{FLAME_ICON}<span>+{esc(r["today"])} 今日新增</span></span></div></div>'
+        f'{FLAME_ICON}<span>{esc(stars_today_str(r["today"]))}</span></span></div></div>'
         f'<p class="text-xs text-slate-300 leading-relaxed mb-4 min-h-[36px]">{desc}</p>'
         f'<div class="flex items-center space-x-4 text-xs text-slate-400 mb-4 pb-2 border-b border-slate-800/50">{lang_span}'
         f'<span class="flex items-center space-x-1">{STAR_ICON}<span class="font-mono text-slate-200">{esc(r["stars"])}</span></span>'
@@ -247,6 +250,74 @@ def build_card(rank, r):
     )
 
 
+def build_js_data(repos):
+    """生成 JS chunk 中 T 数组的字面量（JSON 即合法 JS）。字段顺序与原构建一致。"""
+    items = []
+    for i, r in enumerate(repos[:WANT]):
+        rank = i + 1
+        title, desc = localize(
+            r["repo"], r["desc"] or "暂无详细描述，点击前往 GitHub 探索项目源码。")
+        full = f'{r["owner"]}/{r["repo"]}'
+        items.append({
+            "rank": rank,
+            "name": title,
+            "rawName": r["repo"],
+            "owner": r["owner"],
+            "repo": full,
+            "stars": r["stars"],
+            "forks": r["forks"],
+            "starsToday": stars_today_str(r["today"]),
+            "language": r["lang"],
+            "langColor": r["color"],
+            "tag": tag_for(rank),
+            "desc": desc,
+            "enDesc": r["desc"],
+            "githubUrl": f"https://github.com/{full}",
+            "deployCmd": f"git clone https://github.com/{full}.git",
+        })
+    return "T=" + json.dumps(items, ensure_ascii=True, separators=(",", ":"))
+
+
+def update_js_chunk(repos):
+    """同步更新 _next JS chunk 里的榜单数据，避免 hydration 用旧数据覆盖新 HTML。"""
+    paths = glob.glob("_next/static/chunks/app/page-*.js")
+    if not paths:
+        sys.exit("未找到 page JS chunk，放弃更新")
+    path = paths[0]
+    with open(path, encoding="utf-8") as f:
+        js = f.read()
+    start = js.find("T=[")
+    if start == -1:
+        sys.exit("JS 中未找到 T=[ 数据数组，放弃更新")
+    # 括号匹配找数组结尾（跳过字符串内容）
+    depth, in_str, escape, end = 0, None, False, -1
+    for j in range(start + 2, len(js)):
+        c = js[j]
+        if in_str:
+            if escape:
+                escape = False
+            elif c == "\\":
+                escape = True
+            elif c == in_str:
+                in_str = None
+        elif c in ("\"", "'"):
+            in_str = c
+        elif c == "[":
+            depth += 1
+        elif c == "]":
+            depth -= 1
+            if depth == 0:
+                end = j
+                break
+    if end == -1:
+        sys.exit("JS 数据数组括号不匹配，放弃更新")
+    new_js = js[:start] + build_js_data(repos) + js[end + 1:]
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(new_js)
+    print(f"已同步 JS chunk: {path}")
+    return path
+
+
 def beijing_now():
     tz = datetime.timezone(datetime.timedelta(hours=8))
     return datetime.datetime.now(tz).strftime("%Y-%m-%d %H:%M") + " (UTC+8)"
@@ -259,6 +330,7 @@ def main():
     if len(repos) < MIN_REPOS:
         sys.exit(f"解析到的仓库数量不足({len(repos)})，放弃更新")
     cards = "".join(build_card(i + 1, r) for i, r in enumerate(repos[:WANT]))
+    js_path = update_js_chunk(repos)
     with open("index.html", encoding="utf-8") as f:
         html = f.read()
     if "<!--TRENDING_GRID_START-->" not in html or "<!--TRENDING_GRID_END-->" not in html:
