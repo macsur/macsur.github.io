@@ -2,12 +2,19 @@
 # -*- coding: utf-8 -*-
 """
 每日抓取 GitHub Trending TOP10，更新 index.html 的 [Github乐园] 版块。
+翻译策略（三级，复刻原站 fetch_github_trending.js 的设计）：
+  1. 内置中文词典：命中则直接使用精心打磨的中文标题+简介；
+  2. 大模型 API 翻译：需配置环境变量 TRANSLATE_API_URL + TRANSLATE_API_KEY
+     （GitHub Secrets），翻译英文简介为中文；失败自动降级；
+  3. 规则替换兜底：对英文简介做轻量术语替换。
 - 纯 Python 标准库，零第三方依赖
 - 抓取失败 / 解析数量不足时直接报错退出，不修改文件（避免空提交覆盖线上内容）
 - 在仓库根目录运行
 """
 import datetime
 import html as htmlmod
+import json
+import os
 import re
 import sys
 import urllib.request
@@ -34,6 +41,113 @@ BADGE_CLASS = {
     3: "w-7 h-7 rounded-lg text-xs flex items-center justify-center font-mono bg-gradient-to-r from-amber-700 to-amber-600 text-white font-black shadow-lg shadow-amber-700/20",
 }
 BADGE_DEFAULT = "w-7 h-7 rounded-lg text-xs flex items-center justify-center font-mono bg-slate-800 text-slate-300 font-bold border border-slate-700"
+
+TAG_STYLE = {
+    1: "text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-medium",
+    2: "text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium",
+    3: "text-[11px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-medium",
+}
+TAG_DEFAULT_STYLE = "text-[11px] px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-300 border border-slate-500/20 font-medium"
+
+# ---- 翻译 API（可选；不配置则跳过，直接用词典+规则）----
+TRANSLATE_API_URL = os.environ.get("TRANSLATE_API_URL", "").rstrip("/")
+TRANSLATE_API_KEY = os.environ.get("TRANSLATE_API_KEY", "")
+TRANSLATE_MODEL = os.environ.get("TRANSLATE_MODEL", "cli-api")
+
+# ---- 内置中文词典：命中即用，无需翻译（移植自原站 fetch_github_trending.js）----
+BUILTIN_ZH_DICTIONARY = {
+    "paperclip": ("Paperclip · AI 智能体工作流协同平台",
+                  "专为职场打造的开源多 Agent 管理协同工具，一站式编排与调度团队 AI 智能体。"),
+    "hindsight": ("Hindsight · 具学习能力的 Agent 记忆引擎",
+                  "让 AI 智能体越用越聪明的持久化自学习记忆架构，原生支持终身学习与上下文进化。"),
+    "Model-Optimizer": ("Model-Optimizer · NVIDIA 前沿大模型优化与加速库",
+                        "英伟达官方统一的 SOTA 模型优化库，集成量化、蒸馏、剪枝与推测解码，大幅提升 TensorRT-LLM 与 vLLM 推理吞吐。"),
+    "univer": ("Univer · AI 智能体全能协同 Office 底座",
+               "面向 AI Agent 的全能办公运行底座，单套运行时集成表格、文档、幻灯片、白板与关系数据库。"),
+    "tensorflow": ("TensorFlow · 顶级端到端机器学习开源框架",
+                  "Google 开源的世界级端到端机器学习与深度学习框架，覆盖从科研训练到生产部署全流程。"),
+    "ai-engineering-from-scratch": ("从零构建 AI 工程全栈实践指南",
+                                    "系统化掌握大模型与 AI 生产级落地开发，涵盖从基础架构到商业化全流程实战。"),
+    "openbao": ("OpenBao · 开源高安全密码与密钥管理系统",
+                "开源社区主导的 HashiCorp Vault 独立开源平替，专用于集中安全存储证书、API 秘钥与敏感数据。"),
+    "buzz": ("Buzz · 高并发分布式蜂群即时通信平台",
+             "基于 Rust 打造的去中心化、高吞吐蜂群式通讯与消息协作协议平台。"),
+    "vscode": ("VS Code · 微软开源全能代码编辑器",
+               "全球最受欢迎的现代化开源轻量级代码编辑器，拥有极强的插件扩展能力与生态支持。"),
+    "reverse-skill": ("Reverse-Skill · 逆向渗透与安全研究 AI 技能路由包",
+                      "AI 智能路由驱动的安全工程套件，支持 Claude Code / Cursor / Cline 自动按需自举工具链与经验进化。"),
+}
+
+# ---- 规则兜底：轻量术语替换（移植自原站）----
+RULE_REPLACEMENTS = [
+    ("The open-source app everyone uses to", "人人都在使用的开源应用：用于"),
+    ("An open source", "开源的"),
+    ("A unified library of", "统一的开发库：包含"),
+    ("framework for", "开发框架，适用于"),
+    ("in one runtime", "统一运行时环境"),
+    ("manage agents at work", "在工作场景中调度与管理 AI 智能体"),
+    ("sensitive data including", "敏感数据，包括"),
+    ("communication platform", "通讯协同平台"),
+]
+
+
+def translate_via_api(text):
+    """可选的大模型翻译；未配置或失败返回 None。"""
+    if not (TRANSLATE_API_URL and TRANSLATE_API_KEY) or not text.strip():
+        return None
+    try:
+        payload = json.dumps({
+            "model": TRANSLATE_MODEL,
+            "messages": [
+                {"role": "system",
+                 "content": "你是一个开源软件翻译专家，请将英文项目描述翻译为地道、简明、富有科技感的中文（仅输出中文，不超过50字）。"},
+                {"role": "user", "content": text},
+            ],
+            "temperature": 0.3,
+        }).encode()
+        req = urllib.request.Request(
+            TRANSLATE_API_URL + "/chat/completions", data=payload, method="POST",
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {TRANSLATE_API_KEY}"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.load(r)
+        content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
+        return content or None
+    except Exception as e:  # noqa: BLE001 - 翻译失败就降级，不影响主流程
+        print(f"[warn] API 翻译失败，已降级: {e}", file=sys.stderr)
+        return None
+
+
+def dict_lookup(repo):
+    return BUILTIN_ZH_DICTIONARY.get(repo) or BUILTIN_ZH_DICTIONARY.get(repo.lower())
+
+
+def rule_translate(en_desc):
+    zh = en_desc
+    for en, cn in RULE_REPLACEMENTS:
+        zh = zh.replace(en, cn)
+    return zh
+
+
+def localize(repo, en_desc):
+    """三级翻译：词典 -> API -> 规则。返回 (中文标题, 中文简介)。"""
+    entry = dict_lookup(repo)
+    zh_desc = translate_via_api(en_desc)
+    if zh_desc:
+        return (entry[0] if entry else prettify(repo)), zh_desc
+    if entry:
+        return entry[0], entry[1]
+    return prettify(repo), rule_translate(en_desc)
+
+
+def tag_for(rank):
+    if rank == 1:
+        return "🏆 全球登顶 No.1"
+    if rank == 2:
+        return "🥈 今日榜眼 No.2"
+    if rank == 3:
+        return "🥉 今日探花 No.3"
+    return f"TOP {rank} 趋势"
 
 
 def fetch(url):
@@ -91,15 +205,16 @@ def prettify(repo):
 def build_card(rank, r):
     esc = htmlmod.escape
     badge = BADGE_CLASS.get(rank, BADGE_DEFAULT)
-    champ = ('<span class="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 '
-             'border border-cyan-500/20 font-medium">🏆 全球登顶 No.1</span>' if rank == 1 else "")
+    tag_style = TAG_STYLE.get(rank, TAG_DEFAULT_STYLE)
+    tag_badge = f'<span class="{tag_style}">{tag_for(rank)}</span>'
     lang_span = ""
     if r["lang"]:
         lang_span = (f'<span class="flex items-center space-x-1.5">'
                      f'<span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color:{esc(r["color"])}"></span>'
                      f'<span class="font-medium text-slate-300">{esc(r["lang"])}</span></span>')
-    desc = esc(r["desc"]) if r["desc"] else '<span class="text-slate-500">暂无简介</span>'
-    title = esc(prettify(r["repo"]))
+    title_raw, desc_raw = localize(
+        r["repo"], r["desc"] or "暂无详细描述，点击前往 GitHub 探索项目源码。")
+    title, desc = esc(title_raw), esc(desc_raw)
     full = esc(f'{r["owner"]}/{r["repo"]}')
     return (
         f'<div class="glass-panel p-5 rounded-2xl border border-slate-800/90 hover:border-amber-500/40 '
@@ -107,7 +222,7 @@ def build_card(rank, r):
         f'<div class="flex items-start justify-between gap-3 mb-3"><div class="flex items-center space-x-3">'
         f'<span class="{badge}">#{rank}</span><div>'
         f'<div class="flex items-center space-x-2">'
-        f'<h3 class="font-bold text-white text-base group-hover:text-amber-300 transition-colors">{title}</h3>{champ}</div>'
+        f'<h3 class="font-bold text-white text-base group-hover:text-amber-300 transition-colors">{title}</h3>{tag_badge}</div>'
         f'<span class="text-xs text-slate-400 font-mono flex items-center space-x-1 mt-0.5">{FOLDER_ICON}<span>{full}</span></span>'
         f"</div></div>"
         f'<div class="flex items-center space-x-1.5 shrink-0">'
