@@ -8,10 +8,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Linux生态圈 · 现代化运维与开源应用中心 | x.zttz.eu.org",
-  description: "Linux生态圈 (x.zttz.eu.org) - 一键脚本管理 Linux 服务器、网络调优、建站、Docker 容器与 128+ 现代化应用市场及 [Github乐园]，100% 开源兼容。",
-  keywords: ["Linux生态圈", "Github乐园", "Linux脚本", "应用市场", "Docker管理", "BBRv3", "手风琴菜单", "1Panel", "Deepseek"],
-  authors: [{ name: "Linux生态圈", url: "https://x.zttz.eu.org" }],
+  title: "Linux生态 · 现代化服务器运维与开源应用 | x.zttz.eu.org",
+  description: "Linux生态 (x.zttz.eu.org) - 一键脚本管理 Linux 服务器、网络调优、建站、Docker 容器与 128+ 现代化应用市场及 [Github乐园]，100% 开源兼容。",
+  keywords: ["Linux生态", "Github乐园", "Linux脚本", "应用市场", "Docker管理", "BBRv3", "手风琴菜单", "1Panel", "Deepseek"],
+  authors: [{ name: "Linux生态", url: "https://x.zttz.eu.org" }],
   metadataBase: new URL("https://x.zttz.eu.org"),
   icons: {
     icon: [

@@ -412,7 +412,7 @@ export default function Home() {
                 </span>
               </div>
               <div onClick={toggleTheme} className="cursor-pointer select-none">
-                <span className="font-bold text-lg text-white tracking-wider">Linux生态圈</span>
+                <span className="font-bold text-lg text-white tracking-wider">Linux生态</span>
                 <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">v4.5.10</span>
               </div>
             </div>
@@ -467,7 +467,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6">
             一键融入Linux生态
             <span className="block mt-3 text-gradient-gemini font-extrabold tracking-tight">
-              现代化服务器运维与开源应用生态中心
+              现代化服务器运维与开源应用
             </span>
           </h1>
 
@@ -1236,8 +1236,8 @@ export default function Home() {
       <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-300">Linux生态圈 · x.zttz.eu.org</span>
-            <span>- 现代化 Linux 运维与开源应用生态中心</span>
+            <span className="font-bold text-slate-300">Linux生态 · x.zttz.eu.org</span>
+            <span>- 现代化服务器运维与开源应用</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
@@ -1253,7 +1253,7 @@ export default function Home() {
 
         {/* 底部最下一列：极不显眼的隐蔽彩蛋入口与节点状态 */}
         <div className="mt-8 pt-5 border-t border-slate-900/80 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
-          <span>© 2026 Linux生态圈 · x.zttz.eu.org · 保留所有权利</span>
+          <span>© 2026 Linux生态 · x.zttz.eu.org · 保留所有权利</span>
           <div className="flex items-center space-x-2.5">
             <span className="text-slate-600/80">Cluster: HK-Edge-01</span>
             <span className="text-slate-800">•</span>
