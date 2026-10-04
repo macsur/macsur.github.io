@@ -304,8 +304,11 @@ async function main() {
     return;
   }
 
+  // 严格按 UTC+8 计算北京时间，避免 GitHub Actions 云端 Ubuntu (UTC+0) 时间戳错乱
   const now = new Date();
-  const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} (UTC+8)`;
+  const beijingMs = now.getTime() + 8 * 60 * 60 * 1000;
+  const bj = new Date(beijingMs);
+  const formattedDate = `${bj.getUTCFullYear()}-${String(bj.getUTCMonth() + 1).padStart(2, '0')}-${String(bj.getUTCDate()).padStart(2, '0')} ${String(bj.getUTCHours()).padStart(2, '0')}:${String(bj.getUTCMinutes()).padStart(2, '0')} (UTC+8)`;
 
   const fileContent = `/**
  * 🌟 [Github乐园] GitHub Trending 官方热榜今日数据 (全自动中文汉化版)

@@ -30,6 +30,26 @@ import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
 import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
 
 export default function Home() {
+  // 主题模式：'dark'（默认极客流光暗黑模式）或 'light'（清爽科技白昼模式）
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  // 初始化读取本地偏好
+  useEffect(() => {
+    const saved = localStorage.getItem('theme_preference') as 'dark' | 'light' | null;
+    if (saved) {
+      setTheme(saved);
+      document.documentElement.classList.toggle('light', saved === 'light');
+    }
+  }, []);
+
+  // 切换白天/黑夜模式函数
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('theme_preference', next);
+    document.documentElement.classList.toggle('light', next === 'light');
+  };
+
   // 安装命令源切换 (默认推荐 x.zttz.eu.org 专属增强版)
   const [installSource, setInstallSource] = useState<'enhanced' | 'official' | 'mirror'>('enhanced');
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -374,12 +394,24 @@ export default function Home() {
         <header className="sticky top-0 z-50 glass-panel border-b border-white/5">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img 
-                src="/logo.png" 
-                alt="Linux生态圈 x.zttz.eu.org" 
-                className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-500/40 hover:scale-105 transition-all object-cover cursor-pointer" 
-              />
-              <div>
+              {/* 点击左上角 Logo 实现白天/夜间主题切换，带有轻微点击反馈与模式指示器 */}
+              <div
+                onClick={toggleTheme}
+                title={theme === 'dark' ? '点击切换为清新白天模式 ☀️' : '点击切换为默认极客暗黑模式 🌙'}
+                className="relative group cursor-pointer"
+              >
+                <img
+                  src="/logo.png"
+                  alt="Linux生态圈 x.zttz.eu.org"
+                  className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
+                />
+                <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#090a0f] flex items-center justify-center text-[8px] transition-all ${
+                  theme === 'dark' ? 'bg-amber-400 text-slate-950' : 'bg-blue-600 text-white'
+                }`}>
+                  {theme === 'dark' ? '🌙' : '☀️'}
+                </span>
+              </div>
+              <div onClick={toggleTheme} className="cursor-pointer select-none">
                 <span className="font-bold text-lg text-white tracking-wider">Linux生态圈</span>
                 <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">v4.5.10</span>
               </div>
