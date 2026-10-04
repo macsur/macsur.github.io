@@ -713,7 +713,7 @@ export default function Home() {
             </div>
             <div className="google-card p-5 border border-white/[0.08] text-center group">
               <div className="text-2xl sm:text-3xl font-extrabold text-indigo-400 font-mono group-hover:scale-105 transition-transform">11 大</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">智能手风琴分类 (含Github乐园)</div>
+              <div className="text-xs text-slate-400 mt-1 font-medium">应用分类矩阵 (含Github乐园)</div>
             </div>
             <div className="google-card p-5 border border-white/[0.08] text-center group">
               <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono group-hover:scale-105 transition-transform">100%</div>
@@ -803,25 +803,25 @@ export default function Home() {
             )}
 
             {/* 大折叠总栏目头部 (默认展示，点击展开/收起全部内容) */}
-            <div 
+            <div
               onClick={handleToggleMasterMarket}
-              className={`p-6 sm:p-8 cursor-pointer hover:bg-slate-900/50 transition-all select-none flex flex-col md:flex-row md:items-center justify-between gap-4 group ${
+              className={`p-6 sm:p-8 cursor-pointer hover:bg-slate-900/50 transition-all select-none flex flex-col md:flex-row md:items-center justify-between gap-6 group ${
                 isShockwaveActive ? 'animate-cyber-flash' : ''
               }`}
             >
-              <div className="flex items-start sm:items-center space-x-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
-                  isMasterMarketOpen 
-                    ? 'bg-gradient-to-tr from-cyan-400 to-indigo-500 text-slate-950 shadow-lg shadow-cyan-400/30 scale-105' 
+              <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left space-y-4 sm:space-y-0 sm:space-x-5 flex-1">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
+                  isMasterMarketOpen
+                    ? 'bg-gradient-to-tr from-cyan-400 to-indigo-500 text-slate-950 shadow-lg shadow-cyan-400/30 scale-105'
                     : 'bg-gradient-to-tr from-cyan-500/20 to-indigo-500/20 border border-cyan-500/30 text-cyan-400 group-hover:scale-105'
                 }`}>
-                  <Layers className={`w-6 h-6 transition-transform duration-300 ${isMasterMarketOpen ? 'rotate-90' : ''}`} />
+                  <Layers className={`w-7 h-7 transition-transform duration-300 ${isMasterMarketOpen ? 'rotate-90' : ''}`} />
                 </div>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <div className="flex-1 flex flex-col items-center sm:items-start text-center sm:text-left">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-2">
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide transition-all ${
-                      isMasterMarketOpen 
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm shadow-cyan-400/20' 
+                      isMasterMarketOpen
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm shadow-cyan-400/20'
                         : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-400'
                     }`}>
                       {isMasterMarketOpen ? '⚡ QUANTUM CORE ONLINE' : 'App Marketplace 4.0'}
@@ -830,30 +830,30 @@ export default function Home() {
                       11 大分类 · 128+ 应用
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
-                      独占折叠架构
+                      一键快速部署
                     </span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-white group-hover:text-cyan-300 transition-colors flex items-center space-x-2">
-                    <span>应用生态大厅 · 智能手风琴</span>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-center sm:justify-start space-x-2.5">
+                    <span>应用生态大厅</span>
                     {isMasterMarketOpen && (
                       <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 animate-pulse">
                         已激活
                       </span>
                     )}
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                  <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-2xl leading-relaxed">
                     涵盖服务器面板、AI大模型、探针监控、私有云盘等全景生态。默认全收纳折叠，点击展开浏览。
                   </p>
                 </div>
               </div>
 
               {/* 展开/折叠状态指示器按钮 */}
-              <div className="flex items-center space-x-3 shrink-0 self-end md:self-center">
-                <button 
+              <div className="flex items-center justify-center shrink-0 self-center">
+                <button
                   type="button"
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-2 transition-all shadow-md ${
-                    isMasterMarketOpen 
-                      ? 'bg-slate-900 border border-cyan-500/50 text-cyan-300 shadow-cyan-500/20' 
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-2 transition-all shadow-md ${
+                    isMasterMarketOpen
+                      ? 'bg-slate-900 border border-cyan-500/50 text-cyan-300 shadow-cyan-500/20'
                       : 'bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 border border-cyan-500/30 text-cyan-300 group-hover:border-cyan-400 group-hover:text-white shadow-cyan-500/10'
                   }`}
                 >
