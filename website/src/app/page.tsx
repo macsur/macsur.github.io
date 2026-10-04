@@ -760,6 +760,103 @@ export default function Home() {
       </section>
 
 
+      {/* 🌟 【今日推荐】专区：精选本站极力推荐使用的 3 款一键部署神作 */}
+      <section id="daily-recommend" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="relative rounded-3xl p-6 sm:p-10 border border-white/10 bg-[#0e111a]/80 backdrop-blur-2xl shadow-2xl shadow-black/50 overflow-hidden">
+          {/* 背景装饰辉光 */}
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* 专区标题头 */}
+          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-slate-800">
+            <div>
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold mb-3">
+                <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+                <span>每日甄选 · 极力推荐 · 经过实战高频检验</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight flex items-center space-x-3">
+                <span>【今日推荐】</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
+                  顶级一键部署神作 TOP 3
+                </span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
+                从本站 128+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
+              </p>
+            </div>
+
+            <div className="mt-4 md:mt-0 flex items-center space-x-2">
+              <span className="text-xs px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-300 font-mono flex items-center space-x-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>动态算法实时精选</span>
+              </span>
+            </div>
+          </div>
+
+          {/* 3款推荐卡片 */}
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-5">
+            {recommendedApps.map((app, idx) => (
+              <div
+                key={idx}
+                className="google-card p-6 border border-white/[0.08] hover:border-blue-500/40 hover:bg-[#121624]/90 transition-all duration-300 flex flex-col justify-between group shadow-lg"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 text-xs font-semibold tracking-wide">
+                      {app.badge}
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">
+                      ★ {app.stars}
+                    </span>
+                  </div>
+
+                  <h3 className={`font-bold text-base mb-2 transition-colors ${theme === "dark" ? "text-white group-hover:text-blue-400" : "text-slate-950 font-extrabold group-hover:text-blue-600"}`}>
+                    {app.name}
+                  </h3>
+
+                  <div className="text-[11px] text-slate-400 mb-3 flex items-center space-x-1">
+                    <span>分类：</span>
+                    <span className="font-medium text-slate-300">{app.category}</span>
+                  </div>
+
+                  <p className={`text-xs leading-relaxed mb-4 text-justify min-h-[50px] transition-colors ${theme === "dark" ? "text-slate-300" : "text-slate-900 font-medium"}`}>
+                    {app.highlight}
+                  </p>
+
+                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 mb-4 text-xs">
+                    <span className="text-blue-400 font-bold block mb-1">💡 推荐理由：</span>
+                    <span className={`leading-relaxed ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{app.reason}</span>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between gap-2">
+                  <div className="flex items-center space-x-1 font-mono text-xs text-slate-400 overflow-hidden">
+                    <span className="text-blue-400 font-bold">$</span>
+                    <span className="truncate text-blue-300">{app.cmd}</span>
+                  </div>
+                  <button
+                    onClick={() => handleCopy(app.cmd)}
+                    className="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-all shadow-sm active:scale-95 flex items-center space-x-1"
+                  >
+                    {copiedText === app.cmd ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>已复制</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>一键部署</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 手风琴应用市场大厅 (全折叠为一个大折叠栏目，不点击不展示也不打开 · 伴随炸裂展开动效) */}
       <section id="apps" className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative">
         {/* 💥 粒子炸裂超新星容器 */}
@@ -1120,72 +1217,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 开发者与生态指南 */}
-      <section id="developer" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="google-card rounded-3xl p-8 sm:p-12 border border-white/[0.08] bg-[#0c0e17]/80 backdrop-blur-2xl relative overflow-hidden shadow-2xl">
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>开放社区生态</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
-              想要让你的开源应用加入 Linux生态圈市场？
-            </h2>
-            <p className="text-sm text-slate-400 leading-relaxed mb-6">
-              Linux生态圈应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <a 
-                href="https://dev.kejilion.sh" 
-                target="_blank" 
-                rel="noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2"
-              >
-                <span>开发者官方开发文档</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-              <a 
-                href="https://github.com/macsur/macsur.github.io" 
-                target="_blank" 
-                rel="noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-all flex items-center space-x-2"
-              >
-                <span>GitHub Apps 仓库提交 PR</span>
-              </a>
-
-              {/* 按钮行右侧极不显眼的微光星芒触发点 */}
-              <button
-                onClick={triggerEasterEgg}
-                title="✦"
-                className="p-2 text-slate-700/40 hover:text-cyan-400 hover:scale-125 transition-all duration-300 rounded-lg hover:bg-white/5 cursor-pointer group"
-                aria-label="Quantum Easter Egg"
-              >
-                <Sparkles className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
-              </button>
-            </div>
-
-            {/* 该区域最下面的一列：不显眼，平时暗沉，悬停微亮，点击即是惊喜 */}
-            <div className="mt-8 pt-4 border-t border-slate-800/60 flex flex-wrap items-center justify-between text-[11px] text-slate-500/70 gap-2">
-              <div className="flex items-center space-x-3 font-mono">
-                <span>Schema: v2.4</span>
-                <span className="text-slate-700">•</span>
-                <span>自动化 CI/CD 校验</span>
-                <span className="text-slate-700">•</span>
-                <span>全网分发终端: 100,000+</span>
-              </div>
-              <button
-                onClick={triggerEasterEgg}
-                title="✦ 惊喜彩蛋"
-                className="inline-flex items-center space-x-1 text-slate-600/50 hover:text-cyan-400 hover:scale-110 transition-all duration-300 cursor-pointer group px-2 py-0.5 rounded hover:bg-slate-800/40"
-              >
-                <Sparkles className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100 group-hover:text-cyan-300 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
-                <span className="text-[10px] text-slate-600/70 group-hover:text-cyan-300 font-mono transition-colors">✦</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* 🌟 [Github乐园] 实时官方热榜 TOP 10 专区 (默认折叠，点击展开呈现量子数据礼花与震撼冲击波) */}
       <section id="github-park" className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative">
         {/* 💥 粒子炸裂超新星容器 */}
@@ -1433,99 +1464,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🌟 【今日推荐】专区：精选本站极力推荐使用的 3 款一键部署神作 */}
-      <section id="daily-recommend" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="relative rounded-3xl p-6 sm:p-10 border border-white/10 bg-[#0e111a]/80 backdrop-blur-2xl shadow-2xl shadow-black/50 overflow-hidden">
-          {/* 背景装饰辉光 */}
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* 专区标题头 */}
-          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-slate-800">
-            <div>
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold mb-3">
-                <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-                <span>每日甄选 · 极力推荐 · 经过实战高频检验</span>
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight flex items-center space-x-3">
-                <span>【今日推荐】</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
-                  顶级一键部署神作 TOP 3
-                </span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
-                从本站 128+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
-              </p>
+      {/* 开发者与生态指南 */}
+      <section id="developer" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="google-card rounded-3xl p-8 sm:p-12 border border-white/[0.08] bg-[#0c0e17]/80 backdrop-blur-2xl relative overflow-hidden shadow-2xl">
+          <div className="relative z-10 max-w-2xl">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>开放社区生态</span>
             </div>
-
-            <div className="mt-4 md:mt-0 flex items-center space-x-2">
-              <span className="text-xs px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-300 font-mono flex items-center space-x-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>动态算法实时精选</span>
-              </span>
-            </div>
-          </div>
-
-          {/* 3款推荐卡片 */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {recommendedApps.map((app, idx) => (
-              <div
-                key={idx}
-                className="google-card p-6 border border-white/[0.08] hover:border-blue-500/40 hover:bg-[#121624]/90 transition-all duration-300 flex flex-col justify-between group shadow-lg"
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+              想要让你的开源应用加入 Linux生态圈市场？
+            </h2>
+            <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              Linux生态圈应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <a 
+                href="https://dev.kejilion.sh" 
+                target="_blank" 
+                rel="noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 text-xs font-semibold tracking-wide">
-                      {app.badge}
-                    </span>
-                    <span className="text-xs font-mono text-slate-400">
-                      ★ {app.stars}
-                    </span>
-                  </div>
+                <span>开发者官方开发文档</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+              <a 
+                href="https://github.com/macsur/macsur.github.io" 
+                target="_blank" 
+                rel="noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-all flex items-center space-x-2"
+              >
+                <span>GitHub Apps 仓库提交 PR</span>
+              </a>
 
-                  <h3 className={`font-bold text-base mb-2 transition-colors ${theme === "dark" ? "text-white group-hover:text-blue-400" : "text-slate-950 font-extrabold group-hover:text-blue-600"}`}>
-                    {app.name}
-                  </h3>
+              {/* 按钮行右侧极不显眼的微光星芒触发点 */}
+              <button
+                onClick={triggerEasterEgg}
+                title="✦"
+                className="p-2 text-slate-700/40 hover:text-cyan-400 hover:scale-125 transition-all duration-300 rounded-lg hover:bg-white/5 cursor-pointer group"
+                aria-label="Quantum Easter Egg"
+              >
+                <Sparkles className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
+              </button>
+            </div>
 
-                  <div className="text-[11px] text-slate-400 mb-3 flex items-center space-x-1">
-                    <span>分类：</span>
-                    <span className="font-medium text-slate-300">{app.category}</span>
-                  </div>
-
-                  <p className={`text-xs leading-relaxed mb-4 text-justify min-h-[50px] transition-colors ${theme === "dark" ? "text-slate-300" : "text-slate-900 font-medium"}`}>
-                    {app.highlight}
-                  </p>
-
-                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 mb-4 text-xs">
-                    <span className="text-blue-400 font-bold block mb-1">💡 推荐理由：</span>
-                    <span className={`leading-relaxed ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{app.reason}</span>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t border-slate-800/60 flex items-center justify-between gap-2">
-                  <div className="flex items-center space-x-1 font-mono text-xs text-slate-400 overflow-hidden">
-                    <span className="text-blue-400 font-bold">$</span>
-                    <span className="truncate text-blue-300">{app.cmd}</span>
-                  </div>
-                  <button
-                    onClick={() => handleCopy(app.cmd)}
-                    className="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-all shadow-sm active:scale-95 flex items-center space-x-1"
-                  >
-                    {copiedText === app.cmd ? (
-                      <>
-                        <Check className="w-3.5 h-3.5" />
-                        <span>已复制</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        <span>一键部署</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+            {/* 该区域最下面的一列：不显眼，平时暗沉，悬停微亮，点击即是惊喜 */}
+            <div className="mt-8 pt-4 border-t border-slate-800/60 flex flex-wrap items-center justify-between text-[11px] text-slate-500/70 gap-2">
+              <div className="flex items-center space-x-3 font-mono">
+                <span>Schema: v2.4</span>
+                <span className="text-slate-700">•</span>
+                <span>自动化 CI/CD 校验</span>
+                <span className="text-slate-700">•</span>
+                <span>全网分发终端: 100,000+</span>
               </div>
-            ))}
+              <button
+                onClick={triggerEasterEgg}
+                title="✦ 惊喜彩蛋"
+                className="inline-flex items-center space-x-1 text-slate-600/50 hover:text-cyan-400 hover:scale-110 transition-all duration-300 cursor-pointer group px-2 py-0.5 rounded hover:bg-slate-800/40"
+              >
+                <Sparkles className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100 group-hover:text-cyan-300 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
+                <span className="text-[10px] text-slate-600/70 group-hover:text-cyan-300 font-mono transition-colors">✦</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
