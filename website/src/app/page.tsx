@@ -383,7 +383,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#090a0f] text-slate-100 font-sans selection:bg-blue-600 selection:text-white">
+    <div className={`min-h-screen relative overflow-hidden font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300 ${
+      theme === 'dark' ? 'bg-[#090a0f] text-slate-100' : 'bg-[#f6f8fb] text-slate-800'
+    }`}>
       {/* Google AI 极光科技流体背景 */}
       <div className="fixed inset-0 google-ai-mesh pointer-events-none z-0" />
       <div className="fixed inset-0 google-subtle-grid pointer-events-none z-0" />
@@ -391,7 +393,9 @@ export default function Home() {
       {/* 核心内容视口 (位于光效与网格之上的景深层) */}
       <div className="relative z-10">
         {/* 顶部导航 */}
-        <header className="sticky top-0 z-50 glass-panel border-b border-white/5">
+        <header className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-300 ${
+          theme === 'dark' ? 'bg-[#090a0f]/80 border-white/[0.08]' : 'bg-[#f6f8fb]/85 border-slate-200'
+        }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {/* 点击左上角 Logo 实现白天/夜间主题切换，带有轻微点击反馈与模式指示器 */}
@@ -402,18 +406,22 @@ export default function Home() {
               >
                 <img
                   src="/logo.png"
-                  alt="Linux生态圈 x.zttz.eu.org"
-                  className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
+                  alt="Linux生态 x.zttz.eu.org"
+                  className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
-                <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#090a0f] flex items-center justify-center text-[8px] transition-all ${
-                  theme === 'dark' ? 'bg-amber-400 text-slate-950' : 'bg-blue-600 text-white'
+                <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
+                  theme === 'dark' ? 'bg-amber-400 text-slate-950 ring-2 ring-[#090a0f]' : 'bg-blue-600 text-white ring-2 ring-white'
                 }`}>
                   {theme === 'dark' ? '🌙' : '☀️'}
                 </span>
               </div>
               <div onClick={toggleTheme} className="cursor-pointer select-none">
-                <span className="font-bold text-lg text-white tracking-wider">Linux生态</span>
-                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">v4.5.10</span>
+                <span className={`font-bold text-lg tracking-wider transition-colors ${
+                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>Linux生态</span>
+                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
+                  theme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                }`}>v4.5.10</span>
               </div>
             </div>
 
@@ -523,9 +531,11 @@ export default function Home() {
 
             {/* 命令行与复制按钮 */}
             <div className="relative group">
-              <div className="bg-[#090b10] p-4 rounded-xl border border-white/[0.08] font-mono text-sm sm:text-base text-blue-300 flex items-center justify-between overflow-x-auto shadow-inner">
+              <div className={`p-4 rounded-xl border font-mono text-sm sm:text-base flex items-center justify-between overflow-x-auto shadow-inner transition-colors duration-300 ${
+                theme === 'dark' ? 'bg-[#090b10] border-white/[0.08] text-blue-300' : 'bg-slate-50 border-slate-200 text-blue-700'
+              }`}>
                 <div className="flex items-center space-x-2">
-                  <span className="text-slate-500 select-none">$</span>
+                  <span className="text-slate-400 select-none font-bold">$</span>
                   <span className="select-all font-semibold">{installCommands[installSource]}</span>
                 </div>
                 <button
@@ -534,7 +544,7 @@ export default function Home() {
                 >
                   {copiedText === installCommands[installSource] ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-slate-950" />
+                      <Check className="w-3.5 h-3.5 text-white" />
                       <span>已复制</span>
                     </>
                   ) : (

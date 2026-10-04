@@ -3,14 +3,41 @@
 @tailwind utilities;
 
 :root {
+  /* 严格复刻 https://ai.google.dev 标志性黑夜深度科技色调 */
   --background: #090a0f;
   --foreground: #f1f3f9;
+  --nav-bg: rgba(9, 10, 15, 0.82);
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --card-bg: rgba(17, 20, 29, 0.65);
+  --card-hover-bg: rgba(22, 26, 38, 0.88);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-hover-border: rgba(66, 133, 244, 0.4);
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --card-hover-shadow: 0 20px 45px -12px rgba(66, 133, 244, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --terminal-bg: #090b10;
+  --terminal-border: rgba(255, 255, 255, 0.08);
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --divider: rgba(255, 255, 255, 0.08);
 }
 
-/* 🌞 白天明亮模式变量覆盖 */
+/* 🌿 白天模式：完美参考 https://antigravity.google/blog 护眼温润科技色调（柔和素雅米灰底色，彻底不刺眼） */
 html.light {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f6f8fb;
+  --foreground: #1e293b;
+  --nav-bg: rgba(246, 248, 251, 0.85);
+  --nav-border: rgba(226, 232, 240, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.82);
+  --card-hover-bg: #ffffff;
+  --card-border: rgba(226, 232, 240, 0.85);
+  --card-hover-border: rgba(59, 130, 246, 0.45);
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --card-hover-shadow: 0 16px 36px -8px rgba(59, 130, 246, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --terminal-bg: #ffffff;
+  --terminal-border: #e2e8f0;
+  --text-muted: #475569;
+  --text-subtle: #94a3b8;
+  --divider: #e2e8f0;
 }
 
 body {
@@ -20,7 +47,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 /* 优雅科技微滚动条 */
@@ -51,13 +78,13 @@ html.light ::-webkit-scrollbar-thumb {
 
 html.light .google-ai-mesh {
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(66, 133, 244, 0.12) 0%, transparent 55%),
-    radial-gradient(circle at 10% 25%, rgba(168, 85, 247, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 90% 20%, rgba(59, 130, 246, 0.10) 0%, transparent 50%),
-    radial-gradient(circle at 80% 65%, rgba(16, 185, 129, 0.08) 0%, transparent 45%);
+    radial-gradient(circle at 50% 0%, rgba(66, 133, 244, 0.08) 0%, transparent 55%),
+    radial-gradient(circle at 10% 25%, rgba(147, 197, 253, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 90% 20%, rgba(196, 181, 253, 0.09) 0%, transparent 50%),
+    radial-gradient(circle at 80% 65%, rgba(110, 231, 183, 0.07) 0%, transparent 45%);
 }
 
-/* 极致细腻的微网格底纹 */
+/* 细腻微网格底纹 */
 .google-subtle-grid {
   background-size: 40px 40px;
   background-image:
@@ -69,8 +96,10 @@ html.light .google-ai-mesh {
 
 html.light .google-subtle-grid {
   background-image:
-    linear-gradient(to right, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 50%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 50%, transparent 90%);
 }
 
 /* Google 风格高亮药丸胶囊 */
@@ -93,44 +122,34 @@ html.light .google-subtle-grid {
 }
 
 html.light .google-pill {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 html.light .google-pill:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(66, 133, 244, 0.4);
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 6px 22px rgba(59, 130, 246, 0.1);
 }
 
-/* Google AI 极简科技卡片容器 */
+/* 核心 Google 卡片容器 (带明暗自适应) */
 .google-card {
-  background: rgba(17, 20, 29, 0.65);
+  background: var(--card-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--card-border);
   border-radius: 20px;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .google-card:hover {
-  background: rgba(22, 26, 38, 0.85);
-  border-color: rgba(66, 133, 244, 0.35);
-  box-shadow: 0 20px 45px -12px rgba(66, 133, 244, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: var(--card-hover-bg);
+  border-color: var(--card-hover-border);
+  box-shadow: var(--card-hover-shadow);
   transform: translateY(-2px);
 }
 
-html.light .google-card {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-html.light .google-card:hover {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(66, 133, 244, 0.4);
-  box-shadow: 0 20px 40px -12px rgba(66, 133, 244, 0.15);
-}
-
-/* 渐变标题字体 */
+/* 标题渐变 */
 .text-gradient-google {
   background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 45%, #93c5fd 80%, #60a5fa 100%);
   -webkit-background-clip: text;
@@ -138,7 +157,7 @@ html.light .google-card:hover {
 }
 
 html.light .text-gradient-google {
-  background: linear-gradient(135deg, #0f172a 0%, #334155 45%, #2563eb 80%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #334155 45%, #1d4ed8 80%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -149,7 +168,7 @@ html.light .text-gradient-google {
   -webkit-text-fill-color: transparent;
 }
 
-/* 动效 */
+/* 动态流光与激光扫掠动效 */
 @keyframes laserRotate {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
