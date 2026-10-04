@@ -753,7 +753,7 @@ export default function Home() {
                   {copiedText === item.cmd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+              <p className={`text-xs leading-relaxed transition-colors ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{item.desc}</p>
             </div>
           ))}
         </div>
@@ -998,10 +998,10 @@ export default function Home() {
                                       </span>
                                     )}
                                   </div>
-                                  <h3 className="text-sm font-bold text-white mb-1.5 line-clamp-1">
+                                  <h3 className={`text-sm font-bold mb-1.5 line-clamp-1 ${theme === "dark" ? "text-white" : "text-slate-950 font-extrabold"}`}>
                                     {app.name}
                                   </h3>
-                                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3">
+                                  <p className={`text-xs line-clamp-2 leading-relaxed mb-3 ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>
                                     {app.desc || '便捷部署，极速配置与开箱即用。'}
                                   </p>
                                 </div>
@@ -1337,7 +1337,7 @@ export default function Home() {
                               </span>
                               <div>
                                 <div className="flex items-center space-x-2">
-                                  <h3 className="font-bold text-white text-base group-hover:text-amber-300 transition-colors">
+                                  <h3 className={`font-bold text-base transition-colors ${theme === "dark" ? "text-white group-hover:text-amber-300" : "text-slate-950 font-extrabold group-hover:text-amber-700"}`}>
                                     {item.name}
                                   </h3>
                                   <span className="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-medium">
@@ -1361,7 +1361,7 @@ export default function Home() {
                           </div>
 
                           {/* 项目简介 */}
-                          <p className="text-xs text-slate-300 leading-relaxed mb-4 text-justify">
+                          <p className={`text-xs leading-relaxed mb-4 text-justify transition-colors ${theme === "dark" ? "text-slate-300" : "text-slate-900 font-medium leading-normal"}`}>
                             {item.desc}
                           </p>
 
@@ -1377,12 +1377,12 @@ export default function Home() {
 
                             <span className="flex items-center space-x-1">
                               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                              <span className="font-mono text-slate-200">{item.stars}</span>
+                              <span className={`font-mono font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>{item.stars}</span>
                             </span>
 
                             <span className="flex items-center space-x-1">
                               <GitFork className="w-3.5 h-3.5 text-slate-400" />
-                              <span className="font-mono text-slate-300">{item.forks}</span>
+                              <span className={`font-mono font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-800"}`}>{item.forks}</span>
                             </span>
                           </div>
                         </div>
@@ -1483,7 +1483,7 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-white text-base group-hover:text-blue-400 transition-colors mb-2">
+                  <h3 className={`font-bold text-base mb-2 transition-colors ${theme === "dark" ? "text-white group-hover:text-blue-400" : "text-slate-950 font-extrabold group-hover:text-blue-600"}`}>
                     {app.name}
                   </h3>
 
@@ -1492,13 +1492,13 @@ export default function Home() {
                     <span className="font-medium text-slate-300">{app.category}</span>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4 text-justify min-h-[50px]">
+                  <p className={`text-xs leading-relaxed mb-4 text-justify min-h-[50px] transition-colors ${theme === "dark" ? "text-slate-300" : "text-slate-900 font-medium"}`}>
                     {app.highlight}
                   </p>
 
                   <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 mb-4 text-xs">
                     <span className="text-blue-400 font-bold block mb-1">💡 推荐理由：</span>
-                    <span className="text-slate-400 leading-relaxed">{app.reason}</span>
+                    <span className={`leading-relaxed ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{app.reason}</span>
                   </div>
                 </div>
 
