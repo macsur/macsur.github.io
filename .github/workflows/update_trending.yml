@@ -1,0 +1,42 @@
+name: Daily Update GitHub Trending
+
+on:
+  schedule:
+    # 每天北京时间早上 06:00 (对应 UTC 22:00) 自动触发
+    - cron: '0 22 * * *'
+  workflow_dispatch: # 随时支持在 GitHub 网页上一键手动立即运行
+
+permissions:
+  contents: write
+
+jobs:
+  update-trending:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+
+      - name: Fetch Latest GitHub Trending Data
+        run: |
+          node fetch_github_trending.js
+
+      - name: Install Website Dependencies & Build
+        run: |
+          cd website
+          npm ci
+          npm run build
+
+      - name: Commit & Push New Trending Build
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "AutoSync: Daily update GitHub Trending top 10 [$(date '+%Y-%m-%d %H:%M')]" || exit 0
+          git push origin main

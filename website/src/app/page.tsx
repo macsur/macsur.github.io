@@ -1,0 +1,1390 @@
+'use client';
+/* eslint-disable @next/next/no-img-element */
+
+import React, { useState, useMemo, useEffect } from 'react';
+import confetti from 'canvas-confetti';
+import { 
+  Copy, 
+  Check, 
+  Sparkles, 
+  Layers, 
+  ChevronDown, 
+  ChevronRight, 
+  Search, 
+  Star, 
+  ExternalLink, 
+  Cpu, 
+  ShieldCheck, 
+  Globe, 
+  Database, 
+  Bot, 
+  Server,
+  Zap,
+  FolderGit2,
+  Flame,
+  GitFork,
+  TrendingUp,
+  X
+} from 'lucide-react';
+import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
+import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
+
+export default function Home() {
+  // 安装命令源切换 (默认推荐 x.zttz.eu.org 专属增强版)
+  const [installSource, setInstallSource] = useState<'enhanced' | 'official' | 'mirror'>('enhanced');
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  // 搜索关键字与星标过滤
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [onlyStar, setOnlyStar] = useState(false);
+
+  // 整个应用生态大厅总主折叠状态 (默认全局折叠，不点击不展示也不打开)
+  const [isMasterMarketOpen, setIsMasterMarketOpen] = useState(false);
+
+  // 💥 点击展开炸裂特效状态
+  const [isShockwaveActive, setIsShockwaveActive] = useState(false);
+  const [burstParticles, setBurstParticles] = useState<Array<{ id: number; x: number; y: number; color: string; size: number }>>([]);
+
+  // 🎆 隐蔽彩蛋状态 (量子数据礼花：3真实IP + 6精选域名)
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const [copiedEasterId, setCopiedEasterId] = useState<number | null>(null);
+
+  // 彩蛋数据：来自 https://www.vpngate.net 会话最少(0 sessions)的 3 个真实 IP 与 6 个精选网站 (点击在新页面打开)
+  const easterEggItems = useMemo(() => [
+    { id: 1, text: 'kejilion.sh', url: 'https://kejilion.sh', isReal: false, label: '科技Lion · kejilion.sh', delay: '0.04s', floatDelay: '0s', color: 'from-cyan-500/20 to-blue-600/10', border: 'border-cyan-500/40', glow: 'shadow-cyan-500/20' },
+    { id: 2, text: '106.155.69.27', url: null, isReal: true, label: '真实 VPN 节点 (0 Sessions)', delay: '0.10s', floatDelay: '1.2s', color: 'from-emerald-500/25 to-teal-600/10', border: 'border-emerald-400/60', glow: 'shadow-emerald-500/30' },
+    { id: 3, text: 'sina.com.cn', url: 'https://sina.com.cn', isReal: false, label: '新浪网 · sina.com.cn', delay: '0.16s', floatDelay: '0.6s', color: 'from-indigo-500/20 to-purple-600/10', border: 'border-indigo-500/40', glow: 'shadow-indigo-500/20' },
+    { id: 4, text: '109.126.5.62', url: null, isReal: true, label: '真实 VPN 节点 (0 Sessions)', delay: '0.22s', floatDelay: '1.8s', color: 'from-amber-500/25 to-orange-600/10', border: 'border-amber-400/60', glow: 'shadow-amber-500/30' },
+    { id: 5, text: 'qq.com', url: 'https://qq.com', isReal: false, label: '腾讯网 · qq.com', delay: '0.28s', floatDelay: '0.9s', color: 'from-purple-500/20 to-pink-600/10', border: 'border-purple-500/40', glow: 'shadow-purple-500/20' },
+    { id: 6, text: 'x.zttz.eu.org', url: 'https://x.zttz.eu.org', isReal: false, label: 'Linux生态圈 · x.zttz.eu.org', delay: '0.34s', floatDelay: '2.1s', color: 'from-sky-500/20 to-cyan-600/10', border: 'border-sky-500/40', glow: 'shadow-sky-500/20' },
+    { id: 7, text: '180.17.221.8', url: null, isReal: true, label: '真实 VPN 节点 (0 Sessions)', delay: '0.40s', floatDelay: '1.5s', color: 'from-rose-500/25 to-red-600/10', border: 'border-rose-400/60', glow: 'shadow-rose-500/30' },
+    { id: 8, text: 'bbs.pcbeta.com', url: 'https://bbs.pcbeta.com', isReal: false, label: '远景论坛 · bbs.pcbeta.com', delay: '0.46s', floatDelay: '0.3s', color: 'from-teal-500/20 to-emerald-600/10', border: 'border-teal-500/40', glow: 'shadow-teal-500/20' },
+    { id: 9, text: 'apple.com', url: 'https://apple.com', isReal: false, label: '苹果官网 · apple.com', delay: '0.52s', floatDelay: '2.4s', color: 'from-violet-500/20 to-indigo-600/10', border: 'border-violet-500/40', glow: 'shadow-violet-500/20' },
+  ], []);
+
+  // 键盘 ESC 监听
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowEasterEgg(false);
+      }
+    };
+    if (showEasterEgg) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showEasterEgg]);
+
+  // 播放彩蛋数据礼花专属音效
+  const playEasterEggAudio = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') ctx.resume();
+      const now = ctx.currentTime;
+      
+      // 升空哨音
+      const whistle = ctx.createOscillator();
+      const whistleGain = ctx.createGain();
+      whistle.type = 'sine';
+      whistle.frequency.setValueAtTime(280, now);
+      whistle.frequency.exponentialRampToValueAtTime(1400, now + 0.18);
+      whistleGain.gain.setValueAtTime(0.25, now);
+      whistleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      whistle.connect(whistleGain);
+      whistleGain.connect(ctx.destination);
+      whistle.start(now);
+      whistle.stop(now + 0.22);
+
+      // 水晶礼花爆裂高音
+      const burstOsc = ctx.createOscillator();
+      const burstGain = ctx.createGain();
+      burstOsc.type = 'triangle';
+      burstOsc.frequency.setValueAtTime(980, now + 0.18);
+      burstOsc.frequency.exponentialRampToValueAtTime(2400, now + 0.28);
+      burstOsc.frequency.exponentialRampToValueAtTime(520, now + 0.6);
+      burstGain.gain.setValueAtTime(0.3, now + 0.18);
+      burstGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      burstOsc.connect(burstGain);
+      burstGain.connect(ctx.destination);
+      burstOsc.start(now + 0.18);
+      burstOsc.stop(now + 0.65);
+    } catch {}
+  };
+
+  // 复制彩蛋条目并给予即时反馈
+  const handleCopyEasterEggItem = (text: string, id: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedEasterId(id);
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, ctx.currentTime);
+        gain.gain.setValueAtTime(0.18, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
+      }
+    } catch {}
+    setTimeout(() => {
+      setCopiedEasterId(null);
+    }, 2200);
+  };
+
+  // 触发彩蛋
+  const triggerEasterEgg = () => {
+    setShowEasterEgg(true);
+    playEasterEggAudio();
+    // 释放专属“星芒粒子礼花”
+    confetti({
+      particleCount: 90,
+      spread: 360,
+      startVelocity: 38,
+      origin: { x: 0.5, y: 0.5 },
+      colors: ['#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#38bdf8', '#ffffff'],
+      shapes: ['star', 'circle'],
+      ticks: 220,
+      gravity: 0.65,
+      zIndex: 100000
+    });
+  };
+
+  // 纯原生 Web Audio 极客科幻跃迁充能音效 (零外部资源加载，0ms延迟)
+  const playSciFiAudio = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      const now = ctx.currentTime;
+      // 1. 低频跃迁次声 (Sub-bass rumble)
+      const subOsc = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(75, now);
+      subOsc.frequency.exponentialRampToValueAtTime(260, now + 0.35);
+      subGain.gain.setValueAtTime(0.25, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      subOsc.connect(subGain);
+      subGain.connect(ctx.destination);
+      subOsc.start(now);
+      subOsc.stop(now + 0.4);
+
+      // 2. 高频光子脉冲能量谐波 (Photon shimmer)
+      const shimmerOsc = ctx.createOscillator();
+      const shimmerGain = ctx.createGain();
+      shimmerOsc.type = 'triangle';
+      shimmerOsc.frequency.setValueAtTime(420, now + 0.05);
+      shimmerOsc.frequency.exponentialRampToValueAtTime(1400, now + 0.32);
+      shimmerGain.gain.setValueAtTime(0.15, now + 0.05);
+      shimmerGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+      shimmerOsc.connect(shimmerGain);
+      shimmerGain.connect(ctx.destination);
+      shimmerOsc.start(now + 0.05);
+      shimmerOsc.stop(now + 0.45);
+    } catch {
+      // 忽略音频权限拦截
+    }
+  };
+
+  // 生成粒子爆炸效果
+  const triggerExplosion = () => {
+    const colors = ['#06b6d4', '#818cf8', '#10b981', '#f59e0b', '#ec4899', '#38bdf8', '#a855f7'];
+    const count = 42;
+    const newParticles = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+      const distance = 100 + Math.random() * 200;
+      newParticles.push({
+        id: Date.now() + i + Math.random(),
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: Math.random() * 6 + 3
+      });
+    }
+    setBurstParticles(newParticles);
+    setTimeout(() => {
+      setBurstParticles([]);
+    }, 1100);
+  };
+
+  // 记录是否已经触发过首次满屏大礼花
+  const [hasCelebrated, setHasCelebrated] = useState(false);
+
+  // 🎆 第一次打开：超级满屏盛大烟花礼炮 (双侧加农炮对冲 + 中央爆裂流星雨)
+  const triggerGrandFireworks = () => {
+    // 1. 中央主礼炮炸裂
+    confetti({
+      particleCount: 120,
+      spread: 100,
+      origin: { y: 0.6 },
+      colors: ['#06b6d4', '#f59e0b', '#a855f7', '#10b981', '#ec4899', '#38bdf8'],
+      disableForReducedMotion: true,
+      zIndex: 9999
+    });
+
+    // 2. 左右两侧对冲加农炮齐射 (持续 2.5 秒)
+    const duration = 2.5 * 1000;
+    const animationEnd = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.7 },
+        colors: ['#06b6d4', '#38bdf8', '#818cf8', '#f59e0b'],
+        zIndex: 9999
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.7 },
+        colors: ['#ec4899', '#a855f7', '#10b981', '#f59e0b'],
+        zIndex: 9999
+      });
+
+      if (Date.now() < animationEnd) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  };
+
+  // 展开/收起生态大厅总折叠 (第一次打开满屏大礼花，第二次打开保持现有超新星粒子设计)
+  const handleToggleMasterMarket = () => {
+    if (!isMasterMarketOpen) {
+      if (!hasCelebrated) {
+        // 🎆 第一次打开：满屏超级大礼花
+        setHasCelebrated(true);
+        triggerGrandFireworks();
+      }
+      // 无论是第一次还是第二次打开，均伴随原有的赛博粒子爆炸、能量冲击波与跃迁音效
+      setIsShockwaveActive(true);
+      triggerExplosion();
+      playSciFiAudio();
+      setTimeout(() => setIsShockwaveActive(false), 1200);
+      setIsMasterMarketOpen(true);
+    } else {
+      setIsMasterMarketOpen(false);
+    }
+  };
+
+  // 导航栏跳转并触发特效展开
+  const handleOpenMarketFromNav = () => {
+    if (!isMasterMarketOpen) {
+      handleToggleMasterMarket();
+    }
+  };
+
+  // 手风琴分类展开状态 (默认全部折叠)
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+
+  // 复制文本辅助函数
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    setTimeout(() => {
+      setCopiedText(null);
+    }, 2000);
+  };
+
+  // 安装命令
+  const installCommands = {
+    enhanced: 'bash <(curl -sL https://x.zttz.eu.org/x.sh)',
+    official: 'bash <(curl -sL kejilion.sh)',
+    mirror: 'bash <(curl -sL https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh)'
+  };
+
+  // 常用指令列表
+  const quickCommands = [
+    { cmd: 'k', desc: '启动 Linux生态圈主控制面板' },
+    { cmd: 'k app', desc: '直接呼出智能应用市场' },
+    { cmd: 'k app 57', desc: '一键部署 Deepseek AI 大模型' },
+    { cmd: 'k bbr3', desc: 'BBRv3 内核与网络调优' },
+    { cmd: 'k clean', desc: '一键深度清理系统冗余缓存' },
+    { cmd: 'k dd', desc: '纯净版 Linux 系统一键重装' },
+    { cmd: 'k backup', desc: '全自动 Docker 数据备份' },
+    { cmd: 'k update', desc: '无缝更新工具箱至最新版本' }
+  ];
+
+  // 筛选应用
+  const filteredApps = useMemo(() => {
+    return BUILTIN_APPS.filter(app => {
+      const matchKeyword = 
+        !searchKeyword || 
+        app.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        app.desc.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        app.alias.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        app.id.toString() === searchKeyword.trim();
+      
+      const matchStar = !onlyStar || app.isStar;
+
+      return matchKeyword && matchStar;
+    });
+  }, [searchKeyword, onlyStar]);
+
+  // 按分类对过滤后的应用进行分组
+  const appsByCategory = useMemo(() => {
+    const map: Record<string, AppItem[]> = {};
+    for (const cat of CATEGORIES) {
+      map[cat.id] = [];
+    }
+    for (const app of filteredApps) {
+      if (map[app.category]) {
+        map[app.category].push(app);
+      }
+    }
+    return map;
+  }, [filteredApps]);
+
+  // 手风琴切换 (独占式：点击新分类折叠其他；点击已展开分类则收起)
+  const toggleCategory = (catId: string) => {
+    setExpandedCat(prev => prev === catId ? null : catId);
+  };
+
+  const expandAll = () => {
+    setExpandedCat('ALL');
+  };
+
+  const collapseAll = () => {
+    setExpandedCat(null);
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden bg-[#090a0f] text-slate-100 font-sans selection:bg-blue-600 selection:text-white">
+      {/* Google AI 极光科技流体背景 */}
+      <div className="fixed inset-0 google-ai-mesh pointer-events-none z-0" />
+      <div className="fixed inset-0 google-subtle-grid pointer-events-none z-0" />
+
+      {/* 核心内容视口 (位于光效与网格之上的景深层) */}
+      <div className="relative z-10">
+        {/* 顶部导航 */}
+        <header className="sticky top-0 z-50 glass-panel border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/logo.png" 
+                alt="Linux生态圈 x.zttz.eu.org" 
+                className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/30 ring-2 ring-cyan-500/40 hover:scale-105 transition-all object-cover cursor-pointer" 
+              />
+              <div>
+                <span className="font-bold text-lg text-white tracking-wider">Linux生态圈</span>
+                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">v4.5.10</span>
+              </div>
+            </div>
+
+            <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
+              <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
+              <a href="#github-park" className="text-amber-400 hover:text-amber-300 transition-colors flex items-center space-x-1.5 font-bold">
+                <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
+                <span>[Github乐园]</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-mono border border-amber-500/30">TOP10</span>
+              </a>
+              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (128+)</a>
+              <a href="#features" className="text-slate-300 hover:text-cyan-400 transition-colors">核心特性</a>
+              <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">命令字典</a>
+              <a href="#developer" className="text-slate-300 hover:text-cyan-400 transition-colors">开发者生态</a>
+            </nav>
+
+            <div className="flex items-center space-x-3">
+              <a 
+                href="https://github.com/macsur/macsur.github.io" 
+                target="_blank" 
+                rel="noreferrer"
+                className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 transition-all hover:border-slate-500"
+              >
+                <FolderGit2 className="w-3.5 h-3.5 text-slate-400" />
+                <span>GitHub</span>
+              </a>
+              <a 
+                href="#install" 
+                className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-xs font-semibold text-white shadow-md shadow-cyan-500/25 transition-all"
+              >
+                立即使用
+              </a>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero 区域 */}
+        <section id="install" className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+          {/* Google AI 极简科技流体胶囊徽章 */}
+          <div className="inline-flex items-center google-pill mb-8 select-none">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse mr-2.5 shadow-sm shadow-blue-500/50" />
+            <span className="text-xs text-slate-300 font-medium tracking-wide flex items-center">
+              <span className="text-blue-400 font-semibold">Google Developer Style</span>
+              <span className="mx-2 text-slate-600">/</span>
+              <span className="text-slate-300">自动化智能自愈</span>
+              <span className="mx-2 text-slate-600">/</span>
+              <span className="text-emerald-400 font-mono">128+ 应用矩阵</span>
+            </span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6">
+            一键融入Linux生态
+            <span className="block mt-3 text-gradient-gemini font-extrabold tracking-tight">
+              现代化服务器运维与开源应用生态中心
+            </span>
+          </h1>
+
+          <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
+            专为开发者与极客打造的下一代现代化命令行底座。从网络内核深度调优、自动化备份恢复，到一键部署生产级自托管面板与 AI 大模型智能体集群，体验前所未有的纯净与高效。
+          </p>
+
+          {/* 终端模拟一键安装框 */}
+          <div className="max-w-2xl mx-auto google-card p-6 shadow-2xl shadow-black/60 border border-white/10 text-left">
+            {/* 终端顶部操作栏 */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
+              <div className="flex items-center space-x-2">
+                <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
+                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+                <span className="text-xs text-slate-400 font-mono ml-2">bash ~ terminal</span>
+              </div>
+              
+              {/* 节点切换 */}
+              <div className="flex items-center space-x-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-800 text-xs">
+                <button
+                  onClick={() => setInstallSource('enhanced')}
+                  className={`px-2.5 py-1 rounded-md transition-all font-medium flex items-center space-x-1 ${
+                    installSource === 'enhanced' 
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span>🌟 专属增强版 (手风琴)</span>
+                </button>
+                <button
+                  onClick={() => setInstallSource('official')}
+                  className={`px-2.5 py-1 rounded-md transition-all font-medium ${
+                    installSource === 'official' 
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  官方海外短链
+                </button>
+                <button
+                  onClick={() => setInstallSource('mirror')}
+                  className={`px-2.5 py-1 rounded-md transition-all font-medium ${
+                    installSource === 'mirror' 
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  GitHub 镜像
+                </button>
+              </div>
+            </div>
+
+            {/* 命令行与复制按钮 */}
+            <div className="relative group">
+              <div className="bg-[#090b10] p-4 rounded-xl border border-white/[0.08] font-mono text-sm sm:text-base text-blue-300 flex items-center justify-between overflow-x-auto shadow-inner">
+                <div className="flex items-center space-x-2">
+                  <span className="text-slate-500 select-none">$</span>
+                  <span className="select-all font-semibold">{installCommands[installSource]}</span>
+                </div>
+                <button
+                  onClick={() => handleCopy(installCommands[installSource])}
+                  className="ml-4 shrink-0 flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-all shadow-sm active:scale-95"
+                >
+                  {copiedText === installCommands[installSource] ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-slate-950" />
+                      <span>已复制</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>复制</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between text-xs text-slate-400 px-1">
+              <span>✨ 提示：安装后在任何终端输入快捷指令 <code className="px-1.5 py-0.5 bg-slate-800 text-cyan-300 rounded font-mono">k</code> 即可启动主控制台</span>
+              <span className="font-mono text-slate-500">100% Free & Open Source</span>
+            </div>
+          </div>
+
+          {/* 经典 Neo 风格情怀理念标语 */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mt-6 text-xs text-slate-400">
+            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-indigo-500/40 transition-colors">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span>稳定优先</span>
+            </span>
+            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-emerald-500/40 transition-colors">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>智能自愈</span>
+            </span>
+            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-cyan-500/40 transition-colors">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span>极客可观测</span>
+            </span>
+            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-amber-500/40 transition-colors">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span>GitHub 顶流热榜联动</span>
+            </span>
+          </div>
+
+          {/* 核心指标统计 */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 max-w-4xl mx-auto">
+            <div className="google-card p-5 border border-white/[0.08] text-center group">
+              <div className="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono group-hover:scale-105 transition-transform code-glow">128+</div>
+              <div className="text-xs text-slate-400 mt-1 font-medium">精选现代化应用</div>
+            </div>
+            <div className="google-card p-5 border border-white/[0.08] text-center group">
+              <div className="text-2xl sm:text-3xl font-extrabold text-indigo-400 font-mono group-hover:scale-105 transition-transform">11 大</div>
+              <div className="text-xs text-slate-400 mt-1 font-medium">智能手风琴分类 (含Github乐园)</div>
+            </div>
+            <div className="google-card p-5 border border-white/[0.08] text-center group">
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono group-hover:scale-105 transition-transform">100%</div>
+              <div className="text-xs text-slate-400 mt-1 font-medium">开源完全免费</div>
+            </div>
+            <div className="google-card p-5 border border-white/[0.08] text-center group">
+              <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono group-hover:scale-105 transition-transform">零依赖</div>
+              <div className="text-xs text-slate-400 mt-1 font-medium">智能自愈多端适配</div>
+            </div>
+          </div>
+      </section>
+
+      {/* 快捷命令直达字典 */}
+      <section id="commands" className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center space-x-2">
+              <Zap className="w-5 h-5 text-amber-400" />
+              <span>常用指令快速直达</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">在安装完成后，无需进入层层菜单，输入子指令秒级直达</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {quickCommands.map((item, idx) => (
+            <div 
+              key={idx}
+              onClick={() => handleCopy(item.cmd)}
+              className="google-card p-4 border border-white/[0.08] cursor-pointer group relative"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="font-mono text-sm font-semibold text-cyan-400 group-hover:text-cyan-300">
+                  {item.cmd}
+                </span>
+                <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-700 rounded text-slate-300">
+                  {copiedText === item.cmd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
+      {/* 手风琴应用市场大厅 (全折叠为一个大折叠栏目，不点击不展示也不打开 · 伴随炸裂展开动效) */}
+      <section id="apps" className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto relative">
+        {/* 💥 粒子炸裂超新星容器 */}
+        {burstParticles.length > 0 && (
+          <div className="absolute top-24 left-1/2 -translate-x-1/2 pointer-events-none z-50">
+            {burstParticles.map(p => (
+              <span
+                key={p.id}
+                className="absolute rounded-full shadow-lg pointer-events-none"
+                style={{
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  backgroundColor: p.color,
+                  boxShadow: `0 0 14px ${p.color}, 0 0 26px ${p.color}`,
+                  transform: `translate(${p.x}px, ${p.y}px)`,
+                  transition: 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s ease-out',
+                  opacity: 0.95
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 动态激光边框外壳 (展开状态下高速彩色激光流光环绕 + 冲击波脉冲) */}
+        <div className={`relative rounded-3xl p-[2px] transition-all duration-500 overflow-hidden ${
+          isMasterMarketOpen 
+            ? 'shadow-2xl shadow-cyan-500/25 ring-1 ring-cyan-400/40' 
+            : 'border border-slate-800/90 hover:border-cyan-500/30'
+        } ${isShockwaveActive ? 'animate-shockwave' : ''}`}>
+
+          {/* 展开时的高速激光扫掠底层 */}
+          {isMasterMarketOpen && (
+            <div className="absolute -inset-[150%] bg-[conic-gradient(from_0deg,#06b6d4,#818cf8,#ec4899,#10b981,#06b6d4)] animate-laser-rotate opacity-75 pointer-events-none blur-sm" />
+          )}
+
+          {/* 主体卡片面板 */}
+          <div className="relative google-card rounded-3xl overflow-hidden bg-[#0c0e17]/95 z-10 transition-all duration-300 border border-white/[0.08]">
+            {/* 展开瞬间的全息激光扫描光束 */}
+            {isShockwaveActive && (
+              <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 via-sky-300 to-transparent blur-xs shadow-[0_0_24px_#06b6d4] z-40 pointer-events-none animate-holo-scan" />
+            )}
+
+            {/* 大折叠总栏目头部 (默认展示，点击展开/收起全部内容) */}
+            <div 
+              onClick={handleToggleMasterMarket}
+              className={`p-6 sm:p-8 cursor-pointer hover:bg-slate-900/50 transition-all select-none flex flex-col md:flex-row md:items-center justify-between gap-4 group ${
+                isShockwaveActive ? 'animate-cyber-flash' : ''
+              }`}
+            >
+              <div className="flex items-start sm:items-center space-x-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-500 ${
+                  isMasterMarketOpen 
+                    ? 'bg-gradient-to-tr from-cyan-400 to-indigo-500 text-slate-950 shadow-lg shadow-cyan-400/30 scale-105' 
+                    : 'bg-gradient-to-tr from-cyan-500/20 to-indigo-500/20 border border-cyan-500/30 text-cyan-400 group-hover:scale-105'
+                }`}>
+                  <Layers className={`w-6 h-6 transition-transform duration-300 ${isMasterMarketOpen ? 'rotate-90' : ''}`} />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                      isMasterMarketOpen 
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm shadow-cyan-400/20' 
+                        : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-400'
+                    }`}>
+                      {isMasterMarketOpen ? '⚡ QUANTUM CORE ONLINE' : 'App Marketplace 4.0'}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">
+                      11 大分类 · 128+ 应用
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
+                      独占折叠架构
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-white group-hover:text-cyan-300 transition-colors flex items-center space-x-2">
+                    <span>应用生态大厅 · 智能手风琴</span>
+                    {isMasterMarketOpen && (
+                      <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 animate-pulse">
+                        已激活
+                      </span>
+                    )}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                    涵盖服务器面板、AI大模型、探针监控、私有云盘等全景生态。默认全收纳折叠，点击展开浏览。
+                  </p>
+                </div>
+              </div>
+
+              {/* 展开/折叠状态指示器按钮 */}
+              <div className="flex items-center space-x-3 shrink-0 self-end md:self-center">
+                <button 
+                  type="button"
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-2 transition-all shadow-md ${
+                    isMasterMarketOpen 
+                      ? 'bg-slate-900 border border-cyan-500/50 text-cyan-300 shadow-cyan-500/20' 
+                      : 'bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 border border-cyan-500/30 text-cyan-300 group-hover:border-cyan-400 group-hover:text-white shadow-cyan-500/10'
+                  }`}
+                >
+                  <span>{isMasterMarketOpen ? '收起应用生态大厅' : '点击展开应用生态大厅'}</span>
+                  {isMasterMarketOpen ? (
+                    <ChevronDown className="w-4 h-4 text-cyan-400 transform rotate-180 transition-transform duration-300" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-cyan-400 transition-transform animate-bounce" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+          {/* 当且仅当点击展开后，才展示内部所有搜索栏与11大分类列表 */}
+          {isMasterMarketOpen && (
+            <div className="p-6 sm:p-8 pt-2 border-t border-slate-800/80 bg-slate-950/40 animate-fadeIn">
+              {/* 搜索与快捷控制栏 */}
+              <div className="glass-panel p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                {/* 搜索输入框 */}
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input 
+                    type="text" 
+                    placeholder="搜索应用名称、编号(如 57)、功能..." 
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                  />
+                  {searchKeyword && (
+                    <button 
+                      onClick={() => setSearchKeyword('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* 筛选按钮组 */}
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                  <button
+                    onClick={() => {
+                      triggerGrandFireworks();
+                      playSciFiAudio();
+                    }}
+                    title="无聊时点我随时放满屏大礼花"
+                    className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-cyan-500/15 border border-pink-500/30 text-pink-300 hover:text-white hover:border-pink-400 transition-all shadow-sm active:scale-95 group"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-pink-400 group-hover:rotate-12 transition-transform" />
+                    <span>放个礼花 🎆</span>
+                  </button>
+
+                  <button
+                    onClick={() => setOnlyStar(!onlyStar)}
+                    className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                      onlyStar 
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' 
+                        : 'bg-slate-800/80 text-slate-400 hover:text-slate-200 border border-slate-700'
+                    }`}
+                  >
+                    <Star className={`w-3.5 h-3.5 ${onlyStar ? 'text-amber-400 fill-amber-400' : ''}`} />
+                    <span>精选星标应用</span>
+                  </button>
+
+                  <button
+                    onClick={expandAll}
+                    className="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition-colors"
+                  >
+                    全部展开
+                  </button>
+                  <button
+                    onClick={collapseAll}
+                    className="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition-colors"
+                  >
+                    全部折叠
+                  </button>
+                </div>
+              </div>
+
+              {/* 手风琴分类列表 */}
+              <div className="space-y-3">
+                {CATEGORIES.map((cat: Category) => {
+                  const catApps = appsByCategory[cat.id] || [];
+                  const isExpanded = expandedCat === 'ALL' || expandedCat === cat.id;
+
+                  if (searchKeyword && catApps.length === 0) {
+                    return null;
+                  }
+
+                  return (
+                    <div 
+                      key={cat.id} 
+                      className="glass-panel rounded-2xl border border-slate-800 overflow-hidden transition-all duration-300"
+                    >
+                      {/* 手风琴分类条 */}
+                      <div 
+                        onClick={() => toggleCategory(cat.id)}
+                        className="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-800/40 transition-colors select-none"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <span className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-mono text-xs font-bold flex items-center justify-center">
+                            {cat.key}
+                          </span>
+                          <span className="text-base sm:text-lg font-bold text-white">
+                            {cat.name}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-mono">
+                            {catApps.length} 款
+                          </span>
+                        </div>
+
+                        <div className="flex items-center space-x-2 text-slate-400">
+                          <span className="text-xs hidden sm:inline text-slate-500">
+                            {isExpanded ? '点击折叠' : '点击独占展开'}
+                          </span>
+                          {isExpanded ? (
+                            <ChevronDown className="w-5 h-5 text-cyan-400" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5" />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 手风琴分类展开内容 */}
+                      {isExpanded && (
+                        <div className="px-5 pb-5 pt-1 border-t border-slate-800/80 bg-slate-900/30">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-3">
+                            {catApps.map((app: AppItem) => (
+                              <div 
+                                key={app.id} 
+                                className="glass-panel glass-panel-hover p-4 rounded-xl border border-slate-800 flex flex-col justify-between"
+                              >
+                                <div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono text-xs font-bold">
+                                      #{app.id}
+                                    </span>
+                                    {app.isStar && (
+                                      <span className="flex items-center space-x-1 text-xs text-amber-400 font-medium">
+                                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                        <span>官方星标</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h3 className="text-sm font-bold text-white mb-1.5 line-clamp-1">
+                                    {app.name}
+                                  </h3>
+                                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-3">
+                                    {app.desc || '便捷部署，极速配置与开箱即用。'}
+                                  </p>
+                                </div>
+
+                                <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                                  <span className="text-[11px] text-slate-500 font-mono">
+                                    指令: k app {app.id}
+                                  </span>
+                                  <button
+                                    onClick={() => handleCopy(`k app ${app.id}`)}
+                                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
+                                  >
+                                    {copiedText === `k app ${app.id}` ? (
+                                      <>
+                                        <Check className="w-3 h-3 text-emerald-400" />
+                                        <span>已复制</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Copy className="w-3 h-3" />
+                                        <span>复制安装</span>
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          </div>
+        </div>
+      </section>
+
+      {/* 六大核心能力特性矩阵 */}
+      <section id="features" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
+            <Cpu className="w-3.5 h-3.5" />
+            <span>Power & Capabilities</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+            全能高效的 Linux 运维底座
+          </h2>
+          <p className="text-sm text-slate-400 mt-2">
+            Linux生态圈不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="google-card p-6 border border-white/[0.08]">
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mb-4">
+              <Server className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">系统调优与深度清理</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              一键清除缓存、无用旧内核、日志与垃圾文件；轻松扩展 SWAP 虚拟内存、修改时区与系统信息全盘查询。
+            </p>
+          </div>
+
+          <div className="google-card p-6 border border-white/[0.08]">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4">
+              <Globe className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">BBRv3 与网络极限加速</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              集成最新 BBRv3 内核调优算法，智能优化 TCP 拥塞控制；支持 Cloudflare WARP 优选，告别网络拥堵。
+            </p>
+          </div>
+
+          <div className="google-card p-6 border border-white/[0.08]">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+              <Layers className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Docker 现代化容器编排</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              内置官方与自定义 Compose 模板引擎，118+ 容器化应用秒级起停、自动检测端口占用与冲突防护。
+            </p>
+          </div>
+
+          <div className="google-card p-6 border border-white/[0.08]">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-4">
+              <Bot className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">AI 与大模型知识库矩阵</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              第一时间适配 Deepseek、Dify、OpenWebUI、RAGFlow、Hermes 与 OpenClaw 等尖端 AI 自托管工具。
+            </p>
+          </div>
+
+          <div className="google-card p-6 border border-white/[0.08]">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
+              <Database className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">全应用灾备与跨机还原</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              支持一键无缝打包全部容器数据与数据库，支持 SCP 远程跨服务器秒级迁移与自动还原，数据安全无忧。
+            </p>
+          </div>
+
+          <div className="google-card p-6 border border-white/[0.08]">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mb-4">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">安全防护与端口安全组</h3>
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              集成 Fail2ban 防暴力破解、SSH 密钥导入与安全加固、iptables 防火墙精细化放行与违规 IP 拦截。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 开发者与生态指南 */}
+      <section id="developer" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="google-card rounded-3xl p-8 sm:p-12 border border-white/[0.08] bg-[#0c0e17]/80 backdrop-blur-2xl relative overflow-hidden shadow-2xl">
+          <div className="relative z-10 max-w-2xl">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>开放社区生态</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+              想要让你的开源应用加入 Linux生态圈市场？
+            </h2>
+            <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              Linux生态圈应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <a 
+                href="https://dev.kejilion.sh" 
+                target="_blank" 
+                rel="noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2"
+              >
+                <span>开发者官方开发文档</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+              <a 
+                href="https://github.com/macsur/macsur.github.io" 
+                target="_blank" 
+                rel="noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-all flex items-center space-x-2"
+              >
+                <span>GitHub Apps 仓库提交 PR</span>
+              </a>
+
+              {/* 按钮行右侧极不显眼的微光星芒触发点 */}
+              <button
+                onClick={triggerEasterEgg}
+                title="✦"
+                className="p-2 text-slate-700/40 hover:text-cyan-400 hover:scale-125 transition-all duration-300 rounded-lg hover:bg-white/5 cursor-pointer group"
+                aria-label="Quantum Easter Egg"
+              >
+                <Sparkles className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
+              </button>
+            </div>
+
+            {/* 该区域最下面的一列：不显眼，平时暗沉，悬停微亮，点击即是惊喜 */}
+            <div className="mt-8 pt-4 border-t border-slate-800/60 flex flex-wrap items-center justify-between text-[11px] text-slate-500/70 gap-2">
+              <div className="flex items-center space-x-3 font-mono">
+                <span>Schema: v2.4</span>
+                <span className="text-slate-700">•</span>
+                <span>自动化 CI/CD 校验</span>
+                <span className="text-slate-700">•</span>
+                <span>全网分发终端: 100,000+</span>
+              </div>
+              <button
+                onClick={triggerEasterEgg}
+                title="✦ 惊喜彩蛋"
+                className="inline-flex items-center space-x-1 text-slate-600/50 hover:text-cyan-400 hover:scale-110 transition-all duration-300 cursor-pointer group px-2 py-0.5 rounded hover:bg-slate-800/40"
+              >
+                <Sparkles className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100 group-hover:text-cyan-300 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-all" />
+                <span className="text-[10px] text-slate-600/70 group-hover:text-cyan-300 font-mono transition-colors">✦</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 🌟 [Github乐园] 实时官方热榜 TOP 10 专区 */}
+      <section id="github-park" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <div className="relative rounded-3xl p-6 sm:p-10 border border-white/10 bg-[#0e111a]/80 backdrop-blur-2xl shadow-2xl shadow-black/50 overflow-hidden">
+          {/* 背景装饰辉光 */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* 专区标题头 */}
+          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-slate-800">
+            <div>
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-3">
+                <Flame className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+                <span>GitHub Trending 官方热榜今日直通 · GitHub Actions 每日自动抓取</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight flex items-center space-x-3">
+                <span>[Github乐园]</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-300 to-yellow-200">
+                  今日顶流精选 TOP 10
+                </span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
+                数据 100% 实时源自 GitHub 官方趋势榜（<code className="text-amber-300/90 font-mono">github.com/trending</code>），每日自动抓取今日星标增长最迅猛、最受全球开发者追捧的顶级神作。
+              </p>
+            </div>
+
+            <div className="mt-4 md:mt-0 flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <span className="text-[11px] text-slate-400 font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800">
+                🕒 更新于: {LAST_UPDATED_AT}
+              </span>
+              <a
+                href="https://github.com/trending"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 flex items-center space-x-1.5 transition-all shadow-sm"
+              >
+                <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+                <span>官方 Trending 原网页</span>
+                <ExternalLink className="w-3 h-3 text-slate-400" />
+              </a>
+            </div>
+          </div>
+
+          {/* TOP 10 卡片列表 (2列布局) */}
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {GITHUB_TRENDING_APPS.map((item: GithubTrendingRepo) => {
+              const rankBadgeClass = 
+                item.rank === 1 ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30' :
+                item.rank === 2 ? 'bg-gradient-to-r from-slate-200 to-slate-400 text-slate-950 font-black shadow-lg shadow-slate-300/20' :
+                item.rank === 3 ? 'bg-gradient-to-r from-amber-700 to-amber-600 text-white font-black shadow-lg shadow-amber-700/20' :
+                'bg-slate-800 text-slate-300 font-bold border border-slate-700';
+
+              return (
+                <div 
+                  key={item.rank}
+                  className="google-card p-6 border border-white/[0.08] hover:border-amber-400/30 hover:bg-[#121624]/90 transition-all duration-300 flex flex-col justify-between group shadow-lg"
+                >
+                  <div>
+                    {/* 卡片头部信息 */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center space-x-3">
+                        <span className={`w-7 h-7 rounded-lg text-xs flex items-center justify-center font-mono ${rankBadgeClass}`}>
+                          #{item.rank}
+                        </span>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-bold text-white text-base group-hover:text-amber-300 transition-colors">
+                              {item.name}
+                            </h3>
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-medium">
+                              {item.tag}
+                            </span>
+                          </div>
+                          <span className="text-xs text-slate-400 font-mono flex items-center space-x-1 mt-0.5">
+                            <FolderGit2 className="w-3 h-3 text-slate-500" />
+                            <span>{item.repo}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 今日暴增 Stars */}
+                      <div className="flex items-center space-x-1.5 shrink-0">
+                        <span className="flex items-center space-x-1 px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/30 shadow-sm animate-pulse">
+                          <Flame className="w-3.5 h-3.5 text-amber-400" />
+                          <span>{item.starsToday}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 项目简介 */}
+                    <p className="text-xs text-slate-300 leading-relaxed mb-4 text-justify">
+                      {item.desc}
+                    </p>
+
+                    {/* 指标栏 (语言、总Stars、总Forks) */}
+                    <div className="flex items-center space-x-4 text-xs text-slate-400 mb-4 pb-2 border-b border-slate-800/50">
+                      <span className="flex items-center space-x-1.5">
+                        <span 
+                          className="w-2.5 h-2.5 rounded-full inline-block" 
+                          style={{ backgroundColor: item.langColor || '#3b82f6' }}
+                        />
+                        <span className="font-medium text-slate-300">{item.language}</span>
+                      </span>
+
+                      <span className="flex items-center space-x-1">
+                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                        <span className="font-mono text-slate-200">{item.stars}</span>
+                      </span>
+
+                      <span className="flex items-center space-x-1">
+                        <GitFork className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="font-mono text-slate-300">{item.forks}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 底部操作栏 */}
+                  <div className="pt-2 flex items-center justify-between gap-2">
+                    <div className="flex items-center space-x-1 text-slate-400 font-mono text-xs overflow-hidden">
+                      <span className="text-cyan-400 select-none">$</span>
+                      <span className="truncate text-slate-400 text-[11px]">{item.deployCmd}</span>
+                    </div>
+
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <button
+                        onClick={() => handleCopy(item.deployCmd)}
+                        className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-400 hover:text-slate-950 text-amber-300 text-xs font-semibold transition-all border border-amber-500/40 flex items-center space-x-1.5 shadow-sm active:scale-95"
+                      >
+                        {copiedText === item.deployCmd ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>已复制指令</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>复制代码</span>
+                          </>
+                        )}
+                      </button>
+
+                      <a
+                        href={item.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700"
+                        title="直达 GitHub 开源仓库"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 实时同步说明横幅 */}
+          <div className="relative z-10 mt-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>
+                🤖 <b>自动化守护</b>：该榜单由 GitHub Actions 每日凌晨自动爬取自 <code className="text-amber-300 font-mono">github.com/trending</code> 官方页面，100% 保证客观真实，绝无人工干预。
+              </span>
+            </div>
+            <a 
+              href="https://github.com/trending" 
+              target="_blank" 
+              rel="noreferrer"
+              className="text-amber-400 hover:text-amber-300 hover:underline shrink-0 font-medium flex items-center space-x-1"
+            >
+              <span>查看 GitHub 官方原榜单</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+
+      {/* 底部 Footer */}
+      <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold text-slate-300">Linux生态圈 · x.zttz.eu.org</span>
+            <span>- 现代化 Linux 运维与开源应用生态中心</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
+              Neo Glow Edition
+            </span>
+            <span>主页域名: <a href="https://x.zttz.eu.org" className="text-cyan-400 hover:underline">x.zttz.eu.org</a></span>
+            <span>•</span>
+            <a href="https://github.com/macsur/macsur.github.io" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors">
+              GitHub 源码仓库
+            </a>
+          </div>
+        </div>
+
+        {/* 底部最下一列：极不显眼的隐蔽彩蛋入口与节点状态 */}
+        <div className="mt-8 pt-5 border-t border-slate-900/80 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
+          <span>© 2026 Linux生态圈 · x.zttz.eu.org · 保留所有权利</span>
+          <div className="flex items-center space-x-2.5">
+            <span className="text-slate-600/80">Cluster: HK-Edge-01</span>
+            <span className="text-slate-800">•</span>
+            <span className="text-slate-600/80">Latency: 18ms</span>
+            <span className="text-slate-800">•</span>
+            {/* 极度不显眼的微光星芒触发点：平时极暗，悬浮微亮，点击引爆惊喜彩蛋 */}
+            <button
+              onClick={triggerEasterEgg}
+              title="✦"
+              className="p-1 text-slate-700/40 hover:text-cyan-400 hover:scale-125 transition-all duration-300 rounded focus:outline-none cursor-pointer group"
+              aria-label="Quantum Easter Egg"
+            >
+              <Sparkles className="w-3 h-3 opacity-30 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-opacity" />
+            </button>
+          </div>
+        </div>
+      </footer>
+      </div>
+
+      {/* 🎆 专属量子数据礼花彩蛋弹窗 (跟礼花差不多，但是不一样：9枚炸裂展开的数据碎片，3真实IP+6镜像，点击即复制) */}
+      {showEasterEgg && (
+        <div 
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/85 backdrop-blur-xl animate-fadeIn"
+          onClick={() => setShowEasterEgg(false)}
+        >
+          {/* 背景全息流光与暗场辐射光 */}
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,rgba(168,85,247,0.1)_45%,transparent_75%)]" />
+          
+          {/* 彩蛋主体容器 */}
+          <div 
+            className="relative w-full max-w-3xl rounded-3xl border border-white/15 bg-slate-900/90 shadow-2xl shadow-cyan-500/20 backdrop-blur-2xl p-6 sm:p-8 overflow-hidden z-10 animate-egg-burst"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 顶沿物理反光条 */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-80" />
+            
+            {/* 顶部标题栏 */}
+            <div className="flex items-center justify-between pb-5 border-b border-white/10 mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                  <Sparkles className="w-5 h-5 text-white animate-spin" style={{ animationDuration: '6s' }} />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-lg font-bold text-white tracking-wide">
+                      ✦ 量子数据礼花 · 隐藏彩蛋 ✦
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                      Easter Egg
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    礼花炸开绽放 9 枚全息数据碎片 · 真实 IP 点击即复制，精选网站点击在新页面打开访问
+                  </p>
+                </div>
+              </div>
+
+              {/* 关闭按钮 */}
+              <button
+                onClick={() => setShowEasterEgg(false)}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                title="关闭 (ESC)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 9 枚如礼花般炸开展开的数据碎片卡片 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 my-2">
+              {easterEggItems.map((item) => {
+                const isCopied = copiedEasterId === item.id;
+                const handleClick = () => {
+                  if (item.isReal) {
+                    handleCopyEasterEggItem(item.text, item.id);
+                  } else if (item.url) {
+                    window.open(item.url, '_blank', 'noopener,noreferrer');
+                  }
+                };
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={handleClick}
+                    style={{
+                      animationDelay: item.delay,
+                    }}
+                    title={item.isReal ? `点击复制真实 IP: ${item.text}` : `点击在新窗口访问: ${item.url}`}
+                    className={`group relative rounded-2xl p-4 border ${item.border} bg-gradient-to-br ${item.color} hover:bg-slate-800/80 cursor-pointer transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.03] shadow-lg ${item.glow} backdrop-blur-md animate-egg-burst animate-egg-float`}
+                  >
+                    {/* 微妙的全息流光角标 */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-mono text-slate-400 group-hover:text-slate-300 transition-colors">
+                        #0{item.id} · {item.label}
+                      </span>
+                      <span className={`w-2 h-2 rounded-full ${item.isReal ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-cyan-400/60'}`} />
+                    </div>
+
+                    {/* IP 或域名内容展示 */}
+                    <div className="font-mono text-sm sm:text-base font-bold text-white tracking-wide break-all my-1 select-all flex items-center justify-between">
+                      <span className={item.isReal ? 'text-emerald-300' : 'text-cyan-200 group-hover:text-cyan-300 transition-colors'}>
+                        {item.text}
+                      </span>
+                      {!item.isReal && (
+                        <ExternalLink className="w-3.5 h-3.5 text-cyan-400/60 group-hover:text-cyan-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                      )}
+                    </div>
+
+                    {/* 悬停与交互状态指示 (真实IP为复制，网站为新页面打开) */}
+                    <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
+                      {item.isReal ? (
+                        isCopied ? (
+                          <span className="text-emerald-400 font-semibold flex items-center space-x-1 animate-pulse">
+                            <Check className="w-3.5 h-3.5" />
+                            <span>已复制 IP 到剪贴板！</span>
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 group-hover:text-emerald-300 flex items-center space-x-1 transition-colors">
+                            <Copy className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
+                            <span>点击复制真实 IP</span>
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-slate-400 group-hover:text-cyan-300 flex items-center space-x-1 transition-colors">
+                          <ExternalLink className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
+                          <span>新页面访问网站 ↗</span>
+                        </span>
+                      )}
+
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                        item.isReal 
+                          ? 'text-emerald-400/90 bg-emerald-500/10 border-emerald-500/20' 
+                          : 'text-cyan-300/90 bg-cyan-500/10 border-cyan-500/20'
+                      }`}>
+                        {item.isReal ? 'REAL-IP' : 'VISIT ↗'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 底部操作与提示 */}
+            <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+              <div className="flex items-center space-x-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>真实 IP 提取自 VPNGate 全球实时节点（会话最少 0 sessions）</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={triggerEasterEgg}
+                  className="text-xs text-cyan-400 hover:text-cyan-300 font-medium hover:underline flex items-center space-x-1"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>再放一次礼花</span>
+                </button>
+                <span className="text-slate-600">|</span>
+                <span className="text-slate-500 font-mono text-[11px]">按 ESC 或点击空白处关闭</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

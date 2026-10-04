@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #090a0f;
+  --foreground: #f1f3f9;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 优雅科技微滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e2638;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2d374d;
+}
+
+/* Google AI 标志性流体极光科技背景 */
+.google-ai-mesh {
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(66, 133, 244, 0.18) 0%, transparent 55%),
+    radial-gradient(circle at 10% 25%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 90% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 65%, rgba(16, 185, 129, 0.10) 0%, transparent 45%),
+    radial-gradient(circle at 20% 75%, rgba(245, 158, 11, 0.08) 0%, transparent 40%);
+}
+
+/* 极致细腻的微网格底纹 */
+.google-subtle-grid {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 40%, transparent 85%);
+}
+
+/* Google 风格高亮药丸胶囊 */
+.google-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.google-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Google AI 极简科技卡片容器 */
+.google-card {
+  background: rgba(17, 20, 29, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.google-card:hover {
+  background: rgba(22, 26, 38, 0.85);
+  border-color: rgba(66, 133, 244, 0.35);
+  box-shadow: 0 20px 45px -12px rgba(66, 133, 244, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 渐变标题字体 */
+.text-gradient-google {
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 45%, #93c5fd 80%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gemini {
+  background: linear-gradient(90deg, #4285f4 0%, #9b72cb 40%, #d96570 70%, #fbbc04 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 动效 */
+@keyframes laserRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-laser-rotate {
+  animation: laserRotate 4s linear infinite;
+}
+
+@keyframes shockwavePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.9), 0 0 40px rgba(168, 85, 247, 0.8);
+    transform: scale(0.99);
+  }
+  50% {
+    box-shadow: 0 0 80px 25px rgba(66, 133, 244, 0.5), 0 0 120px 50px rgba(168, 85, 247, 0.35);
+    transform: scale(1.006);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+}
+.animate-shockwave {
+  animation: shockwavePulse 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes holoScan {
+  0% { top: 0%; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.animate-holo-scan {
+  animation: holoScan 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

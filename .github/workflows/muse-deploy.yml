@@ -1,0 +1,84 @@
+name: Muse AI 自动化云端同步与发布 (Muse Triggered Sync & Deploy)
+
+on:
+  # 1. 专门供 Muse AI 视频/文本助理 通过外部 Webhook/API 随时唤醒
+  repository_dispatch:
+    types: [update-website, muse-trigger]
+
+  # 2. 随时支持在 GitHub 网页上点击一键手动立即运行
+  workflow_dispatch:
+
+  # 3. 每日定时自动巡检与同步更新（每天北京时间 06:30 自动执行）
+  schedule:
+    - cron: '30 22 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出源码 (Checkout Repository)
+        uses: actions/checkout@v4
+
+      - name: 配置 Node.js 运行环境 (Node.js 20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+
+      - name: 1. 同步上游 Kejilion 官方最新特性并注入分类折叠
+        run: |
+          node sync_upstream.js
+          bash -n kejilion.sh
+          bash -n apps_manager.sh
+          mkdir -p website/public
+          cp -f kejilion.sh website/public/kejilion.sh
+          cp -f kejilion.sh website/public/x.sh
+          cp -f kejilion.sh x.sh
+          cp -f apps_manager.sh website/public/apps_manager.sh
+
+      - name: 2. 抓取今日 GitHub 热榜并生成 500 字深度中文解析
+        env:
+          TRANSLATE_API_URL: ${{ secrets.TRANSLATE_API_URL || 'https://cli.136222.xyz/v1' }}
+          TRANSLATE_API_KEY: ${{ secrets.TRANSLATE_API_KEY || 'sk-f6ba10cfedb11ef9213fe3f0eae6fc81727b08d12bd4cc211ab015a978cb1f0f' }}
+          TRANSLATE_MODEL: ${{ secrets.TRANSLATE_MODEL || 'gemini-2.5-flash' }}
+        run: |
+          node fetch_github_trending.js || echo "保留现有数据，继续构建"
+
+      - name: 3. 安装依赖并编译 Next.js 生产级静态站点
+        run: |
+          cd website
+          npm ci
+          npm run build
+          cd ..
+
+      - name: 4. 自动发布并推送到 GitHub Pages 站点 (macsur.github.io)
+        env:
+          DEPLOY_PAT: ${{ secrets.DEPLOY_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          DEPLOY_TMP="/tmp/macsur_deploy_ci"
+          rm -rf "$DEPLOY_TMP"
+          git clone --depth=1 "https://x-access-token:${DEPLOY_PAT}@github.com/macsur/macsur.github.io.git" "$DEPLOY_TMP"
+          cd "$DEPLOY_TMP"
+
+          # 备份并清理旧静态资源 (保留 .git)
+          find . -maxdepth 1 ! -name ".git" ! -name "." -exec rm -rf {} +
+
+          # 拷贝最新构建输出与 .nojekyll
+          cp -r "$GITHUB_WORKSPACE/website/out/"* .
+          cp -r "$GITHUB_WORKSPACE/website/out/".[!.]* . 2>/dev/null || true
+          touch .nojekyll
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "✅ 网站内容无变化，无需提交"
+          else
+            git commit -m "AutoSync by Muse AI: Update website & Trending TOP 10 [$(date '+%Y-%m-%d %H:%M')]"
+            git push origin main
+          fi
+          rm -rf "$DEPLOY_TMP"
