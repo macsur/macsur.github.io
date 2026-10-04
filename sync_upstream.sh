@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Kejilion 官方源码一键同步与自动发布脚本
+# Kejilion 官方源码同步与工程推送脚本
 # 用法:
 #   ./sync_upstream.sh          -> 仅同步官方最新源码并注入 11+ 分类折叠
-#   ./sync_upstream.sh --deploy -> 同步后自动重新构建并部署到 GitHub Pages
+#   ./sync_upstream.sh --deploy -> 同步后推送源码到 macsur.github.io 的 source 源码分支
+#                                  (严格禁止推送到 main 分支，由云端 Actions 负责编译并发布到 main)
 # ==============================================================================
 
 set -e
@@ -30,18 +31,12 @@ cp -f kejilion.sh website/public/x.sh
 cp -f kejilion.sh x.sh
 cp -f apps_manager.sh website/public/apps_manager.sh
 
-# 4. 判断是否需要自动部署
+# 4. 判断是否需要自动推送源码分支
 if [ "$1" = "--deploy" ] || [ "$1" = "-d" ]; then
     echo "=================================================="
-    echo "  🚀 开始构建并自动部署至 GitHub Pages..."
+    echo "  🚀 正在推送最新工程源码至 macsur.github.io:source 分支..."
+    echo "  (遵守铁律：绝不直接推 main 分支，触发云端自动统一构建)"
     echo "=================================================="
-
-    echo "🌐 [Trend] 同步抓取今日官方 GitHub Trending TOP 10 (含500字中文深度解析)..."
-    node fetch_github_trending.js || echo "⚠️ 抓取跳过或保留现有版本数据"
-
-    cd website
-    npm run build
-    cd "$SCRIPT_DIR"
 
     # 自动探测本地可用科学上网代理（避免 LibreSSL SSL_connect 失败）
     GIT_PROXY_OPTS=()
@@ -53,37 +48,38 @@ if [ "$1" = "--deploy" ] || [ "$1" = "-d" ]; then
         fi
     done
 
-    DEPLOY_TMP="/tmp/macsur_deploy_$$"
+    DEPLOY_TMP="/tmp/macsur_source_deploy_$$"
     rm -rf "$DEPLOY_TMP"
-    echo "📥 克隆发布仓库 macsur.github.io ..."
-    git "${GIT_PROXY_OPTS[@]}" clone --depth=1 https://github.com/macsur/macsur.github.io.git "$DEPLOY_TMP"
+    echo "📥 克隆 source 源码分支 ..."
+    git "${GIT_PROXY_OPTS[@]}" clone -b source --depth=1 https://github.com/macsur/macsur.github.io.git "$DEPLOY_TMP"
+
+    # 将本地最新工程文件全量同步到临时仓库
+    cp -r "$SCRIPT_DIR/website/src" "$DEPLOY_TMP/website/"
+    cp -r "$SCRIPT_DIR/website/public" "$DEPLOY_TMP/website/"
+    cp -f "$SCRIPT_DIR/fetch_github_trending.js" "$DEPLOY_TMP/"
+    cp -f "$SCRIPT_DIR/sync_upstream.js" "$DEPLOY_TMP/"
+    cp -f "$SCRIPT_DIR/sync_upstream.sh" "$DEPLOY_TMP/"
+    cp -f "$SCRIPT_DIR/apps_manager.sh" "$DEPLOY_TMP/"
+    cp -f "$SCRIPT_DIR/kejilion.sh" "$DEPLOY_TMP/"
+    cp -f "$SCRIPT_DIR/x.sh" "$DEPLOY_TMP/"
+
     cd "$DEPLOY_TMP"
-
-    # 清理旧静态资源 (严格保留 .git，不上传 .github/workflows 以规避 OAuth App workflow scope 权限拦截)
-    find . -maxdepth 1 ! -name ".git" ! -name "." -exec rm -rf {} +
-
-    # 拷贝最新 Next.js 静态导出构建物
-    cp -r "$SCRIPT_DIR/website/out/"* .
-    cp -r "$SCRIPT_DIR/website/out/".[!.]* . 2>/dev/null || true
-
-    # 确保 .nojekyll 存在，防止 GitHub Pages 忽略 _next 目录
-    touch .nojekyll
-
     git add -A
     if git diff --cached --quiet; then
-        echo "✅ 网站内容无变动，跳过提交"
+        echo "✅ source 源码分支无变动，无需推送"
     else
-        git commit -m "AutoSync: Update website to Google AI modern style & Trending TOP 10 [$(date '+%Y-%m-%d %H:%M')]"
-        echo "⬆️ 推送到远程 main 分支..."
-        git "${GIT_PROXY_OPTS[@]}" push origin main
+        git commit -m "AutoSync Source: Update upstream kejilion & site source [$(date '+%Y-%m-%d %H:%M')]"
+        echo "⬆️ 推送到远程 source 分支..."
+        git "${GIT_PROXY_OPTS[@]}" push origin source
+        echo "⚡ 提示: 云端 GitHub Actions 已被自动唤醒，正在进行全新数据拉取与 Pages 发布！"
     fi
 
     cd "$SCRIPT_DIR"
     rm -rf "$DEPLOY_TMP"
 
     echo "=================================================="
-    echo "  🎉 部署完成！线上 x.zttz.eu.org 已生效！"
+    echo "  🎉 源码已同步到 source 分支！云端正在自动构建下发！"
     echo "=================================================="
 else
-    echo "💡 提示: 若需要同步并直接部署上线，请运行: ./sync_upstream.sh --deploy"
+    echo "💡 提示: 若需要同步并推送到源码分支，请运行: ./sync_upstream.sh --deploy"
 fi
