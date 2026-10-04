@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
 import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
+import { DAILY_RECOMMEND } from '@/data/dailyRecommend';
 
 interface RecommendedAppItem {
   id: number;
@@ -43,77 +44,9 @@ interface RecommendedAppItem {
 export default function Home() {
   // 主题模式：'dark'（默认极客流光暗黑模式）或 'light'（清爽科技白昼模式）
   // 🌟 【今日推荐】精选 3 款极力推荐的一键部署应用（由 AI 原创精选 & Kejilion 官方深度实测）
-  const [recommendedApps, setRecommendedApps] = useState<RecommendedAppItem[]>([]);
-
-  useEffect(() => {
-    // 精选候选池：涵盖最新大模型、自托管PaaS、高颜值监控、内网穿透与轻量管理
-    const pool = [
-      {
-        id: 201,
-        cmd: "k app 201",
-        badge: "AI 顶流标杆",
-        name: "DeepSeek-V3/R1 顶尖开源大模型",
-        category: "🤖 人工智能与大模型",
-        stars: "185k+",
-        highlight: "全球瞩目的划时代开源大语言模型与超强推理架构。一键完成模型权重加载、量化适配与本地高并发 API 暴露，零门槛打造企业级私有化 AI 引擎。",
-        reason: "实测在纯 CPU 或消费级 GPU 上均展现出超越同级参数的惊人推理表现，数学与代码生成能力直逼顶级专有模型。"
-      },
-      {
-        id: 3,
-        cmd: "k app 3",
-        badge: "现代化运维首选",
-        name: "1Panel 新一代现代化 Linux 运维面板",
-        category: "🖥️ 服务器运维与面板",
-        stars: "26k+",
-        highlight: "开源、轻量且深度拥抱 Docker 容器化理念的现代化运维神器。界面遵循极简几何美学，内置精选应用市场、自动化证书签发、容器生命周期监控与一键容灾备份。",
-        reason: "彻底摆脱传统面板对系统环境的高侵入性污染，所有服务均在独立沙箱中优雅运行，安全稳定。"
-      },
-      {
-        id: 205,
-        cmd: "k app 205",
-        badge: "极客必备探针",
-        name: "Uptime Kuma 高颜值全功能服务监控",
-        category: "📊 探针监控与运维告警",
-        stars: "62k+",
-        highlight: "自托管监控界的颜值天花板。支持 HTTP(s)、TCP、Ping、DNS、Docker 容器与证书到期监控，内置 90+ 渠道全能实时告警与公开状态页一键生成。",
-        reason: "资源占用极其克制，0 门槛开箱即用，是管理多台服务器与网站集群健康状态的终极守护者。"
-      },
-      {
-        id: 203,
-        cmd: "k app 203",
-        badge: "私有 AI 门户",
-        name: "Open WebUI 全能私有化 AI 交互平台",
-        category: "🤖 人工智能与大模型",
-        stars: "58k+",
-        highlight: "对标顶级商业产品的自托管 AI 工作台。完美兼容 Ollama 与各类 OpenAI 格式接口，原生集成 RAG 知识库检索增强、语音输入输出与多用户权限管理。",
-        reason: "交互体验丝滑细腻，能够将孤立的模型权重秒变人人可用的团队 AI 生产力资产。"
-      },
-      {
-        id: 204,
-        cmd: "k app 204",
-        badge: "极简 PaaS 云底座",
-        name: "Dokploy 轻量开源自托管 PaaS 平台",
-        category: "🖥️ 服务器运维与面板",
-        stars: "14k+",
-        highlight: "被誉为开源自建版 Heroku / Vercel。直接连接 GitHub 仓库自动 CI/CD 构建，原生支持数据库集群、自动 SSL 与 Docker Compose 编排发布。",
-        reason: "让个人开发者拥有一整套属于自己的微型云服务商体验，告别昂贵的第三方托管费用。"
-      },
-      {
-        id: 208,
-        cmd: "k app 208",
-        badge: "AI Agent 中枢",
-        name: "n8n 可视化自动化与智能体编排系统",
-        category: "🛠️ 远程工具与实用套件",
-        stars: "52k+",
-        highlight: "全球领先的开源工作流自动化平台。支持数百种外部应用打通，内置强大的 LangChain 智能体节点，零代码/低代码实现复杂业务流程自动化。",
-        reason: "把重复繁琐的人工日常自动化，甚至能作为个人数字分身 24 小时监控并处理数据。"
-      }
-    ];
-
-    // 随机提取 3 个内容，并保持稳定展示
-    const shuffled = [...pool].sort(() => 0.5 - Math.random());
-    setRecommendedApps(shuffled.slice(0, 3));
-  }, []);
+  // 🌟 【今日推荐】TOP 3 数据由构建时 generate_daily_recommend.js 每日生成
+  // 内容铁律：上游有新应用时优先打新上榜，无新内容时随机抽取，每日构建刷新
+  const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
 
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
