@@ -50,8 +50,19 @@ if [ "$1" = "--deploy" ] || [ "$1" = "-d" ]; then
 
     DEPLOY_TMP="/tmp/macsur_source_deploy_$$"
     rm -rf "$DEPLOY_TMP"
-    echo "📥 克隆 source 源码分支 ..."
-    git "${GIT_PROXY_OPTS[@]}" clone -b source --depth=1 https://github.com/macsur/macsur.github.io.git "$DEPLOY_TMP"
+    echo "📥 克隆 source 源码分支 (带重试保护)..."
+    for attempt in 1 2 3; do
+        if git "${GIT_PROXY_OPTS[@]}" clone -b source --depth=1 https://github.com/macsur/macsur.github.io.git "$DEPLOY_TMP" 2>/dev/null; then
+            break
+        fi
+        echo "⚠️ 克隆网络波动，第 $attempt 次重试中..."
+        sleep 1
+    done
+
+    if [ ! -d "$DEPLOY_TMP/.git" ]; then
+        echo "❌ 连接 GitHub 遇到网络波动，请检查代理后重试。"
+        exit 1
+    fi
 
     # 将本地最新工程文件全量同步到临时仓库
     cp -r "$SCRIPT_DIR/website/src" "$DEPLOY_TMP/website/"
