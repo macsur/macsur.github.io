@@ -194,6 +194,8 @@ if ! kpanel_protocol_active; then
 	if [ ! -f ~/kejilion.sh ]; then
 		if [ -f "./kejilion.sh" ]; then
 			cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1
+		elif [ -f "./x.sh" ]; then
+			cp -f ./x.sh ~/kejilion.sh > /dev/null 2>&1
 		elif [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
 			cp -f "${BASH_SOURCE[0]}" ~/kejilion.sh > /dev/null 2>&1
 		fi
@@ -1623,7 +1625,7 @@ install_ldnmp() {
 	  cd /home/web && docker compose up -d
 	  sleep 1
   	  crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-  	  (crontab -l 2>/dev/null; echo '0 6 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+  	  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
 
 	  fix_phpfpm_conf php
 	  fix_phpfpm_conf php74
@@ -1669,7 +1671,7 @@ install_certbot() {
 	kpanel_web_upgrade_certificate_renewal || return 1
 
 	check_crontab_installed
-	local cron_job="0 6 * * * ~/auto_cert_renewal.sh"
+	local cron_job="0 0 * * * ~/auto_cert_renewal.sh"
 	crontab -l 2>/dev/null | grep -vF "$cron_job" | crontab -
 	(crontab -l 2>/dev/null; echo "$cron_job") | crontab -
 	echo "续签任务已更新"
@@ -2355,7 +2357,7 @@ nginx_upgrade() {
   docker images --filter=reference="${ldnmp_pods}*" -q | xargs docker rmi > /dev/null 2>&1
   docker compose up -d --force-recreate $ldnmp_pods
   crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-  (crontab -l 2>/dev/null; echo '0 6 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
   docker exec nginx chown -R nginx:nginx /var/www/html
   docker exec nginx mkdir -p /var/cache/nginx/proxy
   docker exec nginx mkdir -p /var/cache/nginx/fastcgi
@@ -10900,7 +10902,7 @@ linux_tools() {
 	  echo -e "${gl_kjlan}11.  ${gl_bai}btop 现代化监控工具 ${gl_huang}★${gl_bai}             ${gl_kjlan}12.  ${gl_bai}ranger 文件管理工具"
 	  echo -e "${gl_kjlan}13.  ${gl_bai}ncdu 磁盘占用查看工具             ${gl_kjlan}14.  ${gl_bai}fzf 全局搜索工具"
 	  echo -e "${gl_kjlan}15.  ${gl_bai}vim 文本编辑器                    ${gl_kjlan}16.  ${gl_bai}nano 文本编辑器 ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}git 版本控制系统                  ${gl_kjlan}18.  ${gl_bai}opencode AI编程助手 ${gl_huang}★${gl_bai}"
+	  echo -e "${gl_kjlan}17.  ${gl_bai}git 版本控制系统"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}21.  ${gl_bai}黑客帝国屏保                      ${gl_kjlan}22.  ${gl_bai}跑火车屏保"
 	  echo -e "${gl_kjlan}26.  ${gl_bai}俄罗斯方块小游戏                  ${gl_kjlan}27.  ${gl_bai}贪吃蛇小游戏"
@@ -11059,17 +11061,6 @@ linux_tools() {
 			  send_stats "安装git"
 			  ;;
 
-			18)
-			  clear
-			  cd ~
-			  curl -fsSL https://opencode.ai/install | bash
-			  source ~/.bashrc
-			  source ~/.profile
-			  opencode
-			  send_stats "安装opencode"
-			  ;;
-
-
 			21)
 			  clear
 			  install cmatrix
@@ -11124,8 +11115,6 @@ linux_tools() {
 			  clear
 			  send_stats "全部卸载"
 			  remove htop iftop tmux ffmpeg btop ranger ncdu fzf cmatrix sl bastet nsnake ninvaders vim nano git
-			  opencode uninstall
-			  rm -rf ~/.opencode
 			  ;;
 
 		  41)
@@ -11827,6 +11816,8 @@ kpanel_node_paths() {
 	KPANEL_NODE_SYSTEMD_DIR="/etc/systemd/system"
 	KPANEL_NODE_OPENRC_DIR="/etc/init.d"
 	KPANEL_NODE_UPDATE_PERIODIC="/etc/periodic/hourly/kejilion-node-update"
+	KPANEL_NODE_UPDATE_CRON="${KPANEL_NODE_HOME}/update-cron.sh"
+	KPANEL_NODE_CRONTAB="/etc/crontabs/root"
 	KPANEL_NODE_SSH_LOGIN_SERVICE="${KPANEL_NODE_SYSTEMD_DIR}/kejilion-node-ssh-login.service"
 	KPANEL_NODE_SSH_LOGIN_RUNTIME="/run/kejilion-node-ssh"
 	KPANEL_NODE_SSH_LOGIN_EVENT="${KPANEL_NODE_SSH_LOGIN_RUNTIME}/ssh-login.json"
@@ -11842,7 +11833,52 @@ kpanel_node_paths() {
 	KPANEL_NODE_INIT_SYSTEM=""
 }
 
+kpanel_node_procd_helpers_template() {
+	cat <<'KPANEL_NODE_PROCD_HELPERS'
+# Shared installer/updater checks. No distribution names or writable config
+# select the privileged service backend.
+kpanel_node_procd_trusted_path() {
+	local path="$1" mode
+	[ ! -L "$path" ] && { [ -f "$path" ] || [ -d "$path" ]; } || return 1
+	[ "$(stat -c '%u' "$path")" = 0 ] || return 1
+	mode="$(stat -c '%a' "$path")" || return 1
+	[[ "$mode" =~ ^[0-7]{3,4}$ ]] && [ $((8#$mode & 8#022)) -eq 0 ]
+}
+kpanel_node_procd_capable() {
+	local path command_path
+	[ "$(cat /proc/1/comm 2>/dev/null)" = procd ] || return 1
+	for path in /etc /etc/init.d /etc/rc.common /lib /lib/functions /lib/functions/procd.sh; do
+		kpanel_node_procd_trusted_path "$path" || return 1
+	done
+	[ -f /etc/rc.common ] && [ -f /lib/functions/procd.sh ] || return 1
+	for path in ubus jsonfilter; do
+		command_path="$(type -P "$path")" || return 1
+		command_path="$(readlink -f "$command_path")" || return 1
+		[ -x "$command_path" ] && kpanel_node_procd_trusted_path "$command_path" || return 1
+	done
+	ubus -t 5 call service list '{"name":"kejilion-node"}' >/dev/null 2>&1
+}
+kpanel_node_procd_pid() {
+	local service="${1%.service}" data running pid
+	case "$service" in kejilion-node|kejilion-node-terminal|kejilion-node-ssh-login|kejilion-node-file) ;; *) return 1 ;; esac
+	data="$(ubus -t 5 call service list "{\"name\":\"${service}\"}" 2>/dev/null)" || return 1
+	running="$(printf '%s' "$data" | jsonfilter -e "@['${service}'].instances.main.running")" || return 1
+	[ "$running" = true ] || return 1
+	pid="$(printf '%s' "$data" | jsonfilter -e "@['${service}'].instances.main.pid")" || return 1
+	[[ "$pid" =~ ^[1-9][0-9]*$ ]] && [ -e "/proc/${pid}/exe" ] || return 1
+	printf '%s\n' "$pid"
+}
+KPANEL_NODE_PROCD_HELPERS
+}
+
 kpanel_node_detect_init_system() {
+	source <(kpanel_node_procd_helpers_template)
+	if [ "$(cat /proc/1/comm 2>/dev/null)" = procd ]; then
+		kpanel_node_procd_capable || { echo "procd 依赖缺失或不可信：需要 rc.common、procd.sh、ubus、jsonfilter 和可用的 service 总线。" >&2; return 1; }
+		KPANEL_NODE_INIT_SYSTEM=procd
+		KPANEL_NODE_SSH_LOGIN_SERVICE="${KPANEL_NODE_OPENRC_DIR}/kejilion-node-ssh-login"
+		return 0
+	fi
 	if [ -d /run/systemd/system ] && [ -n "$KPANEL_NODE_SYSTEMCTL" ] && [ -x "$KPANEL_NODE_SYSTEMCTL" ]; then
 		KPANEL_NODE_INIT_SYSTEM=systemd
 		KPANEL_NODE_SSH_LOGIN_SERVICE="${KPANEL_NODE_SYSTEMD_DIR}/kejilion-node-ssh-login.service"
@@ -11856,13 +11892,13 @@ kpanel_node_detect_init_system() {
 		KPANEL_NODE_SSH_LOGIN_SERVICE="${KPANEL_NODE_OPENRC_DIR}/kejilion-node-ssh-login"
 		return 0
 	fi
-	echo "当前系统需要运行 systemd 或 OpenRC，无法安装 KPanel 轻量节点。" >&2
+	echo "当前系统需要运行 systemd、OpenRC 或原生 procd（需可信的 rc.common/procd.sh、ubus、jsonfilter），无法安装 KPanel 轻量节点。" >&2
 	return 1
 }
 
 kpanel_node_service_name() {
 	case "$KPANEL_NODE_INIT_SYSTEM" in
-		openrc) printf '%s\n' "${1%.service}" ;;
+		openrc|procd) printf '%s\n' "${1%.service}" ;;
 		*) printf '%s\n' "$1" ;;
 	esac
 }
@@ -11873,12 +11909,13 @@ kpanel_node_service_exists() {
 	case "$KPANEL_NODE_INIT_SYSTEM" in
 		systemd) "$KPANEL_NODE_SYSTEMCTL" cat "$service" >/dev/null 2>&1 ;;
 		openrc) [ -f "${KPANEL_NODE_OPENRC_DIR}/${service}" ] && [ ! -L "${KPANEL_NODE_OPENRC_DIR}/${service}" ] && [ -x "${KPANEL_NODE_OPENRC_DIR}/${service}" ] ;;
+		procd) [ -x "${KPANEL_NODE_OPENRC_DIR}/${service}" ] && kpanel_node_procd_trusted_path "${KPANEL_NODE_OPENRC_DIR}/${service}" ;;
 		*) return 1 ;;
 	esac
 }
 
 kpanel_node_service_action() {
-	local action="$1" service
+	local action="$1" service pid
 	service="$(kpanel_node_service_name "$2")" || return 1
 	case "$KPANEL_NODE_INIT_SYSTEM" in
 		systemd) "$KPANEL_NODE_SYSTEMCTL" "$action" "$service" ;;
@@ -11891,6 +11928,27 @@ kpanel_node_service_action() {
 				*) return 2 ;;
 			esac
 			;;
+		procd)
+			kpanel_node_service_exists "$service" || return 1
+			case "$action" in
+				is-active)
+					if [ "$service" = cron ]; then
+						ubus -t 5 call service list '{"name":"cron"}' | jsonfilter -e "@.cron.instances.*.running" | grep -qx true
+					else
+						pid="$(kpanel_node_procd_pid "$service")" && [ "/proc/${pid}/exe" -ef "$KPANEL_NODE_BINARY" ]
+					fi
+					;;
+				status)
+					if kpanel_node_service_action is-active "$service"; then
+						printf '%s: running\n' "$service"
+					else
+						printf '%s: inactive or unavailable\n' "$service"; return 3
+					fi
+					;;
+				enable|disable|start|stop|restart) "${KPANEL_NODE_OPENRC_DIR}/${service}" "$action" ;;
+				*) return 2 ;;
+			esac
+			;;
 		*) return 1 ;;
 	esac
 }
@@ -11898,9 +11956,36 @@ kpanel_node_service_action() {
 kpanel_node_service_reload_manager() {
 	case "$KPANEL_NODE_INIT_SYSTEM" in
 		systemd) "$KPANEL_NODE_SYSTEMCTL" daemon-reload ;;
-		openrc) return 0 ;;
+		openrc|procd) return 0 ;;
 		*) return 1 ;;
 	esac
+}
+
+kpanel_node_procd_cron_line() {
+	printf '%s\n' '17 * * * * /usr/local/lib/kejilion-node/update-cron.sh # KPanel lightweight node updater'
+}
+
+kpanel_node_procd_cron_write() {
+	local action="$1" directory="${KPANEL_NODE_CRONTAB%/*}" temporary line
+	line="$(kpanel_node_procd_cron_line)"
+	if [ "$action" = remove ] && [ ! -e "$KPANEL_NODE_CRONTAB" ] && [ ! -L "$KPANEL_NODE_CRONTAB" ]; then return 0; fi
+	if [ ! -e "$directory" ] && [ ! -L "$directory" ]; then mkdir -m 0700 "$directory" || return 1; fi
+	[ -d "$directory" ] && kpanel_node_procd_trusted_path "$directory" || return 1
+	if [ -e "$KPANEL_NODE_CRONTAB" ] || [ -L "$KPANEL_NODE_CRONTAB" ]; then
+		[ -f "$KPANEL_NODE_CRONTAB" ] && kpanel_node_procd_trusted_path "$KPANEL_NODE_CRONTAB" &&
+			[ "$(stat -c '%h' "$KPANEL_NODE_CRONTAB")" = 1 ] || return 1
+	fi
+	if [ "$action" = remove ] && ! grep -Fxq "$line" "$KPANEL_NODE_CRONTAB"; then return 0; fi
+	temporary="$(mktemp "${directory}/.kejilion-node-cron.XXXXXX")" || return 1
+	if [ -f "$KPANEL_NODE_CRONTAB" ]; then
+		awk -v managed="$line" '$0 != managed { print }' "$KPANEL_NODE_CRONTAB" >"$temporary" || { rm -f -- "$temporary"; return 1; }
+	fi
+	if [ "$action" = add ]; then printf '%s\n' "$line" >>"$temporary" || { rm -f -- "$temporary"; return 1; }; fi
+	# BusyBox crond reloads changed crontab directories at its next minute tick.
+	# Atomic replacement preserves every unrelated job and never stops shared cron.
+	if ! chown root:root "$temporary" || ! chmod 0600 "$temporary" || ! mv -f -- "$temporary" "$KPANEL_NODE_CRONTAB"; then
+		rm -f -- "$temporary"; return 1
+	fi
 }
 
 kpanel_node_update_schedule_enable() {
@@ -11909,6 +11994,10 @@ kpanel_node_update_schedule_enable() {
 		openrc)
 			[ -f "$KPANEL_NODE_UPDATE_PERIODIC" ] && [ ! -L "$KPANEL_NODE_UPDATE_PERIODIC" ] && [ -x "$KPANEL_NODE_UPDATE_PERIODIC" ] || return 1
 			kpanel_node_service_action enable crond
+			;;
+		procd)
+			[ -x "$KPANEL_NODE_UPDATE_CRON" ] && kpanel_node_procd_trusted_path "$KPANEL_NODE_UPDATE_CRON" || return 1
+			kpanel_node_procd_cron_write add && kpanel_node_service_action enable cron
 			;;
 		*) return 1 ;;
 	esac
@@ -11920,6 +12009,7 @@ kpanel_node_update_schedule_start() {
 		openrc)
 			kpanel_node_service_action is-active crond || kpanel_node_service_action start crond
 			;;
+		procd) kpanel_node_service_action is-active cron || kpanel_node_service_action start cron ;;
 		*) return 1 ;;
 	esac
 }
@@ -11929,7 +12019,10 @@ kpanel_node_update_schedule_stop() {
 }
 
 kpanel_node_update_schedule_disable() {
-	[ "$KPANEL_NODE_INIT_SYSTEM" != systemd ] || kpanel_node_service_action disable kejilion-node-update.timer
+	case "$KPANEL_NODE_INIT_SYSTEM" in
+		systemd) kpanel_node_service_action disable kejilion-node-update.timer ;;
+		procd) kpanel_node_procd_cron_write remove ;;
+	esac
 }
 
 kpanel_node_preflight() {
@@ -11937,7 +12030,7 @@ kpanel_node_preflight() {
 		echo "KPanel 轻量节点安装需要 root 权限。" >&2
 		return 1
 	}
-	for command_name in curl sha256sum mktemp flock; do
+	for command_name in bash curl sha256sum mktemp flock stat readlink awk grep sed cmp od tr; do
 		command -v "$command_name" >/dev/null 2>&1 || {
 			echo "缺少必要命令: ${command_name}" >&2
 			return 1
@@ -11962,11 +12055,20 @@ kpanel_node_preflight() {
 			return 1
 		}
 	fi
+	if [ "$KPANEL_NODE_INIT_SYSTEM" = procd ]; then
+		[ -x "${KPANEL_NODE_OPENRC_DIR}/cron" ] && kpanel_node_procd_trusted_path "${KPANEL_NODE_OPENRC_DIR}/cron" || {
+			echo "procd 系统缺少可信的 /etc/init.d/cron，无法启用安全自动更新。" >&2
+			return 1
+		}
+		for command_name in ubus jsonfilter logread; do
+			command -v "$command_name" >/dev/null 2>&1 || { echo "缺少必要命令: ${command_name}" >&2; return 1; }
+		done
+	fi
 	case "$(uname -m)" in
 		x86_64|amd64) KPANEL_NODE_ARCH="amd64" ;;
 		aarch64|arm64) KPANEL_NODE_ARCH="arm64" ;;
 		*)
-			echo "当前 CPU 架构暂不支持 KPanel 轻量节点。" >&2
+			echo "当前 CPU 架构暂不支持 KPanel 轻量节点（支持 amd64/x86_64、arm64/aarch64）。" >&2
 			return 1
 			;;
 	esac
@@ -11975,7 +12077,8 @@ kpanel_node_preflight() {
 kpanel_node_ensure_account() {
 	local nologin_shell="/usr/sbin/nologin" sysusers_config=""
 	if id kejilion-node >/dev/null 2>&1; then
-		[ "$(id -gn kejilion-node 2>/dev/null)" = "kejilion-node" ] || {
+		[ "$(id -gn kejilion-node 2>/dev/null)" = "kejilion-node" ] &&
+			[ "$(id -u kejilion-node)" != 0 ] && [ "$(id -g kejilion-node)" != 0 ] || {
 			echo "现有 kejilion-node 账户的主组不安全，拒绝继续。" >&2
 			return 1
 		}
@@ -11985,7 +12088,7 @@ kpanel_node_ensure_account() {
 	[ -x "$nologin_shell" ] || nologin_shell="/bin/false"
 
 	if command -v useradd >/dev/null 2>&1; then
-		useradd --system --no-create-home --home-dir /nonexistent --shell "$nologin_shell" kejilion-node || return 1
+		useradd --system --user-group --no-create-home --home-dir /nonexistent --shell "$nologin_shell" kejilion-node || return 1
 	elif command -v systemd-sysusers >/dev/null 2>&1; then
 		sysusers_config="$(mktemp /tmp/kejilion-node-sysusers.XXXXXX)" || return 1
 		printf 'u kejilion-node - "KPanel Lightweight Monitoring Node" /nonexistent %s\n' "$nologin_shell" >"$sysusers_config"
@@ -12005,7 +12108,8 @@ kpanel_node_ensure_account() {
 		adduser -S -D -H -h /nonexistent -s "$nologin_shell" -G kejilion-node kejilion-node || return 1
 	fi
 
-	id kejilion-node >/dev/null 2>&1 && [ "$(id -gn kejilion-node 2>/dev/null)" = "kejilion-node" ] || {
+	id kejilion-node >/dev/null 2>&1 && [ "$(id -gn kejilion-node 2>/dev/null)" = "kejilion-node" ] &&
+		[ "$(id -u kejilion-node)" != 0 ] && [ "$(id -g kejilion-node)" != 0 ] || {
 		echo "KPanel 轻量节点低权限账户创建失败。" >&2
 		return 1
 	}
@@ -12105,8 +12209,9 @@ kpanel_node_write_updater() {
 	updater_temporary="$(mktemp "${KPANEL_NODE_HOME}/.update.sh.XXXXXX")" || return 1
 	printf '#!/bin/bash\n' >"$updater_temporary" || return 1
 	kpanel_node_lock_template >>"$updater_temporary" || return 1
+	kpanel_node_procd_helpers_template >>"$updater_temporary" || return 1
 	cat >>"$updater_temporary" <<'KPANEL_NODE_UPDATE'
-# KPANEL_NODE_RUNTIME_GENERATION=4
+# KPANEL_NODE_RUNTIME_GENERATION=5
 set -euo pipefail
 
 mode="${1:-update}"
@@ -12210,13 +12315,16 @@ release_base="${release_url%/SHA256SUMS}"
 
 file_service="kejilion-node-file.service"
 update_init_system=""
-if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+if [ "$(cat /proc/1/comm 2>/dev/null)" = procd ]; then
+	kpanel_node_procd_capable || { echo "KPanel lightweight node requires a running, trusted procd service manager with ubus/jsonfilter" >&2; exit 1; }
+	update_init_system=procd
+elif [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
 	update_init_system=systemd
 elif [ -d /run/openrc ] && command -v rc-service >/dev/null 2>&1 && command -v rc-update >/dev/null 2>&1 &&
 	command -v supervise-daemon >/dev/null 2>&1 && command -v logger >/dev/null 2>&1; then
 	update_init_system=openrc
 else
-	echo "KPanel lightweight node requires a running systemd or OpenRC service manager" >&2
+	echo "KPanel lightweight node requires a running systemd, OpenRC or native procd service manager" >&2
 	exit 1
 fi
 if [ "$update_init_system" = systemd ]; then
@@ -12228,7 +12336,7 @@ file_service_definition_changed=false
 
 updater_service_name() {
 	case "$update_init_system" in
-		openrc) printf '%s\n' "${1%.service}" ;;
+		openrc|procd) printf '%s\n' "${1%.service}" ;;
 		*) printf '%s\n' "$1" ;;
 	esac
 }
@@ -12239,6 +12347,7 @@ updater_service_exists() {
 	case "$update_init_system" in
 		systemd) systemctl cat "$service" >/dev/null 2>&1 ;;
 		openrc) [ -f "/etc/init.d/${service}" ] && [ ! -L "/etc/init.d/${service}" ] && [ -x "/etc/init.d/${service}" ] ;;
+		procd) [ -x "/etc/init.d/${service}" ] && kpanel_node_procd_trusted_path "/etc/init.d/${service}" ;;
 	esac
 }
 
@@ -12255,6 +12364,14 @@ updater_service_action() {
 				*) return 2 ;;
 			esac
 			;;
+		procd)
+			updater_service_exists "$service" || return 1
+			case "$action" in
+				is-active) kpanel_node_procd_pid "$service" >/dev/null ;;
+				enable|restart) "/etc/init.d/${service}" "$action" ;;
+				*) return 2 ;;
+			esac
+			;;
 	esac
 }
 
@@ -12265,6 +12382,42 @@ ensure_file_service_unit() {
 		[ $(( 8#$(stat -c '%a' "$file_service_path") & 8#022 )) -eq 0 ] || return 1
 	fi
 	local template legacy_template="" unit_temporary
+	if [ "$update_init_system" = procd ]; then
+		template="${temporary_dir}/file.procd"
+		cat >"$template" <<'KPANEL_NODE_FILE_PROCD'
+#!/bin/sh /etc/rc.common
+# KPanel managed procd service
+USE_PROCD=1
+START=95
+STOP=10
+
+start_service() {
+	[ -f /etc/kejilion-node/node.json ] || return 1
+	procd_open_instance main
+	procd_set_param command /bin/sh -c 'umask 077; exec /usr/local/lib/kejilion-node/kejilion-node file-broker --config /etc/kejilion-node/node.json --terminal-config /etc/kejilion-node/terminal.json'
+	procd_set_param user root
+	procd_set_param group root
+	procd_set_param respawn 3600 15 0
+	procd_set_param term_timeout 30
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	grep -q no_new_privs /lib/functions/procd.sh && procd_set_param no_new_privs 1
+	procd_close_instance
+}
+KPANEL_NODE_FILE_PROCD
+		if [ -f "$file_service_path" ]; then
+			cmp -s "$file_service_path" "$template" && return 0
+			echo "KPanel file service has custom settings; retaining the existing procd service" >&2
+			return 0
+		fi
+		unit_temporary="$(mktemp "${file_service_path}.XXXXXX")" || return 1
+		if ! install -o root -g root -m 0755 "$template" "$unit_temporary" || ! mv -f -- "$unit_temporary" "$file_service_path"; then
+			rm -f -- "$unit_temporary"
+			return 1
+		fi
+		file_service_definition_changed=true
+		return 0
+	fi
 	if [ "$update_init_system" = openrc ]; then
 		template="${temporary_dir}/file.openrc"
 		cat >"$template" <<'KPANEL_NODE_FILE_OPENRC'
@@ -12373,6 +12526,7 @@ service_running_current() {
 	case "$update_init_system" in
 		systemd) pid="$(systemctl show "$service" --property=MainPID --value)" || return 1 ;;
 		openrc) pid="$(cat "/run/kejilion-node/$(updater_service_name "$service").pid" 2>/dev/null)" || return 1 ;;
+		procd) pid="$(kpanel_node_procd_pid "$service")" || return 1 ;;
 	esac
 	[[ "$pid" =~ ^[1-9][0-9]*$ ]] && [ "/proc/${pid}/exe" -ef "$binary_path" ]
 }
@@ -12650,7 +12804,139 @@ KPANEL_NODE_OPENRC_UPDATE
 		"$KPANEL_NODE_UPDATE_PERIODIC"
 }
 
+kpanel_node_write_procd_units() {
+	local path
+	# Every privileged destination is fixed and in a root-owned, non-writable
+	# directory. Reject linked or custom-owned files before opening a heredoc.
+	for path in "$KPANEL_NODE_OPENRC_DIR" "$KPANEL_NODE_HOME" "$KPANEL_NODE_CONFIG_DIR"; do
+		[ -d "$path" ] && kpanel_node_procd_trusted_path "$path" || return 1
+	done
+	for path in "${KPANEL_NODE_OPENRC_DIR}/kejilion-node" "${KPANEL_NODE_OPENRC_DIR}/kejilion-node-terminal" \
+		"$KPANEL_NODE_SSH_LOGIN_SERVICE" "${KPANEL_NODE_OPENRC_DIR}/kejilion-node-file" "$KPANEL_NODE_UPDATE_CRON"; do
+		if [ -e "$path" ] || [ -L "$path" ]; then
+			[ -f "$path" ] && kpanel_node_procd_trusted_path "$path" && [ "$(stat -c '%h' "$path")" = 1 ] || return 1
+		fi
+	done
+	path="${KPANEL_NODE_CONFIG_DIR}/state"
+	[ ! -L "$path" ] || return 1
+	if [ -e "$path" ]; then
+		[ -d "$path" ] && [ "$(stat -c '%u:%g:%a' "$path")" = 0:0:700 ] || return 1
+	else
+		"$KPANEL_NODE_INSTALL_BIN" -d -o root -g root -m 0700 "$path" || return 1
+	fi
+	cat >"${KPANEL_NODE_OPENRC_DIR}/kejilion-node" <<'KPANEL_NODE_PROCD_SERVICE'
+#!/bin/sh /etc/rc.common
+# KPanel managed procd service
+USE_PROCD=1
+START=95
+STOP=10
+
+start_service() {
+	[ -f /etc/kejilion-node/node.json ] || return 1
+	procd_open_instance main
+	procd_set_param command /bin/sh -c 'umask 077; exec /usr/local/lib/kejilion-node/kejilion-node run --config /etc/kejilion-node/node.json'
+	procd_set_param user kejilion-node
+	procd_set_param group kejilion-node
+	procd_set_param respawn 3600 15 0
+	procd_set_param term_timeout 30
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	grep -q no_new_privs /lib/functions/procd.sh && procd_set_param no_new_privs 1
+	procd_close_instance
+}
+KPANEL_NODE_PROCD_SERVICE
+
+	cat >"${KPANEL_NODE_OPENRC_DIR}/kejilion-node-terminal" <<'KPANEL_NODE_PROCD_TERMINAL_SERVICE'
+#!/bin/sh /etc/rc.common
+# KPanel managed procd service
+USE_PROCD=1
+START=95
+STOP=10
+
+start_service() {
+	[ -f /etc/kejilion-node/node.json ] || return 1
+	[ -f /etc/kejilion-node/terminal.json ] || return 1
+	procd_open_instance main
+	procd_set_param command /bin/sh -c 'umask 077; exec /usr/local/lib/kejilion-node/kejilion-node terminal-broker --config /etc/kejilion-node/node.json --terminal-config /etc/kejilion-node/terminal.json'
+	procd_set_param user root
+	procd_set_param group root
+	procd_set_param respawn 3600 5 0
+	procd_set_param term_timeout 30
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_close_instance
+}
+KPANEL_NODE_PROCD_TERMINAL_SERVICE
+
+	cat >"${KPANEL_NODE_OPENRC_DIR}/kejilion-node-ssh-login" <<'KPANEL_NODE_PROCD_SSH_LOGIN_SERVICE'
+#!/bin/sh /etc/rc.common
+# KPanel managed procd service
+USE_PROCD=1
+START=95
+STOP=10
+
+start_service() {
+	[ ! -L /run/kejilion-node-ssh ] || return 1
+	if [ -e /run/kejilion-node-ssh ]; then
+		[ -d /run/kejilion-node-ssh ] && [ "$(stat -c '%u:%a' /run/kejilion-node-ssh)" = 0:750 ] || return 1
+	fi
+	command install -d -o root -g kejilion-node -m 0750 /run/kejilion-node-ssh || return 1
+	procd_open_instance main
+	procd_set_param command /bin/sh -c 'umask 027; exec /usr/local/lib/kejilion-node/kejilion-node ssh-login-broker --output /run/kejilion-node-ssh/ssh-login.json'
+	procd_set_param user root
+	procd_set_param group kejilion-node
+	procd_set_param respawn 3600 15 0
+	procd_set_param term_timeout 30
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	grep -q no_new_privs /lib/functions/procd.sh && procd_set_param no_new_privs 1
+	procd_close_instance
+}
+KPANEL_NODE_PROCD_SSH_LOGIN_SERVICE
+
+	cat >"${KPANEL_NODE_OPENRC_DIR}/kejilion-node-file" <<'KPANEL_NODE_PROCD_FILE_SERVICE'
+#!/bin/sh /etc/rc.common
+# KPanel managed procd service
+USE_PROCD=1
+START=95
+STOP=10
+
+start_service() {
+	[ -f /etc/kejilion-node/node.json ] || return 1
+	procd_open_instance main
+	procd_set_param command /bin/sh -c 'umask 077; exec /usr/local/lib/kejilion-node/kejilion-node file-broker --config /etc/kejilion-node/node.json --terminal-config /etc/kejilion-node/terminal.json'
+	procd_set_param user root
+	procd_set_param group root
+	procd_set_param respawn 3600 15 0
+	procd_set_param term_timeout 30
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	grep -q no_new_privs /lib/functions/procd.sh && procd_set_param no_new_privs 1
+	procd_close_instance
+}
+KPANEL_NODE_PROCD_FILE_SERVICE
+
+	cat >"$KPANEL_NODE_UPDATE_CRON" <<'KPANEL_NODE_PROCD_UPDATE'
+#!/bin/sh
+set -eu
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export PATH
+umask 077
+random_value="$(od -An -N2 -tu2 /dev/urandom 2>/dev/null | tr -d ' ' || true)"
+case "$random_value" in *[!0-9]*|'') random_value=0 ;; esac
+sleep "$((random_value % 901))"
+exec /usr/local/lib/kejilion-node/update.sh update
+KPANEL_NODE_PROCD_UPDATE
+	chmod 0755 "${KPANEL_NODE_OPENRC_DIR}/kejilion-node" \
+		"${KPANEL_NODE_OPENRC_DIR}/kejilion-node-terminal" "$KPANEL_NODE_SSH_LOGIN_SERVICE" \
+		"${KPANEL_NODE_OPENRC_DIR}/kejilion-node-file" "$KPANEL_NODE_UPDATE_CRON"
+}
+
 kpanel_node_write_units() {
+	if [ "$KPANEL_NODE_INIT_SYSTEM" = procd ]; then
+		kpanel_node_write_procd_units
+		return
+	fi
 	if [ "$KPANEL_NODE_INIT_SYSTEM" = openrc ]; then
 		kpanel_node_write_openrc_units
 		return
@@ -13020,6 +13306,17 @@ kpanel_node_activate() {
 	if ! kpanel_node_service_action is-active kejilion-node-ssh-login.service >/dev/null; then
 		echo "KPanel SSH 登录采集服务当前不可用；普通遥测仍在运行。" >&2
 	fi
+	if [ "$KPANEL_NODE_INIT_SYSTEM" = procd ]; then
+		local attempt
+		for attempt in {1..20}; do
+			if kpanel_node_service_action is-active kejilion-node.service >/dev/null; then
+				sleep 0.25
+				kpanel_node_service_action is-active kejilion-node.service >/dev/null && return 0
+			fi
+			sleep 0.25
+		done
+		return 1
+	fi
 	kpanel_node_service_action is-active kejilion-node.service >/dev/null
 }
 
@@ -13171,6 +13468,14 @@ kpanel_node_status() {
 	done
 	if [ "$KPANEL_NODE_INIT_SYSTEM" = systemd ]; then
 		kpanel_node_service_action status kejilion-node-update.timer || true
+	elif [ "$KPANEL_NODE_INIT_SYSTEM" = procd ]; then
+		kpanel_node_service_action status cron || true
+		if [ -x "$KPANEL_NODE_UPDATE_CRON" ] && kpanel_node_procd_trusted_path "$KPANEL_NODE_UPDATE_CRON" &&
+			grep -Fxq "$(kpanel_node_procd_cron_line)" "$KPANEL_NODE_CRONTAB"; then
+			echo "KPanel lightweight node updater: enabled (cron)"
+		else
+			echo "KPanel lightweight node updater: disabled or unavailable" >&2
+		fi
 	else
 		kpanel_node_service_action status crond || true
 		if [ -x "$KPANEL_NODE_UPDATE_PERIODIC" ] && [ ! -L "$KPANEL_NODE_UPDATE_PERIODIC" ]; then
@@ -13201,6 +13506,19 @@ kpanel_node_update() {
 	)
 }
 
+kpanel_node_clear_monitoring_relay() {
+	local directory=/run/kejilion-node-monitoring path
+	[ -e "$directory" ] || [ -L "$directory" ] || return 0
+	# An unrecognized entry is preserved; no recursive removal of runtime data.
+	[ -d "$directory" ] && [ ! -L "$directory" ] && [ "$(stat -c '%u:%a' "$directory")" = 0:750 ] || return 1
+	for path in "$directory/check-status.json" "$directory/procd-health.json"; do
+		[ -e "$path" ] || [ -L "$path" ] || continue
+		kpanel_node_safe_regular_file "$path" || return 1
+	done
+	rm -f -- "$directory/check-status.json" "$directory/procd-health.json" || return 1
+	rmdir -- "$directory" 2>/dev/null || true
+}
+
 kpanel_node_uninstall() {
 	(
 	kpanel_node_paths
@@ -13210,13 +13528,18 @@ kpanel_node_uninstall() {
 	}
 	kpanel_node_lock || return 1
 	kpanel_node_detect_init_system >/dev/null 2>&1 || true
+	# Remove only our exact cron entry even if procd/ubus is currently broken.
+	kpanel_node_procd_cron_write remove || { echo "无法安全移除 KPanel 自动更新计划，卸载已停止。" >&2; return 1; }
 	if [ -n "$KPANEL_NODE_INIT_SYSTEM" ]; then
 		for service in kejilion-node.service kejilion-node-terminal.service kejilion-node-ssh-login.service kejilion-node-file.service; do
 			kpanel_node_service_action stop "$service" >/dev/null 2>&1 || true
 			kpanel_node_service_action disable "$service" >/dev/null 2>&1 || true
 		done
 		kpanel_node_update_schedule_stop >/dev/null 2>&1 || true
-		kpanel_node_update_schedule_disable >/dev/null 2>&1 || true
+		if ! kpanel_node_update_schedule_disable; then
+			echo "无法安全移除 KPanel 自动更新计划，卸载已停止。" >&2
+			return 1
+		fi
 	fi
 	rm -f -- /etc/systemd/system/kejilion-node.service \
 		/etc/systemd/system/kejilion-node-terminal.service \
@@ -13229,6 +13552,7 @@ kpanel_node_uninstall() {
 		/etc/init.d/kejilion-node-ssh-login \
 		/etc/init.d/kejilion-node-file \
 		"$KPANEL_NODE_UPDATE_PERIODIC"
+	kpanel_node_clear_monitoring_relay || echo "KPanel 状态中继目录存在未知权限或链接，已保留供人工检查。" >&2
 	rm -rf -- "$KPANEL_NODE_HOME" "$KPANEL_NODE_CONFIG_DIR"
 	rmdir -- "$KPANEL_NODE_SSH_LOGIN_RUNTIME" 2>/dev/null || true
 	[ "$KPANEL_NODE_INIT_SYSTEM" != systemd ] || kpanel_node_service_reload_manager >/dev/null 2>&1 || true
@@ -14572,7 +14896,6 @@ linux_ldnmp() {
 	echo -e "${gl_huang}------------------------"
 	echo -e "${gl_huang}31.  ${gl_bai}站点数据管理 ${gl_huang}★${gl_bai}                    ${gl_huang}32.  ${gl_bai}备份全站数据"
 	echo -e "${gl_huang}33.  ${gl_bai}定时远程备份                      ${gl_huang}34.  ${gl_bai}还原全站数据"
-	echo "k. 通用加密备份与恢复 (.kpb，与 KPanel 互通)"
 	echo -e "${gl_huang}------------------------"
 	echo -e "${gl_huang}35.  ${gl_bai}防护LDNMP环境                     ${gl_huang}36.  ${gl_bai}优化LDNMP环境"
 	echo -e "${gl_huang}37.  ${gl_bai}更新LDNMP环境                     ${gl_huang}38.  ${gl_bai}卸载LDNMP环境"
@@ -21387,6 +21710,17 @@ refresh_apps_catalog() {
 	return 0
 }
 
+run_ai_cli_manager() (
+	local app="$1" manager
+	case "$app" in claude-code|codex|opencode|antigravity-cli) ;; *) return 1 ;; esac
+	manager=$(mktemp "${TMPDIR:-/tmp}/kejilion-ai-cli.XXXXXX") || return 1
+	trap 'rm -f -- "$manager"' EXIT
+	curl -fLsS --connect-timeout 15 --max-time 120 "${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/ai_cli_manager.sh" -o "$manager" || return 1
+	[ -s "$manager" ] && bash -n "$manager" || return 1
+	. "$manager" || return 1
+	ai_cli_main "$app"
+)
+
 linux_panel() {
 
 local sub_choice="$1"
@@ -21484,6 +21818,8 @@ while true; do
 	  echo -e "${gl_kjlan}113. ${color113}Firefox浏览器                       ${gl_kjlan}114. ${color114}OpenClaw机器人管理工具${gl_huang}★${gl_bai}"
 	  echo -e "${gl_kjlan}115. ${color115}Hermes机器人管理工具${gl_huang}★${gl_bai}               ${gl_kjlan}116. ${color116}DeepSeek Harness管理工具${gl_huang}★${gl_bai}"
 	  echo -e "${gl_kjlan}117. ${color117}99CDN自建CDN管理平台                ${gl_kjlan}118. ${color118}99DNS智能调度服务"
+	  echo -e "${gl_kjlan}119. ${color119}Claude Code编程助手${gl_huang}★${gl_bai}                ${gl_kjlan}120. ${color120}Codex编程助手${gl_huang}★${gl_bai}"
+	  echo -e "${gl_kjlan}121. ${color121}OpenCode编程助手${gl_huang}★${gl_bai}                   ${gl_kjlan}122. ${color122}Antigravity CLI编程助手${gl_huang}★${gl_bai}"
 	  echo -e "${gl_kjlan}-------------------------"
 	  echo -e "${gl_kjlan}第三方应用列表"
   	  echo -e "${gl_kjlan}想要让你的应用出现在这里？查看开发者指南: ${gl_huang}https://dev.kejilion.sh/${gl_bai}"
@@ -25177,6 +25513,22 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 		  bash <(curl -fsSL ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/deepseek_harness_manager.sh)
 		  ;;
 
+	  119|claude-code|claude)
+		  run_ai_cli_manager claude-code
+		  ;;
+
+	  120|codex)
+		  run_ai_cli_manager codex
+		  ;;
+
+	  121|opencode|OpenCode)
+		  run_ai_cli_manager opencode
+		  ;;
+
+	  122|antigravity-cli|agy)
+		  run_ai_cli_manager antigravity-cli
+		  ;;
+
 	  117|99cdn)
 
 		local app_id="117"
@@ -25365,737 +25717,6 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	sub_choice=""
 
 done
-}
-
-
-
-
-# ==============================================================================
-# 11+ 应用市场 [分类折叠] 模块 (智能手风琴视图)
-# 采用纯样式 0 开销折叠、A1~J* 分类专属代号与一键极速安装
-# ==============================================================================
-CATEGORY_LIST=(
-  "panel:A:🖥️  服务器运维与面板:11"
-  "ai:B:🤖 人工智能与大模型:14"
-  "monitor:C:📊 探针监控与运维告警:11"
-  "storage:D:🗄️  私有网盘与文件存储:14"
-  "network:E:🌐 网络代理与穿透组网:15"
-  "media:F:🎬 影音媒体与下载娱乐:14"
-  "office:G:📝 协作办公与知识库:13"
-  "social:H:💬 即时通讯与社交媒体:7"
-  "tools:I:🛠️  远程工具与实用套件:19"
-  "custom:J:📦 自定义与第三方应用:0"
-)
-
-# 展开状态记录字符串 (空格分隔的已展开分类ID，初始为空代表全折叠)
-EXPANDED_CATEGORIES=""
-
-is_cat_expanded() {
-    local target="$1"
-    [[ " $EXPANDED_CATEGORIES " == *" $target "* ]]
-}
-
-toggle_cat_expanded() {
-    local target="$1"
-    if is_cat_expanded "$target"; then
-        # 再次选中当前已展开的分类，执行折叠收起
-        EXPANDED_CATEGORIES=""
-    else
-        # 独占式手风琴：只展开当前选中的分类，其他分类自动折叠
-        EXPANDED_CATEGORIES=" $target "
-    fi
-}
-
-expand_all_cats() {
-    EXPANDED_CATEGORIES="panel ai monitor storage network media office social tools custom"
-}
-
-collapse_all_cats() {
-    EXPANDED_CATEGORIES=""
-}
-
-get_cat_name() {
-    local target="$1"
-    for item in "${CATEGORY_LIST[@]}"; do
-        local cid="" ckey="" cname="" ccount=""
-        IFS=':' read -r cid ckey cname ccount <<< "$item"
-        if [ "$cid" = "$target" ]; then
-            echo "$cname"
-            return 0
-        fi
-    done
-    echo "$target"
-}
-
-get_cid_by_key() {
-    local upper_k="$1"
-    for item in "${CATEGORY_LIST[@]}"; do
-        local cid="" ckey="" cname="" ccount=""
-        IFS=':' read -r cid ckey cname ccount <<< "$item"
-        if [ "$ckey" = "$upper_k" ]; then
-            echo "$cid"
-            return 0
-        fi
-    done
-    echo ""
-}
-
-# 内置 118 个软件的标准数据库 (id|name|category|star|aliases|desc)
-BUILTIN_APPS=(
-  "1|宝塔面板官方版|panel||bt|baota|" \
-  "2|aaPanel宝塔国际版|panel||aapanel|" \
-  "3|1Panel新一代管理面板|panel||1p|1panel|" \
-  "4|NginxProxyManager可视化面板|network||npm|一个Nginx反向代理工具面板，不支持添加域名访问。" \
-  "5|OpenList多存储文件列表程序|storage||openlist|一个支持多种存储，支持网页浏览和 WebDAV 的文件列表程序，由 gi..." \
-  "6|Ubuntu远程桌面网页版|tools||webtop-ubuntu|webtop基于Ubuntu的容器。若IP无法访问，请添加域名访问。" \
-  "7|哪吒探针VPS监控面板|monitor||nezha|" \
-  "8|QB离线BT磁力下载面板|media||qb|QB|qbittorrent离线BT磁力下载服务" \
-  "9|Poste.io邮件服务器程序|social||mail|" \
-  "10|RocketChat多人在线聊天系统|social||rocketchat|Rocket.Chat 是一个开源的团队通讯平台，支持实时聊天、音视频通..." \
-  "11|禅道项目管理软件|office||zentao|禅道是通用的项目管理软件" \
-  "12|青龙面板定时任务管理平台|panel||qinglong|青龙面板是一个定时任务管理平台" \
-  "13|Cloudreve网盘|storage||cloudreve|cloudreve是一个支持多家云存储的网盘系统" \
-  "14|简单图床图片管理程序|storage||easyimage|简单图床是一个简单的图床程序" \
-  "15|emby多媒体管理系统|media||emby|emby是一个主从式架构的媒体服务器软件，可以用来整理服务器上的视频和音..." \
-  "16|Speedtest测速面板|monitor||looking|Speedtest测速面板是一个VPS网速测试工具，多项测试功能，还可以..." \
-  "17|AdGuardHome去广告软件|network||adguardhome|AdGuardHome是一款全网广告拦截与反跟踪软件，未来将不止是一个D..." \
-  "18|onlyoffice在线办公OFFICE|office||onlyoffice|onlyoffice是一款开源的在线office工具，太强大了！" \
-  "19|雷池WAF防火墙面板|network||safeline|" \
-  "20|portainer容器管理面板|panel||portainer|portainer是一个轻量级的docker容器管理面板" \
-  "21|VScode网页版|office||vscode|VScode是一款强大的在线代码编写工具" \
-  "22|UptimeKuma监控工具|monitor||uptime-kuma|Uptime Kuma 易于使用的自托管监控工具" \
-  "23|Memos网页备忘录|office||memos|Memos是一款轻量级、自托管的备忘录中心" \
-  "24|Webtop远程桌面网页版|tools||webtop|webtop基于Alpine的中文版容器。若IP无法访问，请添加域名访问..." \
-  "25|Nextcloud网盘|storage||nextcloud|Nextcloud拥有超过 400,000 个部署，是您可以下载的最受欢..." \
-  "26|QD-Today定时任务管理框架|tools||qd|QD-Today是一个HTTP请求定时任务自动执行框架" \
-  "27|Dockge容器堆栈管理面板|panel||dockge|dockge是一个可视化的docker-compose容器管理面板" \
-  "28|LibreSpeed测速工具|monitor||speedtest|librespeed是用Javascript实现的轻量级速度测试工具，即..." \
-  "29|searxng聚合搜索站|tools||searxng|searxng是一个私有且隐私的搜索引擎站点" \
-  "30|PhotoPrism私有相册系统|storage||photoprism|photoprism非常强大的私有相册系统" \
-  "31|StirlingPDF工具大全|office||s-pdf|这是一个强大的本地托管基于 Web 的 PDF 操作工具，使用 dock..." \
-  "32|drawio免费的在线图表软件|office||drawio|这是一个强大图表绘制软件。思维导图，拓扑图，流程图，都能画" \
-  "33|Sun-Panel导航面板|social||sun-panel|Sun-Panel服务器、NAS导航面板、Homepage、浏览器首页" \
-  "34|Pingvin-Share文件分享平台|storage||pingvin-share|Pingvin Share 是一个可自建的文件分享平台，是 WeTran..." \
-  "35|极简朋友圈|social||moments|极简朋友圈，高仿微信朋友圈，记录你的美好生活" \
-  "36|LobeChatAI聊天聚合网站|ai||lobe-chat|LobeChat聚合市面上主流的AI大模型，ChatGPT/Claude..." \
-  "37|MyIP工具箱|tools||myip|是一个多功能IP工具箱，可以查看自己IP信息及连通性，用网页面板呈现" \
-  "38|小雅alist全家桶|storage||xiaoya|" \
-  "39|Bililive直播录制工具|media||bililive|Bililive-go是一个支持多种直播平台的直播录制工具" \
-  "40|webssh网页版SSH连接工具|tools||webssh|简易在线ssh连接工具和sftp工具" \
-  "41|耗子管理面板|panel||haozi|acepanel|" \
-  "42|Nexterm远程连接工具|tools||nexterm|nexterm是一款强大的在线SSH/VNC/RDP连接工具。" \
-  "43|RustDesk远程桌面(服务端)|tools||hbbs|rustdesk开源的远程桌面(服务端)，类似自己的向日葵私服。" \
-  "44|RustDesk远程桌面(中继端)|tools||hbbr|rustdesk开源的远程桌面(中继端)，类似自己的向日葵私服。" \
-  "45|Docker加速站|network||registry|Docker Registry 是一个用于存储和分发 Docker 镜像..." \
-  "46|GitHub加速站|network||ghproxy|使用Go实现的GHProxy，用于加速部分地区Github仓库的拉取。" \
-  "47|普罗米修斯监控|monitor||prometheus|grafana|Prometheus+Grafana企业级监控系统" \
-  "48|普罗米修斯(主机监控)|monitor||node-exporter|这是一个普罗米修斯的主机数据采集组件，请部署在被监控主机上。" \
-  "49|普罗米修斯(容器监控)|monitor||cadvisor|这是一个普罗米修斯的容器数据采集组件，请部署在被监控主机上。" \
-  "50|补货监控工具|monitor||changedetection|这是一款网站变化检测、补货监控和通知的小工具" \
-  "51|PVE开小鸡面板|panel||pve|" \
-  "52|DPanel容器管理面板|panel||dpanel|Docker可视化面板系统，提供完善的docker管理功能。" \
-  "53|llama3聊天AI大模型|ai||llama3|OpenWebUI一款大语言模型网页框架，接入全新的llama3大语言模..." \
-  "54|AMH主机建站管理面板|panel||amh|" \
-  "55|FRP内网穿透(服务端)|network||frps|" \
-  "56|FRP内网穿透(客户端)|network||frpc|" \
-  "57|Deepseek聊天AI大模型|ai||deepseek|OpenWebUI一款大语言模型网页框架，接入全新的DeepSeek R..." \
-  "58|Dify大模型知识库|ai||dify|是一款开源的大语言模型(LLM) 应用开发平台。自托管训练数据用于AI生..." \
-  "59|NewAPI大模型资产管理|ai||new-api|新一代大模型网关与AI资产管理系统" \
-  "60|JumpServer开源堡垒机|panel||jms|是一个开源的特权访问管理 (PAM) 工具，该程序占用80端口不支持添加..." \
-  "61|在线翻译服务器|tools||libretranslate|免费开源机器翻译 API，完全自托管，它的翻译引擎由开源Argos Tr..." \
-  "62|RAGFlow大模型知识库|ai||ragflow|基于深度文档理解的开源 RAG（检索增强生成）引擎" \
-  "63|OpenWebUI自托管AI平台|ai||open-webui|OpenWebUI一款大语言模型网页框架，官方精简版本，支持各大模型AP..." \
-  "64|it-tools工具箱|tools||it-tools|对开发人员和 IT 工作者来说非常有用的工具" \
-  "65|n8n自动化工作流平台|tools||n8n|是一款功能强大的自动化工作流平台" \
-  "66|yt-dlp视频下载工具|media||yt|" \
-  "67|ddns-go动态DNS管理工具|network||ddns|自动将你的公网 IP（IPv4/IPv6）实时更新到各大 DNS 服务商..." \
-  "68|AllinSSL证书管理平台|network||allinssl|开源免费的 SSL 证书自动化管理平台" \
-  "69|SFTPGo文件传输工具|storage||sftpgo|开源免费随时随地SFTP FTP WebDAV 文件传输工具" \
-  "70|AstrBot聊天机器人框架|ai||astrbot|开源AI聊天机器人框架，支持微信，QQ，TG接入AI大模型" \
-  "71|Navidrome私有音乐服务器|media||navidrome|是一个轻量、高性能的音乐流媒体服务器" \
-  "72|bitwarden密码管理器|tools||bitwarden|一个你可以控制数据的密码管理器" \
-  "73|LibreTV私有影视|media||libretv|免费在线视频搜索与观看平台" \
-  "74|MoonTV私有影视|media||moontv|免费在线视频搜索与观看平台" \
-  "75|Melody音乐精灵|media||melody|你的音乐精灵，旨在帮助你更好地管理音乐。" \
-  "76|在线DOS老游戏|media||dosgame|是一个中文DOS游戏合集网站" \
-  "77|迅雷离线下载工具|media||xunlei|迅雷你的离线高速BT磁力下载工具" \
-  "78|PandaWiki智能文档管理系统|office||PandaWiki|PandaWiki是一款AI大模型驱动的开源智能文档管理系统，强烈建议不..." \
-  "79|Beszel服务器监控|monitor||beszel|Beszel轻量易用的服务器监控" \
-  "80|linkwarden书签管理|office||linkwarden|一个开源的自托管书签管理平台，支持标签、搜索和团队协作。" \
-  "81|JitsiMeet视频会议|social||jitsi|一个开源的安全视频会议解决方案，支持多人在线会议、屏幕共享与加密通信。" \
-  "82|gpt-load高性能AI透明代理|ai||gpt-load|高性能AI接口透明代理服务" \
-  "83|komari服务器监控工具|monitor||komari|轻量级的自托管服务器监控工具" \
-  "84|Wallos个人财务管理工具|office||wallos|开源个人订阅追踪器，可用于财务管理" \
-  "85|immich图片视频管理器|storage||immich|高性能自托管照片和视频管理解决方案。" \
-  "86|jellyfin媒体管理系统|media||jellyfin|是一款开源媒体服务器软件" \
-  "87|SyncTV一起看片神器|media||synctv|远程一起观看电影和直播的程序。它提供了同步观影、直播、聊天等功能" \
-  "88|Owncast自托管直播平台|media||owncast|开源、免费的自建直播平台" \
-  "89|FileCodeBox文件快递|storage||file-code-box|匿名口令分享文本和文件，像拿快递一样取文件" \
-  "90|matrix去中心化聊天协议|social||matrix|Matrix是一个去中心化的聊天协议" \
-  "91|gitea私有代码仓库|tools||gitea|免费新一代的代码托管平台，提供接近 GitHub 的使用体验。" \
-  "92|FileBrowser文件管理器|storage||filebrowser|是一个基于Web的文件管理器" \
-  "93|Dufs极简静态文件服务器|storage||dufs|极简静态文件服务器，支持上传下载" \
-  "94|Gopeed高速下载工具|media||gopeed|分布式高速下载工具，支持多种协议" \
-  "95|paperless文档管理平台|office||paperless|开源的电子文档管理系统，它的主要用途是把你的纸质文件数字化并管理起来。" \
-  "96|2FAuth自托管二步验证器|tools||2fauth|自托管的双重身份验证 (2FA) 账户管理和验证码生成工具。" \
-  "97|WireGuard组网(服务端)|network||wgs|现代化、高性能的虚拟专用网络工具" \
-  "98|WireGuard组网(客户端)|network||wgc|现代化、高性能的虚拟专用网络工具" \
-  "99|DSM群晖虚拟机|tools||dsm|Docker容器中的虚拟DSM" \
-  "100|Syncthing点对点文件同步工具|storage||syncthing|开源的点对点文件同步工具，类似于 Dropbox、Resilio Syn..." \
-  "101|AI视频生成工具|ai||moneyprinterturbo|MoneyPrinterTurbo是一款使用AI大模型合成高清短视频的工..." \
-  "102|VoceChat多人在线聊天系统|social||vocechat|是一款支持独立部署的个人云社交媒体聊天服务" \
-  "103|Umami网站统计工具|monitor||umami|开源、轻量、隐私友好的网站分析工具，类似于GoogleAnalytics..." \
-  "104|Stream四层代理转发工具|network||nginx-stream|" \
-  "105|思源笔记|office||siyuan|思源笔记是一款隐私优先的知识管理系统" \
-  "106|Drawnix开源白板工具|office||drawnix|是一款强大的开源白板工具，集成思维导图、流程图等。" \
-  "107|PanSou网盘搜索|tools||pansou|PanSou是一个高性能的网盘资源搜索API服务。" \
-  "108|LangBot聊天机器人|ai||langbot|是一个开源的大语言模型原生即时通信机器人开发平台" \
-  "109|ZFile在线网盘|storage||zfile|是一个适用于个人或小团队的在线网盘程序。" \
-  "110|Karakeep书签管理|office||karakeep|是一款可自行托管的书签应用，带有人工智能功能，专为数据囤积者而设计。" \
-  "111|多格式文件转换工具|tools||convertx|是一个功能强大的多格式文件转换工具（支持文档、图像、音频视频等）强烈建议..." \
-  "112|Lucky大内网穿透工具|network||lucky|Lucky 是一个大内网穿透及端口转发管理工具，支持 DDNS、反向代理..." \
-  "113|Firefox浏览器|tools||firefox|是一个运行在 Docker 中的 Firefox 浏览器，支持通过网页直..." \
-  "114|OpenClaw机器人管理工具|ai||Moltbot|ClawdBot|moltbot|clawdbot|openclaw|OpenClaw|" \
-  "115|Hermes机器人管理工具|ai||hermes|" \
-  "116|DeepSeek Harness管理工具|ai||deepseek-harness|DeepSeek-Harness|dsh|" \
-  "117|99CDN自建CDN管理平台|network||99cdn|" \
-  "118|99DNS智能调度服务|network||99dns|"
-)
-
-# 动态加载第三方应用
-load_custom_apps() {
-    CUSTOM_APPS=()
-    local scanned_files=()
-
-    local dirs=("$HOME/apps" "${KJ_SCRIPT_DIR:-}/apps" "$(dirname "$0")/apps" "./apps")
-
-    # 搜集所有存在的 .conf 文件
-    local found_confs=()
-    for d in "${dirs[@]}"; do
-        [ -d "$d" ] || continue
-        for conf in "$d"/*.conf; do
-            [ -f "$conf" ] || continue
-            local bname
-            bname=$(basename "$conf" .conf)
-            if [[ " ${scanned_files[*]} " == *" ${bname} "* ]]; then
-                continue
-            fi
-            scanned_files+=("$bname")
-            found_confs+=("$conf")
-        done
-    done
-
-    # 按照文件名升序排序，使 J1, J2... 顺序稳定固定
-    local sorted_confs=()
-    if [ "${#found_confs[@]}" -gt 0 ]; then
-        while IFS= read -r line; do
-            [ -n "$line" ] && sorted_confs+=("$line")
-        done < <(printf '%s\n' "${found_confs[@]}" | sort -f)
-    fi
-
-    for conf in "${sorted_confs[@]}"; do
-        local bname
-        bname=$(basename "$conf" .conf)
-        local app_id="$bname"
-        local app_name=""
-        local app_category="custom"
-        local app_text=""
-        local app_star=""
-
-        app_id=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_id=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-        [ -z "$app_id" ] && app_id="$bname"
-
-        app_name=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | sed -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*$//')
-        [ -z "$app_name" ] && app_name="$app_id"
-
-        local cat_temp
-        cat_temp=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
-        if [ -n "$cat_temp" ]; then
-            case "$cat_temp" in
-                panel|ai|monitor|storage|network|media|office|social|tools|custom)
-                    app_category="$cat_temp"
-                    ;;
-            esac
-        fi
-
-        app_text=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | sed -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*$//')
-        [ -n "$app_text" ] && [ ${#app_text} -gt 36 ] && app_text="${app_text:0:36}..."
-
-        CUSTOM_APPS+=("$app_id|$app_name|$app_category|$app_star|$bname|$app_text|$conf")
-    done
-}
-
-# 渲染手风琴式可折叠菜单
-render_accordion_apps_menu() {
-    load_custom_apps
-
-    local app_installed=""
-    if [ -f /home/docker/appno.txt ]; then
-        app_installed=$(cat /home/docker/appno.txt 2>/dev/null || echo "")
-    fi
-
-    while true; do
-        clear
-        echo -e "${gl_kjlan}========================================================================${gl_bai}"
-        echo -e "${gl_huang}  🚀 科技Lion 应用市场 · 智能分类手风琴视图 (共 118+ 应用)${gl_bai}"
-        echo -e "${gl_kjlan}========================================================================${gl_bai}"
-
-        for item in "${CATEGORY_LIST[@]}"; do
-            local cid="" ckey="" cname="" ccount=""
-            IFS=':' read -r cid ckey cname ccount <<< "$item"
-
-            # 动态获取自定义应用款数
-            if [ "$cid" = "custom" ]; then
-                ccount="${#CUSTOM_APPS[@]}"
-            fi
-
-            if is_cat_expanded "$cid"; then
-                echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
-                echo -e "${gl_hui}  ┌───────────────────────────────────────────────────────────────────${gl_bai}"
-
-                # 展开内置分类：输出专属代号 [A1]、[A2]... 并附带原应用编号
-                local item_idx=1
-                for entry in "${BUILTIN_APPS[@]}"; do
-                    local aid="" aname="" acat="" astar="" aalias="" adesc=""
-                    IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
-
-                    if [ "$acat" = "$cid" ]; then
-                        local is_inst=0
-                        if [ -n "$app_installed" ] && [[ " $app_installed " == *" $aid "* ]]; then
-                            is_inst=1
-                        fi
-
-                        local star_badge=""
-                        [ -n "$astar" ] && star_badge="${gl_huang}★${gl_bai}"
-
-                        local tag="${ckey}${item_idx}"
-                        local num_prefix=""
-                        num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$tag")
-                        local status_badge=""
-                        if [ "$is_inst" -eq 1 ]; then
-                            status_badge="${gl_lv}[已安装]${gl_bai}"
-                        fi
-
-                        local orig_id_str
-                        orig_id_str=$(printf "${gl_hui}#%-3s${gl_bai}" "$aid")
-
-                        printf "%b%-30s %b %b %b\n" "$num_prefix" "$aname$star_badge" "$orig_id_str" "$status_badge" "${gl_hui}$adesc${gl_bai}"
-                        item_idx=$((item_idx + 1))
-                    fi
-                done
-
-                # 若是自定义分类，自动生成 [J1]、[J2] 顺序序号并展示
-                if [ "$cid" = "custom" ]; then
-                    if [ "${#CUSTOM_APPS[@]}" -eq 0 ]; then
-                        echo -e "${gl_hui}  │ (暂未检测到自定义应用。可按 [+] 添加或将 .conf 放入 ~/apps 目录)${gl_bai}"
-                    else
-                        local j_idx=1
-                        for entry in "${CUSTOM_APPS[@]}"; do
-                            local aid="" aname="" acat="" astar="" aalias="" adesc="" aconf=""
-                            IFS='|' read -r aid aname acat astar aalias adesc aconf <<< "$entry"
-                            local j_tag="J${j_idx}"
-                            local num_prefix=""
-                            num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$j_tag")
-                            printf "%b%-34s %b\n" "$num_prefix" "$aname" "${gl_hui}$adesc${gl_bai}"
-                            j_idx=$((j_idx + 1))
-                        done
-                    fi
-                fi
-
-                echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
-            else
-                # 未展开分类瞬间输出纯折叠样式行，0 延迟秒开
-                echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
-            fi
-        done
-
-        echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_bai}分类控制: [${gl_huang}A~J${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
-        echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}11${gl_bai}] 经典平铺  [${gl_huang}BAK${gl_bai}] 备份  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
-        echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_huang}提示: 输入 A~J 查看分类；输入专属代号(如 A1, B3, J1)或原编号(如 1, 57)直接安装！${gl_bai}"
-
-        read -e -p "请输入你的选择: " user_input
-        [ -z "$user_input" ] && continue
-
-        local upper_input
-        upper_input=$(echo "$user_input" | tr '[:lower:]' '[:upper:]')
-        local lower_input
-        lower_input=$(echo "$user_input" | tr '[:upper:]' '[:lower:]')
-
-        # 1. 匹配分类专属代号 (A1~A*, B1~B*, ..., J1~J* 等)
-        if [[ "$upper_input" =~ ^([A-J])([0-9]+)$ ]]; then
-            local cat_key="${BASH_REMATCH[1]}"
-            local item_num="${BASH_REMATCH[2]}"
-            local item_idx=$((item_num - 1))
-
-            if [ "$cat_key" = "J" ]; then
-                # 自定义分类
-                if [ "$item_idx" -ge 0 ] && [ "$item_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
-                    local t_entry="${CUSTOM_APPS[$item_idx]}"
-                    local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
-                    IFS='|' read -r t_aid t_aname t_acat t_astar t_alias t_adesc t_conf <<< "$t_entry"
-                    SELECTED_APP_ACTION="$t_alias"
-                    SELECTED_CUSTOM_CONF="$t_conf"
-                    return 0
-                else
-                    echo -e "${gl_hong}错误: 自定义应用编号 J${item_num} 无效 (当前可用范围: J1 ~ J${#CUSTOM_APPS[@]})${gl_bai}"
-                    sleep 1.5
-                    continue
-                fi
-            else
-                # 内置分类 (A ~ I)
-                local target_cid
-                target_cid=$(get_cid_by_key "$cat_key")
-                local cur_idx=0
-                local matched_aid=""
-                for entry in "${BUILTIN_APPS[@]}"; do
-                    local b_aid="" b_name="" b_cat="" rest=""
-                    IFS='|' read -r b_aid b_name b_cat rest <<< "$entry"
-                    if [ "$b_cat" = "$target_cid" ]; then
-                        cur_idx=$((cur_idx + 1))
-                        if [ "$cur_idx" -eq "$item_num" ]; then
-                            matched_aid="$b_aid"
-                            break
-                        fi
-                    fi
-                done
-
-                if [ -n "$matched_aid" ]; then
-                    SELECTED_APP_ACTION="$matched_aid"
-                    return 0
-                else
-                    echo -e "${gl_hong}错误: 分类 [${cat_key}] 编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${cur_idx})${gl_bai}"
-                    sleep 1.5
-                    continue
-                fi
-            fi
-        fi
-
-        # 2. 匹配原数字编号直接安装 (如 1, 36, 57 等，自由取舍，二者同时有效)
-        if [[ "$user_input" =~ ^[0-9]+$ ]]; then
-            SELECTED_APP_ACTION="$user_input"
-            return 0
-        fi
-
-        # 3. 匹配单字母分类快捷键 (A~J / a~j) 展开/折叠分类
-        local matched_cid
-        matched_cid=$(get_cid_by_key "$upper_input")
-        if [ -n "$matched_cid" ]; then
-            toggle_cat_expanded "$matched_cid"
-            continue
-        fi
-
-        # 4. 匹配分类英文全称直接展开 (如 ai, panel, monitor 等)
-        case "$lower_input" in
-            panel|ai|monitor|storage|network|media|office|social|tools|custom)
-                toggle_cat_expanded "$lower_input"
-                continue
-                ;;
-        esac
-
-        # 5. 全局快捷操作
-        case "$lower_input" in
-            0)
-                SELECTED_APP_ACTION="0"
-                return 0
-                ;;
-            11|orig|classic)
-                SELECTED_APP_ACTION="11"
-                return 0
-                ;;
-            all|\*)
-                expand_all_cats
-                continue
-                ;;
-            col|collapse|_|-)
-                collapse_all_cats
-                continue
-                ;;
-            s|/|search|find)
-                search_apps_wizard
-                if [ -n "$SELECTED_APP_ACTION" ]; then
-                    return 0
-                fi
-                continue
-                ;;
-            \+|add|new)
-                new_custom_app_wizard
-                load_custom_apps
-                continue
-                ;;
-            bak|backup)
-                SELECTED_APP_ACTION="b"
-                return 0
-                ;;
-            r|rst|restore)
-                SELECTED_APP_ACTION="r"
-                return 0
-                ;;
-            *)
-                # 其它按键传给应用管理器处理
-                SELECTED_APP_ACTION="$user_input"
-                return 0
-                ;;
-        esac
-    done
-}
-
-# 交互式搜索应用向导
-search_apps_wizard() {
-    clear
-    echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  🔍 Kejilion 应用市场 · 快速搜索${gl_bai}"
-    echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    read -e -p "请输入应用关键词或拼音 (直接回车取消): " kw
-    [ -z "$kw" ] && return 0
-
-    local kw_lower
-    kw_lower=$(echo "$kw" | tr '[:upper:]' '[:lower:]')
-
-    local matches=()
-    for entry in "${BUILTIN_APPS[@]}"; do
-        local aid="" aname="" acat="" astar="" aalias="" adesc=""
-        aid=$(echo "$entry" | cut -d'|' -f1)
-        aname=$(echo "$entry" | cut -d'|' -f2)
-        acat=$(echo "$entry" | cut -d'|' -f3)
-        astar=$(echo "$entry" | cut -d'|' -f4)
-        aalias=$(echo "$entry" | cut -d'|' -f5)
-        adesc=$(echo "$entry" | cut -d'|' -f6)
-
-        local search_str="$aid $aname $aalias $adesc $acat"
-        search_str=$(echo "$search_str" | tr '[:upper:]' '[:lower:]')
-        if [[ "$search_str" == *"$kw_lower"* ]]; then
-            matches+=("$aid|$aname|$acat|$astar|$adesc")
-        fi
-    done
-
-    for entry in "${CUSTOM_APPS[@]}"; do
-        local aid="" aname="" acat="" astar="" aalias="" adesc=""
-        aid=$(echo "$entry" | cut -d'|' -f1)
-        aname=$(echo "$entry" | cut -d'|' -f2)
-        acat=$(echo "$entry" | cut -d'|' -f3)
-        astar=$(echo "$entry" | cut -d'|' -f4)
-        aalias=$(echo "$entry" | cut -d'|' -f5)
-        adesc=$(echo "$entry" | cut -d'|' -f6)
-
-        local search_str="$aid $aname $aalias $adesc $acat"
-        search_str=$(echo "$search_str" | tr '[:upper:]' '[:lower:]')
-        if [[ "$search_str" == *"$kw_lower"* ]]; then
-            matches+=("$aid|$aname|$acat|$astar|$adesc")
-        fi
-    done
-
-    echo ""
-    if [ ${#matches[@]} -eq 0 ]; then
-        echo -e "${gl_hong}未找到与 "$kw" 相关的软件。${gl_bai}"
-        read -e -p "按回车键返回菜单..." _dummy
-        return 0
-    fi
-
-    echo -e "共找到 ${gl_huang}${#matches[@]}${gl_bai} 款匹配的应用："
-    echo -e "${gl_hui}------------------------------------------------------------------------${gl_bai}"
-    for m in "${matches[@]}"; do
-        local maid="" maname="" macat="" mastar="" mdesc=""
-        maid=$(echo "$m" | cut -d'|' -f1)
-        maname=$(echo "$m" | cut -d'|' -f2)
-        macat=$(echo "$m" | cut -d'|' -f3)
-        mastar=$(echo "$m" | cut -d'|' -f4)
-        mdesc=$(echo "$m" | cut -d'|' -f5)
-        local cat_title
-        cat_title=$(get_cat_name "$macat")
-        printf "  ${gl_kjlan}[%-5s]${gl_bai} %-30s ${gl_hui}%-22s %s${gl_bai}\n" "$maid" "$maname" "($cat_title)" "$mdesc"
-    done
-    echo -e "${gl_hui}------------------------------------------------------------------------${gl_bai}"
-    read -e -p "请输入要操作的应用编号 (输入0取消): " chosen_id
-    if [ -n "$chosen_id" ] && [ "$chosen_id" != "0" ]; then
-        SELECTED_APP_ACTION="$chosen_id"
-    fi
-}
-
-# 一键创建自定义软件向导
-new_custom_app_wizard() {
-    clear
-    echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  ➕ Kejilion 新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
-    echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "本向导将帮助您根据 ${gl_huang}dev.kejilion.sh${gl_bai} 官方规范快速注册一个新应用。"
-    echo ""
-
-    local app_dir="$HOME/apps"
-    [ ! -d "$app_dir" ] && mkdir -p "$app_dir"
-
-    read -e -p "1. 应用唯一英文ID (例: my-blog, 仅小写字母和连字符): " wiz_id
-    wiz_id=$(echo "$wiz_id" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-_')
-    if [ -z "$wiz_id" ]; then
-        echo -e "${gl_hong}ID 不能为空，已取消。${gl_bai}"
-        sleep 1.5
-        return 0
-    fi
-
-    if [ -f "$app_dir/$wiz_id.conf" ]; then
-        echo -e "${gl_hong}应用配置文件 $app_dir/$wiz_id.conf 已存在！${gl_bai}"
-        read -e -p "是否覆盖创建？(y/N): " wiz_overwrite
-        [[ "$wiz_overwrite" =~ ^[Yy]$ ]] || return 0
-    fi
-
-    read -e -p "2. 应用显示名称 (例: 我的个人博客): " wiz_name
-    [ -z "$wiz_name" ] && wiz_name="$wiz_id"
-
-    echo ""
-    echo "请选择所属分类："
-    echo "  1) panel   - 🖥️  服务器运维与面板"
-    echo "  2) ai      - 🤖 人工智能与大模型"
-    echo "  3) monitor - 📊 探针监控与运维告警"
-    echo "  4) storage - 🗄️  私有网盘与文件存储"
-    echo "  5) network - 🌐 网络代理与穿透组网"
-    echo "  6) media   - 🎬 影音媒体与下载娱乐"
-    echo "  7) office  - 📝 协作办公与知识库"
-    echo "  8) social  - 💬 即时通讯与社交媒体"
-    echo "  9) tools   - 🛠️  远程工具与实用套件"
-    read -e -p "3. 请输入分类序号 [默认9]: " wiz_cat_idx
-    local wiz_cat="tools"
-    if [ "$wiz_cat_idx" = "1" ]; then
-        wiz_cat="panel"
-    elif [ "$wiz_cat_idx" = "2" ]; then
-        wiz_cat="ai"
-    elif [ "$wiz_cat_idx" = "3" ]; then
-        wiz_cat="monitor"
-    elif [ "$wiz_cat_idx" = "4" ]; then
-        wiz_cat="storage"
-    elif [ "$wiz_cat_idx" = "5" ]; then
-        wiz_cat="network"
-    elif [ "$wiz_cat_idx" = "6" ]; then
-        wiz_cat="media"
-    elif [ "$wiz_cat_idx" = "7" ]; then
-        wiz_cat="office"
-    elif [ "$wiz_cat_idx" = "8" ]; then
-        wiz_cat="social"
-    else
-        wiz_cat="tools"
-    fi
-
-    read -e -p "4. 一句话简介 (说明用途): " wiz_text
-    read -e -p "5. 项目官网/GitHub链接: " wiz_url
-    read -e -p "6. Docker容器名 [默认 ${wiz_id}_app]: " wiz_dname
-    [ -z "$wiz_dname" ] && wiz_dname="${wiz_id}_app"
-
-    read -e -p "7. 默认访问端口 [默认 8080]: " wiz_dport
-    [ -z "$wiz_dport" ] && wiz_dport="8080"
-
-    read -e -p "8. 占用空间估算(GB) [默认 1]: " wiz_size
-    [ -z "$wiz_size" ] && wiz_size="1"
-
-    cat << WIZARD_EOF > "$app_dir/$wiz_id.conf"
-# --- 基础信息 / Basic Information ---
-local app_id="$wiz_id"
-local app_name="$wiz_name"
-local app_category="$wiz_cat"
-local app_text="$wiz_text"
-local app_url="$wiz_url"
-local docker_name="$wiz_dname"
-local docker_port="$wiz_dport"
-local app_size="$wiz_size"
-
-# --- 核心逻辑 / Core Logic ---
-docker_app_install() {
-    mkdir -p /home/docker/$wiz_id && cd /home/docker/$wiz_id
-    cat << DOCKER_COMPOSE_EOF > docker-compose.yml
-services:
-  $wiz_dname:
-    image: nginx:alpine
-    container_name: $wiz_dname
-    restart: always
-    ports:
-      - "\${docker_port}:80"
-DOCKER_COMPOSE_EOF
-
-    docker compose up -d
-    echo "$wiz_name 安装完成！"
-    check_docker_app_ip
-}
-
-docker_app_update() {
-    cd /home/docker/$wiz_id
-    docker compose pull
-    docker compose up -d
-    echo "$wiz_name 更新完成！"
-}
-
-docker_app_uninstall() {
-    cd /home/docker/$wiz_id
-    docker compose down --rmi all
-    rm -rf /home/docker/$wiz_id
-    echo "$wiz_name 卸载完成！"
-}
-
-# --- 注册 (必须包含) ---
-docker_app_plus
-WIZARD_EOF
-
-    chmod +x "$app_dir/$wiz_id.conf"
-    local cat_display
-    cat_display=$(get_cat_name "$wiz_cat")
-    echo ""
-    echo -e "${gl_lv}✅ 成功创建自定义应用配置文件: $app_dir/$wiz_id.conf${gl_bai}"
-    echo -e "您可以在该分类（$cat_display）下直接看到并管理它！"
-    read -e -p "按回车键继续..." _dummy
-}
-
-linux_panel_accordion() {
-    local target_app=""
-    while true; do
-        render_accordion_apps_menu
-        target_app="$SELECTED_APP_ACTION"
-        [ -z "$target_app" ] && break
-
-        case "$target_app" in
-            0)
-                break
-                ;;
-            11|orig|classic)
-                CALL_FROM_ACCORDION=1 linux_panel
-                ;;
-            b|bak|backup)
-                CALL_FROM_ACCORDION=1 linux_panel "b"
-                ;;
-            r|rst|restore)
-                CALL_FROM_ACCORDION=1 linux_panel "r"
-                ;;
-            *)
-                # 带着用户选择的应用ID直接调用原生安装管理引擎，执行完毕或退出后精准返回本手风琴菜单
-                CALL_FROM_ACCORDION=1 linux_panel "$target_app"
-                ;;
-        esac
-    done
-}
-
-linux_panel_accordion() {
-    local target_app=""
-    while true; do
-        render_accordion_apps_menu
-        target_app="$SELECTED_APP_ACTION"
-        [ -z "$target_app" ] && break
-
-        case "$target_app" in
-            0)
-                break
-                ;;
-            11|orig|classic)
-                CALL_FROM_ACCORDION=1 linux_panel
-                ;;
-            b|bak|backup)
-                CALL_FROM_ACCORDION=1 linux_panel "b"
-                ;;
-            r|rst|restore)
-                CALL_FROM_ACCORDION=1 linux_panel "r"
-                ;;
-            *)
-                # 带着用户选择的应用ID直接调用原生安装管理引擎，执行完毕或退出后精准返回本手风琴菜单
-                CALL_FROM_ACCORDION=1 linux_panel "$target_app"
-                ;;
-        esac
-    done
 }
 
 
@@ -30638,10 +30259,10 @@ kpanel_network_operations_traffic_status() {
 	start_count="$(grep -Fxc '# kejilion traffic shutdown start' "$cron_path")"
 	end_count="$(grep -Fxc '# kejilion traffic shutdown end' "$cron_path")"
 	invocation_count="$(grep -Fxc "* * * * * $script_path" "$cron_path")"
-	reset_line_count="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/p' "$cron_path" | grep -Ec '^0 [16] ([1-9]|[12][0-9]|3[01]) \* \* reboot$')"
+	reset_line_count="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/p' "$cron_path" | grep -Ec '^0 1 ([1-9]|[12][0-9]|3[01]) \* \* reboot$')"
 	if [ "$enabled" = true ] && [ "$rx_threshold" -gt 0 ] && [ "$tx_threshold" -gt 0 ] &&
 		[ "$start_count" -eq 1 ] && [ "$end_count" -eq 1 ] && [ "$invocation_count" -eq 1 ] && [ "$reset_line_count" -eq 1 ]; then
-		reset_day="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/s/^0 [16] \([0-9][0-9]*\) \* \* reboot$/\1/p' "$cron_path")"
+		reset_day="$(sed -n '/^# kejilion traffic shutdown start$/,/^# kejilion traffic shutdown end$/s/^0 1 \([0-9][0-9]*\) \* \* reboot$/\1/p' "$cron_path")"
 		if [[ "$reset_day" =~ ^([1-9]|[12][0-9]|3[01])$ ]]; then
 			health=ready
 		else
@@ -30701,7 +30322,7 @@ kpanel_network_operations_build_cron() {
 		{
 			printf '%s\n' '# kejilion traffic shutdown start'
 			printf '* * * * * %s\n' "$script_path"
-			printf '0 6 %s * * reboot\n' "$reset_day"
+			printf '0 1 %s * * reboot\n' "$reset_day"
 			printf '%s\n' '# kejilion traffic shutdown end'
 		} >> "$target" || return 1
 	fi
@@ -33558,7 +33179,7 @@ while true; do
 
 			check_crontab_installed
 			(crontab -l | grep -v "kejilion.sh") | crontab -
-			(crontab -l 2>/dev/null; echo "0 6 * * * bash -c '$SH_Update_task'") | crontab -
+			(crontab -l 2>/dev/null; echo "$(shuf -i 0-59 -n 1) 2 * * * bash -c '$SH_Update_task'") | crontab -
 			echo -e "${gl_lv}自动更新已开启，每天凌晨2点脚本会自动更新！${gl_bai}"
 			send_stats "开启脚本自动更新"
 			break_end
@@ -33699,7 +33320,6 @@ echo "放行IP              k fxip 127.0.0.0/8 |k 放行IP 127.0.0.0/8"
 echo "阻止IP              k zzip 177.5.25.36 |k 阻止IP 177.5.25.36"
 echo "命令收藏夹          k fav | k 命令收藏夹"
 echo "应用市场管理        k app"
-echo "应用市场 [分类折叠]  k app+"
 echo "应用市场 [分类折叠]  k app+"
 echo "应用编号快捷管理    k app 26 | k app 1panel | k app npm"
 echo "KPanel管理          k app kpanel"
@@ -34079,12 +33699,6 @@ else
 			shift
 			send_stats "应用$@"
 			linux_panel "$@"
-			;;
-
-		app+|app-cat|app-category)
-			shift
-			send_stats "分类折叠应用$@"
-			linux_panel_accordion "$@"
 			;;
 
 		app+|app-cat|app-category)
