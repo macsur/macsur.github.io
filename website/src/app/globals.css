@@ -21,22 +21,22 @@
   --divider: rgba(255, 255, 255, 0.08);
 }
 
-/* 🌿 白天模式：完美参考 https://antigravity.google/blog 护眼温润科技色调（柔和素雅米灰底色，彻底不刺眼） */
+/* 🌿 白天模式：顶级纯黑/高对比黑字标准，杜绝任何发灰发浅，眼部阅读极为清晰饱满 */
 html.light {
   --background: #f6f8fb;
-  --foreground: #1e293b;
-  --nav-bg: rgba(246, 248, 251, 0.85);
-  --nav-border: rgba(226, 232, 240, 0.9);
-  --card-bg: rgba(255, 255, 255, 0.82);
+  --foreground: #090d16;
+  --nav-bg: rgba(246, 248, 251, 0.92);
+  --nav-border: rgba(203, 213, 225, 0.8);
+  --card-bg: #ffffff;
   --card-hover-bg: #ffffff;
-  --card-border: rgba(226, 232, 240, 0.85);
-  --card-hover-border: rgba(59, 130, 246, 0.45);
-  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --card-hover-shadow: 0 16px 36px -8px rgba(59, 130, 246, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1);
+  --card-border: rgba(203, 213, 225, 0.8);
+  --card-hover-border: #2563eb;
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --card-hover-shadow: 0 16px 36px -8px rgba(37, 99, 235, 0.16), 0 2px 6px rgba(0, 0, 0, 0.06);
   --terminal-bg: #ffffff;
-  --terminal-border: #e2e8f0;
-  --text-muted: #475569;
-  --text-subtle: #94a3b8;
+  --terminal-border: #cbd5e1;
+  --text-muted: #1e293b;
+  --text-subtle: #475569;
   --divider: #e2e8f0;
 }
 
@@ -96,8 +96,8 @@ html.light .google-ai-mesh {
 
 html.light .google-subtle-grid {
   background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, rgba(15, 23, 42, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
   mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 50%, transparent 90%);
   -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 25%, black 50%, transparent 90%);
 }
@@ -122,14 +122,14 @@ html.light .google-subtle-grid {
 }
 
 html.light .google-pill {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
 }
 html.light .google-pill:hover {
   background: #ffffff;
-  border-color: #3b82f6;
-  box-shadow: 0 6px 22px rgba(59, 130, 246, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
 }
 
 /* 核心 Google 卡片容器 (带明暗自适应) */
@@ -157,7 +157,7 @@ html.light .google-pill:hover {
 }
 
 html.light .text-gradient-google {
-  background: linear-gradient(135deg, #0f172a 0%, #334155 45%, #1d4ed8 80%, #2563eb 100%);
+  background: linear-gradient(135deg, #020617 0%, #0f172a 45%, #1d4ed8 80%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -166,6 +166,109 @@ html.light .text-gradient-google {
   background: linear-gradient(90deg, #4285f4 0%, #9b72cb 40%, #d96570 70%, #fbbc04 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+html.light .text-gradient-gemini {
+  background: linear-gradient(90deg, #1d4ed8 0%, #7c3aed 40%, #c026d3 70%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 🌟 全局白天模式文字对比度增强规则：将灰色文字在白底强行提升为高清晰度纯正深黑与石板黑 */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6 {
+  color: #020617 !important;
+}
+
+html.light p,
+html.light .text-slate-300,
+html.light .text-slate-400 {
+  color: #1e293b !important;
+  font-weight: 450;
+}
+
+html.light .text-slate-200 {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-500 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-600 {
+  color: #475569 !important;
+}
+
+html.light code {
+  color: #1e40af !important;
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light .bg-slate-900,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-950,
+html.light .bg-slate-950\/40,
+html.light .bg-slate-950\/90 {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/90,
+html.light .border-white\/10,
+html.light .border-white\/\[0\.08\] {
+  border-color: #cbd5e1 !important;
+}
+
+html.light .text-white {
+  color: #020617 !important;
+}
+
+html.light .text-cyan-400,
+html.light .text-cyan-300 {
+  color: #0284c7 !important;
+}
+
+html.light .text-amber-400,
+html.light .text-amber-300 {
+  color: #b45309 !important;
+}
+
+html.light .text-indigo-400,
+html.light .text-indigo-300 {
+  color: #4338ca !important;
+}
+
+html.light .text-emerald-400,
+html.light .text-emerald-300 {
+  color: #047857 !important;
+}
+
+html.light .bg-cyan-500\/10 {
+  background-color: #e0f2fe !important;
+  color: #0369a1 !important;
+  border-color: #bae6fd !important;
+}
+
+html.light .bg-amber-500\/10,
+html.light .bg-amber-500\/20 {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/80 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 /* 动态流光与激光扫掠动效 */
