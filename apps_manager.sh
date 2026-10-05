@@ -289,7 +289,7 @@ render_accordion_apps_menu() {
     while true; do
         clear
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
-        echo -e "${gl_huang}  🚀 科技Lion 应用市场 · 智能分类手风琴视图 (共 118+ 应用)${gl_bai}"
+        echo -e "${gl_huang}  🚀 Kejilion 应用市场 · 8 大分类${gl_bai}"
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
 
         for item in "${CATEGORY_LIST[@]}"; do
