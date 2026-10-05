@@ -163,13 +163,13 @@ html.light .text-gradient-google {
 }
 
 .text-gradient-gemini {
-  background: linear-gradient(90deg, #4285f4 0%, #9b72cb 40%, #d96570 70%, #fbbc04 100%);
+  background: linear-gradient(90deg, #38bdf8 0%, #3b82f6 50%, #818cf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 html.light .text-gradient-gemini {
-  background: linear-gradient(90deg, #1d4ed8 0%, #7c3aed 40%, #c026d3 70%, #d97706 100%);
+  background: linear-gradient(90deg, #0284c7 0%, #1d4ed8 60%, #4338ca 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

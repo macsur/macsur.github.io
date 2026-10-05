@@ -18,16 +18,6 @@ export const DAILY_RECOMMEND_GENERATED_AT = "2026-10-05";
 
 export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   {
-    "id": 207,
-    "cmd": "k app 207",
-    "badge": "隐私云相册",
-    "name": "Immich 高性能私有化相册与视频管理",
-    "category": "🗄️ 私有网盘与数据存储",
-    "stars": "61k+",
-    "highlight": "全面替代 Google Photos 与 iCloud 的超强开源相册备份。原生配备手机端自动备份、本地离线人脸识别、以图搜图与实况照片完美展示。",
-    "reason": "真正把珍贵的生活回忆锁在自己的服务器里，支持多用户隔离与智能相册聚类，体验极速。"
-  },
-  {
     "id": 204,
     "cmd": "k app 204",
     "badge": "极简 PaaS 云底座",
@@ -38,13 +28,23 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = [
     "reason": "让个人开发者拥有一整套属于自己的微型云服务商体验，告别昂贵的第三方托管费用。"
   },
   {
-    "id": 201,
-    "cmd": "k app 201",
-    "badge": "AI 顶流标杆",
-    "name": "DeepSeek-V3/R1 顶尖开源大模型",
-    "category": "🤖 人工智能与前沿大模型",
-    "stars": "185k+",
-    "highlight": "全球瞩目的划时代开源大语言模型与超强推理架构。一键完成模型权重加载、量化适配与本地高并发 API 暴露，零门槛打造企业级私有化 AI 引擎。",
-    "reason": "实测在纯 CPU 或消费级 GPU 上均展现出超越同级参数的惊人推理表现，数学与代码生成能力直逼顶级专有模型。"
+    "id": 207,
+    "cmd": "k app 207",
+    "badge": "隐私云相册",
+    "name": "Immich 高性能私有化相册与视频管理",
+    "category": "🗄️ 私有网盘与数据存储",
+    "stars": "61k+",
+    "highlight": "全面替代 Google Photos 与 iCloud 的超强开源相册备份。原生配备手机端自动备份、本地离线人脸识别、以图搜图与实况照片完美展示。",
+    "reason": "真正把珍贵的生活回忆锁在自己的服务器里，支持多用户隔离与智能相册聚类，体验极速。"
+  },
+  {
+    "id": 208,
+    "cmd": "k app 208",
+    "badge": "AI Agent 中枢",
+    "name": "n8n 可视化自动化与智能体编排系统",
+    "category": "📝 协作办公与实用工具",
+    "stars": "52k+",
+    "highlight": "全球领先的开源工作流自动化平台。支持数百种外部应用打通，内置强大的 LangChain 智能体节点，零代码/低代码实现复杂业务流程自动化。",
+    "reason": "把重复繁琐的人工日常自动化，甚至能作为个人数字分身 24 小时监控并处理数据。"
   }
 ];

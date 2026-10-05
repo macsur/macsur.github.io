@@ -33,7 +33,7 @@ export const CATEGORIES: Category[] = [
   {
     "id": "github",
     "key": "A",
-    "name": "🌟 [Github乐园] 热门开源TOP10"
+    "name": "⭐ 热门开源 TOP10"
   },
   {
     "id": "ops",

@@ -19,7 +19,7 @@ fi
 
 # 定义分类列表: 分类ID:快捷键:分类名称:预置数量
 CATEGORY_LIST=(
-  "github:A:🌟 [Github乐园] 热门开源TOP10:10"
+  "github:A:⭐ 热门开源 TOP10:10"
   "ops:B:🖥️  服务器运维与探针监控:29"
   "ai:C:🤖 人工智能与前沿大模型:14"
   "network:D:🌐 网络代理与穿透组网:15"

@@ -2,7 +2,8 @@
 
 <img src="./logo.png" width="130" height="130" alt="Linux生态圈 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
 
-# 🌟 Linux生态圈 · 现代化运维与开源应用中心
+# 🌟 一条 curl，整个开源世界随叫随到
+### Linux生态 · 现代化服务器运维基座与开源应用中心
 
 [![Website](https://img.shields.io/badge/官网主页-x.zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://x.zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
@@ -11,11 +12,11 @@
 [![License](https://img.shields.io/badge/License-GPLv3-amber?style=for-the-badge)](./LICENSE)
 
 <p align="center">
-  <b>面向 Linux 极客的现代化应用生态大厅与全周期运维工具箱</b><br>
-  涵盖 128+ 精选容器化应用、手风琴智能折叠分类市场、GitHub Trending 当日热榜自动汉化同步、BBRv3 极限网络加速与纯净系统自愈部署。
+  <b>专为开发者与极客打造的现代化命令行底座，体验前所未有的纯净与高效。</b><br>
+  涵盖 160+ 精选开源与社区扩展应用、8 核心分类手风琴智能折叠市场、GitHub Trending 官方趋势榜自动汉化同步、BBRv3 极限网络加速与纯净系统一键自愈。
 </p>
 
-[🌐 访问官方主站](https://x.zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 7-分类折叠市场](#-7-应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
+[🌐 访问官方主站](https://x.zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 8 核心分类市场](#-8-核心分类应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
 
 ---
 

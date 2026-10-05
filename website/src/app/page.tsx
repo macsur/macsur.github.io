@@ -491,24 +491,14 @@ export default function Home() {
               </div>
             </div>
 
-            <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
+            <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
-              <a href="#daily-recommend" className="text-blue-400 hover:text-blue-300 transition-colors flex items-center space-x-1.5 font-semibold">
-                <Clock className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span>今日更新</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-mono border border-emerald-500/30">
-                  {updateBadgeText}
-                </span>
-              </a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (160+)</a>
-              <a href="#features" className="text-slate-300 hover:text-cyan-400 transition-colors">核心特性</a>
               <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">命令字典</a>
-              <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-amber-400 hover:text-amber-300 transition-colors flex items-center space-x-1.5 font-bold">
-                <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
-                <span>[Github乐园]</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-mono border border-amber-500/30">TOP10</span>
+              <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-400" />
+                <span>GitHub乐园</span>
               </a>
-              <a href="#developer" className="text-slate-300 hover:text-cyan-400 transition-colors">开发者生态</a>
             </nav>
 
             <div className="flex items-center space-x-3">
@@ -953,11 +943,11 @@ export default function Home() {
                       triggerGrandFireworks();
                       playSciFiAudio();
                     }}
-                    title="无聊时点我随时放满屏大礼花"
-                    className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-pink-500/15 via-purple-500/15 to-cyan-500/15 border border-pink-500/30 text-pink-300 hover:text-white hover:border-pink-400 transition-all shadow-sm active:scale-95 group"
+                    title="触发满屏礼花"
+                    className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-cyan-300 border border-slate-700/80 hover:border-cyan-500/40 bg-slate-900/60 transition-all shadow-sm active:scale-95"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-pink-400 group-hover:rotate-12 transition-transform" />
-                    <span>放个礼花 🎆</span>
+                    <Sparkles className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300" />
+                    <span>放礼花</span>
                   </button>
 
                   <button
@@ -1279,7 +1269,7 @@ export default function Home() {
                     </span>
                   </div>
                   <h2 className="text-xl sm:text-2xl font-extrabold text-white group-hover:text-amber-300 transition-colors flex items-center space-x-2">
-                    <span>[Github乐园] 今日顶流精选 TOP 10</span>
+                    <span>GitHub乐园 今日顶流精选 TOP 10</span>
                     {isGithubParkOpen && (
                       <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 animate-pulse">
                         已激活
@@ -1531,14 +1521,18 @@ export default function Home() {
             <span className="font-bold text-slate-300">Linux生态 · x.zttz.eu.org</span>
             <span>- 现代化服务器运维与开源应用</span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
-              Neo Glow Edition
-            </span>
-            <span>主页域名: <a href="https://x.zttz.eu.org" className="text-cyan-400 hover:underline">x.zttz.eu.org</a></span>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+            <a href="#daily-recommend" className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center space-x-1">
+              <Clock className="w-3 h-3 text-emerald-400" />
+              <span>今日更新 ({updateBadgeText})</span>
+            </a>
+            <span>•</span>
+            <a href="#features" className="text-slate-400 hover:text-cyan-400 transition-colors">核心特性</a>
+            <span>•</span>
+            <a href="#developer" className="text-slate-400 hover:text-cyan-400 transition-colors">开发者生态</a>
             <span>•</span>
             <a href="https://github.com/macsur/macsur.github.io" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors">
-              GitHub 源码仓库
+              GitHub 仓库
             </a>
           </div>
         </div>
