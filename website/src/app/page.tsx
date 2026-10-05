@@ -500,7 +500,7 @@ export default function Home() {
                   {updateBadgeText}
                 </span>
               </a>
-              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (128+)</a>
+              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (160+)</a>
               <a href="#features" className="text-slate-300 hover:text-cyan-400 transition-colors">核心特性</a>
               <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">命令字典</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-amber-400 hover:text-amber-300 transition-colors flex items-center space-x-1.5 font-bold">
@@ -541,7 +541,7 @@ export default function Home() {
               <span className="mx-2 text-slate-600">/</span>
               <span className="text-slate-300">纯净命令行底座</span>
               <span className="mx-2 text-slate-600">/</span>
-              <span className="text-emerald-400 font-mono">128+ 开源精选</span>
+              <span className="text-emerald-400 font-mono">160+ 开源精选</span>
             </span>
           </div>
 
@@ -734,7 +734,7 @@ export default function Home() {
               <p className={`text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed transition-colors ${
                 theme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
               }`}>
-                从本站 128+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
+                从本站 160+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
               </p>
             </div>
 
