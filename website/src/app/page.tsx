@@ -473,14 +473,19 @@ export default function Home() {
 
             <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
+              <a href="#daily-recommend" className="text-blue-400 hover:text-blue-300 transition-colors flex items-center space-x-1 font-semibold">
+                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                <span>今日推荐</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-mono border border-blue-500/30">TOP3</span>
+              </a>
+              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (128+)</a>
+              <a href="#features" className="text-slate-300 hover:text-cyan-400 transition-colors">核心特性</a>
+              <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">命令字典</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-amber-400 hover:text-amber-300 transition-colors flex items-center space-x-1.5 font-bold">
                 <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
                 <span>[Github乐园]</span>
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-mono border border-amber-500/30">TOP10</span>
               </a>
-              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (128+)</a>
-              <a href="#features" className="text-slate-300 hover:text-cyan-400 transition-colors">核心特性</a>
-              <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">命令字典</a>
               <a href="#developer" className="text-slate-300 hover:text-cyan-400 transition-colors">开发者生态</a>
             </nav>
 
@@ -686,7 +691,9 @@ export default function Home() {
 
       {/* 🌟 【今日推荐】专区：精选本站极力推荐使用的 3 款一键部署神作 */}
       <section id="daily-recommend" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="relative rounded-3xl p-6 sm:p-10 border border-white/10 bg-[#0e111a]/80 backdrop-blur-2xl shadow-2xl shadow-black/50 overflow-hidden">
+        <div className={`relative rounded-3xl p-6 sm:p-10 border transition-colors duration-300 backdrop-blur-2xl shadow-2xl overflow-hidden ${
+          theme === "dark" ? "border-white/10 bg-[#0e111a]/80 shadow-black/50" : "border-slate-200/90 bg-white/90 shadow-slate-200/60"
+        }`}>
           {/* 背景装饰辉光 */}
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -701,10 +708,12 @@ export default function Home() {
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight flex items-center space-x-3">
                 <span>【今日推荐】</span>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
-                  顶级一键部署神作 TOP 3
+                  顶级神作 一键部署 TOP 3
                 </span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
+              <p className={`text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed transition-colors ${
+                theme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
+              }`}>
                 从本站 128+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
               </p>
             </div>
@@ -747,7 +756,9 @@ export default function Home() {
                     {app.highlight}
                   </p>
 
-                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 mb-4 text-xs">
+                  <div className={`p-3 rounded-xl mb-4 text-xs transition-colors duration-300 border ${
+                    theme === "dark" ? "bg-slate-900/60 border-slate-800/80" : "bg-slate-50 border-slate-200"
+                  }`}>
                     <span className="text-blue-400 font-bold block mb-1">💡 推荐理由：</span>
                     <span className={`leading-relaxed ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{app.reason}</span>
                   </div>
@@ -817,7 +828,9 @@ export default function Home() {
           )}
 
           {/* 主体卡片面板 */}
-          <div className="relative google-card rounded-3xl overflow-hidden bg-[#0c0e17]/95 z-10 transition-all duration-300 border border-white/[0.08]">
+          <div className={`relative google-card rounded-3xl overflow-hidden z-10 transition-all duration-300 border ${
+            theme === "dark" ? "bg-[#0c0e17]/95 border-white/[0.08]" : "bg-white/95 border-slate-200 shadow-lg shadow-slate-200/50"
+          }`}>
             {/* 展开瞬间的全息激光扫描光束 */}
             {isShockwaveActive && (
               <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 via-sky-300 to-transparent blur-xs shadow-[0_0_24px_#06b6d4] z-40 pointer-events-none animate-holo-scan" />
@@ -1177,7 +1190,9 @@ export default function Home() {
           )}
 
           {/* 主体卡片面板 */}
-          <div className="relative google-card rounded-3xl overflow-hidden bg-[#0c0e17]/95 z-10 transition-all duration-300 border border-white/[0.08]">
+          <div className={`relative google-card rounded-3xl overflow-hidden z-10 transition-all duration-300 border ${
+            theme === "dark" ? "bg-[#0c0e17]/95 border-white/[0.08]" : "bg-white/95 border-slate-200 shadow-lg shadow-slate-200/50"
+          }`}>
             {/* 展开瞬间的全息激光扫描光束 */}
             {isParkShockwaveActive && (
               <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 via-orange-300 to-transparent blur-xs shadow-[0_0_24px_#f59e0b] z-40 pointer-events-none animate-holo-scan" />
@@ -1371,7 +1386,11 @@ export default function Home() {
                               href={item.githubUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all border border-slate-700"
+                              className={`p-1.5 rounded-lg transition-all border ${
+                                theme === "dark"
+                                  ? "bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700"
+                                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-950 border-slate-300"
+                              }`}
                               title="直达 GitHub 开源仓库"
                             >
                               <ExternalLink className="w-4 h-4" />
@@ -1390,14 +1409,16 @@ export default function Home() {
 
       {/* 开发者与生态指南 */}
       <section id="developer" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <div className="google-card rounded-3xl p-8 sm:p-12 border border-white/[0.08] bg-[#0c0e17]/80 backdrop-blur-2xl relative overflow-hidden shadow-2xl">
+        <div className={`google-card rounded-3xl p-8 sm:p-12 border relative overflow-hidden shadow-2xl transition-colors duration-300 backdrop-blur-2xl ${
+          theme === "dark" ? "border-white/[0.08] bg-[#0c0e17]/80 shadow-black/50" : "border-slate-200 bg-white/90 shadow-slate-200/60"
+        }`}>
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
               <Sparkles className="w-3.5 h-3.5" />
               <span>开放社区生态</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
-              想要让你的开源应用加入 Linux生态圈市场？
+              想要让你的开源应用加入 Linux生态市场？
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
               Linux生态圈应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
