@@ -18,14 +18,14 @@ export const DAILY_RECOMMEND_GENERATED_AT = "2026-10-05";
 
 export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   {
-    "id": 205,
-    "cmd": "k app 205",
-    "badge": "极客必备探针",
-    "name": "Uptime Kuma 高颜值全功能服务监控",
-    "category": "🖥️ 服务器运维与探针监控",
-    "stars": "62k+",
-    "highlight": "自托管监控界的颜值天花板。支持 HTTP(s)、TCP、Ping、DNS、Docker 容器与证书到期监控，内置 90+ 渠道全能实时告警与公开状态页一键生成。",
-    "reason": "资源占用极其克制，0 门槛开箱即用，是管理多台服务器与网站集群健康状态的终极守护者。"
+    "id": 201,
+    "cmd": "k app 201",
+    "badge": "AI 顶流标杆",
+    "name": "DeepSeek-V3/R1 顶尖开源大模型",
+    "category": "🤖 人工智能与前沿大模型",
+    "stars": "185k+",
+    "highlight": "全球瞩目的划时代开源大语言模型与超强推理架构。一键完成模型权重加载、量化适配与本地高并发 API 暴露，零门槛打造企业级私有化 AI 引擎。",
+    "reason": "实测在纯 CPU 或消费级 GPU 上均展现出超越同级参数的惊人推理表现，数学与代码生成能力直逼顶级专有模型。"
   },
   {
     "id": 202,
@@ -38,13 +38,13 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = [
     "reason": "跨平台生态适配最成熟的开源运行时，与各类客户端无缝联动，开箱即用体验堪称行业标杆。"
   },
   {
-    "id": 207,
-    "cmd": "k app 207",
-    "badge": "隐私云相册",
-    "name": "Immich 高性能私有化相册与视频管理",
-    "category": "🗄️ 私有网盘与数据存储",
-    "stars": "61k+",
-    "highlight": "全面替代 Google Photos 与 iCloud 的超强开源相册备份。原生配备手机端自动备份、本地离线人脸识别、以图搜图与实况照片完美展示。",
-    "reason": "真正把珍贵的生活回忆锁在自己的服务器里，支持多用户隔离与智能相册聚类，体验极速。"
+    "id": 3,
+    "cmd": "k app 3",
+    "badge": "现代化运维首选",
+    "name": "1Panel 新一代现代化 Linux 运维面板",
+    "category": "🖥️ 服务器运维与探针监控",
+    "stars": "26k+",
+    "highlight": "开源、轻量且深度拥抱 Docker 容器化理念的现代化运维神器。界面遵循极简几何美学，内置精选应用市场、自动化证书签发、容器生命周期监控与一键容灾备份。",
+    "reason": "彻底摆脱传统面板对系统环境的高侵入性污染，所有服务均在独立沙箱中优雅运行，安全稳定。"
   }
 ];

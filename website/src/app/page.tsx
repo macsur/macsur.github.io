@@ -1034,18 +1034,28 @@ export default function Home() {
                       {/* 手风琴分类展开内容 */}
                       {isExpanded && (
                         <div className="px-5 pb-5 pt-1 border-t border-slate-800/80 bg-slate-900/30">
+                          {cat.id === 'custom' && (
+                            <div className="mt-3 mb-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs flex items-center justify-between text-amber-300">
+                              <span>💡 本板块为社区与第三方优秀扩展应用示例展示。实际安装请在终端按 <code className="px-1.5 py-0.5 bg-slate-800 rounded font-mono text-cyan-300">H</code> 查看与部署本地扩展。</span>
+                              <span className="font-mono text-[11px] text-slate-400">~/apps/*.conf</span>
+                            </div>
+                          )}
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-3">
                             {catApps.map((app: AppItem) => (
-                              <div 
-                                key={app.id} 
+                              <div
+                                key={app.id}
                                 className="glass-panel glass-panel-hover p-4 rounded-xl border border-slate-800 flex flex-col justify-between"
                               >
                                 <div>
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono text-xs font-bold">
-                                      #{app.id}
+                                      {cat.id === 'custom' ? `EXT` : `#${app.id}`}
                                     </span>
-                                    {app.isStar && (
+                                    {cat.id === 'custom' ? (
+                                      <span className="text-[11px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-medium">
+                                        示例展示
+                                      </span>
+                                    ) : app.isStar && (
                                       <span className="flex items-center space-x-1 text-xs text-amber-400 font-medium">
                                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                                         <span>官方星标</span>
@@ -1062,24 +1072,43 @@ export default function Home() {
 
                                 <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
                                   <span className="text-[11px] text-slate-500 font-mono">
-                                    指令: k app {app.id}
+                                    {cat.id === 'custom' ? `终端指令: k app` : `指令: k app ${app.id}`}
                                   </span>
-                                  <button
-                                    onClick={() => handleCopy(`k app ${app.id}`)}
-                                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
-                                  >
-                                    {copiedText === `k app ${app.id}` ? (
-                                      <>
-                                        <Check className="w-3 h-3 text-emerald-400" />
-                                        <span>已复制</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Copy className="w-3 h-3" />
-                                        <span>复制安装</span>
-                                      </>
-                                    )}
-                                  </button>
+                                  {cat.id === 'custom' ? (
+                                    <button
+                                      onClick={() => handleCopy(`k app`)}
+                                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
+                                    >
+                                      {copiedText === `k app` ? (
+                                        <>
+                                          <Check className="w-3 h-3 text-emerald-400" />
+                                          <span>已复制</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="w-3 h-3" />
+                                          <span>终端安装</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleCopy(`k app ${app.id}`)}
+                                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
+                                    >
+                                      {copiedText === `k app ${app.id}` ? (
+                                        <>
+                                          <Check className="w-3 h-3 text-emerald-400" />
+                                          <span>已复制</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="w-3 h-3" />
+                                          <span>复制安装</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             ))}

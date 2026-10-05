@@ -26213,13 +26213,20 @@ render_accordion_apps_menu() {
             local cid="" ckey="" cname="" ccount=""
             IFS=':' read -r cid ckey cname ccount <<< "$item"
 
-            # 动态获取自定义应用款数
+            # 动态获取自定义应用款数与标签展示
+            local cat_badge=""
             if [ "$cid" = "custom" ]; then
                 ccount="${#CUSTOM_APPS[@]}"
+                cat_badge="${gl_huang}[本地]${gl_bai} "
+            fi
+
+            local count_str="[${ccount} 款]"
+            if [ "$cid" = "custom" ] && [ "$ccount" -eq 0 ]; then
+                count_str="[暂无本地配置]"
             fi
 
             if is_cat_expanded "$cid"; then
-                echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
+                echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${cat_badge}${gl_bai}$cname ${gl_hui}${count_str}${gl_bai}"
                 echo -e "${gl_hui}  ┌───────────────────────────────────────────────────────────────────${gl_bai}"
 
                 # 展开内置分类 (A~G)：输出专属代号 [A1]、[B1]... 并附带原应用编号
@@ -26269,15 +26276,14 @@ render_accordion_apps_menu() {
                             custom_idx=$((custom_idx + 1))
                         done
                     else
-                        echo -e "${gl_hui}  │ 暂无本地第三方应用配置 (扫描目录: ~/apps/*.conf)${gl_bai}"
-                        echo -e "${gl_hui}  │ 输入 [${gl_huang}+${gl_hui}] 即可呼出一键添加第三方应用向导${gl_bai}"
+                        echo -e "${gl_hui}  │ 暂无本地第三方应用，输入 [${gl_huang}+${gl_hui}] 可快速添加，或访问开发者生态获取${gl_bai}"
                     fi
                 fi
 
                 echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
             else
                 # 未展开分类瞬间输出纯折叠样式行，0 延迟秒开
-                echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
+                echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${cat_badge}${gl_bai}$cname ${gl_hui}${count_str}${gl_bai}"
             fi
         done
 
@@ -26432,6 +26438,23 @@ render_accordion_apps_menu() {
                 return 0
                 ;;
             *)
+                # 6. Fallback：匹配本地第三方应用文件名 (如 kpanel, kpanel.conf 等直接输入/粘贴)
+                local clean_name
+                clean_name=$(echo "$user_input" | sed -e 's/\.conf$//I' | tr '[:upper:]' '[:lower:]')
+                for c_entry in "${CUSTOM_APPS[@]}"; do
+                    local ca_id="" ca_name="" ca_cat="" ca_star="" ca_alias="" ca_desc="" ca_conf=""
+                    IFS='|' read -r ca_id ca_name ca_cat ca_star ca_alias ca_desc ca_conf <<< "$c_entry"
+                    local ca_alias_lower
+                    ca_alias_lower=$(echo "$ca_alias" | tr '[:upper:]' '[:lower:]')
+                    local ca_id_lower
+                    ca_id_lower=$(echo "$ca_id" | tr '[:upper:]' '[:lower:]')
+                    if [ "$clean_name" = "$ca_alias_lower" ] || [ "$clean_name" = "$ca_id_lower" ]; then
+                        SELECTED_APP_ACTION="$ca_alias"
+                        SELECTED_CUSTOM_CONF="$ca_conf"
+                        return 0
+                    fi
+                done
+
                 # 其它按键传给应用管理器处理
                 SELECTED_APP_ACTION="$user_input"
                 return 0
