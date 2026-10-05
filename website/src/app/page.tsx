@@ -29,6 +29,7 @@ import {
 import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
 import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
 import { DAILY_RECOMMEND } from '@/data/dailyRecommend';
+import { EASTER_EGG_ITEMS, EasterEggItem } from '@/data/easterEggData';
 
 interface RecommendedAppItem {
   id: number;
@@ -88,22 +89,12 @@ export default function Home() {
   const [isShockwaveActive, setIsShockwaveActive] = useState(false);
   const [burstParticles, setBurstParticles] = useState<Array<{ id: number; x: number; y: number; color: string; size: number }>>([]);
 
-  // 🎆 隐蔽彩蛋状态 (量子数据礼花：3真实IP + 6精选域名)
+  // 🎆 隐蔽彩蛋状态 (✦ 量子礼花 · 猜你喜欢 ✦：6个固定精选友情链接 + 3个来自 VPNGate L2TP/IPsec 优质节点)
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [copiedEasterId, setCopiedEasterId] = useState<number | null>(null);
 
-  // 彩蛋数据：来自 https://www.vpngate.net 会话最少(0 sessions)的 3 个真实 IP 与 6 个精选网站 (点击在新页面打开)
-  const easterEggItems = useMemo(() => [
-    { id: 1, text: 'kejilion.sh', url: 'https://kejilion.sh', isReal: false, label: '科技Lion · kejilion.sh', delay: '0.04s', floatDelay: '0s', color: 'from-cyan-500/20 to-blue-600/10', border: 'border-cyan-500/40', glow: 'shadow-cyan-500/20' },
-    { id: 2, text: '106.155.69.27', url: null, isReal: true, label: '真实 VPN 节点 (0 Sessions)', delay: '0.10s', floatDelay: '1.2s', color: 'from-emerald-500/25 to-teal-600/10', border: 'border-emerald-400/60', glow: 'shadow-emerald-500/30' },
-    { id: 3, text: 'sina.com.cn', url: 'https://sina.com.cn', isReal: false, label: '新浪网 · sina.com.cn', delay: '0.16s', floatDelay: '0.6s', color: 'from-indigo-500/20 to-purple-600/10', border: 'border-indigo-500/40', glow: 'shadow-indigo-500/20' },
-    { id: 4, text: '109.126.5.62', url: null, isReal: true, label: '真实 VPN 节点 (0 Sessions)', delay: '0.22s', floatDelay: '1.8s', color: 'from-amber-500/25 to-orange-600/10', border: 'border-amber-400/60', glow: 'shadow-amber-500/30' },
-    { id: 5, text: 'qq.com', url: 'https://qq.com', isReal: false, label: '腾讯网 · qq.com', delay: '0.28s', floatDelay: '0.9s', color: 'from-purple-500/20 to-pink-600/10', border: 'border-purple-500/40', glow: 'shadow-purple-500/20' },
-    { id: 6, text: 'x.zttz.eu.org', url: 'https://x.zttz.eu.org', isReal: false, label: 'Linux生态圈 · x.zttz.eu.org', delay: '0.34s', floatDelay: '2.1s', color: 'from-sky-500/20 to-cyan-600/10', border: 'border-sky-500/40', glow: 'shadow-sky-500/20' },
-    { id: 7, text: '180.17.221.8', url: null, isReal: true, label: '真实 VPN 节点 (0 Sessions)', delay: '0.40s', floatDelay: '1.5s', color: 'from-rose-500/25 to-red-600/10', border: 'border-rose-400/60', glow: 'shadow-rose-500/30' },
-    { id: 8, text: 'bbs.pcbeta.com', url: 'https://bbs.pcbeta.com', isReal: false, label: '远景论坛 · bbs.pcbeta.com', delay: '0.46s', floatDelay: '0.3s', color: 'from-teal-500/20 to-emerald-600/10', border: 'border-teal-500/40', glow: 'shadow-teal-500/20' },
-    { id: 9, text: 'apple.com', url: 'https://apple.com', isReal: false, label: '苹果官网 · apple.com', delay: '0.52s', floatDelay: '2.4s', color: 'from-violet-500/20 to-indigo-600/10', border: 'border-violet-500/40', glow: 'shadow-violet-500/20' },
-  ], []);
+  // 彩蛋数据：6个固定精选链接 + 3个来自 VPNGate 的 L2TP/IPsec 节点
+  const easterEggItems: EasterEggItem[] = useMemo(() => EASTER_EGG_ITEMS, []);
 
   // 键盘 ESC 监听
   useEffect(() => {
@@ -1530,14 +1521,14 @@ export default function Home() {
                 <div>
                   <div className="flex items-center space-x-2">
                     <h3 className="text-lg font-bold text-white tracking-wide">
-                      ✦ 量子数据礼花 · 隐藏彩蛋 ✦
+                      ✦ 量子礼花 · 猜你喜欢 ✦
                     </h3>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                       Easter Egg
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    礼花炸开绽放 9 枚全息数据碎片 · 真实 IP 点击即复制，精选网站点击在新页面打开访问
+                    绽放 9 枚全息数据碎片 · 包含 6 个精选导航与 3 个实时精选的 L2TP/IPsec [US] 节点（点击即复制）
                   </p>
                 </div>
               </div>

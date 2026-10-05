@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node fetch_vpngate.js && node generate_daily_recommend.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
