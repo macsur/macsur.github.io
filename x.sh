@@ -12025,16 +12025,197 @@ kpanel_node_update_schedule_disable() {
 	esac
 }
 
-kpanel_node_preflight() {
+kpanel_node_require_platform() {
 	[ "$(id -u)" = "0" ] || {
 		echo "KPanel 轻量节点安装需要 root 权限。" >&2
 		return 1
 	}
-	for command_name in bash curl sha256sum mktemp flock stat readlink awk grep sed cmp od tr; do
-		command -v "$command_name" >/dev/null 2>&1 || {
-			echo "缺少必要命令: ${command_name}" >&2
-			return 1
+	[ "$(uname -s)" = Linux ] || { echo "KPanel 轻量节点仅支持 Linux。" >&2; return 1; }
+	case "$(uname -m)" in
+		x86_64|amd64) KPANEL_NODE_ARCH=amd64 ;;
+		aarch64|arm64) KPANEL_NODE_ARCH=arm64 ;;
+		*) echo "当前 CPU 架构暂不支持 KPanel 轻量节点（支持 amd64/x86_64、arm64/aarch64）。" >&2; return 1 ;;
+	esac
+}
+
+# Only join calls the package bootstrap. Status, manual/periodic update and
+# uninstall keep their existing read-only dependency checks.
+kpanel_node_dependency_init_hint() {
+	local pid1=""
+	IFS= read -r pid1 </proc/1/comm || true
+	KPANEL_NODE_DEPENDENCY_INIT=""
+	if [ "$pid1" = procd ]; then
+		[ -f /etc/rc.common ] && [ -f /lib/functions/procd.sh ] && [ -x /etc/init.d/cron ] || {
+			echo "procd 基础服务不完整，无法自动安装轻量节点依赖。" >&2; return 1
 		}
+		KPANEL_NODE_DEPENDENCY_INIT=procd
+	elif [ -d /run/systemd/system ] && [ -n "$KPANEL_NODE_SYSTEMCTL" ] && [ -x "$KPANEL_NODE_SYSTEMCTL" ]; then
+		KPANEL_NODE_DEPENDENCY_INIT=systemd
+	elif [ -d /run/openrc ] && [ -n "$KPANEL_NODE_RC_SERVICE" ] && [ -x "$KPANEL_NODE_RC_SERVICE" ] &&
+		[ -n "$KPANEL_NODE_RC_UPDATE" ] && [ -x "$KPANEL_NODE_RC_UPDATE" ] &&
+		[ -n "$KPANEL_NODE_SUPERVISE_DAEMON" ] && [ -x "$KPANEL_NODE_SUPERVISE_DAEMON" ]; then
+		[ -x /etc/init.d/crond ] && [ -d /etc/periodic/hourly ] || {
+			echo "OpenRC 缺少 crond 服务或 /etc/periodic/hourly，无法自动安装轻量节点依赖。" >&2; return 1
+		}
+		KPANEL_NODE_DEPENDENCY_INIT=openrc
+	else
+		echo "当前系统需要运行 systemd、OpenRC 或原生 procd，无法自动安装轻量节点依赖。" >&2
+		return 1
+	fi
+}
+
+kpanel_node_account_tool_available() {
+	type -P useradd >/dev/null 2>&1 || type -P systemd-sysusers >/dev/null 2>&1 || {
+		type -P adduser >/dev/null 2>&1 && type -P addgroup >/dev/null 2>&1
+	}
+}
+
+kpanel_node_collect_missing_dependencies() {
+	local command_name
+	KPANEL_NODE_MISSING_DEPENDENCIES=()
+	local -a commands=(bash curl sha256sum mktemp flock stat readlink awk grep sed cmp od tr install)
+	case "${KPANEL_NODE_DEPENDENCY_INIT:-}" in
+		procd) commands+=(ubus jsonfilter logread) ;;
+		openrc) commands+=(logger) ;;
+	esac
+	for command_name in "${commands[@]}"; do
+		type -P "$command_name" >/dev/null 2>&1 || KPANEL_NODE_MISSING_DEPENDENCIES+=("$command_name")
+	done
+	kpanel_node_account_tool_available || KPANEL_NODE_MISSING_DEPENDENCIES+=(account-tools)
+}
+
+kpanel_node_report_missing_dependencies() {
+	echo "仍缺少轻量节点依赖: ${KPANEL_NODE_MISSING_DEPENDENCIES[*]}。请按系统软件源提示处理后重试。" >&2
+}
+
+kpanel_node_dependency_family() {
+	local release=/etc/os-release key value os_id="" os_like="" family
+	local -a families=()
+	[ -r "$release" ] || release=/usr/lib/os-release
+	# os-release is data, never shell code. No source/eval or external parser is
+	# used here because grep/awk/sed themselves may be missing.
+	if [ -r "$release" ]; then
+		while IFS='=' read -r key value; do
+			case "$key" in ID|ID_LIKE) ;; *) continue ;; esac
+			case "$value" in \"*\") value="${value:1:${#value}-2}" ;; \'*\') value="${value:1:${#value}-2}" ;; esac
+			[[ "$value" =~ ^[a-z0-9._\ -]*$ ]] || continue
+			case "$key" in ID) os_id="$value" ;; ID_LIKE) os_like="$value" ;; esac
+		done <"$release"
+	fi
+	# Native procd plus OpenWrt metadata also covers derivatives with their own
+	# ID. apk on OpenWrt still uses OpenWrt's split package names, not Alpine's.
+	if [ "$KPANEL_NODE_DEPENDENCY_INIT" = procd ] && [ -f /etc/openwrt_release ]; then
+		KPANEL_NODE_DEPENDENCY_FAMILY=openwrt; return 0
+	fi
+	read -r -a families <<<"$os_id $os_like"
+	for family in "${families[@]}"; do
+		case "$family" in
+			openwrt) KPANEL_NODE_DEPENDENCY_FAMILY=openwrt; return 0 ;;
+			alpine) KPANEL_NODE_DEPENDENCY_FAMILY=alpine; return 0 ;;
+			debian|ubuntu) KPANEL_NODE_DEPENDENCY_FAMILY=debian; return 0 ;;
+			fedora|rhel|centos|rocky|almalinux|ol|amzn) KPANEL_NODE_DEPENDENCY_FAMILY=rpm; return 0 ;;
+		esac
+	done
+	echo "无法识别原生软件包家族，未自动安装依赖。" >&2
+	return 1
+}
+
+kpanel_node_native_package_manager() {
+	local name="$1" directory
+	# Never pick an Entware /opt binary or a user-supplied PATH wrapper.
+	for directory in /usr/bin /bin /usr/sbin /sbin; do
+		if [ -f "${directory}/${name}" ] && [ -x "${directory}/${name}" ]; then
+			printf '%s\n' "${directory}/${name}"; return 0
+		fi
+	done
+	return 1
+}
+
+kpanel_node_dependency_package() {
+	local dependency="$1"
+	case "$dependency" in
+		bash|curl|grep|sed) printf '%s\n' "$dependency" ;;
+		awk) printf '%s\n' gawk ;;
+		cmp) printf '%s\n' diffutils ;;
+		install|od|stat|sha256sum|mktemp|readlink|tr)
+			if [ "$KPANEL_NODE_DEPENDENCY_FAMILY" = openwrt ]; then printf 'coreutils-%s\n' "$dependency"; else printf '%s\n' coreutils; fi ;;
+		flock)
+			case "$KPANEL_NODE_DEPENDENCY_FAMILY" in openwrt|alpine) printf '%s\n' flock ;; *) printf '%s\n' util-linux ;; esac ;;
+		logger)
+			case "$KPANEL_NODE_DEPENDENCY_FAMILY" in alpine) printf '%s\n' logger ;; debian) printf '%s\n' bsdutils ;; rpm) printf '%s\n' util-linux ;; *) return 1 ;; esac ;;
+		account-tools)
+			case "$KPANEL_NODE_DEPENDENCY_FAMILY" in
+				openwrt) printf '%s\n' shadow-useradd ;; alpine) printf '%s\n' shadow ;;
+				debian) printf '%s\n' passwd ;; rpm) printf '%s\n' shadow-utils ;;
+			esac ;;
+		ubus|jsonfilter|logread)
+			[ "$KPANEL_NODE_DEPENDENCY_FAMILY" = openwrt ] || return 1
+			if [ "$dependency" = logread ]; then printf '%s\n' logd; else printf '%s\n' "$dependency"; fi ;;
+		*) return 1 ;;
+	esac
+}
+
+kpanel_node_ensure_dependencies() {
+	local manager="" alternate="" manager_name="" dependency package found existing
+	local -a packages=()
+	kpanel_node_require_platform || return 1
+	kpanel_node_dependency_init_hint || return 1
+	kpanel_node_collect_missing_dependencies
+	[ "${#KPANEL_NODE_MISSING_DEPENDENCIES[@]}" -gt 0 ] || return 0
+	if ! kpanel_node_dependency_family; then kpanel_node_report_missing_dependencies; return 1; fi
+	case "$KPANEL_NODE_DEPENDENCY_FAMILY" in
+		openwrt)
+			manager="$(kpanel_node_native_package_manager opkg || true)"
+			alternate="$(kpanel_node_native_package_manager apk || true)"
+			if [ -n "$manager" ] && [ -n "$alternate" ]; then
+				echo "同时发现原生 opkg 和 apk，无法安全确定软件包管理器；请手动补齐依赖。" >&2
+				kpanel_node_report_missing_dependencies; return 1
+			fi
+			if [ -n "$manager" ]; then manager_name=opkg; else manager="$alternate"; manager_name=apk; fi ;;
+		alpine) manager_name=apk; manager="$(kpanel_node_native_package_manager apk || true)" ;;
+		debian) manager_name=apt-get; manager="$(kpanel_node_native_package_manager apt-get || true)" ;;
+		rpm)
+			manager_name=dnf; manager="$(kpanel_node_native_package_manager dnf || true)"
+			if [ -z "$manager" ]; then manager_name=yum; manager="$(kpanel_node_native_package_manager yum || true)"; fi ;;
+	esac
+	if [ -z "$manager" ]; then
+		echo "未找到该系统的原生软件包管理器，未自动安装依赖。" >&2
+		kpanel_node_report_missing_dependencies; return 1
+	fi
+	for dependency in "${KPANEL_NODE_MISSING_DEPENDENCIES[@]}"; do
+		package="$(kpanel_node_dependency_package "$dependency")" || {
+			echo "该系统没有可确认的依赖包映射: $dependency" >&2
+			kpanel_node_report_missing_dependencies; return 1
+		}
+		found=false
+		for existing in "${packages[@]}"; do [ "$existing" != "$package" ] || found=true; done
+		[ "$found" = true ] || packages+=("$package")
+	done
+	echo "正在使用 ${manager_name} 补齐轻量节点依赖: ${packages[*]}"
+	# One index refresh and one transaction; never change repositories, disable
+	# signature checks, install an init system, or upgrade the whole system.
+	local installed=false
+	case "$manager_name" in
+		opkg) "$manager" update && "$manager" install "${packages[@]}" && installed=true ;;
+		apk) "$manager" update && "$manager" add "${packages[@]}" && installed=true ;;
+		apt-get) "$manager" update && DEBIAN_FRONTEND=noninteractive "$manager" install -y --no-install-recommends "${packages[@]}" && installed=true ;;
+		dnf|yum) "$manager" -y makecache && "$manager" -y install "${packages[@]}" && installed=true ;;
+	esac
+	hash -r
+	kpanel_node_collect_missing_dependencies
+	if [ "$installed" != true ]; then
+		echo "轻量节点依赖安装失败；请检查上方软件包管理器的原始错误。" >&2
+		[ "${#KPANEL_NODE_MISSING_DEPENDENCIES[@]}" -eq 0 ] || kpanel_node_report_missing_dependencies
+		return 1
+	fi
+	[ "${#KPANEL_NODE_MISSING_DEPENDENCIES[@]}" -eq 0 ] || { kpanel_node_report_missing_dependencies; return 1; }
+}
+
+kpanel_node_preflight() {
+	local command_name
+	kpanel_node_require_platform || return 1
+	for command_name in bash curl sha256sum mktemp flock stat readlink awk grep sed cmp od tr; do
+		command -v "$command_name" >/dev/null 2>&1 || { echo "缺少必要命令: ${command_name}" >&2; return 1; }
 	done
 	kpanel_node_detect_init_system || return 1
 	KPANEL_NODE_INSTALL_BIN="$(type -P install 2>/dev/null || true)"
@@ -12042,10 +12223,8 @@ kpanel_node_preflight() {
 		echo "缺少必要命令: install (coreutils)" >&2
 		return 1
 	}
-	if ! command -v useradd >/dev/null 2>&1 &&
-		! command -v systemd-sysusers >/dev/null 2>&1 &&
-		! command -v adduser >/dev/null 2>&1; then
-		echo "缺少系统账户创建工具: useradd、systemd-sysusers 或 adduser" >&2
+	if ! kpanel_node_account_tool_available; then
+		echo "缺少系统账户创建工具: useradd、systemd-sysusers 或 adduser/addgroup" >&2
 		return 1
 	fi
 	if [ "$KPANEL_NODE_INIT_SYSTEM" = openrc ]; then
@@ -12064,14 +12243,6 @@ kpanel_node_preflight() {
 			command -v "$command_name" >/dev/null 2>&1 || { echo "缺少必要命令: ${command_name}" >&2; return 1; }
 		done
 	fi
-	case "$(uname -m)" in
-		x86_64|amd64) KPANEL_NODE_ARCH="amd64" ;;
-		aarch64|arm64) KPANEL_NODE_ARCH="arm64" ;;
-		*)
-			echo "当前 CPU 架构暂不支持 KPanel 轻量节点（支持 amd64/x86_64、arm64/aarch64）。" >&2
-			return 1
-			;;
-	esac
 }
 
 kpanel_node_ensure_account() {
@@ -12211,7 +12382,7 @@ kpanel_node_write_updater() {
 	kpanel_node_lock_template >>"$updater_temporary" || return 1
 	kpanel_node_procd_helpers_template >>"$updater_temporary" || return 1
 	cat >>"$updater_temporary" <<'KPANEL_NODE_UPDATE'
-# KPANEL_NODE_RUNTIME_GENERATION=5
+# KPANEL_NODE_RUNTIME_GENERATION=6
 set -euo pipefail
 
 mode="${1:-update}"
@@ -12232,6 +12403,10 @@ binary_path="${home_dir}/kejilion-node"
 # GitHub URLs and hide the redirects that bind the checksum to one release.
 github_host="github.com"
 base_url="https://${github_host}/kejilion/KPanel/releases/latest/download"
+# Fallback when github.com or its release CDN is unreachable (mainland China,
+# IPv6-only hosts). The mirror belongs to the kejilion.sh author, who already
+# serves this script, and follows GitHub's release redirect itself.
+mirror_prefix="https://gh.kejilion.pro/"
 temporary_dir=""
 
 kpanel_node_acquire_lock || exit 1
@@ -12293,12 +12468,22 @@ if [ "$quiet" != true ] && [ -t 2 ]; then
 fi
 update_error=release_check
 [ "$quiet" = true ] || echo "Checking KPanel lightweight node release..."
+# GitHub is tried first with a short budget so an unreachable host falls back
+# to the mirror within about a minute instead of after every retry.
+manifest_source=github
 if ! curl --proto '=https' --proto-redir '=https' --tlsv1.2 --fail --location "${curl_progress[@]}" \
-	--connect-timeout 15 --max-time 60 --retry 3 --retry-delay 5 --retry-max-time 240 \
+	--connect-timeout 10 --max-time 30 --retry 1 --retry-delay 2 --retry-max-time 45 \
 	--max-filesize 65536 --dump-header "${temporary_dir}/headers" \
 	-o "${temporary_dir}/SHA256SUMS" "${base_url}/SHA256SUMS"; then
-	echo "KPanel release check failed; check access to github.com and retry." >&2
-	exit 1
+	manifest_source=mirror
+	[ "$quiet" = true ] || echo "github.com is unreachable; using the gh.kejilion.pro mirror..."
+	if ! curl --proto '=https' --proto-redir '=https' --tlsv1.2 --fail --location "${curl_progress[@]}" \
+		--connect-timeout 15 --max-time 60 --retry 3 --retry-delay 5 --retry-max-time 240 \
+		--max-filesize 65536 \
+		-o "${temporary_dir}/SHA256SUMS" "${mirror_prefix}${base_url}/SHA256SUMS"; then
+		echo "KPanel release check failed; check access to github.com or gh.kejilion.pro and retry." >&2
+		exit 1
+	fi
 fi
 update_error=manifest
 expected="$(awk -v name="$binary_name" '$2 == name { print $1 }' "${temporary_dir}/SHA256SUMS")"
@@ -12306,12 +12491,19 @@ printf '%s' "$expected" | grep -Eq '^[0-9a-f]{64}$' || {
 	echo "release checksum is unavailable" >&2
 	exit 1
 }
-# The first redirect binds the manifest to a release; the following CDN redirect
-# must never be used as a base URL or mixed with a later value of latest.
-release_url="$(awk 'tolower($1) == "location:" { sub(/\r$/, "", $2); print $2 }' "${temporary_dir}/headers" |
-	grep -E '^https://github[.]com/kejilion/KPanel/releases/download/v[0-9]+\.[0-9]+\.[0-9]+/SHA256SUMS$' | tail -n 1 || true)"
-[ -n "$release_url" ] || { echo "release manifest redirect is invalid" >&2; exit 1; }
-release_base="${release_url%/SHA256SUMS}"
+if [ "$manifest_source" = github ]; then
+	# The first redirect binds the manifest to a release; the following CDN redirect
+	# must never be used as a base URL or mixed with a later value of latest.
+	release_url="$(awk 'tolower($1) == "location:" { sub(/\r$/, "", $2); print $2 }' "${temporary_dir}/headers" |
+		grep -E '^https://github[.]com/kejilion/KPanel/releases/download/v[0-9]+\.[0-9]+\.[0-9]+/SHA256SUMS$' | tail -n 1 || true)"
+	[ -n "$release_url" ] || { echo "release manifest redirect is invalid" >&2; exit 1; }
+	release_base="${release_url%/SHA256SUMS}"
+else
+	# The mirror resolves latest itself, so no tag is visible. The binary comes
+	# from the same latest; a release published in between fails the checksum
+	# below and the next run retries.
+	release_base="${mirror_prefix}${base_url}"
+fi
 
 file_service="kejilion-node-file.service"
 update_init_system=""
@@ -12604,12 +12796,27 @@ fi
 
 update_error=download
 [ "$quiet" = true ] || echo "Downloading KPanel lightweight node..."
-if ! curl --proto '=https' --proto-redir '=https' --tlsv1.2 --fail --location "${curl_progress[@]}" \
-	--connect-timeout 15 --max-time 180 --retry 3 --retry-delay 5 --retry-max-time 600 \
-	--max-filesize 134217728 \
-	-o "${temporary_dir}/${binary_name}" "${release_base}/${binary_name}"; then
-	echo "KPanel node download failed; check access to GitHub release downloads and retry." >&2
-	exit 1
+download_binary() {
+	curl --proto '=https' --proto-redir '=https' --tlsv1.2 --fail --location "${curl_progress[@]}" \
+		--connect-timeout 15 --max-time 180 "$@" \
+		--max-filesize 134217728 \
+		-o "${temporary_dir}/${binary_name}" "$release_download"
+}
+release_download="${release_base}/${binary_name}"
+if [ "$manifest_source" = mirror ]; then
+	download_binary --retry 3 --retry-delay 5 --retry-max-time 600 || {
+		echo "KPanel node download failed; check access to gh.kejilion.pro and retry." >&2
+		exit 1
+	}
+elif ! download_binary --retry 1 --retry-delay 2 --retry-max-time 200; then
+	# github.com answered but its release CDN did not. The versioned URL through
+	# the mirror keeps the binary bound to the manifest's release.
+	[ "$quiet" = true ] || echo "GitHub release download is unreachable; using the gh.kejilion.pro mirror..."
+	release_download="${mirror_prefix}${release_base}/${binary_name}"
+	download_binary --retry 3 --retry-delay 5 --retry-max-time 600 || {
+		echo "KPanel node download failed; check access to GitHub release downloads or gh.kejilion.pro and retry." >&2
+		exit 1
+	}
 fi
 update_error=checksum
 actual="$(sha256sum "${temporary_dir}/${binary_name}" | awk '{print $1}')"
@@ -13337,22 +13544,24 @@ kpanel_node_join() {
 		esac
 	done
 	kpanel_node_paths
-	kpanel_node_preflight || return 1
 	case "$token" in
 		kpl1.*) ;;
 		kpb1.*) batch_token=true ;;
 		*) echo "轻量节点接入授权无效。" >&2; return 2 ;;
 	esac
-	[ "${#token}" -le 2048 ] || {
+	[ "${#token}" -le 2048 ] && [[ "$token" =~ ^kp[lb]1\.[A-Za-z0-9_-]+$ ]] || {
 		echo "轻量节点接入授权无效。" >&2
 		return 2
 	}
 	if [ -n "$node_name" ]; then
-		[ "${#node_name}" -le 80 ] && ! LC_ALL=C printf '%s' "$node_name" | grep -q '[[:cntrl:]]' || {
+		[ "${#node_name}" -le 80 ] && [[ "$node_name" != *[[:cntrl:]]* ]] || {
 			echo "轻量节点名称无效。" >&2
 			return 2
 		}
-	else
+	fi
+	kpanel_node_ensure_dependencies || return 1
+	kpanel_node_preflight || return 1
+	if [ -z "$node_name" ]; then
 		node_name="$(hostname 2>/dev/null | LC_ALL=C tr -cd '[:alnum:]_. -' | cut -c1-80)"
 	fi
 	kpanel_node_lock || return 1
