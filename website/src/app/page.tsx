@@ -550,12 +550,12 @@ export default function Home() {
                 <button
                   onClick={() => setInstallSource('enhanced')}
                   className={`px-2.5 py-1 rounded-md transition-all font-medium flex items-center space-x-1 ${
-                    installSource === 'enhanced' 
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                    installSource === 'enhanced'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <span>🌟 专属增强版 (手风琴)</span>
+                  <span>🌟 VIP ⭐⭐⭐⭐⭐ | 分类版</span>
                 </button>
                 <button
                   onClick={() => setInstallSource('official')}
