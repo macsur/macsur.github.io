@@ -11,7 +11,7 @@ export interface GithubTopRepo {
   highlights: string[];
   githubUrl: string;
   deployCmd: string;
-  appId?: number;
+  appId?: number | string;
 }
 
 export interface Category {
@@ -21,7 +21,7 @@ export interface Category {
 }
 
 export interface AppItem {
-  id: number;
+  id: number | string;
   name: string;
   category: string;
   isStar: boolean;
@@ -64,12 +64,17 @@ export const CATEGORIES: Category[] = [
     "id": "office",
     "key": "G",
     "name": "📝 协作办公与实用工具"
+  },
+  {
+    "id": "custom",
+    "key": "H",
+    "name": "📦 第三方与社区扩展应用"
   }
 ];
 
 export const BUILTIN_APPS: AppItem[] = [
   {
-    "id": 201,
+    "id": "201",
     "name": "DeepSeek-V3/R1 顶尖开源大模型",
     "category": "github",
     "isStar": true,
@@ -77,7 +82,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "全球瞩目的划时代开源大语言模型与超强推理架构。"
   },
   {
-    "id": 202,
+    "id": "202",
     "name": "Ollama 本地大模型极速运行引擎",
     "category": "github",
     "isStar": true,
@@ -85,7 +90,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "一键在本地或 VPS 运行 DeepSeek、Llama3 等大模型。"
   },
   {
-    "id": 203,
+    "id": "203",
     "name": "Open WebUI 全能私有化 AI 交互平台",
     "category": "github",
     "isStar": true,
@@ -93,7 +98,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "媲美 ChatGPT 的自托管多模型 Web 界面。"
   },
   {
-    "id": 204,
+    "id": "204",
     "name": "Dokploy 轻量开源自托管 PaaS 运维平台",
     "category": "github",
     "isStar": true,
@@ -101,7 +106,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "下一代轻量级 PaaS 应用平台，一键管理容器应用与数据库。"
   },
   {
-    "id": 205,
+    "id": "205",
     "name": "Uptime Kuma 高颜值自托管探针监控",
     "category": "github",
     "isStar": true,
@@ -109,7 +114,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "高颜值探针监控，支持 90+ 告警通知与公开状态页。"
   },
   {
-    "id": 206,
+    "id": "206",
     "name": "RustDesk 开源全平台远程桌面中继",
     "category": "github",
     "isStar": true,
@@ -117,7 +122,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源远程桌面客户端与自建中继服务，端到端高强度加密安全可控。"
   },
   {
-    "id": 207,
+    "id": "207",
     "name": "Immich 高性能私有云相册与视频备份",
     "category": "github",
     "isStar": true,
@@ -125,7 +130,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "自主可控的极速相册备份方案，内置隐私 AI 识别与人脸聚合。"
   },
   {
-    "id": 208,
+    "id": "208",
     "name": "n8n 智能自动化与 AI Agent 流程编排",
     "category": "github",
     "isStar": true,
@@ -133,7 +138,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "可视化拖拽自动化工作流，原生构建私有 AI Agent 智能体。"
   },
   {
-    "id": 209,
+    "id": "209",
     "name": "Lobe Chat 现代多模态开源大模型聊天框架",
     "category": "github",
     "isStar": true,
@@ -141,7 +146,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "极致现代化设计，支持语音、视觉多模态与丰富插件市场。"
   },
   {
-    "id": 210,
+    "id": "210",
     "name": "Code-Server 浏览器云端全功能 VS Code",
     "category": "github",
     "isStar": true,
@@ -149,7 +154,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "在远程服务器运行 VS Code，浏览器即开即写。"
   },
   {
-    "id": 1,
+    "id": "1",
     "name": "宝塔面板官方版",
     "category": "ops",
     "isStar": false,
@@ -157,7 +162,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "baota"
   },
   {
-    "id": 2,
+    "id": "2",
     "name": "aaPanel宝塔国际版",
     "category": "ops",
     "isStar": false,
@@ -165,7 +170,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 3,
+    "id": "3",
     "name": "1Panel新一代管理面板",
     "category": "ops",
     "isStar": false,
@@ -173,7 +178,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "1panel"
   },
   {
-    "id": 4,
+    "id": "4",
     "name": "NginxProxyManager可视化面板",
     "category": "network",
     "isStar": false,
@@ -181,7 +186,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "一个Nginx反向代理工具面板，不支持添加域名访问。"
   },
   {
-    "id": 5,
+    "id": "5",
     "name": "OpenList多存储文件列表程序",
     "category": "storage",
     "isStar": false,
@@ -189,7 +194,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "一个支持多种存储，支持网页浏览和 WebDAV 的文件列表程序，由 gi..."
   },
   {
-    "id": 6,
+    "id": "6",
     "name": "Ubuntu远程桌面网页版",
     "category": "ops",
     "isStar": false,
@@ -197,7 +202,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "webtop基于Ubuntu的容器。若IP无法访问，请添加域名访问。"
   },
   {
-    "id": 7,
+    "id": "7",
     "name": "哪吒探针VPS监控面板",
     "category": "ops",
     "isStar": false,
@@ -205,7 +210,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 8,
+    "id": "8",
     "name": "QB离线BT磁力下载面板",
     "category": "media",
     "isStar": false,
@@ -213,7 +218,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "QB"
   },
   {
-    "id": 9,
+    "id": "9",
     "name": "Poste.io邮件服务器程序",
     "category": "office",
     "isStar": false,
@@ -221,7 +226,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 10,
+    "id": "10",
     "name": "RocketChat多人在线聊天系统",
     "category": "office",
     "isStar": false,
@@ -229,7 +234,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Rocket.Chat 是一个开源的团队通讯平台，支持实时聊天、音视频通..."
   },
   {
-    "id": 11,
+    "id": "11",
     "name": "禅道项目管理软件",
     "category": "office",
     "isStar": false,
@@ -237,7 +242,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "禅道是通用的项目管理软件"
   },
   {
-    "id": 12,
+    "id": "12",
     "name": "青龙面板定时任务管理平台",
     "category": "ops",
     "isStar": false,
@@ -245,7 +250,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "青龙面板是一个定时任务管理平台"
   },
   {
-    "id": 13,
+    "id": "13",
     "name": "Cloudreve网盘",
     "category": "storage",
     "isStar": false,
@@ -253,7 +258,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "cloudreve是一个支持多家云存储的网盘系统"
   },
   {
-    "id": 14,
+    "id": "14",
     "name": "简单图床图片管理程序",
     "category": "storage",
     "isStar": false,
@@ -261,7 +266,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "简单图床是一个简单的图床程序"
   },
   {
-    "id": 15,
+    "id": "15",
     "name": "emby多媒体管理系统",
     "category": "media",
     "isStar": false,
@@ -269,7 +274,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "emby是一个主从式架构的媒体服务器软件，可以用来整理服务器上的视频和音..."
   },
   {
-    "id": 16,
+    "id": "16",
     "name": "Speedtest测速面板",
     "category": "ops",
     "isStar": false,
@@ -277,7 +282,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Speedtest测速面板是一个VPS网速测试工具，多项测试功能，还可以..."
   },
   {
-    "id": 17,
+    "id": "17",
     "name": "AdGuardHome去广告软件",
     "category": "network",
     "isStar": false,
@@ -285,7 +290,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "AdGuardHome是一款全网广告拦截与反跟踪软件，未来将不止是一个D..."
   },
   {
-    "id": 18,
+    "id": "18",
     "name": "onlyoffice在线办公OFFICE",
     "category": "office",
     "isStar": false,
@@ -293,7 +298,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "onlyoffice是一款开源的在线office工具，太强大了！"
   },
   {
-    "id": 19,
+    "id": "19",
     "name": "雷池WAF防火墙面板",
     "category": "network",
     "isStar": false,
@@ -301,7 +306,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 20,
+    "id": "20",
     "name": "portainer容器管理面板",
     "category": "ops",
     "isStar": false,
@@ -309,7 +314,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "portainer是一个轻量级的docker容器管理面板"
   },
   {
-    "id": 21,
+    "id": "21",
     "name": "VScode网页版",
     "category": "office",
     "isStar": false,
@@ -317,7 +322,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "VScode是一款强大的在线代码编写工具"
   },
   {
-    "id": 22,
+    "id": "22",
     "name": "UptimeKuma监控工具",
     "category": "ops",
     "isStar": false,
@@ -325,7 +330,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Uptime Kuma 易于使用的自托管监控工具"
   },
   {
-    "id": 23,
+    "id": "23",
     "name": "Memos网页备忘录",
     "category": "office",
     "isStar": false,
@@ -333,7 +338,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Memos是一款轻量级、自托管的备忘录中心"
   },
   {
-    "id": 24,
+    "id": "24",
     "name": "Webtop远程桌面网页版",
     "category": "ops",
     "isStar": false,
@@ -341,7 +346,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "webtop基于Alpine的中文版容器。若IP无法访问，请添加域名访问..."
   },
   {
-    "id": 25,
+    "id": "25",
     "name": "Nextcloud网盘",
     "category": "storage",
     "isStar": false,
@@ -349,7 +354,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Nextcloud拥有超过 400,000 个部署，是您可以下载的最受欢..."
   },
   {
-    "id": 26,
+    "id": "26",
     "name": "QD-Today定时任务管理框架",
     "category": "office",
     "isStar": false,
@@ -357,7 +362,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "QD-Today是一个HTTP请求定时任务自动执行框架"
   },
   {
-    "id": 27,
+    "id": "27",
     "name": "Dockge容器堆栈管理面板",
     "category": "ops",
     "isStar": false,
@@ -365,7 +370,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "dockge是一个可视化的docker-compose容器管理面板"
   },
   {
-    "id": 28,
+    "id": "28",
     "name": "LibreSpeed测速工具",
     "category": "ops",
     "isStar": false,
@@ -373,7 +378,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "librespeed是用Javascript实现的轻量级速度测试工具，即..."
   },
   {
-    "id": 29,
+    "id": "29",
     "name": "searxng聚合搜索站",
     "category": "office",
     "isStar": false,
@@ -381,7 +386,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "searxng是一个私有且隐私的搜索引擎站点"
   },
   {
-    "id": 30,
+    "id": "30",
     "name": "PhotoPrism私有相册系统",
     "category": "storage",
     "isStar": false,
@@ -389,7 +394,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "photoprism非常强大的私有相册系统"
   },
   {
-    "id": 31,
+    "id": "31",
     "name": "StirlingPDF工具大全",
     "category": "office",
     "isStar": false,
@@ -397,7 +402,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "这是一个强大的本地托管基于 Web 的 PDF 操作工具，使用 dock..."
   },
   {
-    "id": 32,
+    "id": "32",
     "name": "drawio免费的在线图表软件",
     "category": "office",
     "isStar": false,
@@ -405,7 +410,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "这是一个强大图表绘制软件。思维导图，拓扑图，流程图，都能画"
   },
   {
-    "id": 33,
+    "id": "33",
     "name": "Sun-Panel导航面板",
     "category": "office",
     "isStar": false,
@@ -413,7 +418,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Sun-Panel服务器、NAS导航面板、Homepage、浏览器首页"
   },
   {
-    "id": 34,
+    "id": "34",
     "name": "Pingvin-Share文件分享平台",
     "category": "storage",
     "isStar": false,
@@ -421,7 +426,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Pingvin Share 是一个可自建的文件分享平台，是 WeTran..."
   },
   {
-    "id": 35,
+    "id": "35",
     "name": "极简朋友圈",
     "category": "office",
     "isStar": false,
@@ -429,7 +434,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "极简朋友圈，高仿微信朋友圈，记录你的美好生活"
   },
   {
-    "id": 36,
+    "id": "36",
     "name": "LobeChatAI聊天聚合网站",
     "category": "ai",
     "isStar": false,
@@ -437,7 +442,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "LobeChat聚合市面上主流的AI大模型，ChatGPT/Claude..."
   },
   {
-    "id": 37,
+    "id": "37",
     "name": "MyIP工具箱",
     "category": "office",
     "isStar": false,
@@ -445,7 +450,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个多功能IP工具箱，可以查看自己IP信息及连通性，用网页面板呈现"
   },
   {
-    "id": 38,
+    "id": "38",
     "name": "小雅alist全家桶",
     "category": "storage",
     "isStar": false,
@@ -453,7 +458,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 39,
+    "id": "39",
     "name": "Bililive直播录制工具",
     "category": "media",
     "isStar": false,
@@ -461,7 +466,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Bililive-go是一个支持多种直播平台的直播录制工具"
   },
   {
-    "id": 40,
+    "id": "40",
     "name": "webssh网页版SSH连接工具",
     "category": "ops",
     "isStar": false,
@@ -469,7 +474,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "简易在线ssh连接工具和sftp工具"
   },
   {
-    "id": 41,
+    "id": "41",
     "name": "耗子管理面板",
     "category": "ops",
     "isStar": false,
@@ -477,7 +482,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "acepanel"
   },
   {
-    "id": 42,
+    "id": "42",
     "name": "Nexterm远程连接工具",
     "category": "ops",
     "isStar": false,
@@ -485,7 +490,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "nexterm是一款强大的在线SSH/VNC/RDP连接工具。"
   },
   {
-    "id": 43,
+    "id": "43",
     "name": "RustDesk远程桌面(服务端)",
     "category": "ops",
     "isStar": false,
@@ -493,7 +498,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "rustdesk开源的远程桌面(服务端)，类似自己的向日葵私服。"
   },
   {
-    "id": 44,
+    "id": "44",
     "name": "RustDesk远程桌面(中继端)",
     "category": "ops",
     "isStar": false,
@@ -501,7 +506,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "rustdesk开源的远程桌面(中继端)，类似自己的向日葵私服。"
   },
   {
-    "id": 45,
+    "id": "45",
     "name": "Docker加速站",
     "category": "network",
     "isStar": false,
@@ -509,7 +514,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Docker Registry 是一个用于存储和分发 Docker 镜像..."
   },
   {
-    "id": 46,
+    "id": "46",
     "name": "GitHub加速站",
     "category": "network",
     "isStar": false,
@@ -517,7 +522,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "使用Go实现的GHProxy，用于加速部分地区Github仓库的拉取。"
   },
   {
-    "id": 47,
+    "id": "47",
     "name": "普罗米修斯监控",
     "category": "ops",
     "isStar": false,
@@ -525,7 +530,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "grafana"
   },
   {
-    "id": 48,
+    "id": "48",
     "name": "普罗米修斯(主机监控)",
     "category": "ops",
     "isStar": false,
@@ -533,7 +538,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "这是一个普罗米修斯的主机数据采集组件，请部署在被监控主机上。"
   },
   {
-    "id": 49,
+    "id": "49",
     "name": "普罗米修斯(容器监控)",
     "category": "ops",
     "isStar": false,
@@ -541,7 +546,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "这是一个普罗米修斯的容器数据采集组件，请部署在被监控主机上。"
   },
   {
-    "id": 50,
+    "id": "50",
     "name": "补货监控工具",
     "category": "ops",
     "isStar": false,
@@ -549,7 +554,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "这是一款网站变化检测、补货监控和通知的小工具"
   },
   {
-    "id": 51,
+    "id": "51",
     "name": "PVE开小鸡面板",
     "category": "ops",
     "isStar": false,
@@ -557,7 +562,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 52,
+    "id": "52",
     "name": "DPanel容器管理面板",
     "category": "ops",
     "isStar": false,
@@ -565,7 +570,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Docker可视化面板系统，提供完善的docker管理功能。"
   },
   {
-    "id": 53,
+    "id": "53",
     "name": "llama3聊天AI大模型",
     "category": "ai",
     "isStar": false,
@@ -573,7 +578,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "OpenWebUI一款大语言模型网页框架，接入全新的llama3大语言模..."
   },
   {
-    "id": 54,
+    "id": "54",
     "name": "AMH主机建站管理面板",
     "category": "ops",
     "isStar": false,
@@ -581,7 +586,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 55,
+    "id": "55",
     "name": "FRP内网穿透(服务端)",
     "category": "network",
     "isStar": false,
@@ -589,7 +594,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 56,
+    "id": "56",
     "name": "FRP内网穿透(客户端)",
     "category": "network",
     "isStar": false,
@@ -597,7 +602,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 57,
+    "id": "57",
     "name": "Deepseek聊天AI大模型",
     "category": "ai",
     "isStar": false,
@@ -605,7 +610,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "OpenWebUI一款大语言模型网页框架，接入全新的DeepSeek R..."
   },
   {
-    "id": 58,
+    "id": "58",
     "name": "Dify大模型知识库",
     "category": "ai",
     "isStar": false,
@@ -613,7 +618,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一款开源的大语言模型(LLM) 应用开发平台。自托管训练数据用于AI生..."
   },
   {
-    "id": 59,
+    "id": "59",
     "name": "NewAPI大模型资产管理",
     "category": "ai",
     "isStar": false,
@@ -621,7 +626,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "新一代大模型网关与AI资产管理系统"
   },
   {
-    "id": 60,
+    "id": "60",
     "name": "JumpServer开源堡垒机",
     "category": "ops",
     "isStar": false,
@@ -629,7 +634,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个开源的特权访问管理 (PAM) 工具，该程序占用80端口不支持添加..."
   },
   {
-    "id": 61,
+    "id": "61",
     "name": "在线翻译服务器",
     "category": "office",
     "isStar": false,
@@ -637,7 +642,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "免费开源机器翻译 API，完全自托管，它的翻译引擎由开源Argos Tr..."
   },
   {
-    "id": 62,
+    "id": "62",
     "name": "RAGFlow大模型知识库",
     "category": "ai",
     "isStar": false,
@@ -645,7 +650,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "基于深度文档理解的开源 RAG（检索增强生成）引擎"
   },
   {
-    "id": 63,
+    "id": "63",
     "name": "OpenWebUI自托管AI平台",
     "category": "ai",
     "isStar": false,
@@ -653,7 +658,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "OpenWebUI一款大语言模型网页框架，官方精简版本，支持各大模型AP..."
   },
   {
-    "id": 64,
+    "id": "64",
     "name": "it-tools工具箱",
     "category": "office",
     "isStar": false,
@@ -661,7 +666,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "对开发人员和 IT 工作者来说非常有用的工具"
   },
   {
-    "id": 65,
+    "id": "65",
     "name": "n8n自动化工作流平台",
     "category": "office",
     "isStar": false,
@@ -669,7 +674,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一款功能强大的自动化工作流平台"
   },
   {
-    "id": 66,
+    "id": "66",
     "name": "yt-dlp视频下载工具",
     "category": "media",
     "isStar": false,
@@ -677,7 +682,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 67,
+    "id": "67",
     "name": "ddns-go动态DNS管理工具",
     "category": "network",
     "isStar": false,
@@ -685,7 +690,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "自动将你的公网 IP（IPv4/IPv6）实时更新到各大 DNS 服务商..."
   },
   {
-    "id": 68,
+    "id": "68",
     "name": "AllinSSL证书管理平台",
     "category": "network",
     "isStar": false,
@@ -693,7 +698,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源免费的 SSL 证书自动化管理平台"
   },
   {
-    "id": 69,
+    "id": "69",
     "name": "SFTPGo文件传输工具",
     "category": "storage",
     "isStar": false,
@@ -701,7 +706,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源免费随时随地SFTP FTP WebDAV 文件传输工具"
   },
   {
-    "id": 70,
+    "id": "70",
     "name": "AstrBot聊天机器人框架",
     "category": "ai",
     "isStar": false,
@@ -709,7 +714,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源AI聊天机器人框架，支持微信，QQ，TG接入AI大模型"
   },
   {
-    "id": 71,
+    "id": "71",
     "name": "Navidrome私有音乐服务器",
     "category": "media",
     "isStar": false,
@@ -717,7 +722,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个轻量、高性能的音乐流媒体服务器"
   },
   {
-    "id": 72,
+    "id": "72",
     "name": "bitwarden密码管理器",
     "category": "office",
     "isStar": false,
@@ -725,7 +730,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "一个你可以控制数据的密码管理器"
   },
   {
-    "id": 73,
+    "id": "73",
     "name": "LibreTV私有影视",
     "category": "media",
     "isStar": false,
@@ -733,7 +738,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "免费在线视频搜索与观看平台"
   },
   {
-    "id": 74,
+    "id": "74",
     "name": "MoonTV私有影视",
     "category": "media",
     "isStar": false,
@@ -741,7 +746,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "免费在线视频搜索与观看平台"
   },
   {
-    "id": 75,
+    "id": "75",
     "name": "Melody音乐精灵",
     "category": "media",
     "isStar": false,
@@ -749,7 +754,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "你的音乐精灵，旨在帮助你更好地管理音乐。"
   },
   {
-    "id": 76,
+    "id": "76",
     "name": "在线DOS老游戏",
     "category": "media",
     "isStar": false,
@@ -757,7 +762,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个中文DOS游戏合集网站"
   },
   {
-    "id": 77,
+    "id": "77",
     "name": "迅雷离线下载工具",
     "category": "media",
     "isStar": false,
@@ -765,7 +770,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "迅雷你的离线高速BT磁力下载工具"
   },
   {
-    "id": 78,
+    "id": "78",
     "name": "PandaWiki智能文档管理系统",
     "category": "office",
     "isStar": false,
@@ -773,7 +778,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "PandaWiki是一款AI大模型驱动的开源智能文档管理系统，强烈建议不..."
   },
   {
-    "id": 79,
+    "id": "79",
     "name": "Beszel服务器监控",
     "category": "ops",
     "isStar": false,
@@ -781,7 +786,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Beszel轻量易用的服务器监控"
   },
   {
-    "id": 80,
+    "id": "80",
     "name": "linkwarden书签管理",
     "category": "office",
     "isStar": false,
@@ -789,7 +794,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "一个开源的自托管书签管理平台，支持标签、搜索和团队协作。"
   },
   {
-    "id": 81,
+    "id": "81",
     "name": "JitsiMeet视频会议",
     "category": "office",
     "isStar": false,
@@ -797,7 +802,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "一个开源的安全视频会议解决方案，支持多人在线会议、屏幕共享与加密通信。"
   },
   {
-    "id": 82,
+    "id": "82",
     "name": "gpt-load高性能AI透明代理",
     "category": "ai",
     "isStar": false,
@@ -805,7 +810,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "高性能AI接口透明代理服务"
   },
   {
-    "id": 83,
+    "id": "83",
     "name": "komari服务器监控工具",
     "category": "ops",
     "isStar": false,
@@ -813,7 +818,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "轻量级的自托管服务器监控工具"
   },
   {
-    "id": 84,
+    "id": "84",
     "name": "Wallos个人财务管理工具",
     "category": "office",
     "isStar": false,
@@ -821,7 +826,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源个人订阅追踪器，可用于财务管理"
   },
   {
-    "id": 85,
+    "id": "85",
     "name": "immich图片视频管理器",
     "category": "storage",
     "isStar": false,
@@ -829,7 +834,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "高性能自托管照片和视频管理解决方案。"
   },
   {
-    "id": 86,
+    "id": "86",
     "name": "jellyfin媒体管理系统",
     "category": "media",
     "isStar": false,
@@ -837,7 +842,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一款开源媒体服务器软件"
   },
   {
-    "id": 87,
+    "id": "87",
     "name": "SyncTV一起看片神器",
     "category": "media",
     "isStar": false,
@@ -845,7 +850,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "远程一起观看电影和直播的程序。它提供了同步观影、直播、聊天等功能"
   },
   {
-    "id": 88,
+    "id": "88",
     "name": "Owncast自托管直播平台",
     "category": "media",
     "isStar": false,
@@ -853,7 +858,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源、免费的自建直播平台"
   },
   {
-    "id": 89,
+    "id": "89",
     "name": "FileCodeBox文件快递",
     "category": "storage",
     "isStar": false,
@@ -861,7 +866,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "匿名口令分享文本和文件，像拿快递一样取文件"
   },
   {
-    "id": 90,
+    "id": "90",
     "name": "matrix去中心化聊天协议",
     "category": "office",
     "isStar": false,
@@ -869,7 +874,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Matrix是一个去中心化的聊天协议"
   },
   {
-    "id": 91,
+    "id": "91",
     "name": "gitea私有代码仓库",
     "category": "office",
     "isStar": false,
@@ -877,7 +882,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "免费新一代的代码托管平台，提供接近 GitHub 的使用体验。"
   },
   {
-    "id": 92,
+    "id": "92",
     "name": "FileBrowser文件管理器",
     "category": "storage",
     "isStar": false,
@@ -885,7 +890,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个基于Web的文件管理器"
   },
   {
-    "id": 93,
+    "id": "93",
     "name": "Dufs极简静态文件服务器",
     "category": "storage",
     "isStar": false,
@@ -893,7 +898,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "极简静态文件服务器，支持上传下载"
   },
   {
-    "id": 94,
+    "id": "94",
     "name": "Gopeed高速下载工具",
     "category": "media",
     "isStar": false,
@@ -901,7 +906,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "分布式高速下载工具，支持多种协议"
   },
   {
-    "id": 95,
+    "id": "95",
     "name": "paperless文档管理平台",
     "category": "office",
     "isStar": false,
@@ -909,7 +914,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源的电子文档管理系统，它的主要用途是把你的纸质文件数字化并管理起来。"
   },
   {
-    "id": 96,
+    "id": "96",
     "name": "2FAuth自托管二步验证器",
     "category": "office",
     "isStar": false,
@@ -917,7 +922,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "自托管的双重身份验证 (2FA) 账户管理和验证码生成工具。"
   },
   {
-    "id": 97,
+    "id": "97",
     "name": "WireGuard组网(服务端)",
     "category": "network",
     "isStar": false,
@@ -925,7 +930,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "现代化、高性能的虚拟专用网络工具"
   },
   {
-    "id": 98,
+    "id": "98",
     "name": "WireGuard组网(客户端)",
     "category": "network",
     "isStar": false,
@@ -933,7 +938,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "现代化、高性能的虚拟专用网络工具"
   },
   {
-    "id": 99,
+    "id": "99",
     "name": "DSM群晖虚拟机",
     "category": "ops",
     "isStar": false,
@@ -941,7 +946,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Docker容器中的虚拟DSM"
   },
   {
-    "id": 100,
+    "id": "100",
     "name": "Syncthing点对点文件同步工具",
     "category": "storage",
     "isStar": false,
@@ -949,7 +954,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源的点对点文件同步工具，类似于 Dropbox、Resilio Syn..."
   },
   {
-    "id": 101,
+    "id": "101",
     "name": "AI视频生成工具",
     "category": "ai",
     "isStar": false,
@@ -957,7 +962,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "MoneyPrinterTurbo是一款使用AI大模型合成高清短视频的工..."
   },
   {
-    "id": 102,
+    "id": "102",
     "name": "VoceChat多人在线聊天系统",
     "category": "office",
     "isStar": false,
@@ -965,7 +970,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一款支持独立部署的个人云社交媒体聊天服务"
   },
   {
-    "id": 103,
+    "id": "103",
     "name": "Umami网站统计工具",
     "category": "ops",
     "isStar": false,
@@ -973,7 +978,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "开源、轻量、隐私友好的网站分析工具，类似于GoogleAnalytics..."
   },
   {
-    "id": 104,
+    "id": "104",
     "name": "Stream四层代理转发工具",
     "category": "network",
     "isStar": false,
@@ -981,7 +986,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 105,
+    "id": "105",
     "name": "思源笔记",
     "category": "office",
     "isStar": false,
@@ -989,7 +994,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "思源笔记是一款隐私优先的知识管理系统"
   },
   {
-    "id": 106,
+    "id": "106",
     "name": "Drawnix开源白板工具",
     "category": "office",
     "isStar": false,
@@ -997,7 +1002,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一款强大的开源白板工具，集成思维导图、流程图等。"
   },
   {
-    "id": 107,
+    "id": "107",
     "name": "PanSou网盘搜索",
     "category": "office",
     "isStar": false,
@@ -1005,7 +1010,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "PanSou是一个高性能的网盘资源搜索API服务。"
   },
   {
-    "id": 108,
+    "id": "108",
     "name": "LangBot聊天机器人",
     "category": "ai",
     "isStar": false,
@@ -1013,7 +1018,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个开源的大语言模型原生即时通信机器人开发平台"
   },
   {
-    "id": 109,
+    "id": "109",
     "name": "ZFile在线网盘",
     "category": "storage",
     "isStar": false,
@@ -1021,7 +1026,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个适用于个人或小团队的在线网盘程序。"
   },
   {
-    "id": 110,
+    "id": "110",
     "name": "Karakeep书签管理",
     "category": "office",
     "isStar": false,
@@ -1029,7 +1034,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一款可自行托管的书签应用，带有人工智能功能，专为数据囤积者而设计。"
   },
   {
-    "id": 111,
+    "id": "111",
     "name": "多格式文件转换工具",
     "category": "office",
     "isStar": false,
@@ -1037,7 +1042,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个功能强大的多格式文件转换工具（支持文档、图像、音频视频等）强烈建议..."
   },
   {
-    "id": 112,
+    "id": "112",
     "name": "Lucky大内网穿透工具",
     "category": "network",
     "isStar": false,
@@ -1045,7 +1050,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "Lucky 是一个大内网穿透及端口转发管理工具，支持 DDNS、反向代理..."
   },
   {
-    "id": 113,
+    "id": "113",
     "name": "Firefox浏览器",
     "category": "office",
     "isStar": false,
@@ -1053,7 +1058,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "是一个运行在 Docker 中的 Firefox 浏览器，支持通过网页直..."
   },
   {
-    "id": 114,
+    "id": "114",
     "name": "OpenClaw机器人管理工具",
     "category": "ai",
     "isStar": false,
@@ -1061,7 +1066,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "ClawdBot"
   },
   {
-    "id": 115,
+    "id": "115",
     "name": "Hermes机器人管理工具",
     "category": "ai",
     "isStar": false,
@@ -1069,7 +1074,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 116,
+    "id": "116",
     "name": "DeepSeek Harness管理工具",
     "category": "ai",
     "isStar": false,
@@ -1077,7 +1082,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": "DeepSeek-Harness"
   },
   {
-    "id": 117,
+    "id": "117",
     "name": "99CDN自建CDN管理平台",
     "category": "network",
     "isStar": false,
@@ -1085,11 +1090,339 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
-    "id": 118,
+    "id": "118",
     "name": "99DNS智能调度服务",
     "category": "network",
     "isStar": false,
     "alias": "99dns",
     "desc": ""
+  },
+  {
+    "id": "AIClient-2-API",
+    "name": "AIClient-2-API",
+    "category": "custom",
+    "isStar": false,
+    "alias": "AIClient-2-API",
+    "desc": "AI客户端转API代理，将Gemini/Kiro/Qwen Code等客户端大模型转为OpenAI兼容接口"
+  },
+  {
+    "id": "CLIProxyAPI",
+    "name": "CLIProxyAPI",
+    "category": "custom",
+    "isStar": true,
+    "alias": "CLIProxyAPI",
+    "desc": "将 Gemini、Claude、Codex、Qwen 等免费模型包装成 OpenAI 兼容 API 服务"
+  },
+  {
+    "id": "airadio",
+    "name": "AIradio",
+    "category": "custom",
+    "isStar": false,
+    "alias": "airadio",
+    "desc": "AI 驱动的在线电台，可制作节目、生成配音并管理音乐播放。"
+  },
+  {
+    "id": "aistudio-to-api",
+    "name": "AIStudioToAPI",
+    "category": "custom",
+    "isStar": false,
+    "alias": "aistudio-to-api",
+    "desc": "将 Google AI Studio Build 封装为 OpenAI、Gemini、Anthropic 兼容 API"
+  },
+  {
+    "id": "antigravity",
+    "name": "Antigravity Manager",
+    "category": "custom",
+    "isStar": true,
+    "alias": "antigravity",
+    "desc": "专业级 AI 账号管理与协议代理系统"
+  },
+  {
+    "id": "arena-brawl",
+    "name": "大乱斗 Arena Brawl",
+    "category": "custom",
+    "isStar": false,
+    "alias": "arena-brawl",
+    "desc": "实时多人在线网页大乱斗游戏，支持排行榜与聊天"
+  },
+  {
+    "id": "bomb-party",
+    "name": "炸弹派对 Bomb Party",
+    "category": "custom",
+    "isStar": false,
+    "alias": "bomb-party",
+    "desc": "Q版多人在线炸弹人对战游戏，实时联机，排行榜持久化"
+  },
+  {
+    "id": "clouddrive2",
+    "name": "clouddrive2",
+    "category": "custom",
+    "isStar": false,
+    "alias": "clouddrive2",
+    "desc": "一个全方位的云存储管理平台，旨在无缝集成多个云存储服务"
+  },
+  {
+    "id": "copaw",
+    "name": "CoPaw AI Assistant",
+    "category": "custom",
+    "isStar": true,
+    "alias": "copaw",
+    "desc": "阿里开源的个人AI助手，支持钉钉/飞书/QQ/Discord多渠道，内置技能系统与长期记忆。"
+  },
+  {
+    "id": "discourse",
+    "name": "Discourse",
+    "category": "custom",
+    "isStar": false,
+    "alias": "discourse",
+    "desc": "开源社区论坛与知识讨论平台"
+  },
+  {
+    "id": "dnsmgr",
+    "name": "彩虹聚合DNS管理系统",
+    "category": "custom",
+    "isStar": false,
+    "alias": "dnsmgr",
+    "desc": "彩虹聚合DNS一站式管理阿里云、腾讯云、Cloudflare等解析，支持容灾自动切换"
+  },
+  {
+    "id": "dstatus",
+    "name": "DStatus",
+    "category": "custom",
+    "isStar": false,
+    "alias": "dstatus",
+    "desc": "现代化服务器状态监控面板，支持实时监控与多服务器管理"
+  },
+  {
+    "id": "easyimg",
+    "name": "EasyImg",
+    "category": "custom",
+    "isStar": false,
+    "alias": "easyimg",
+    "desc": "一站式图床服务. 支持公共上传，支持部署AI鉴黄检测，权限控制、数据统计、实时推送等功能"
+  },
+  {
+    "id": "easytier",
+    "name": "EasyTier",
+    "category": "custom",
+    "isStar": false,
+    "alias": "easytier",
+    "desc": "简单、安全、去中心化的异地组网方案，支持 NAT 穿透、Web 管理与 WireGuard"
+  },
+  {
+    "id": "excalidraw",
+    "name": "Excalidraw",
+    "category": "custom",
+    "isStar": false,
+    "alias": "excalidraw",
+    "desc": "虚拟手绘风格白板，支持绘制流程图、图表，数据存储在本地浏览器中"
+  },
+  {
+    "id": "fast-note-sync-service",
+    "name": "Fast Note Sync Service",
+    "category": "custom",
+    "isStar": false,
+    "alias": "fast-note-sync-service",
+    "desc": "高性能、低延迟的笔记同步、在线管理平台，支持MCP协议和多设备实时同步。"
+  },
+  {
+    "id": "gemini-business2api",
+    "name": "Gemini Business2API",
+    "category": "custom",
+    "isStar": false,
+    "alias": "gemini-business2api",
+    "desc": "Gemini Business 转 OpenAI 兼容 API（含管理面板/多账号负载）"
+  },
+  {
+    "id": "global-radio",
+    "name": "全球电台 (GlobalRadio)",
+    "category": "custom",
+    "isStar": false,
+    "alias": "global-radio",
+    "desc": "一个在线电台应用，支持全球电台收听、搜索、收藏、定时、多语言。"
+  },
+  {
+    "id": "gmssh",
+    "name": "GMSSH",
+    "category": "custom",
+    "isStar": false,
+    "alias": "gmssh",
+    "desc": "桌面级AI运维系统，高性能·零侵入·AI智驱的SSH远程工具"
+  },
+  {
+    "id": "grok2api",
+    "name": "Grok2API",
+    "category": "custom",
+    "isStar": true,
+    "alias": "grok2api",
+    "desc": "多账号 Grok API 网关，支持 OpenAI/Anthropic 兼容接口与管理控制台"
+  },
+  {
+    "id": "headscale",
+    "name": "Headscale",
+    "category": "custom",
+    "isStar": false,
+    "alias": "headscale",
+    "desc": "自托管 Tailscale 控制服务器 + Web管理面板，基于 WireGuard 的 Mesh VPN 组网"
+  },
+  {
+    "id": "hubproxy",
+    "name": "HubProxy",
+    "category": "custom",
+    "isStar": false,
+    "alias": "hubproxy",
+    "desc": "Docker和GitHub加速服务器"
+  },
+  {
+    "id": "ice-climber-arena",
+    "name": "敲冰块大逃脱 Ice Climber Arena",
+    "category": "custom",
+    "isStar": false,
+    "alias": "ice-climber-arena",
+    "desc": "多人在线敲冰块爬塔逃杀游戏，实时联机，排行榜持久化"
+  },
+  {
+    "id": "iyuuplus",
+    "name": "IYUUPlus",
+    "category": "custom",
+    "isStar": false,
+    "alias": "iyuuplus",
+    "desc": "全自动PT辅种与管理工具，支持多客户端互通"
+  },
+  {
+    "id": "kpanel",
+    "name": "KPanel",
+    "category": "custom",
+    "isStar": true,
+    "alias": "kpanel",
+    "desc": "完全贴合 kejilion.sh 业务的现代化 Linux Web 管理面板"
+  },
+  {
+    "id": "lsky-pro",
+    "name": "Lsky Pro",
+    "category": "custom",
+    "isStar": false,
+    "alias": "lsky-pro",
+    "desc": "高性能、功能丰富的自托管图床系统(Postgres + Redis版)"
+  },
+  {
+    "id": "mlflow",
+    "name": "MLflow",
+    "category": "custom",
+    "isStar": false,
+    "alias": "mlflow",
+    "desc": "开源AI/ML开发平台，支持实验追踪、模型管理、LLM可观测性与评估"
+  },
+  {
+    "id": "molilotto",
+    "name": "魔力彩票助手（Lottery Prediction Assistant）",
+    "category": "custom",
+    "isStar": false,
+    "alias": "molilotto",
+    "desc": "自动抓取开奖信息+ 自定义AI大模型分析对比+后台管理。"
+  },
+  {
+    "id": "monitor",
+    "name": "Monitor Probe",
+    "category": "custom",
+    "isStar": false,
+    "alias": "monitor",
+    "desc": "极简探针 Rust 编写的轻量级服务器探针，支持实时监控、流量统计与掉线通知"
+  },
+  {
+    "id": "mytube",
+    "name": "MyTube",
+    "category": "custom",
+    "isStar": false,
+    "alias": "mytube",
+    "desc": "私人视频收藏与管理工具(支持 YouTube BiliBli 下载)"
+  },
+  {
+    "id": "neon-arena-fps",
+    "name": "霓虹竞技场 NEON ARENA",
+    "category": "custom",
+    "isStar": false,
+    "alias": "neon-arena-fps",
+    "desc": "3D第一人称多人在线射击游戏，霓虹风格竞技场"
+  },
+  {
+    "id": "next-terminal",
+    "name": "Next Terminal",
+    "category": "custom",
+    "isStar": false,
+    "alias": "next-terminal",
+    "desc": "Web 运维审计堡垒机，支持 SSH、RDP、VNC 等协议"
+  },
+  {
+    "id": "nodeget",
+    "name": "NodeGet",
+    "category": "custom",
+    "isStar": false,
+    "alias": "nodeget",
+    "desc": "NodeGet 服务器节点监控、API 扩展与自动化运维平台"
+  },
+  {
+    "id": "npc",
+    "name": "NPC",
+    "category": "custom",
+    "isStar": false,
+    "alias": "npc",
+    "desc": "NPS内网穿透客户端，连接服务端后支持TCP/UDP/HTTP/HTTPS/SOCKS5等隧道穿透"
+  },
+  {
+    "id": "nps",
+    "name": "NPS",
+    "category": "custom",
+    "isStar": false,
+    "alias": "nps",
+    "desc": "轻量级内网穿透服务端，支持TCP/UDP/HTTP/HTTPS等多种隧道，自带Web管理面板"
+  },
+  {
+    "id": "octopus",
+    "name": "Octopus",
+    "category": "custom",
+    "isStar": false,
+    "alias": "octopus",
+    "desc": "为个人打造的简单美观优雅的LLMAPI聚合与负载均衡服务"
+  },
+  {
+    "id": "pika",
+    "name": "Pika Monitor",
+    "category": "custom",
+    "isStar": false,
+    "alias": "pika",
+    "desc": "基于 Go 的实时探针监控系统，支持性能监控、服务监控与安全审计。"
+  },
+  {
+    "id": "sub2api",
+    "name": "Sub2API",
+    "category": "custom",
+    "isStar": false,
+    "alias": "sub2api",
+    "desc": "AI API 网关平台 - 订阅配额分发管理（Claude/Gemini/OpenAI/Grok 等）"
+  },
+  {
+    "id": "workbuddy2api",
+    "name": "WorkBuddy2API + Manager",
+    "category": "custom",
+    "isStar": false,
+    "alias": "workbuddy2api",
+    "desc": "第三方 CodeBuddy 账号池 API 网关与管理面板（仅本机监听）"
+  },
+  {
+    "id": "wxchat",
+    "name": "WxChat",
+    "category": "custom",
+    "isStar": false,
+    "alias": "wxchat",
+    "desc": "MoviePilot微信转发代理Docker"
+  },
+  {
+    "id": "zeroclaw",
+    "name": "ZeroClaw",
+    "category": "custom",
+    "isStar": false,
+    "alias": "zeroclaw",
+    "desc": "快速、小型且完全自主的 AI 助手基础设施，可在低成本硬件上部署，并支持可替换组件。"
   }
 ];

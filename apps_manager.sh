@@ -26,6 +26,7 @@ CATEGORY_LIST=(
   "storage:E:🗄️  私有网盘与数据存储:14"
   "media:F:🎬 影音媒体与离线下载:14"
   "office:G:📝 协作办公与实用工具:32"
+  "custom:H:📦 第三方与社区扩展应用:0"
 )
 
 # 展开状态记录字符串 (空格分隔的已展开分类ID，初始为空代表全折叠)
@@ -48,7 +49,7 @@ toggle_cat_expanded() {
 }
 
 expand_all_cats() {
-    EXPANDED_CATEGORIES="github ops ai network storage media office"
+    EXPANDED_CATEGORIES="github ops ai network storage media office custom"
 }
 
 collapse_all_cats() {
@@ -304,51 +305,56 @@ render_accordion_apps_menu() {
                 echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${gl_bai}$cname ${gl_hui}[$ccount 款]${gl_bai}"
                 echo -e "${gl_hui}  ┌───────────────────────────────────────────────────────────────────${gl_bai}"
 
-                # 展开内置分类：输出专属代号 [A1]、[A2]... 并附带原应用编号
-                local item_idx=1
-                for entry in "${BUILTIN_APPS[@]}"; do
-                    local aid="" aname="" acat="" astar="" aalias="" adesc=""
-                    IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
+                # 展开内置分类 (A~G)：输出专属代号 [A1]、[B1]... 并附带原应用编号
+                if [ "$cid" != "custom" ]; then
+                    local item_idx=1
+                    for entry in "${BUILTIN_APPS[@]}"; do
+                        local aid="" aname="" acat="" astar="" aalias="" adesc=""
+                        IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
 
-                    if [ "$acat" = "$cid" ]; then
-                        local is_inst=0
-                        if [ -n "$app_installed" ] && [[ " $app_installed " == *" $aid "* ]]; then
-                            is_inst=1
+                        if [ "$acat" = "$cid" ]; then
+                            local is_inst=0
+                            if [ -n "$app_installed" ] && [[ " $app_installed " == *" $aid "* ]]; then
+                                is_inst=1
+                            fi
+
+                            local star_badge=""
+                            [ -n "$astar" ] && star_badge="${gl_huang}★${gl_bai}"
+
+                            local tag="${ckey}${item_idx}"
+                            local num_prefix=""
+                            num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$tag")
+                            local status_badge=""
+                            if [ "$is_inst" -eq 1 ]; then
+                                status_badge="${gl_lv}[已安装]${gl_bai}"
+                            fi
+
+                            local orig_id_str
+                            orig_id_str=$(printf "${gl_hui}#%-3s${gl_bai}" "$aid")
+
+                            printf "%b%-30s %b %b %b\n" "$num_prefix" "$aname$star_badge" "$orig_id_str" "$status_badge" "${gl_hui}$adesc${gl_bai}"
+                            item_idx=$((item_idx + 1))
                         fi
-
-                        local star_badge=""
-                        [ -n "$astar" ] && star_badge="${gl_huang}★${gl_bai}"
-
-                        local tag="${ckey}${item_idx}"
-                        local num_prefix=""
-                        num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$tag")
-                        local status_badge=""
-                        if [ "$is_inst" -eq 1 ]; then
-                            status_badge="${gl_lv}[已安装]${gl_bai}"
-                        fi
-
-                        local orig_id_str
-                        orig_id_str=$(printf "${gl_hui}#%-3s${gl_bai}" "$aid")
-
-                        printf "%b%-30s %b %b %b\n" "$num_prefix" "$aname$star_badge" "$orig_id_str" "$status_badge" "${gl_hui}$adesc${gl_bai}"
-                        item_idx=$((item_idx + 1))
-                    fi
-                done
-
-                # 若展开 office 分类且有自定义应用，自动在末尾追加展示 [G*] 自定义软件
-                if [ "$cid" = "office" ] && [ "${#CUSTOM_APPS[@]}" -gt 0 ]; then
-                    local custom_idx=$((item_idx))
-                    for entry in "${CUSTOM_APPS[@]}"; do
-                        local aid="" aname="" acat="" astar="" aalias="" adesc="" aconf=""
-                        IFS='|' read -r aid aname acat astar aalias adesc aconf <<< "$entry"
-                        local g_tag="G${custom_idx}"
-                        local num_prefix=""
-                        num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$g_tag")
-                        local orig_id_str
-                        orig_id_str=$(printf "${gl_lv}#%-3s${gl_bai}" "DIY")
-                        printf "%b%-30s %b %b\n" "$num_prefix" "$aname" "$orig_id_str" "${gl_hui}$adesc${gl_bai}"
-                        custom_idx=$((custom_idx + 1))
                     done
+                else
+                    # 展开 [H] 独立的第三方与扩展应用列表
+                    if [ "${#CUSTOM_APPS[@]}" -gt 0 ]; then
+                        local custom_idx=1
+                        for entry in "${CUSTOM_APPS[@]}"; do
+                            local aid="" aname="" acat="" astar="" aalias="" adesc="" aconf=""
+                            IFS='|' read -r aid aname acat astar aalias adesc aconf <<< "$entry"
+                            local h_tag="H${custom_idx}"
+                            local num_prefix=""
+                            num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$h_tag")
+                            local orig_id_str
+                            orig_id_str=$(printf "${gl_lv}#%-3s${gl_bai}" "DIY")
+                            printf "%b%-30s %b %b\n" "$num_prefix" "$aname" "$orig_id_str" "${gl_hui}$adesc${gl_bai}"
+                            custom_idx=$((custom_idx + 1))
+                        done
+                    else
+                        echo -e "${gl_hui}  │ 暂无本地第三方应用配置 (扫描目录: ~/apps/*.conf)${gl_bai}"
+                        echo -e "${gl_hui}  │ 输入 [${gl_huang}+${gl_hui}] 即可呼出一键添加第三方应用向导${gl_bai}"
+                    fi
                 fi
 
                 echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
@@ -359,10 +365,10 @@ render_accordion_apps_menu() {
         done
 
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_bai}分类控制: [${gl_huang}A~G${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
+        echo -e "${gl_bai}分类控制: [${gl_huang}A~H${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
         echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}11${gl_bai}] 经典平铺  [${gl_huang}BAK${gl_bai}] 备份  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
         echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
-        echo -e "${gl_huang}提示: 输入 A~G 查看分类；输入专属代号(如 A1, B1, G1)或原编号(如 1, 57)直接安装！${gl_bai}"
+        echo -e "${gl_huang}提示: 输入 A~H 查看分类；输入专属代号(如 A1, B1, H1)或原编号(如 1, 57)直接安装！${gl_bai}"
 
         read -e -p "请输入你的选择: " user_input
         [ -z "$user_input" ] && continue
@@ -372,8 +378,8 @@ render_accordion_apps_menu() {
         local lower_input
         lower_input=$(echo "$user_input" | tr '[:upper:]' '[:lower:]')
 
-        # 1. 匹配分类专属代号 (A1~A*, B1~B*, ..., G1~G*，兼顾 J1 自定义兼容)
-        if [[ "$upper_input" =~ ^([A-G]|J)([0-9]+)$ ]]; then
+        # 1. 匹配分类专属代号 (A1~A*, B1~B*, ..., H1~H*，兼顾历史 J1 自定义兼容)
+        if [[ "$upper_input" =~ ^([A-H]|J)([0-9]+)$ ]]; then
             local cat_key="${BASH_REMATCH[1]}"
             local item_num="${BASH_REMATCH[2]}"
             local item_idx=$((item_num - 1))
@@ -402,8 +408,8 @@ render_accordion_apps_menu() {
                         continue
                         ;;
                 esac
-            elif [ "$cat_key" = "J" ]; then
-                # 兼容历史 J1~J* 自定义快捷代号
+            elif [ "$cat_key" = "H" ] || [ "$cat_key" = "J" ]; then
+                # 独立 H1~H* 第三方与社区扩展应用（兼容历史 J1~J*）
                 if [ "$item_idx" -ge 0 ] && [ "$item_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
                     local t_entry="${CUSTOM_APPS[$item_idx]}"
                     local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
@@ -412,7 +418,7 @@ render_accordion_apps_menu() {
                     SELECTED_CUSTOM_CONF="$t_conf"
                     return 0
                 else
-                    echo -e "${gl_hong}错误: 自定义应用编号 J${item_num} 无效 (当前可用范围: J1 ~ J${#CUSTOM_APPS[@]})${gl_bai}"
+                    echo -e "${gl_hong}错误: 第三方应用编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${#CUSTOM_APPS[@]})${gl_bai}"
                     sleep 1.5
                     continue
                 fi
@@ -434,28 +440,11 @@ render_accordion_apps_menu() {
                     fi
                 done
 
-                # 若是 G 类且超出预置应用范围，继续在自定义应用中匹配 (G33, G34 等)
-                if [ -z "$matched_aid" ] && [ "$cat_key" = "G" ]; then
-                    local custom_offset=$((item_num - cur_idx - 1))
-                    if [ "$custom_offset" -ge 0 ] && [ "$custom_offset" -lt "${#CUSTOM_APPS[@]}" ]; then
-                        local t_entry="${CUSTOM_APPS[$custom_offset]}"
-                        local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
-                        IFS='|' read -r t_aid t_aname t_acat t_astar t_alias t_adesc t_conf <<< "$t_entry"
-                        SELECTED_APP_ACTION="$t_alias"
-                        SELECTED_CUSTOM_CONF="$t_conf"
-                        return 0
-                    fi
-                fi
-
                 if [ -n "$matched_aid" ]; then
                     SELECTED_APP_ACTION="$matched_aid"
                     return 0
                 else
-                    local max_range="$cur_idx"
-                    if [ "$cat_key" = "G" ]; then
-                        max_range=$((cur_idx + ${#CUSTOM_APPS[@]}))
-                    fi
-                    echo -e "${gl_hong}错误: 分类 [${cat_key}] 编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${max_range})${gl_bai}"
+                    echo -e "${gl_hong}错误: 分类 [${cat_key}] 编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${cur_idx})${gl_bai}"
                     sleep 1.5
                     continue
                 fi
@@ -468,7 +457,7 @@ render_accordion_apps_menu() {
             return 0
         fi
 
-        # 3. 匹配单字母分类快捷键 (A~G / a~g) 展开/折叠分类
+        # 3. 匹配单字母分类快捷键 (A~H / a~h) 展开/折叠分类
         local matched_cid
         matched_cid=$(get_cid_by_key "$upper_input")
         if [ -n "$matched_cid" ]; then
@@ -476,12 +465,12 @@ render_accordion_apps_menu() {
             continue
         fi
 
-        # 4. 匹配分类英文全称直接展开 (如 github, ops, ai, network, storage, media, office 等)
+        # 4. 匹配分类英文全称直接展开 (如 github, ops, ai, network, storage, media, office, custom 等)
         case "$lower_input" in
             github|ops|ai|network|storage|media|office|custom|panel|monitor|tools|social)
                 local mapped_cat="$lower_input"
                 [ "$mapped_cat" = "panel" ] || [ "$mapped_cat" = "monitor" ] && mapped_cat="ops"
-                [ "$mapped_cat" = "tools" ] || [ "$mapped_cat" = "social" ] || [ "$mapped_cat" = "custom" ] && mapped_cat="office"
+                [ "$mapped_cat" = "tools" ] || [ "$mapped_cat" = "social" ] && mapped_cat="office"
                 toggle_cat_expanded "$mapped_cat"
                 continue
                 ;;

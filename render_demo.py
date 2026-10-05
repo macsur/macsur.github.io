@@ -142,23 +142,24 @@ for frame_idx in range(TOTAL_FRAMES):
 
         y = 86
         if local_f >= 6:
-            draw.text((24, y), "  [INFO] 正在呼出现代化应用生态大厅 (7 个应用分类 · 128+ 应用)...", fill=TEXT_CYAN, font=font_zh)
-            draw.text((24, y + 28), "  ================ 🚀 精选开源服务 7 核心分类矩阵 ================", fill=TEXT_YELLOW, font=font_zh_bold)
-            draw.text((24, y + 56), "  [A] 🌟 [Github乐园] 热门开源TOP10 (A1~A10 / DeepSeek / AI Agent)", fill=TEXT_GREEN, font=font_zh)
-            draw.text((24, y + 84), "  [B] 🖥️  服务器运维与探针监控   (29款 / 宝塔面板, 哪吒探针, 1Panel)", fill=TEXT_WHITE, font=font_zh)
-            draw.text((24, y + 112), "  [C] 🤖 人工智能与前沿大模型   (14款 / Ollama, Dify, FastGPT, Open-WebUI)", fill=TEXT_WHITE, font=font_zh)
-            draw.text((24, y + 140), "  [D] 🌐 网络代理与穿透组网     (15款 / FRP, 1Panel-WAF, Tailscale)", fill=TEXT_WHITE, font=font_zh)
-            draw.text((24, y + 168), "  [E] 🗄️  私有网盘与数据存储     (14款 / AList, Nextcloud, Cloudreve)", fill=TEXT_WHITE, font=font_zh)
-            draw.text((24, y + 196), "  [F] 🎬 影音媒体与离线下载     (14款 / Emby, Jellyfin, qBittorrent)", fill=TEXT_WHITE, font=font_zh)
-            draw.text((24, y + 224), "  [G] 📝 协作办公与实用工具     (32款 / N8N, Vaultwarden, Halo, Memos)", fill=TEXT_WHITE, font=font_zh)
-            draw.text((24, y + 254), "  ================================================================", fill=BORDER_COLOR, font=font_mono_regular)
-            draw.text((24, y + 284), "  ⚡ 快捷操作：输入分类代号展开 [A-G]，或输入序号 (如 57) 直达安装", fill=TEXT_CYAN, font=font_zh)
+            draw.text((24, y), "  [INFO] 正在呼出现代化应用生态大厅 (8 个应用分类 · 160+ 应用)...", fill=TEXT_CYAN, font=font_zh)
+            draw.text((24, y + 26), "  ================ 🚀 精选开源服务 8 核心分类矩阵 ================", fill=TEXT_YELLOW, font=font_zh_bold)
+            draw.text((24, y + 52), "  [A] 🌟 [Github乐园] 热门开源TOP10 (A1~A10 / DeepSeek / AI Agent)", fill=TEXT_GREEN, font=font_zh)
+            draw.text((24, y + 78), "  [B] 🖥️  服务器运维与探针监控   (29款 / 宝塔面板, 哪吒探针, 1Panel)", fill=TEXT_WHITE, font=font_zh)
+            draw.text((24, y + 104), "  [C] 🤖 人工智能与前沿大模型   (14款 / Ollama, Dify, FastGPT, Open-WebUI)", fill=TEXT_WHITE, font=font_zh)
+            draw.text((24, y + 130), "  [D] 🌐 网络代理与穿透组网     (15款 / FRP, 1Panel-WAF, Tailscale)", fill=TEXT_WHITE, font=font_zh)
+            draw.text((24, y + 156), "  [E] 🗄️  私有网盘与数据存储     (14款 / AList, Nextcloud, Cloudreve)", fill=TEXT_WHITE, font=font_zh)
+            draw.text((24, y + 182), "  [F] 🎬 影音媒体与离线下载     (14款 / Emby, Jellyfin, qBittorrent)", fill=TEXT_WHITE, font=font_zh)
+            draw.text((24, y + 208), "  [G] 📝 协作办公与实用工具     (32款 / N8N, Vaultwarden, Halo, Memos)", fill=TEXT_WHITE, font=font_zh)
+            draw.text((24, y + 234), "  [H] 📦 第三方与社区扩展应用   (41+款 / KPanel, CLIProxyAPI, CoPaw, Grok)", fill=TEXT_YELLOW, font=font_zh)
+            draw.text((24, y + 262), "  ================================================================", fill=BORDER_COLOR, font=font_mono_regular)
+            draw.text((24, y + 288), "  ⚡ 快捷操作：输入分类代号展开 [A-H]，或输入序号 (如 57) 直达安装", fill=TEXT_CYAN, font=font_zh)
 
             if local_f >= 25:
-                draw.text((24, y + 314), "  选择 > ", fill=TEXT_YELLOW, font=font_zh_bold)
-                draw.text((80, y + 314), "A", fill=TEXT_WHITE, font=font_mono_bold)
+                draw.text((24, y + 316), "  选择 > ", fill=TEXT_YELLOW, font=font_zh_bold)
+                draw.text((80, y + 316), "H", fill=TEXT_WHITE, font=font_mono_bold)
                 if cursor_visible:
-                    draw.rectangle([98, y + 315, 108, y + 333], fill=TEXT_WHITE)
+                    draw.rectangle([98, y + 317, 108, y + 335], fill=TEXT_WHITE)
 
     frame_path = os.path.join(OUTPUT_DIR, f"frame_{frame_idx:04d}.png")
     img.save(frame_path)

@@ -700,7 +700,7 @@ export default function Home() {
                 </video>
               </div>
               <div className="mt-2.5 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span>三幕演示：curl 安装 → 输入 k → k app 直达 7 分类</span>
+                <span>三幕演示：curl 安装 → 输入 k → k app 直达 8 分类</span>
                 <span className="font-mono text-cyan-400">11.4s 循环</span>
               </div>
             </div>
@@ -881,7 +881,7 @@ export default function Home() {
                       {isMasterMarketOpen ? '⚡ QUANTUM CORE ONLINE' : 'App Marketplace 4.0'}
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">
-                      7 个应用分类 · 128+ 应用
+                      8 个应用分类 · 160+ 应用
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
                       一键快速部署
@@ -921,7 +921,7 @@ export default function Home() {
               </div>
             </div>
 
-          {/* 当且仅当点击展开后，才展示内部所有搜索栏与7个应用分类列表 */}
+          {/* 当且仅当点击展开后，才展示内部所有搜索栏与8个应用分类列表 */}
           {isMasterMarketOpen && (
             <div className="p-6 sm:p-8 pt-2 border-t border-slate-800/80 bg-slate-950/40 animate-fadeIn">
               {/* 搜索与快捷控制栏 */}
