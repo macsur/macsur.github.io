@@ -566,7 +566,7 @@ export default function Home() {
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <span>🌟 VIP ⭐⭐⭐⭐⭐ | 分类版</span>
+                  <span>🌟分类链</span>
                 </button>
                 <button
                   onClick={() => setInstallSource('official')}
@@ -576,7 +576,7 @@ export default function Home() {
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  官方海外短链
+                  官方链
                 </button>
                 <button
                   onClick={() => setInstallSource('mirror')}
@@ -586,7 +586,7 @@ export default function Home() {
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  GitHub 镜像
+                  GitHub链
                 </button>
               </div>
             </div>
