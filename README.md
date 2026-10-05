@@ -15,7 +15,7 @@
   涵盖 128+ 精选容器化应用、手风琴智能折叠分类市场、GitHub Trending 当日热榜自动汉化同步、BBRv3 极限网络加速与纯净系统自愈部署。
 </p>
 
-[🌐 访问官方主站](https://x.zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 11-分类折叠市场](#-11-应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
+[🌐 访问官方主站](https://x.zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 7-分类折叠市场](#-7-应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
 
 ---
 
@@ -45,30 +45,26 @@ bash <(curl -sL https://x.zttz.eu.org/x.sh)
 
 ---
 
-### 2. 🗂️ 11+. 应用市场 · 手风琴智能分类折叠
+### 2. 🗂️ 7+. 应用市场 · 手风琴智能分类折叠
 - **分类折叠，告别滚屏**：彻底终结原版 118+ 应用平铺滚屏的繁琐体验，引入全新手风琴折叠交互；
 - **独占展开机制**：展开新分类时自动智能折叠上一个分类，保持终端始终清爽极简；
-- **A ~ K 专属字母代号**：为各大分类应用赋予专属排序编号（如 `A1` 宝塔、`B1` DeepSeek、`K1` 今日榜首），支持按键直选安装；
-- **双向无缝兼容**：既支持输入 `A1`、`B3`、`K1`，也支持原版数字编号（如 `1`、`57`），二者同时生效，自由取舍；
-- **精准闭环退出**：进入任意应用安装向导退出后，**100% 精准回到当前 11+ 分类折叠菜单**，绝不跳转打乱浏览节奏。
+- **A ~ G 专属字母代号**：为各大分类应用赋予专属排序编号（如 `A1` DeepSeek、`B1` 宝塔、`G1` OnlyOffice），支持按键直选安装；
+- **双向无缝兼容**：既支持输入 `A1`、`B3`、`G1`，也支持原版数字编号（如 `1`、`57`），二者同时生效，自由取舍；
+- **精准闭环退出**：进入任意应用安装向导退出后，**100% 精准回到当前 7+ 分类折叠菜单**，绝不跳转打乱浏览节奏。
 
 ---
 
-### 3. 🖥️ 11 大核心分类矩阵与 128+ 精选开源服务
+### 3. 🖥️ 7 大核心分类矩阵与 128+ 精选开源服务
 
 | 分类键 | 分类名称与核心定位 | 收录数量 | 代表性开源应用举例 |
 | :---: | :--- | :---: | :--- |
-| **[A]** | **🖥️ 服务器运维与面板** | 11 款 | 宝塔面板、aaPanel 国际版、1Panel 新一代面板、AMH、PVE、JumpServer 等 |
-| **[B]** | **🤖 人工智能与大模型** | 14 款 | DeepSeek-V3/R1、Ollama、OpenWebUI、Dify、RAGFlow、Hermes 等 |
-| **[C]** | **📊 探针监控与运维告警** | 11 款 | 哪吒探针、Uptime Kuma、Prometheus+Grafana、Speedtest、网站补货监控等 |
-| **[D]** | **🗄️ 私有网盘与文件存储** | 14 款 | Cloudreve、Nextcloud、PhotoPrism、SFTPGo、简单图床、Pingvin 等 |
-| **[E]** | **🌐 网络代理与穿透组网** | 15 款 | NginxProxyManager、雷池 WAF、FRP (服务端/客户端)、ddns-go、99CDN 等 |
-| **[F]** | **🎬 影音媒体与下载娱乐** | 14 款 | qBittorrent 离线下载、Emby 影音中心、Navidrome 音乐库、yt-dlp 等 |
-| **[G]** | **📝 协作办公与知识库** | 13 款 | OnlyOffice 在线协作、Memos 网页备忘录、Stirling-PDF、Draw.io 绘图等 |
-| **[H]** | **💬 即时通讯与社交媒体** | 7 款 | RocketChat 团队通讯、Poste.io 邮件服务、Sun-Panel 导航、极简朋友圈等 |
-| **[I]** | **🛠️ 远程工具与实用套件** | 19 款 | RustDesk 自建中继、Ubuntu 远程桌面、Bitwarden 密码库、IT-Tools 工具箱等 |
-| **[J]** | **📦 自定义与第三方应用** | 动态扩展 | 支持读取本地 `~/apps/*.conf`，自动按 `J1`、`J2`... 编号并极速安装 |
-| **[K]** | **🌟 [Github乐园] 热门开源TOP10** | 10 款 | 紧随全球开源趋势，今日星标增长最猛的 TOP 10 顶流神作 |
+| **[A]** | **🌟 [Github乐园] 热门开源TOP10** | 10 款 | 紧随全球开源趋势，今日星标增长最猛的 TOP 10 顶流神作 (DeepSeek, Ollama, OpenWebUI 等) |
+| **[B]** | **🖥️ 服务器运维与探针监控** | 29 款 | 宝塔面板、aaPanel 国际版、1Panel、哪吒探针、Uptime Kuma、Prometheus、RustDesk中继、WebSSH 等 |
+| **[C]** | **🤖 人工智能与前沿大模型** | 14 款 | DeepSeek-V3/R1、Ollama、OpenWebUI、Dify 知识库、RAGFlow、AstrBot、NewAPI 等 |
+| **[D]** | **🌐 网络代理与穿透组网** | 15 款 | NginxProxyManager、雷池 WAF、FRP (服务端/客户端)、WireGuard、ddns-go、Lucky、99CDN 等 |
+| **[E]** | **🗄️ 私有网盘与数据存储** | 14 款 | Cloudreve、Nextcloud、PhotoPrism、SFTPGo、简单图床、Syncthing 同步、ZFile 等 |
+| **[F]** | **🎬 影音媒体与离线下载** | 14 款 | qBittorrent 离线下载、Emby 影音中心、Jellyfin、Navidrome 音乐库、yt-dlp、SyncTV 等 |
+| **[G]** | **📝 协作办公与实用工具** | 32+ 款 | OnlyOffice、思源笔记、VScode网页版、Poste邮件、RocketChat、Bitwarden密码库、It-Tools、自定义扩展等 |
 
 ---
 
