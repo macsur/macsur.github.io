@@ -24,6 +24,8 @@ import {
   Flame,
   GitFork,
   TrendingUp,
+  Clock,
+  Play,
   X
 } from 'lucide-react';
 import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
@@ -58,6 +60,24 @@ export default function Home() {
       setTheme(saved);
       document.documentElement.classList.toggle('light', saved === 'light');
     }
+  }, []);
+
+  // 换算北京时间展示友好更新标签（如 "今日 03:00 已更新"）
+  const updateBadgeText = useMemo(() => {
+    if (!LAST_UPDATED_AT) return '今日已更新';
+    const match = LAST_UPDATED_AT.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+    if (!match) return '今日已更新';
+    const [, year, month, day, hour, minute] = match;
+    const now = new Date();
+    const utcNow = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const bjNow = new Date(utcNow + (8 * 3600000));
+    const bjYear = bjNow.getFullYear();
+    const bjMonth = String(bjNow.getMonth() + 1).padStart(2, '0');
+    const bjDay = String(bjNow.getDate()).padStart(2, '0');
+    if (parseInt(year, 10) === bjYear && month === bjMonth && day === bjDay) {
+      return `今日 ${hour}:${minute} 已更新`;
+    }
+    return `${month}-${day} ${hour}:${minute} 已更新`;
   }, []);
 
   // 切换白天/黑夜模式函数
@@ -473,10 +493,12 @@ export default function Home() {
 
             <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
-              <a href="#daily-recommend" className="text-blue-400 hover:text-blue-300 transition-colors flex items-center space-x-1 font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                <span>今日推荐</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-mono border border-blue-500/30">TOP3</span>
+              <a href="#daily-recommend" className="text-blue-400 hover:text-blue-300 transition-colors flex items-center space-x-1.5 font-semibold">
+                <Clock className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                <span>今日更新</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-mono border border-emerald-500/30">
+                  {updateBadgeText}
+                </span>
               </a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (128+)</a>
               <a href="#features" className="text-slate-300 hover:text-cyan-400 transition-colors">核心特性</a>
@@ -511,27 +533,26 @@ export default function Home() {
 
         {/* Hero 区域 */}
         <section id="install" className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
-          {/* Google AI 极简科技流体胶囊徽章 */}
+          {/* 首屏定位胶囊 */}
           <div className="inline-flex items-center google-pill mb-8 select-none">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse mr-2.5 shadow-sm shadow-blue-500/50" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
             <span className="text-xs text-slate-300 font-medium tracking-wide flex items-center">
-              <span className="text-blue-400 font-semibold">Google Developer Style</span>
+              <span className="text-cyan-400 font-semibold">Linux 极客应用大厅</span>
               <span className="mx-2 text-slate-600">/</span>
-              <span className="text-slate-300">自动化智能自愈</span>
+              <span className="text-slate-300">纯净命令行底座</span>
               <span className="mx-2 text-slate-600">/</span>
-              <span className="text-emerald-400 font-mono">128+ 应用矩阵</span>
+              <span className="text-emerald-400 font-mono">128+ 开源精选</span>
             </span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6">
-            一键融入Linux生态
-            <span className="block mt-3 text-gradient-gemini font-extrabold tracking-tight">
-              现代化服务器运维与开源应用
+            <span className="block text-gradient-gemini font-extrabold tracking-tight">
+              一条 curl，整个开源世界随叫随到
             </span>
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
-            专为开发者与极客打造的下一代现代化命令行底座。从网络内核深度调优、自动化备份恢复，到一键部署生产级自托管面板与 AI 大模型智能体集群，体验前所未有的纯净与高效。
+            专为开发者与极客打造的现代化命令行底座，体验前所未有的纯净与高效。
           </p>
 
           {/* 终端模拟一键安装框 */}
@@ -544,7 +565,7 @@ export default function Home() {
                 <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
                 <span className="text-xs text-slate-400 font-mono ml-2">bash ~ terminal</span>
               </div>
-              
+
               {/* 节点切换 */}
               <div className="flex items-center space-x-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-800 text-xs">
                 <button
@@ -560,8 +581,8 @@ export default function Home() {
                 <button
                   onClick={() => setInstallSource('official')}
                   className={`px-2.5 py-1 rounded-md transition-all font-medium ${
-                    installSource === 'official' 
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                    installSource === 'official'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -570,8 +591,8 @@ export default function Home() {
                 <button
                   onClick={() => setInstallSource('mirror')}
                   className={`px-2.5 py-1 rounded-md transition-all font-medium ${
-                    installSource === 'mirror' 
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' 
+                    installSource === 'mirror'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -613,49 +634,9 @@ export default function Home() {
               <span className="font-mono text-slate-500">100% Free & Open Source</span>
             </div>
           </div>
-
-          {/* 经典 Neo 风格情怀理念标语 */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 mt-6 text-xs text-slate-400">
-            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-indigo-500/40 transition-colors">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-              <span>稳定优先</span>
-            </span>
-            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-emerald-500/40 transition-colors">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>智能自愈</span>
-            </span>
-            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-cyan-500/40 transition-colors">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span>极客可观测</span>
-            </span>
-            <span className="px-3.5 py-1 rounded-full bg-slate-900/60 border border-slate-800/80 backdrop-blur-md flex items-center space-x-1.5 shadow-sm hover:border-amber-500/40 transition-colors">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              <span>GitHub 顶流热榜联动</span>
-            </span>
-          </div>
-
-          {/* 核心指标统计 */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 max-w-4xl mx-auto">
-            <div className="google-card p-5 border border-white/[0.08] text-center group">
-              <div className="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono group-hover:scale-105 transition-transform code-glow">128+</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">精选现代化应用</div>
-            </div>
-            <div className="google-card p-5 border border-white/[0.08] text-center group">
-              <div className="text-2xl sm:text-3xl font-extrabold text-indigo-400 font-mono group-hover:scale-105 transition-transform">11 大</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">应用分类矩阵 (含Github乐园)</div>
-            </div>
-            <div className="google-card p-5 border border-white/[0.08] text-center group">
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono group-hover:scale-105 transition-transform">100%</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">开源完全免费</div>
-            </div>
-            <div className="google-card p-5 border border-white/[0.08] text-center group">
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono group-hover:scale-105 transition-transform">零依赖</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">智能自愈多端适配</div>
-            </div>
-          </div>
       </section>
 
-      {/* 快捷命令直达字典 */}
+      {/* 快捷命令直达字典与终端演示动画 */}
       <section id="commands" className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -667,24 +648,63 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {quickCommands.map((item, idx) => (
-            <div 
-              key={idx}
-              onClick={() => handleCopy(item.cmd)}
-              className="google-card p-4 border border-white/[0.08] cursor-pointer group relative"
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="font-mono text-sm font-semibold text-cyan-400 group-hover:text-cyan-300">
-                  {item.cmd}
-                </span>
-                <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-700 rounded text-slate-300">
-                  {copiedText === item.cmd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* 左侧：8 个常用快捷指令卡片 */}
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {quickCommands.map((item, idx) => (
+              <div
+                key={idx}
+                onClick={() => handleCopy(item.cmd)}
+                className="google-card p-4 border border-white/[0.08] cursor-pointer group relative"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-mono text-sm font-semibold text-cyan-400 group-hover:text-cyan-300">
+                    {item.cmd}
+                  </span>
+                  <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-700 rounded text-slate-300">
+                    {copiedText === item.cmd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+                <p className={`text-xs leading-relaxed transition-colors ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{item.desc}</p>
               </div>
-              <p className={`text-xs leading-relaxed transition-colors ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{item.desc}</p>
+            ))}
+          </div>
+
+          {/* 右侧：终端演示动画 (hero-terminal-demo.mp4 自动播放 + gif 降级) */}
+          <div className="lg:col-span-5">
+            <div className="google-card p-3 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden group">
+              <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+                  <span className="text-[11px] text-slate-400 font-mono ml-1.5">terminal · demo</span>
+                </div>
+                <div className="flex items-center space-x-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
+                  <Play className="w-2.5 h-2.5 fill-emerald-400" />
+                  <span>实时演示</span>
+                </div>
+              </div>
+              <div className="relative rounded-lg overflow-hidden bg-[#0d1017] border border-slate-800/80 aspect-[960/560]">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                  poster="/hero-terminal-demo.gif"
+                >
+                  <source src="/hero-terminal-demo.mp4" type="video/mp4" />
+                  {/* 降级备用图片 */}
+                  <img src="/hero-terminal-demo.gif" alt="终端演示动画" className="w-full h-full object-cover" />
+                </video>
+              </div>
+              <div className="mt-2.5 px-2 flex items-center justify-between text-[11px] text-slate-400">
+                <span>三幕演示：curl 安装 → 输入 k → k app 直达 7 分类</span>
+                <span className="font-mono text-cyan-400">11.4s 循环</span>
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
@@ -861,7 +881,7 @@ export default function Home() {
                       {isMasterMarketOpen ? '⚡ QUANTUM CORE ONLINE' : 'App Marketplace 4.0'}
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">
-                      11 大分类 · 128+ 应用
+                      7 个应用分类 · 128+ 应用
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
                       一键快速部署
@@ -901,7 +921,7 @@ export default function Home() {
               </div>
             </div>
 
-          {/* 当且仅当点击展开后，才展示内部所有搜索栏与11大分类列表 */}
+          {/* 当且仅当点击展开后，才展示内部所有搜索栏与7个应用分类列表 */}
           {isMasterMarketOpen && (
             <div className="p-6 sm:p-8 pt-2 border-t border-slate-800/80 bg-slate-950/40 animate-fadeIn">
               {/* 搜索与快捷控制栏 */}
@@ -1076,7 +1096,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 六大核心能力特性矩阵 */}
+      {/* 核心能力特性矩阵 */}
       <section id="features" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
