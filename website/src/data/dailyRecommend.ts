@@ -18,33 +18,33 @@ export const DAILY_RECOMMEND_GENERATED_AT = "2026-10-05";
 
 export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   {
-    "id": 206,
-    "cmd": "k app 206",
-    "badge": "自建中继神器",
-    "name": "RustDesk 开源全平台远程桌面中继",
+    "id": 3,
+    "cmd": "k app 3",
+    "badge": "现代化运维首选",
+    "name": "1Panel 新一代现代化 Linux 运维面板",
     "category": "🖥️ 服务器运维与探针监控",
-    "stars": "76k+",
-    "highlight": "端到端高强度加密的完全自主可控远程桌面。支持自建中继服务器与信令网关，无视第三方商业软件限速与隐私风险，流畅低延迟操控云端主机。",
-    "reason": "原生 Rust 编写，内存极小，高并发性能极其强悍，是个人与企业团队必备的远程运维底座。"
+    "stars": "26k+",
+    "highlight": "开源、轻量且深度拥抱 Docker 容器化理念的现代化运维神器。界面遵循极简几何美学，内置精选应用市场、自动化证书签发、容器生命周期监控与一键容灾备份。",
+    "reason": "彻底摆脱传统面板对系统环境的高侵入性污染，所有服务均在独立沙箱中优雅运行，安全稳定。"
   },
   {
-    "id": 205,
-    "cmd": "k app 205",
-    "badge": "极客必备探针",
-    "name": "Uptime Kuma 高颜值全功能服务监控",
+    "id": 204,
+    "cmd": "k app 204",
+    "badge": "极简 PaaS 云底座",
+    "name": "Dokploy 轻量开源自托管 PaaS 平台",
     "category": "🖥️ 服务器运维与探针监控",
-    "stars": "62k+",
-    "highlight": "自托管监控界的颜值天花板。支持 HTTP(s)、TCP、Ping、DNS、Docker 容器与证书到期监控，内置 90+ 渠道全能实时告警与公开状态页一键生成。",
-    "reason": "资源占用极其克制，0 门槛开箱即用，是管理多台服务器与网站集群健康状态的终极守护者。"
+    "stars": "14k+",
+    "highlight": "被誉为开源自建版 Heroku / Vercel。直接连接 GitHub 仓库自动 CI/CD 构建，原生支持数据库集群、自动 SSL 与 Docker Compose 编排发布。",
+    "reason": "让个人开发者拥有一整套属于自己的微型云服务商体验，告别昂贵的第三方托管费用。"
   },
   {
-    "id": 202,
-    "cmd": "k app 202",
-    "badge": "极速大模型引擎",
-    "name": "Ollama 极简轻量化本地大模型框架",
+    "id": 203,
+    "cmd": "k app 203",
+    "badge": "私有 AI 门户",
+    "name": "Open WebUI 全能私有化 AI 交互平台",
     "category": "🤖 人工智能与前沿大模型",
-    "stars": "115k+",
-    "highlight": "让大模型如同普通命令行工具一样易用。一行指令完成大模型拉取、量化、运行与显存管理，完美支撑各类下游 AI 应用与开发环境。",
-    "reason": "跨平台生态适配最成熟的开源运行时，与各类客户端无缝联动，开箱即用体验堪称行业标杆。"
+    "stars": "58k+",
+    "highlight": "对标顶级商业产品的自托管 AI 工作台。完美兼容 Ollama 与各类 OpenAI 格式接口，原生集成 RAG 知识库检索增强、语音输入输出与多用户权限管理。",
+    "reason": "交互体验丝滑细腻，能够将孤立的模型权重秒变人人可用的团队 AI 生产力资产。"
   }
 ];

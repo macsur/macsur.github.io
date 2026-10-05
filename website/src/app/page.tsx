@@ -741,7 +741,7 @@ export default function Home() {
             {recommendedApps.map((app, idx) => (
               <div
                 key={idx}
-                className="google-card p-6 border border-white/[0.08] hover:border-blue-500/40 hover:bg-[#121624]/90 transition-all duration-300 flex flex-col justify-between group shadow-lg"
+                className="google-card p-6 border border-white/[0.08] hover:border-blue-500/40 transition-all duration-300 flex flex-col justify-between group shadow-lg"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -1333,9 +1333,9 @@ export default function Home() {
                       "bg-slate-800 text-slate-300 font-bold border border-slate-700";
 
                     return (
-                      <div 
+                      <div
                         key={item.rank}
-                        className="google-card p-6 border border-white/[0.08] hover:border-amber-400/30 hover:bg-[#121624]/90 transition-all duration-300 flex flex-col justify-between group shadow-lg"
+                        className="google-card p-6 border border-white/[0.08] hover:border-amber-400/30 transition-all duration-300 flex flex-col justify-between group shadow-lg"
                       >
                         <div>
                           {/* 卡片头部信息 */}

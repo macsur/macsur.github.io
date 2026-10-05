@@ -132,6 +132,11 @@ html.light .google-pill:hover {
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
 }
 
+/* 消除移动端 touch 灰色遮罩 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* 核心 Google 卡片容器 (带明暗自适应) */
 .google-card {
   background: var(--card-bg);
@@ -142,11 +147,22 @@ html.light .google-pill:hover {
   box-shadow: var(--card-shadow);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.google-card:hover {
-  background: var(--card-hover-bg);
-  border-color: var(--card-hover-border);
-  box-shadow: var(--card-hover-shadow);
-  transform: translateY(-2px);
+
+/* 仅在精确指针/真实鼠标设备下应用 hover 变化，彻底杜绝手机 touch 后粘住深色背景 */
+@media (hover: hover) and (pointer: fine) {
+  .google-card:hover {
+    background: var(--card-hover-bg);
+    border-color: var(--card-hover-border);
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+  }
+}
+
+/* 触屏移动设备下仅做轻量微动缩放反馈，绝不改背景色 */
+@media (hover: none) {
+  .google-card:active {
+    transform: scale(0.985);
+  }
 }
 
 /* 标题渐变 */
@@ -269,6 +285,24 @@ html.light .bg-slate-800\/80 {
   background-color: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
+}
+
+/* 强制在浅色模式下杜绝任何深黑背景粘滞态 */
+html.light .google-card {
+  background-color: #ffffff !important;
+}
+@media (hover: hover) and (pointer: fine) {
+  html.light .google-card:hover {
+    background-color: #ffffff !important;
+    border-color: #2563eb !important;
+  }
+}
+@media (hover: none) {
+  html.light .google-card:active,
+  html.light .google-card:focus,
+  html.light .google-card:focus-within {
+    background-color: #ffffff !important;
+  }
 }
 
 /* 动态流光与激光扫掠动效 */
