@@ -336,18 +336,16 @@ linux_panel_accordion() {
 
 officialCode = officialCode.substring(0, linuxWorkIdx) + accordionBlock + '\n\n' + officialCode.substring(linuxWorkIdx);
 
-// 补丁 4: 主菜单 kejilion_sh() 注入 11+. 应用市场 [分类折叠]
-const mainMenuTarget = 'echo -e "${gl_huang}10.  ${gl_bai}LDNMP建站"\n' +
-'echo -e "${gl_kjlan}11.  ${gl_bai}应用市场"\n' +
-'echo -e "${gl_kjlan}12.  ${gl_bai}后台工作区"';
+// 补丁 4: 主菜单 kejilion_sh() 顶部注入 11+. 应用市场 [分类折叠] 快捷入口
+const mainMenuTopTarget = 'echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"\n' +
+'echo -e "${gl_kjlan}------------------------${gl_bai}"';
 
-const mainMenuReplacement = 'echo -e "${gl_huang}10.  ${gl_bai}LDNMP建站"\n' +
-'echo -e "${gl_kjlan}11.  ${gl_bai}应用市场"\n' +
+const mainMenuTopReplacement = 'echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"\n' +
 'echo -e "${gl_huang}11+. ${gl_bai}应用市场 [分类折叠]${gl_bai}"\n' +
-'echo -e "${gl_kjlan}12.  ${gl_bai}后台工作区"';
+'echo -e "${gl_kjlan}------------------------${gl_bai}"';
 
-if (officialCode.includes(mainMenuTarget)) {
-    officialCode = officialCode.replace(mainMenuTarget, mainMenuReplacement);
+if (officialCode.includes(mainMenuTopTarget)) {
+    officialCode = officialCode.replace(mainMenuTopTarget, mainMenuTopReplacement);
 }
 
 // 补丁 5: 主菜单分支注入
