@@ -405,7 +405,7 @@ export default function Home() {
 
   // 常用指令列表
   const quickCommands = [
-    { cmd: 'k', desc: '启动 Linux生态圈主控制面板' },
+    { cmd: 'k', desc: '启动 Kejilion 工具箱主控制面板' },
     { cmd: 'k app', desc: '直接呼出智能应用市场' },
     { cmd: 'k app 57', desc: '一键部署 DeepSeek AI 大模型' },
     { cmd: 'k bbr3', desc: 'BBRv3 内核与网络调优' },
@@ -482,7 +482,7 @@ export default function Home() {
               >
                 <img
                   src="/logo.png"
-                  alt="Linux生态 x.zttz.eu.org"
+                  alt="Kejilion 工具箱 x.zttz.eu.org"
                   className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
@@ -503,7 +503,7 @@ export default function Home() {
 
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
-              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (160+)</a>
+              <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用市场 (160+)</a>
               <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">常用指令</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
@@ -884,7 +884,7 @@ export default function Home() {
                     </span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-center sm:justify-start space-x-2.5">
-                    <span>应用生态大厅</span>
+                    <span>工具箱 · 应用市场</span>
                     {isMasterMarketOpen && (
                       <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 animate-pulse">
                         已激活
@@ -907,7 +907,7 @@ export default function Home() {
                       : 'bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 border border-cyan-500/30 text-cyan-300 group-hover:border-cyan-400 group-hover:text-white shadow-cyan-500/10'
                   }`}
                 >
-                  <span>{isMasterMarketOpen ? '收起应用生态大厅' : '点击展开应用生态大厅'}</span>
+                  <span>{isMasterMarketOpen ? '收起应用市场' : '点击展开应用市场'}</span>
                   {isMasterMarketOpen ? (
                     <ChevronDown className="w-4 h-4 text-cyan-400 transform rotate-180 transition-transform duration-300" />
                   ) : (
@@ -1132,7 +1132,7 @@ export default function Home() {
             全能高效的 Linux 运维底座
           </h2>
           <p className="text-sm text-slate-400 mt-2">
-            Linux生态圈不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
+            Kejilion 工具箱不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
           </p>
         </div>
 
@@ -1463,10 +1463,10 @@ export default function Home() {
               <span>开放社区生态</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
-              想要让你的开源应用加入 Linux生态市场？
+              想要让你的开源应用加入工具箱应用市场？
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
-              Linux生态圈应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
+              Kejilion 工具箱应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <a 
@@ -1524,7 +1524,7 @@ export default function Home() {
       <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-300">Linux生态 · x.zttz.eu.org</span>
+            <span className="font-bold text-slate-300">Kejilion 工具箱 · x.zttz.eu.org</span>
             <span>- 现代化服务器运维与开源应用</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
@@ -1545,7 +1545,7 @@ export default function Home() {
 
         {/* 底部最下一列：极不显眼的隐蔽彩蛋入口与节点状态 */}
         <div className="mt-8 pt-5 border-t border-slate-900/80 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
-          <span>© 2026 Linux生态 · x.zttz.eu.org · 保留所有权利</span>
+          <span>© 2026 Kejilion 工具箱 · x.zttz.eu.org · 保留所有权利</span>
           <div className="flex items-center space-x-2.5">
             <span className="text-slate-600/80">Cluster: HK-Edge-01</span>
             <span className="text-slate-800">•</span>

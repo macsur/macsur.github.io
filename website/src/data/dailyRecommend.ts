@@ -18,16 +18,6 @@ export const DAILY_RECOMMEND_GENERATED_AT = "2026-10-06";
 
 export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   {
-    "id": 208,
-    "cmd": "k app 208",
-    "badge": "AI Agent 中枢",
-    "name": "n8n 可视化自动化与智能体编排系统",
-    "category": "📝 协作办公与实用工具",
-    "stars": "52k+",
-    "highlight": "全球领先的开源工作流自动化平台。支持数百种外部应用打通，内置强大的 LangChain 智能体节点，零代码/低代码实现复杂业务流程自动化。",
-    "reason": "把重复繁琐的人工日常自动化，甚至能作为个人数字分身 24 小时监控并处理数据。"
-  },
-  {
     "id": 204,
     "cmd": "k app 204",
     "badge": "极简 PaaS 云底座",
@@ -38,13 +28,23 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = [
     "reason": "让个人开发者拥有一整套属于自己的微型云服务商体验，告别昂贵的第三方托管费用。"
   },
   {
-    "id": 202,
-    "cmd": "k app 202",
-    "badge": "极速大模型引擎",
-    "name": "Ollama 极简轻量化本地大模型框架",
-    "category": "🤖 人工智能与前沿大模型",
-    "stars": "115k+",
-    "highlight": "让大模型如同普通命令行工具一样易用。一行指令完成大模型拉取、量化、运行与显存管理，完美支撑各类下游 AI 应用与开发环境。",
-    "reason": "跨平台生态适配最成熟的开源运行时，与各类客户端无缝联动，开箱即用体验堪称行业标杆。"
+    "id": 207,
+    "cmd": "k app 207",
+    "badge": "隐私云相册",
+    "name": "Immich 高性能私有化相册与视频管理",
+    "category": "🗄️ 私有网盘与数据存储",
+    "stars": "61k+",
+    "highlight": "全面替代 Google Photos 与 iCloud 的超强开源相册备份。原生配备手机端自动备份、本地离线人脸识别、以图搜图与实况照片完美展示。",
+    "reason": "真正把珍贵的生活回忆锁在自己的服务器里，支持多用户隔离与智能相册聚类，体验极速。"
+  },
+  {
+    "id": 3,
+    "cmd": "k app 3",
+    "badge": "现代化运维首选",
+    "name": "1Panel 新一代现代化 Linux 运维面板",
+    "category": "🖥️ 服务器运维与探针监控",
+    "stars": "26k+",
+    "highlight": "开源、轻量且深度拥抱 Docker 容器化理念的现代化运维神器。界面遵循极简几何美学，内置精选应用市场、自动化证书签发、容器生命周期监控与一键容灾备份。",
+    "reason": "彻底摆脱传统面板对系统环境的高侵入性污染，所有服务均在独立沙箱中优雅运行，安全稳定。"
   }
 ];
