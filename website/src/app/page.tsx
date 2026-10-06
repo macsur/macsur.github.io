@@ -494,7 +494,7 @@ export default function Home() {
               <div onClick={toggleTheme} className="cursor-pointer select-none">
                 <span className={`font-bold text-lg tracking-wider transition-colors ${
                   theme === 'dark' ? 'text-white' : 'text-slate-900'
-                }`}>Linux生态</span>
+                }`}>Kejilion 工具箱</span>
                 <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
                   theme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
                 }`}>v4.5.10</span>
