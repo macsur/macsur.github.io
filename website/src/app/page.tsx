@@ -2,7 +2,6 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import confetti from 'canvas-confetti';
 import { 
   Copy, 
   Check, 
@@ -43,6 +42,17 @@ interface RecommendedAppItem {
   highlight: string;
   reason: string;
 }
+
+// 动态按需加载 confetti 特效库，降低首屏 Bundle 体积
+import type { Options as ConfettiOptions } from 'canvas-confetti';
+const fireConfetti = async (options?: ConfettiOptions) => {
+  try {
+    const confettiModule = (await import('canvas-confetti')).default;
+    return confettiModule(options);
+  } catch (err) {
+    console.error('Failed to load confetti module', err);
+  }
+};
 
 export default function Home() {
   // 主题模式：'dark'（默认极客流光暗黑模式）或 'light'（清爽科技白昼模式）
@@ -197,7 +207,7 @@ export default function Home() {
     setShowEasterEgg(true);
     playEasterEggAudio();
     // 释放专属“星芒粒子礼花”
-    confetti({
+    fireConfetti({
       particleCount: 90,
       spread: 360,
       startVelocity: 38,
@@ -287,7 +297,7 @@ export default function Home() {
   // 🎆 第一次打开：超级满屏盛大烟花礼炮 (双侧加农炮对冲 + 中央爆裂流星雨)
   const triggerGrandFireworks = () => {
     // 1. 中央主礼炮炸裂
-    confetti({
+    fireConfetti({
       particleCount: 120,
       spread: 100,
       origin: { y: 0.6 },
@@ -301,7 +311,7 @@ export default function Home() {
     const animationEnd = Date.now() + duration;
 
     const frame = () => {
-      confetti({
+      fireConfetti({
         particleCount: 5,
         angle: 60,
         spread: 55,
@@ -309,7 +319,7 @@ export default function Home() {
         colors: ['#06b6d4', '#38bdf8', '#818cf8', '#f59e0b'],
         zIndex: 9999
       });
-      confetti({
+      fireConfetti({
         particleCount: 5,
         angle: 120,
         spread: 55,

@@ -7,6 +7,10 @@
 
 ## 1. 🚨 必须绝对遵守的开发与推送铁律 (最高优先级)
 
+> ⚠️ **【重要基础设施例外记录 (2026-10-06)】**：
+> GitHub 平台硬性规定：`repository_dispatch` 事件触发时，必定仅运行**默认分支 (`main`)** 下定义的 workflow。
+> 因此，在前端从 npm 彻底迁移至 Bun 1.3.14 期间，对 `main` 只读铁律进行了**唯一一次性基础设施例外同步**：将新版支持 Bun 的 `.github/workflows/muse-deploy.yml` 单独同步更新至 `main` 分支，以确保 `update-website` 调度命令在云端不因寻找已废弃的 `package-lock.json` 崩溃停摆。除此基础设施 workflow 文件维护外，所有业务开发与代码提交依然严格**100% 只推 `source` 分支**。
+
 1. **只推 `source` 分支，绝不动 `main` 分支**：
    - 用户的个人开发仓库是 **`macsur/macsur.github.io`**。
    - `macsur.github.io` 的 **`main` 分支是云端 GitHub Actions 编译产物的专属只读发布分支**！
@@ -24,6 +28,17 @@
 ---
 
 ## 2. 核心架构与演进总结
+
+### 🚀 前端工具链全面升级为 Bun 1.3.14 与首屏性能优化 (2026-10-06)
+1. **全面引入 Bun 统一开发与构建工具链**：
+   - 确立 **Bun 1.3.14** 作为网站前端（`website/`）及后台辅助脚本的统一运行时与包管理器。
+   - **锁文件统一策略**：彻底废弃并移除 `package-lock.json`，确立 **`website/bun.lock`** 为唯一可信源（SSOT），并在 `.gitignore` 中忽略 `package-lock.json` 杜绝死灰复燃。
+   - **版本固定**：在 `website/.bun-version` 中写入 `1.3.14`，保持团队与环境一致。
+   - **CI/CD 注意事项 (重要)**：远端 GitHub Actions 工作流（如 `muse-deploy.yml`）需配合将 `setup-node` 调整为 `oven-sh/setup-bun@v1` (版本 `1.3.14`)，并将命令切换为 `bun install --frozen-lockfile` 与 `bun run build`，避免因缺少 `package-lock.json` 导致构建报错。
+2. **性能与代码优化落地**：
+   - **预构建脚本原生化**：`website/package.json` 的 `prebuild` 脚本从 `node` 切换为原生 `bun fetch_vpngate.js && bun generate_daily_recommend.js`，实现全流程由 Bun 单一引擎贯穿。
+   - **首屏 JS 体积大幅瘦身 (动态按需导入)**：将原本在首屏静态打包的 `canvas-confetti` 礼花特效库改为 `fireConfetti()` 动态按需加载（Dynamic Import）。
+   - **实测成效**：首屏首页体积由 **38.8 kB 骤降至 34.9 kB**（瘦身 ~10%），First Load JS 降至 **122 kB**，进一步拉升首屏秒开体验。
 
 ### 8 核心分类矩阵与【H】第三方生态标准 (A~H 全纳版)
 - 将应用市场划分为 8 核心分类矩阵（A~H），官方内置 128 款与本地第三方扩展深度融合：

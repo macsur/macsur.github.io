@@ -1,0 +1,63 @@
+name: Muse AI 自动化云端同步与发布 (Muse Triggered Sync & Deploy)
+
+on:
+  repository_dispatch:
+    types: [update-website, muse-trigger]
+  push:
+    branches:
+      - source
+  workflow_dispatch:
+  schedule:
+    - cron: '0 19 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出源码分支 (Checkout Source Code)
+        uses: actions/checkout@v4
+        with:
+          ref: source
+
+      - name: 配置 Bun 运行环境 (Bun 1.3.14)
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.3.14
+
+      - name: 1. 同步上游 Kejilion 官方最新特性并注入分类折叠
+        run: |
+          bun sync_upstream.js
+          bash -n kejilion.sh
+          bash -n apps_manager.sh
+          mkdir -p website/public
+          cp -f kejilion.sh website/public/kejilion.sh
+          cp -f kejilion.sh website/public/x.sh
+          cp -f apps_manager.sh website/public/apps_manager.sh
+
+      - name: 2. 抓取今日 GitHub 热榜并生成 500 字深度中文解析
+        env:
+          TRANSLATE_API_URL: ${{ secrets.TRANSLATE_API_URL || 'https://cli.136222.xyz/v1' }}
+          TRANSLATE_API_KEY: ${{ secrets.TRANSLATE_API_KEY || 'sk-f6ba10cfedb11ef9213fe3f0eae6fc81727b08d12bd4cc211ab015a978cb1f0f' }}
+          TRANSLATE_MODEL: ${{ secrets.TRANSLATE_MODEL || 'gemini-2.5-flash' }}
+        run: |
+          bun fetch_github_trending.js || echo "保留现有数据，继续构建"
+
+      - name: 3. 安装依赖并编译 Next.js 生产级静态站点 (包含自动打新与彩蛋节点更新)
+        run: |
+          cd website
+          bun install --frozen-lockfile
+          bun run build
+          cd ..
+
+      - name: 4. 自动发布推送到 main 分支 (GitHub Pages)
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: website/out
+          branch: main
+          clean: true
+          clean-exclude: |
+            .github/**
+          commit-message: "AutoSync by Muse AI: Update website & Trending TOP 10 [skip ci]"
