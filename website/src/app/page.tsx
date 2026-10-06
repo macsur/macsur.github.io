@@ -647,6 +647,49 @@ export default function Home() {
             </span>
           </div>
 
+          {/* 🌟 Hero 品牌创意广告：压在副标题上方，全宽展示 */}
+          <div className="max-w-4xl mx-auto mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
+            <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
+              <div className="flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                <span className="text-[11px] text-slate-300 font-semibold tracking-wide">为什么酷 · 品牌创意</span>
+              </div>
+              <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
+                <span>极客之选</span>
+              </div>
+            </div>
+
+            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80">
+              {/* 桌面端 (>= 768px): 16:9 标准版 */}
+              <div className="hidden md:block aspect-[960/540] relative">
+                <Image
+                  src="/toolbox-ad.gif"
+                  alt="Kejilion 工具箱极客创意广告：从裸机到就绪、一条命令整备一台服务器"
+                  width={960}
+                  height={540}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* 移动端 (< 768px): 1:1 方形版优化排版 */}
+              <div className="block md:hidden aspect-square relative">
+                <Image
+                  src="/toolbox-ad-square.gif"
+                  alt="Kejilion 工具箱极客创意广告 (移动端正方形适配)"
+                  width={800}
+                  height={800}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="truncate mr-2">终端之美，效率之诗 · 工具箱在手，运维不愁</span>
+              <span className="font-mono text-cyan-400 shrink-0">~9s 循环</span>
+            </div>
+          </div>
+
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
             系统重装、BBR 加速、Docker 部署、160+ 应用一键安装
           </p>
@@ -745,52 +788,8 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* 左侧：常用指令网格（一排左上首位为品牌创意卡，横跨两列占满第一排；k 及后续卡片依次后移补位） */}
+          {/* 左侧：8 个常用快捷指令卡片 */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* 🌟 品牌创意广告卡：位于常用指令网格一排左上，横跨两列占满第一排 */}
-            <div className="sm:col-span-2 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
-              <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
-                <div className="flex items-center space-x-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                  <span className="text-[11px] text-slate-300 font-semibold tracking-wide">为什么酷 · 品牌创意</span>
-                </div>
-                <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                  <span>极客之选</span>
-                </div>
-              </div>
-
-              <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80">
-                {/* 桌面端 (>= 768px): 16:9 标准版 */}
-                <div className="hidden md:block aspect-[960/540] relative">
-                  <Image
-                    src="/toolbox-ad.gif"
-                    alt="Kejilion 工具箱极客创意广告：从裸机到就绪、一条命令整备一台服务器"
-                    width={960}
-                    height={540}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {/* 移动端 (< 768px): 1:1 方形版优化排版 */}
-                <div className="block md:hidden aspect-square relative">
-                  <Image
-                    src="/toolbox-ad-square.gif"
-                    alt="Kejilion 工具箱极客创意广告 (移动端正方形适配)"
-                    width={800}
-                    height={800}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span className="truncate mr-2">终端之美，效率之诗 · 工具箱在手，运维不愁</span>
-                <span className="font-mono text-cyan-400 shrink-0">~9s 循环</span>
-              </div>
-            </div>
-
-            {/* k 及后续 8 个常用指令卡片依次后移补位 */}
             {quickCommands.map((item, idx) => (
               <div
                 key={idx}
