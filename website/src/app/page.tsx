@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { 
   Copy, 
@@ -32,6 +32,7 @@ import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
 import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
 import { DAILY_RECOMMEND } from '@/data/dailyRecommend';
 import { EASTER_EGG_ITEMS, EasterEggItem } from '@/data/easterEggData';
+import { isHolidayToday } from '@/data/holidays';
 
 interface RecommendedAppItem {
   id: number;
@@ -91,42 +92,87 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [heroSlogans.length]);
 
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  // 主题模式状态机：'auto' | 'light' | 'dark'，默认 'auto'
+  const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
+  // 实际生效的展示样式：'dark' | 'light'
+  const [activeTheme, setActiveTheme] = useState<'dark' | 'light'>('dark');
+
+  // 计算当前北京时间 (UTC+8) 应该处于白天还是黑夜 (06:00-17:59 白天，其余黑夜)
+  const getBeijingAutoTheme = useCallback((): 'light' | 'dark' => {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const bjHour = new Date(utc + 8 * 3600000).getHours();
+    return bjHour >= 6 && bjHour < 18 ? 'light' : 'dark';
+  }, []);
+
+  // 应用主题到 DOM 并同步状态
+  const applyTheme = useCallback((mode: 'auto' | 'light' | 'dark') => {
+    setThemeMode(mode);
+    const resolved: 'light' | 'dark' = mode === 'auto' ? getBeijingAutoTheme() : mode;
+    setActiveTheme(resolved);
+    if (resolved === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
+    }
+  }, [getBeijingAutoTheme]);
 
   // 初始化读取本地偏好
   useEffect(() => {
     const saved = localStorage.getItem('theme_preference') as 'dark' | 'light' | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.classList.toggle('light', saved === 'light');
+    if (saved === 'dark' || saved === 'light') {
+      applyTheme(saved);
+    } else {
+      applyTheme('auto');
     }
-  }, []);
+  }, [applyTheme]);
+  useEffect(() => {
+    if (themeMode !== 'auto') return;
+    const interval = setInterval(() => {
+      const currentAuto = getBeijingAutoTheme();
+      if (currentAuto !== activeTheme) {
+        applyTheme('auto');
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [themeMode, activeTheme, applyTheme, getBeijingAutoTheme]);
 
-  // 换算北京时间展示友好更新标签（如 "今日 03:00 已更新"）
+  // ① Logo 点击手动切换（白天/黑夜互切，写入 localStorage）
+  const toggleTheme = () => {
+    const next: 'light' | 'dark' = activeTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme_preference', next);
+    applyTheme(next);
+  };
+
+  // ② "🕐 跟随时间"小按钮（清除手动记录，回到自动）
+  const resetToAutoTheme = () => {
+    localStorage.removeItem('theme_preference');
+    applyTheme('auto');
+  };
+
+  // 换算北京时间展示友好更新标签（如 "今日 03:00 已更新"）；法定节假日期间提示为假日更新
   const updateBadgeText = useMemo(() => {
-    if (!LAST_UPDATED_AT) return '今日已更新';
+    const holidayPrefix = isHolidayToday() ? '假日' : '今日';
+    if (!LAST_UPDATED_AT) return `${holidayPrefix}已更新`;
+
     const match = LAST_UPDATED_AT.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
-    if (!match) return '今日已更新';
+    if (!match) return `${holidayPrefix}已更新`;
+
     const [, year, month, day, hour, minute] = match;
     const now = new Date();
-    const utcNow = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const bjNow = new Date(utcNow + (8 * 3600000));
+    const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
+    const bjNow = new Date(utcNow + 8 * 3600000);
     const bjYear = bjNow.getFullYear();
     const bjMonth = String(bjNow.getMonth() + 1).padStart(2, '0');
     const bjDay = String(bjNow.getDate()).padStart(2, '0');
+
     if (parseInt(year, 10) === bjYear && month === bjMonth && day === bjDay) {
-      return `今日 ${hour}:${minute} 已更新`;
+      return `${holidayPrefix} ${hour}:${minute} 已更新`;
     }
     return `${month}-${day} ${hour}:${minute} 已更新`;
   }, []);
-
-  // 切换白天/黑夜模式函数
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('theme_preference', next);
-    document.documentElement.classList.toggle('light', next === 'light');
-  };
 
   // 安装命令源切换 (默认推荐 x.zttz.eu.org 专属增强版)
   const [installSource, setInstallSource] = useState<'enhanced' | 'official' | 'mirror'>('enhanced');
@@ -490,7 +536,7 @@ export default function Home() {
 
   return (
     <div className={`min-h-screen relative overflow-hidden font-sans selection:bg-blue-600 selection:text-white transition-colors duration-300 ${
-      theme === 'dark' ? 'bg-[#090a0f] text-slate-100' : 'bg-[#f6f8fb] text-slate-800'
+      activeTheme === 'dark' ? 'bg-[#090a0f] text-slate-100' : 'bg-[#f6f8fb] text-slate-800'
     }`}>
       {/* Google AI 极光科技流体背景 */}
       <div className="fixed inset-0 google-ai-mesh pointer-events-none z-0" />
@@ -500,14 +546,14 @@ export default function Home() {
       <div className="relative z-10">
         {/* 顶部导航 */}
         <header className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-300 ${
-          theme === 'dark' ? 'bg-[#090a0f]/80 border-white/[0.08]' : 'bg-[#f6f8fb]/85 border-slate-200'
+          activeTheme === 'dark' ? 'bg-[#090a0f]/80 border-white/[0.08]' : 'bg-[#f6f8fb]/85 border-slate-200'
         }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {/* 点击左上角 Logo 实现白天/夜间主题切换，带有轻微点击反馈与模式指示器 */}
               <div
                 onClick={toggleTheme}
-                title={theme === 'dark' ? '点击切换为清新白天模式 ☀️' : '点击切换为默认极客暗黑模式 🌙'}
+                title={activeTheme === 'dark' ? '点击切换为清新白天模式 ☀️' : '点击切换为默认极客暗黑模式 🌙'}
                 className="relative group cursor-pointer"
               >
                 <img
@@ -516,19 +562,32 @@ export default function Home() {
                   className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
-                  theme === 'dark' ? 'bg-amber-400 text-slate-950 ring-2 ring-[#090a0f]' : 'bg-blue-600 text-white ring-2 ring-white'
+                  activeTheme === 'dark' ? 'bg-amber-400 text-slate-950 ring-2 ring-[#090a0f]' : 'bg-blue-600 text-white ring-2 ring-white'
                 }`}>
-                  {theme === 'dark' ? '🌙' : '☀️'}
+                  {activeTheme === 'dark' ? '🌙' : '☀️'}
                 </span>
               </div>
               <div onClick={toggleTheme} className="cursor-pointer select-none">
                 <span className={`font-bold text-lg tracking-wider transition-colors ${
-                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                  activeTheme === 'dark' ? 'text-white' : 'text-slate-900'
                 }`}>Kejilion 工具箱</span>
                 <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
-                  theme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                  activeTheme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
                 }`}>v4.5.10</span>
               </div>
+              {/* 跟随时间自动模式指示器与恢复按钮 */}
+              <button
+                onClick={resetToAutoTheme}
+                title={themeMode === 'auto' ? '当前已跟随北京时间自动切换 (06:00~18:00 白天，其余夜晚)' : '点击恢复为跟随北京时间自动切换'}
+                className={`ml-1 flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all ${
+                  themeMode === 'auto'
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-slate-800/60 hover:bg-slate-700/80 text-slate-400 hover:text-slate-200 border border-slate-700/60'
+                }`}
+              >
+                <Clock className="w-3 h-3" />
+                <span>{themeMode === 'auto' ? '跟随时间' : '恢复自动'}</span>
+              </button>
             </div>
 
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
@@ -589,7 +648,7 @@ export default function Home() {
           </div>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
-            系统重装、BBR 加速、Docker 部署、160+ 应用一键安装、自动备份——全在终端里搞定，不用装面板。
+            系统重装、BBR 加速、Docker 部署、160+ 应用一键安装
           </p>
 
           {/* 终端模拟一键安装框 */}
@@ -641,7 +700,7 @@ export default function Home() {
             {/* 命令行与复制按钮 */}
             <div className="relative group">
               <div className={`p-4 rounded-xl border font-mono text-sm sm:text-base flex items-center justify-between overflow-x-auto shadow-inner transition-colors duration-300 ${
-                theme === 'dark' ? 'bg-[#090b10] border-white/[0.08] text-blue-300' : 'bg-slate-50 border-slate-200 text-blue-700'
+                activeTheme === 'dark' ? 'bg-[#090b10] border-white/[0.08] text-blue-300' : 'bg-slate-50 border-slate-200 text-blue-700'
               }`}>
                 <div className="flex items-center space-x-2">
                   <span className="text-slate-400 select-none font-bold">$</span>
@@ -686,8 +745,52 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* 左侧：8 个常用快捷指令卡片 */}
+          {/* 左侧：常用指令网格（一排左上首位为品牌创意卡，横跨两列占满第一排；k 及后续卡片依次后移补位） */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* 🌟 品牌创意广告卡：位于常用指令网格一排左上，横跨两列占满第一排 */}
+            <div className="sm:col-span-2 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
+              <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
+                <div className="flex items-center space-x-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  <span className="text-[11px] text-slate-300 font-semibold tracking-wide">为什么酷 · 品牌创意</span>
+                </div>
+                <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
+                  <span>极客之选</span>
+                </div>
+              </div>
+
+              <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80">
+                {/* 桌面端 (>= 768px): 16:9 标准版 */}
+                <div className="hidden md:block aspect-[960/540] relative">
+                  <Image
+                    src="/toolbox-ad.gif"
+                    alt="Kejilion 工具箱极客创意广告：从裸机到就绪、一条命令整备一台服务器"
+                    width={960}
+                    height={540}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* 移动端 (< 768px): 1:1 方形版优化排版 */}
+                <div className="block md:hidden aspect-square relative">
+                  <Image
+                    src="/toolbox-ad-square.gif"
+                    alt="Kejilion 工具箱极客创意广告 (移动端正方形适配)"
+                    width={800}
+                    height={800}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
+                <span className="truncate mr-2">终端之美，效率之诗 · 工具箱在手，运维不愁</span>
+                <span className="font-mono text-cyan-400 shrink-0">~9s 循环</span>
+              </div>
+            </div>
+
+            {/* k 及后续 8 个常用指令卡片依次后移补位 */}
             {quickCommands.map((item, idx) => (
               <div
                 key={idx}
@@ -702,14 +805,13 @@ export default function Home() {
                     {copiedText === item.cmd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
-                <p className={`text-xs leading-relaxed transition-colors ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{item.desc}</p>
+                <p className={`text-xs leading-relaxed transition-colors ${activeTheme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{item.desc}</p>
               </div>
             ))}
           </div>
 
-          {/* 右侧：双卡片联动展示（操作演示「怎么用」+ 品牌酷炫「为什么酷」） */}
+          {/* 右侧：单卡片展示（终端操作演示动画「怎么用」· 保持原位置，布局自然上提） */}
           <div className="lg:col-span-5 flex flex-col space-y-4">
-            {/* 卡片一：终端操作演示动画 (讲「怎么用」) */}
             <div className="google-card p-3 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden group">
               <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
                 <div className="flex items-center space-x-1.5">
@@ -742,49 +844,6 @@ export default function Home() {
                 <span className="font-mono text-cyan-400">11.4s 循环</span>
               </div>
             </div>
-
-            {/* 卡片二：品牌创意广告 GIF (讲「为什么酷」· 响应式小屏加载方形版/桌面端16:9并懒加载) */}
-            <div className="google-card p-3 border border-cyan-500/20 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors">
-              <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
-                <div className="flex items-center space-x-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                  <span className="text-[11px] text-slate-300 font-semibold tracking-wide">为什么酷 · 品牌创意</span>
-                </div>
-                <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                  <span>极客之选</span>
-                </div>
-              </div>
-              
-              <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80">
-                {/* 桌面端 (>= 768px): 16:9 标准版 */}
-                <div className="hidden md:block aspect-[960/540] relative">
-                  <Image
-                    src="/toolbox-ad.gif"
-                    alt="Kejilion 工具箱极客创意广告：从裸机到就绪、一条命令整备一台服务器"
-                    width={960}
-                    height={540}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {/* 移动端 (< 768px): 1:1 方形版优化排版 */}
-                <div className="block md:hidden aspect-square relative">
-                  <Image
-                    src="/toolbox-ad-square.gif"
-                    alt="Kejilion 工具箱极客创意广告 (移动端正方形适配)"
-                    width={800}
-                    height={800}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span className="truncate mr-2">终端之美，效率之诗 · 工具箱在手，运维不愁</span>
-                <span className="font-mono text-cyan-400 shrink-0">~9s 循环</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -793,7 +852,7 @@ export default function Home() {
       {/* 🌟 【今日推荐】专区：精选本站极力推荐使用的 3 款一键部署神作 */}
       <section id="daily-recommend" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <div className={`relative rounded-3xl p-6 sm:p-10 border transition-colors duration-300 backdrop-blur-2xl shadow-2xl overflow-hidden ${
-          theme === "dark" ? "border-white/10 bg-[#0e111a]/80 shadow-black/50" : "border-slate-200/90 bg-white/90 shadow-slate-200/60"
+          activeTheme === "dark" ? "border-white/10 bg-[#0e111a]/80 shadow-black/50" : "border-slate-200/90 bg-white/90 shadow-slate-200/60"
         }`}>
           {/* 背景装饰辉光 */}
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -813,7 +872,7 @@ export default function Home() {
                 </span>
               </h2>
               <p className={`text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed transition-colors ${
-                theme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
+                activeTheme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
               }`}>
                 从本站 160+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
               </p>
@@ -844,7 +903,7 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <h3 className={`font-bold text-base mb-2 transition-colors ${theme === "dark" ? "text-white group-hover:text-blue-400" : "text-slate-950 font-extrabold group-hover:text-blue-600"}`}>
+                  <h3 className={`font-bold text-base mb-2 transition-colors ${activeTheme === "dark" ? "text-white group-hover:text-blue-400" : "text-slate-950 font-extrabold group-hover:text-blue-600"}`}>
                     {app.name}
                   </h3>
 
@@ -853,15 +912,15 @@ export default function Home() {
                     <span className="font-medium text-slate-300">{app.category}</span>
                   </div>
 
-                  <p className={`text-xs leading-relaxed mb-4 text-justify min-h-[50px] transition-colors ${theme === "dark" ? "text-slate-300" : "text-slate-900 font-medium"}`}>
+                  <p className={`text-xs leading-relaxed mb-4 text-justify min-h-[50px] transition-colors ${activeTheme === "dark" ? "text-slate-300" : "text-slate-900 font-medium"}`}>
                     {app.highlight}
                   </p>
 
                   <div className={`p-3 rounded-xl mb-4 text-xs transition-colors duration-300 border ${
-                    theme === "dark" ? "bg-slate-900/60 border-slate-800/80" : "bg-slate-50 border-slate-200"
+                    activeTheme === "dark" ? "bg-slate-900/60 border-slate-800/80" : "bg-slate-50 border-slate-200"
                   }`}>
                     <span className="text-blue-400 font-bold block mb-1">💡 推荐理由：</span>
-                    <span className={`leading-relaxed ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{app.reason}</span>
+                    <span className={`leading-relaxed ${activeTheme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{app.reason}</span>
                   </div>
                 </div>
 
@@ -930,7 +989,7 @@ export default function Home() {
 
           {/* 主体卡片面板 */}
           <div className={`relative google-card rounded-3xl overflow-hidden z-10 transition-all duration-300 border ${
-            theme === "dark" ? "bg-[#0c0e17]/95 border-white/[0.08]" : "bg-white/95 border-slate-200 shadow-lg shadow-slate-200/50"
+            activeTheme === "dark" ? "bg-[#0c0e17]/95 border-white/[0.08]" : "bg-white/95 border-slate-200 shadow-lg shadow-slate-200/50"
           }`}>
             {/* 展开瞬间的全息激光扫描光束 */}
             {isShockwaveActive && (
@@ -1143,10 +1202,10 @@ export default function Home() {
                                       </span>
                                     )}
                                   </div>
-                                  <h3 className={`text-sm font-bold mb-1.5 line-clamp-1 ${theme === "dark" ? "text-white" : "text-slate-950 font-extrabold"}`}>
+                                  <h3 className={`text-sm font-bold mb-1.5 line-clamp-1 ${activeTheme === "dark" ? "text-white" : "text-slate-950 font-extrabold"}`}>
                                     {app.name}
                                   </h3>
-                                  <p className={`text-xs line-clamp-2 leading-relaxed mb-3 ${theme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>
+                                  <p className={`text-xs line-clamp-2 leading-relaxed mb-3 ${activeTheme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>
                                     {app.desc || '便捷部署，极速配置与开箱即用。'}
                                   </p>
                                 </div>
@@ -1321,7 +1380,7 @@ export default function Home() {
 
           {/* 主体卡片面板 */}
           <div className={`relative google-card rounded-3xl overflow-hidden z-10 transition-all duration-300 border ${
-            theme === "dark" ? "bg-[#0c0e17]/95 border-white/[0.08]" : "bg-white/95 border-slate-200 shadow-lg shadow-slate-200/50"
+            activeTheme === "dark" ? "bg-[#0c0e17]/95 border-white/[0.08]" : "bg-white/95 border-slate-200 shadow-lg shadow-slate-200/50"
           }`}>
             {/* 展开瞬间的全息激光扫描光束 */}
             {isParkShockwaveActive && (
@@ -1437,7 +1496,7 @@ export default function Home() {
                               </span>
                               <div>
                                 <div className="flex items-center space-x-2">
-                                  <h3 className={`font-bold text-base transition-colors ${theme === "dark" ? "text-white group-hover:text-amber-300" : "text-slate-950 font-extrabold group-hover:text-amber-700"}`}>
+                                  <h3 className={`font-bold text-base transition-colors ${activeTheme === "dark" ? "text-white group-hover:text-amber-300" : "text-slate-950 font-extrabold group-hover:text-amber-700"}`}>
                                     {item.name}
                                   </h3>
                                   <span className="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-medium">
@@ -1461,7 +1520,7 @@ export default function Home() {
                           </div>
 
                           {/* 项目简介 */}
-                          <p className={`text-xs leading-relaxed mb-4 text-justify transition-colors ${theme === "dark" ? "text-slate-300" : "text-slate-900 font-medium leading-normal"}`}>
+                          <p className={`text-xs leading-relaxed mb-4 text-justify transition-colors ${activeTheme === "dark" ? "text-slate-300" : "text-slate-900 font-medium leading-normal"}`}>
                             {item.desc}
                           </p>
 
@@ -1477,12 +1536,12 @@ export default function Home() {
 
                             <span className="flex items-center space-x-1">
                               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                              <span className={`font-mono font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>{item.stars}</span>
+                              <span className={`font-mono font-semibold ${activeTheme === "dark" ? "text-slate-200" : "text-slate-900"}`}>{item.stars}</span>
                             </span>
 
                             <span className="flex items-center space-x-1">
                               <GitFork className="w-3.5 h-3.5 text-slate-400" />
-                              <span className={`font-mono font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-800"}`}>{item.forks}</span>
+                              <span className={`font-mono font-semibold ${activeTheme === "dark" ? "text-slate-300" : "text-slate-800"}`}>{item.forks}</span>
                             </span>
                           </div>
                         </div>
@@ -1517,7 +1576,7 @@ export default function Home() {
                               target="_blank"
                               rel="noreferrer"
                               className={`p-1.5 rounded-lg transition-all border ${
-                                theme === "dark"
+                                activeTheme === "dark"
                                   ? "bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700"
                                   : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-950 border-slate-300"
                               }`}
@@ -1540,7 +1599,7 @@ export default function Home() {
       {/* 开发者与生态指南 */}
       <section id="developer" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <div className={`google-card rounded-3xl p-8 sm:p-12 border relative overflow-hidden shadow-2xl transition-colors duration-300 backdrop-blur-2xl ${
-          theme === "dark" ? "border-white/[0.08] bg-[#0c0e17]/80 shadow-black/50" : "border-slate-200 bg-white/90 shadow-slate-200/60"
+          activeTheme === "dark" ? "border-white/[0.08] bg-[#0c0e17]/80 shadow-black/50" : "border-slate-200 bg-white/90 shadow-slate-200/60"
         }`}>
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
