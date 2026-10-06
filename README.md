@@ -5,7 +5,7 @@
 # 🌟 一条命令，整备一台服务器
 ### Linux生态 · 现代化服务器运维基座与开源应用中心
 
-[![Website](https://img.shields.io/badge/官网主页-x.zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://x.zttz.eu.org)
+[![Website](https://img.shields.io/badge/官网主页-zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![Bun](https://img.shields.io/badge/Bun-1.3.14-f7d7b6?style=for-the-badge&logo=bun&logoColor=111827)](https://bun.sh)
@@ -17,7 +17,7 @@
   涵盖 160+ 精选开源与社区扩展应用、8 核心分类手风琴智能折叠市场、GitHub Trending 官方趋势榜自动汉化同步、BBRv3 极限网络加速与纯净系统一键自愈。
 </p>
 
-[🌐 访问官方主站](https://x.zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 8 核心分类市场](#-8-核心分类应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
+[🌐 访问官方主站](https://zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 8 核心分类市场](#-8-核心分类应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
 
 ---
 
@@ -28,7 +28,7 @@
 无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux生态圈**：
 
 ```bash
-bash <(curl -sL https://x.zttz.eu.org/x.sh)
+bash <(curl -sL https://zttz.eu.org/x.sh)
 ```
 
 > **💡 贴心自愈特性**：
@@ -113,7 +113,7 @@ k update        # 无缝检测并更新工具箱至最新版本
 
 ## 🔗 相关链接
 
-- **主页域名**：[https://x.zttz.eu.org](https://x.zttz.eu.org)
+- **主页域名**：[https://zttz.eu.org](https://zttz.eu.org)
 - **GitHub 源码仓库**：[https://github.com/macsur/macsur.github.io](https://github.com/macsur/macsur.github.io)
 - **上游官方项目**：[kejilion/sh](https://github.com/kejilion/sh)
 
