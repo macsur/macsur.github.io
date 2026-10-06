@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import { 
   Copy, 
   Check, 
@@ -706,8 +707,9 @@ export default function Home() {
             ))}
           </div>
 
-          {/* 右侧：终端演示动画 (hero-terminal-demo.mp4 自动播放 + gif 降级) */}
-          <div className="lg:col-span-5">
+          {/* 右侧：双卡片联动展示（操作演示「怎么用」+ 品牌酷炫「为什么酷」） */}
+          <div className="lg:col-span-5 flex flex-col space-y-4">
+            {/* 卡片一：终端操作演示动画 (讲「怎么用」) */}
             <div className="google-card p-3 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden group">
               <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
                 <div className="flex items-center space-x-1.5">
@@ -718,7 +720,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center space-x-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
                   <Play className="w-2.5 h-2.5 fill-emerald-400" />
-                  <span>实时演示</span>
+                  <span>操作演示</span>
                 </div>
               </div>
               <div className="relative rounded-lg overflow-hidden bg-[#0d1017] border border-slate-800/80 aspect-[960/560]">
@@ -732,12 +734,55 @@ export default function Home() {
                 >
                   <source src="/hero-terminal-demo.mp4" type="video/mp4" />
                   {/* 降级备用图片 */}
-                  <img src="/hero-terminal-demo.gif" alt="终端演示动画" className="w-full h-full object-cover" />
+                  <img src="/hero-terminal-demo.gif" alt="终端操作演示动画" className="w-full h-full object-cover" />
                 </video>
               </div>
-              <div className="mt-2.5 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span>三幕演示：curl 安装 → 输入 k → k app 直达 8 分类</span>
+              <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
+                <span>三幕流程：一键安装 → 呼出 k → 直达常用与分类</span>
                 <span className="font-mono text-cyan-400">11.4s 循环</span>
+              </div>
+            </div>
+
+            {/* 卡片二：品牌创意广告 GIF (讲「为什么酷」· 响应式小屏加载方形版/桌面端16:9并懒加载) */}
+            <div className="google-card p-3 border border-cyan-500/20 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors">
+              <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
+                <div className="flex items-center space-x-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  <span className="text-[11px] text-slate-300 font-semibold tracking-wide">为什么酷 · 品牌创意</span>
+                </div>
+                <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
+                  <span>极客之选</span>
+                </div>
+              </div>
+              
+              <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80">
+                {/* 桌面端 (>= 768px): 16:9 标准版 */}
+                <div className="hidden md:block aspect-[960/540] relative">
+                  <Image
+                    src="/toolbox-ad.gif"
+                    alt="Kejilion 工具箱极客创意广告：从裸机到就绪、一条命令整备一台服务器"
+                    width={960}
+                    height={540}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* 移动端 (< 768px): 1:1 方形版优化排版 */}
+                <div className="block md:hidden aspect-square relative">
+                  <Image
+                    src="/toolbox-ad-square.gif"
+                    alt="Kejilion 工具箱极客创意广告 (移动端正方形适配)"
+                    width={800}
+                    height={800}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
+                <span className="truncate mr-2">终端之美，效率之诗 · 工具箱在手，运维不愁</span>
+                <span className="font-mono text-cyan-400 shrink-0">~9s 循环</span>
               </div>
             </div>
           </div>
