@@ -8,11 +8,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Linux 服务器工具箱 | x.zttz.eu.org",
-  description: "Kejilion 工具箱 (x.zttz.eu.org) - 一键脚本管理 Linux 服务器、网络调优、建站、Docker 容器与 160+ 现代化应用市场及 [GitHub乐园]，100% 开源兼容。",
+  title: "Linux 服务器工具箱 | zttz.eu.org",
+  description: "Kejilion 工具箱 (zttz.eu.org) - 一键脚本管理 Linux 服务器、网络调优、建站、Docker 容器与 160+ 现代化应用市场及 [GitHub乐园]，100% 开源兼容。",
   keywords: ["Linux生态", "Github乐园", "Linux脚本", "应用市场", "Docker管理", "BBRv3", "手风琴菜单", "1Panel", "Deepseek"],
-  authors: [{ name: "Kejilion 工具箱", url: "https://x.zttz.eu.org" }],
-  metadataBase: new URL("https://x.zttz.eu.org"),
+  authors: [{ name: "Kejilion 工具箱", url: "https://zttz.eu.org" }],
+  metadataBase: new URL("https://zttz.eu.org"),
   icons: {
     icon: [
       { url: "/favicon.ico" },

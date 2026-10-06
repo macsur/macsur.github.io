@@ -174,7 +174,7 @@ export default function Home() {
     return `${month}-${day} ${hour}:${minute} 已更新`;
   }, []);
 
-  // 安装命令源切换 (默认推荐 x.zttz.eu.org 专属增强版)
+  // 安装命令源切换 (默认推荐 zttz.eu.org 专属增强版)
   const [installSource, setInstallSource] = useState<'enhanced' | 'official' | 'mirror'>('enhanced');
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
@@ -474,7 +474,7 @@ export default function Home() {
 
   // 安装命令
   const installCommands = {
-    enhanced: 'bash <(curl -sL https://x.zttz.eu.org/x.sh)',
+    enhanced: 'bash <(curl -sL https://zttz.eu.org/x.sh)',
     official: 'bash <(curl -sL kejilion.sh)',
     mirror: 'bash <(curl -sL https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh)'
   };
@@ -558,7 +558,7 @@ export default function Home() {
               >
                 <img
                   src="/logo.png"
-                  alt="Kejilion 工具箱 x.zttz.eu.org"
+                  alt="Kejilion 工具箱 zttz.eu.org"
                   className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
@@ -1667,7 +1667,7 @@ export default function Home() {
       <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-300">Kejilion 工具箱 · x.zttz.eu.org</span>
+            <span className="font-bold text-slate-300">Kejilion 工具箱 · zttz.eu.org</span>
             <span>- 现代化服务器运维与开源应用</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
@@ -1688,7 +1688,7 @@ export default function Home() {
 
         {/* 底部最下一列：极不显眼的隐蔽彩蛋入口与节点状态 */}
         <div className="mt-8 pt-5 border-t border-slate-900/80 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
-          <span>© 2026 Kejilion 工具箱 · x.zttz.eu.org · 保留所有权利</span>
+          <span>© 2026 Kejilion 工具箱 · zttz.eu.org · 保留所有权利</span>
           <div className="flex items-center space-x-2.5">
             <span className="text-slate-600/80">Cluster: HK-Edge-01</span>
             <span className="text-slate-800">•</span>

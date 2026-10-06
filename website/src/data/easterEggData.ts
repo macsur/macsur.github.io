@@ -55,10 +55,10 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 4,
-    "text": "x.zttz.eu.org",
-    "url": "https://x.zttz.eu.org",
+    "text": "zttz.eu.org",
+    "url": "https://zttz.eu.org",
     "isReal": false,
-    "label": "Linux生态 · x.zttz.eu.org",
+    "label": "Linux生态 · zttz.eu.org",
     "delay": "0.22s",
     "floatDelay": "1.8s",
     "color": "from-sky-500/20 to-cyan-600/10",

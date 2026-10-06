@@ -49,13 +49,13 @@ def draw_window_frame():
     draw.ellipse([56, 13, 68, 25], fill=(16, 185, 129))
 
     # 标题文字
-    title_text = "bash ~ root@linux-node: / (x.zttz.eu.org)"
+    title_text = "bash ~ root@linux-node: / (zttz.eu.org)"
     draw.text((WIDTH // 2 - 130, 10), title_text, fill=TEXT_GRAY, font=font_title)
     return img
 
 # 剧本分段规划 (共 171 帧, 11.4 秒)
 # 第一幕 (0 - 65 帧, 4.3 秒):
-# 0-25 帧: 逐字打字 bash <(curl -sL https://x.zttz.eu.org/x.sh)
+# 0-25 帧: 逐字打字 bash <(curl -sL https://zttz.eu.org/x.sh)
 # 26-42 帧: 滚动输出安装日志
 # 43-65 帧: 安装成功提示，停留
 #
@@ -69,7 +69,7 @@ def draw_window_frame():
 # 122-132 帧: 键入 k app
 # 133-171 帧: 正在呼出智能应用市场... 加载 128+ 精选应用, 7 个核心分类即装即用
 
-CMD_1 = "bash <(curl -sL https://x.zttz.eu.org/x.sh)"
+CMD_1 = "bash <(curl -sL https://zttz.eu.org/x.sh)"
 
 for frame_idx in range(TOTAL_FRAMES):
     img = draw_window_frame()
