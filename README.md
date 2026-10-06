@@ -8,6 +8,7 @@
 [![Website](https://img.shields.io/badge/官网主页-x.zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://x.zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Bun](https://img.shields.io/badge/Bun-1.3.14-f7d7b6?style=for-the-badge&logo=bun&logoColor=111827)](https://bun.sh)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/License-GPLv3-amber?style=for-the-badge)](./LICENSE)
 
@@ -100,6 +101,10 @@ k update        # 无缝检测并更新工具箱至最新版本
 ## 🛠️ 自动化流水线与代码工程
 
 - **前端技术栈**：采用 **Next.js 14 (App Router)** + **Tailwind CSS** 构建，全静态导出（SSG）极速秒开；
+- **Bun.sh 1.3.14 统一工具链**：网站端 `website/` 已固定使用 `website/.bun-version` 与 `website/bun.lock`，本地和 GitHub Actions 均通过 `bun install --frozen-lockfile`、`bun run build` 完成依赖安装与生产构建；
+- **更快的安装与构建链路**：Bun 的包管理器、运行时与脚本执行器合一，减少 Node/npm 多工具切换成本，CI 中无需再维护 `package-lock.json` 与 npm 缓存策略，依赖解析更稳定；
+- **预构建脚本原生化**：`prebuild` 已切换为 `bun fetch_vpngate.js && bun generate_daily_recommend.js`，VPNGate 彩蛋节点更新、每日推荐打新、Next.js 构建统一由 Bun 驱动，降低脚本启动开销；
+- **云端发布更可靠**：`.github/workflows/muse-deploy.yml` 使用 `oven-sh/setup-bun@v1` 固定 Bun 1.3.14，避免云端 Actions 因 npm 锁文件缺失或版本漂移导致自动同步停摆；
 - **自动化同步引擎**：包含官方源码自动同步脚本 `sync_upstream.sh` 与 `sync_upstream.js`，可平滑跟进上游更新并保持分类折叠特性零冲突；
 - **每日热榜抓取器**：`fetch_github_trending.js` 自动抓取 GitHub 官方趋势榜，智能翻译后即时渲染；
 - **高颜值视觉系统**：配备专属圆形机甲猫咪 Logo、标准 180×180 Apple Touch Icon 与 Favicon 图标集。
