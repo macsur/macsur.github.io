@@ -19,7 +19,9 @@
 2. **绝对严禁向 `origin` (`kejilion/sh.git`) 推送**：
    - `origin` 是上游原作者的只读参考仓库，不是用户的仓库。当前本地已将 `origin push` 设为 `DISABLED_DO_NOT_PUSH_UPSTREAM`，切勿修改其配置。
 3. **站点核心架构与域名**：
-   - 站点主域名：`https://x.zttz.eu.org`（DNS CNAME 指向 Cloudflare Pages 项目 `macsur-github-io`，其代码由 `main` 分支自动化构建注入）。
+   - 站点主域名已于 **2026-10-07** 正式迁移为：`https://zttz.eu.org`。
+   - Cloudflare Pages 项目：`macsur-github-io`，Pages 已绑定 `zttz.eu.org` 且部署验证通过。
+   - 历史域名 `https://x.zttz.eu.org` 只作为旧链接兼容入口，需在 Cloudflare 配置 301 跳转到根域名：`https://zttz.eu.org/*`；`www.zttz.eu.org/*` 同样 301 到根域名；`dy.zttz.eu.org` 不动。
    - 源码主力分支：`source` 分支。
    - 云端通过 GitHub Actions（`muse-deploy.yml` 监听 `push: source` 或 `repository_dispatch: update-website`）以及每日北京时间 03:00 (UTC 19:00) 定时自动抓取热榜、打新构建并发布到 `main`。
 4. **Cloudflare Pages 部署提示**：
@@ -28,6 +30,49 @@
 ---
 
 ## 2. 核心架构与演进总结
+
+### 🌐 主域名迁移完成：`zttz.eu.org` 成为唯一主推域名 (2026-10-07)
+1. **迁移结果与终验状态**：
+   - 代码提交 `12cb6f7 chore(website): switch primary domain to zttz.eu.org` 已将公开代码和文档里的主域名统一从 `x.zttz.eu.org` 切换为 `zttz.eu.org`。
+   - GitHub Actions / Pages 部署已成功，`https://zttz.eu.org` 打开正常。
+   - 首页标题、Hero 广告、副标题、安装命令、footer、metadata、彩蛋数据、`README.md`、`website/public/README.md`、`website/public/CNAME` 均已切到新域名。
+   - `https://zttz.eu.org/x.sh` 已验证可达，脚本正常。
+2. **标准安装命令（新文档只推荐这一条）**：
+   ```bash
+   bash <(curl -sL https://zttz.eu.org/x.sh)
+   ```
+3. **旧链接兼容策略**：
+   - `x.zttz.eu.org` 不再作为主推域名，只作为旧教程、旧截图、旧转发链接的兼容入口。
+   - Cloudflare 需保留/配置 301：`x.zttz.eu.org/*` → `https://zttz.eu.org/*`，`www.zttz.eu.org/*` → `https://zttz.eu.org/*`。
+   - 旧安装命令 `curl -sL` 带 `-L`，会自动跟随 301，因此历史教程不会断。
+4. **本次改动涉及关键文件**：
+   - `README.md`
+   - `website/public/README.md`
+   - `website/public/CNAME`
+   - `website/src/app/layout.tsx`
+   - `website/src/app/page.tsx`
+   - `website/src/data/easterEggData.ts`
+   - `website/fetch_vpngate.js`（重要：构建时会重写 `easterEggData.ts`，必须同步这里）
+   - `render_demo.py`
+
+### 🧾 README 与 Bun 工具链文档同步 (2026-10-07)
+1. **文档标题统一**：
+   - 根 `README.md` 与 `website/public/README.md` 的标题 slogan 已统一为：`一条命令，整备一台服务器`，与网站首页 Hero 主标题一致。
+2. **Bun.sh 文档补齐**：
+   - `README.md` 增加 Bun 1.3.14 badge 与 Bun 工具链收益说明。
+   - `website/public/README.md` 已同步同款 Bun badge 与“自动化流水线与代码工程”说明。
+3. **npm 锁文件清理**：
+   - 提交 `3319c5e docs: document Bun toolchain benefits` 已删除 `website/package-lock.json`，`.gitignore` 已忽略 `package-lock.json` 与 `website/package-lock.json`。
+   - `website/bun.lock` 是唯一锁文件来源。
+
+### 🎨 Hero 品牌广告与中文字体修复 (2026-10-07)
+1. **广告位置最终版**：
+   - 品牌创意广告从“常用指令网格左上”移动到 Hero 区，信息流固定为：徽章 → 主标题 → 广告语轮播 → 品牌创意广告 → 副标题 → 终端安装卡。
+   - 常用指令网格已恢复原样，`k` 回到第一位，8 张指令卡按原顺序展示。
+   - 右侧 terminal demo 卡保持原位置不动。
+2. **广告素材中文方框乱码修复**：
+   - 远端 `source` 已合入 `823c1d1` 与 `3a1adcb`，分别重新生成 `toolbox-ad.gif` 与 `toolbox-ad-square.gif`，使用 CJK 字体修复中文 tofu 方框。
+   - 后续如再改 GIF 素材，务必显式使用中文字体渲染，不能依赖默认英文字体。
 
 ### 🚀 前端工具链全面升级为 Bun 1.3.14 与首屏性能优化 (2026-10-06)
 1. **全面引入 Bun 统一开发与构建工具链**：
@@ -105,8 +150,9 @@
 ## 4. 后续开发建议与操作规范
 
 1. **修改流程**：
-   - 本地在 `source` 分支修改代码 → `npm run build` 或 `bash -n` 本地验证通过。
+   - 本地在 `source` 分支修改代码 → 进入 `website/` 执行 `bun run build`，或对脚本执行 `bash -n` 本地验证通过。
    - 提交 commit 并推送到 `macsur/source` 分支 (`git push macsur source`)。
+   - 构建脚本会自动刷新 `website/src/data/dailyRecommend.ts` 与 `website/src/data/recommendManifest.json`；若本次任务无关每日推荐，提交前应检查并还原这些自动生成数据，避免无关改动混入。
 2. **发布与上线**：
    - 向 `macsur/source` push 后会自动触发 GitHub Actions，或者由 Muse 发送 `repository_dispatch` (`event_type: update-website`)。
    - 编译完成后 Actions 会自动将静态页面部署到 `main` 分支。
