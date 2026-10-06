@@ -407,7 +407,7 @@ export default function Home() {
   const quickCommands = [
     { cmd: 'k', desc: '启动 Linux生态圈主控制面板' },
     { cmd: 'k app', desc: '直接呼出智能应用市场' },
-    { cmd: 'k app 57', desc: '一键部署 Deepseek AI 大模型' },
+    { cmd: 'k app 57', desc: '一键部署 DeepSeek AI 大模型' },
     { cmd: 'k bbr3', desc: 'BBRv3 内核与网络调优' },
     { cmd: 'k clean', desc: '一键深度清理系统冗余缓存' },
     { cmd: 'k dd', desc: '纯净版 Linux 系统一键重装' },
@@ -504,7 +504,7 @@ export default function Home() {
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用生态 (160+)</a>
-              <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">命令字典</a>
+              <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">常用指令</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
                 <span>GitHub乐园</span>
@@ -537,22 +537,18 @@ export default function Home() {
           <div className="inline-flex items-center google-pill mb-8 select-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
             <span className="text-xs text-slate-300 font-medium tracking-wide flex items-center">
-              <span className="text-cyan-400 font-semibold">Linux 极客应用大厅</span>
-              <span className="mx-2 text-slate-600">/</span>
-              <span className="text-slate-300">纯净命令行底座</span>
-              <span className="mx-2 text-slate-600">/</span>
-              <span className="text-emerald-400 font-mono">160+ 开源精选</span>
+              <span className="text-cyan-400 font-semibold">Linux 服务器工具箱</span>
             </span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6">
             <span className="block text-gradient-gemini font-extrabold tracking-tight">
-              一条 curl，整个开源世界随叫随到
+              一条命令，从裸机到就绪
             </span>
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
-            专为开发者与极客打造的现代化命令行底座，体验前所未有的纯净与高效。
+            系统重装、BBR 加速、Docker 部署、160+ 应用一键安装、自动备份——全在终端里搞定，不用装面板。
           </p>
 
           {/* 终端模拟一键安装框 */}
@@ -642,7 +638,7 @@ export default function Home() {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center space-x-2">
               <Zap className="w-5 h-5 text-amber-400" />
-              <span>常用指令快速直达</span>
+              <span>常用指令</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">在安装完成后，无需进入层层菜单，输入子指令秒级直达</p>
           </div>
@@ -1302,7 +1298,7 @@ export default function Home() {
                       : "bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 text-amber-300 group-hover:border-amber-400 group-hover:text-white shadow-amber-500/10"
                   }`}
                 >
-                  <span>{isGithubParkOpen ? "收起 Github乐园" : "点击展开 Github乐园"}</span>
+                  <span>{isGithubParkOpen ? "收起 GitHub乐园" : "点击展开 GitHub乐园"}</span>
                   {isGithubParkOpen ? (
                     <ChevronDown className="w-4 h-4 text-amber-400 transform rotate-180 transition-transform duration-300" />
                   ) : (

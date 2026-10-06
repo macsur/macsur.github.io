@@ -28,23 +28,23 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = [
     "reason": "把重复繁琐的人工日常自动化，甚至能作为个人数字分身 24 小时监控并处理数据。"
   },
   {
-    "id": 201,
-    "cmd": "k app 201",
-    "badge": "AI 顶流标杆",
-    "name": "DeepSeek-V3/R1 顶尖开源大模型",
-    "category": "🤖 人工智能与前沿大模型",
-    "stars": "185k+",
-    "highlight": "全球瞩目的划时代开源大语言模型与超强推理架构。一键完成模型权重加载、量化适配与本地高并发 API 暴露，零门槛打造企业级私有化 AI 引擎。",
-    "reason": "实测在纯 CPU 或消费级 GPU 上均展现出超越同级参数的惊人推理表现，数学与代码生成能力直逼顶级专有模型。"
+    "id": 204,
+    "cmd": "k app 204",
+    "badge": "极简 PaaS 云底座",
+    "name": "Dokploy 轻量开源自托管 PaaS 平台",
+    "category": "🖥️ 服务器运维与探针监控",
+    "stars": "14k+",
+    "highlight": "被誉为开源自建版 Heroku / Vercel。直接连接 GitHub 仓库自动 CI/CD 构建，原生支持数据库集群、自动 SSL 与 Docker Compose 编排发布。",
+    "reason": "让个人开发者拥有一整套属于自己的微型云服务商体验，告别昂贵的第三方托管费用。"
   },
   {
-    "id": 203,
-    "cmd": "k app 203",
-    "badge": "私有 AI 门户",
-    "name": "Open WebUI 全能私有化 AI 交互平台",
+    "id": 202,
+    "cmd": "k app 202",
+    "badge": "极速大模型引擎",
+    "name": "Ollama 极简轻量化本地大模型框架",
     "category": "🤖 人工智能与前沿大模型",
-    "stars": "58k+",
-    "highlight": "对标顶级商业产品的自托管 AI 工作台。完美兼容 Ollama 与各类 OpenAI 格式接口，原生集成 RAG 知识库检索增强、语音输入输出与多用户权限管理。",
-    "reason": "交互体验丝滑细腻，能够将孤立的模型权重秒变人人可用的团队 AI 生产力资产。"
+    "stars": "115k+",
+    "highlight": "让大模型如同普通命令行工具一样易用。一行指令完成大模型拉取、量化、运行与显存管理，完美支撑各类下游 AI 应用与开发环境。",
+    "reason": "跨平台生态适配最成熟的开源运行时，与各类客户端无缝联动，开箱即用体验堪称行业标杆。"
   }
 ];
