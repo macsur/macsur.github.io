@@ -61,6 +61,35 @@ export default function Home() {
   // 内容铁律：上游有新应用时优先打新上榜，无新内容时随机抽取，每日构建刷新
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
 
+  // 🎯 Hero 广告语轮播 (12条文案，每4秒轮播一次，淡入淡出)
+  const heroSlogans = useMemo(() => [
+    '终端之美，效率之诗',
+    '极简之美，一键即达',
+    '运维的艺术，极客的浪漫',
+    '工具箱在手，运维不愁',
+    '少点点击，多点掌控',
+    '不装面板，不将就',
+    '一行命令，万事俱备',
+    '把复杂留给脚本，把优雅留给你',
+    '省下的时间，拿去写诗',
+    '从裸机到就绪，只差一条命令',
+    '重装不求人，部署不熬夜',
+    '开箱即用，开箱即酷'
+  ], []);
+  const [sloganIdx, setSloganIdx] = useState(0);
+  const [sloganFade, setSloganFade] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSloganFade(false);
+      setTimeout(() => {
+        setSloganIdx((prev) => (prev + 1) % heroSlogans.length);
+        setSloganFade(true);
+      }, 400);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [heroSlogans.length]);
+
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // 初始化读取本地偏好
@@ -541,11 +570,22 @@ export default function Home() {
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3">
             <span className="block text-gradient-gemini font-extrabold tracking-tight">
-              一条命令，从裸机到就绪
+              一条命令，整备一台服务器
             </span>
           </h1>
+
+          {/* 🎯 Hero 广告语轮播（情绪层） */}
+          <div className="h-6 mb-4 flex items-center justify-center select-none">
+            <span
+              className={`text-xs sm:text-sm font-medium tracking-wider text-cyan-400/80 transition-opacity duration-500 ease-in-out ${
+                sloganFade ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              ✦ {heroSlogans[sloganIdx]} ✦
+            </span>
+          </div>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
             系统重装、BBR 加速、Docker 部署、160+ 应用一键安装、自动备份——全在终端里搞定，不用装面板。

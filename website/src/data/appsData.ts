@@ -27,6 +27,12 @@ export interface AppItem {
   isStar: boolean;
   alias: string;
   desc: string;
+  rec?: {
+    badge: string;
+    stars: string;
+    highlight: string;
+    reason: string;
+  };
 }
 
 export const CATEGORIES: Category[] = [
@@ -79,7 +85,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "deepseek",
-    "desc": "全球瞩目的划时代开源大语言模型与超强推理架构。"
+    "desc": "全球瞩目的划时代开源大语言模型与超强推理架构。",
+    "rec": {
+      "badge": "AI 顶流标杆",
+      "stars": "185k+",
+      "highlight": "全球瞩目的划时代开源大语言模型与超强推理架构。一键完成模型权重加载、量化适配与本地高并发 API 暴露，零门槛打造企业级私有化 AI 引擎。",
+      "reason": "实测在纯 CPU 或消费级 GPU 上均展现出超越同级参数的惊人推理表现，数学与代码生成能力直逼顶级专有模型。"
+    }
   },
   {
     "id": "202",
@@ -87,7 +99,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "ollama",
-    "desc": "一键在本地或 VPS 运行 DeepSeek、Llama3 等大模型。"
+    "desc": "一键在本地或 VPS 运行 DeepSeek、Llama3 等大模型。",
+    "rec": {
+      "badge": "极速大模型引擎",
+      "stars": "115k+",
+      "highlight": "让大模型如同普通命令行工具一样易用。一行指令完成大模型拉取、量化、运行与显存管理，完美支撑各类下游 AI 应用与开发环境。",
+      "reason": "跨平台生态适配最成熟的开源运行时，与各类客户端无缝联动，开箱即用体验堪称行业标杆。"
+    }
   },
   {
     "id": "203",
@@ -95,7 +113,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "open-webui",
-    "desc": "媲美 ChatGPT 的自托管多模型 Web 界面。"
+    "desc": "媲美 ChatGPT 的自托管多模型 Web 界面。",
+    "rec": {
+      "badge": "私有 AI 门户",
+      "stars": "58k+",
+      "highlight": "对标顶级商业产品的自托管 AI 工作台。完美兼容 Ollama 与各类 OpenAI 格式接口，原生集成 RAG 知识库检索增强、语音输入输出与多用户权限管理。",
+      "reason": "交互体验丝滑细腻，能够将孤立的模型权重秒变人人可用的团队 AI 生产力资产。"
+    }
   },
   {
     "id": "204",
@@ -103,7 +127,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "dokploy",
-    "desc": "下一代轻量级 PaaS 应用平台，一键管理容器应用与数据库。"
+    "desc": "下一代轻量级 PaaS 应用平台，一键管理容器应用与数据库。",
+    "rec": {
+      "badge": "极简 PaaS 云底座",
+      "stars": "14k+",
+      "highlight": "被誉为开源自建版 Heroku / Vercel。直接连接 GitHub 仓库自动 CI/CD 构建，原生支持数据库集群、自动 SSL 与 Docker Compose 编排发布。",
+      "reason": "让个人开发者拥有一整套属于自己的微型云服务商体验，告别昂贵的第三方托管费用。"
+    }
   },
   {
     "id": "205",
@@ -111,7 +141,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "uptime-kuma",
-    "desc": "高颜值探针监控，支持 90+ 告警通知与公开状态页。"
+    "desc": "高颜值探针监控，支持 90+ 告警通知与公开状态页。",
+    "rec": {
+      "badge": "极客必备探针",
+      "stars": "62k+",
+      "highlight": "自托管监控界的颜值天花板。支持 HTTP(s)、TCP、Ping、DNS、Docker 容器与证书到期监控，内置 90+ 渠道全能实时告警与公开状态页一键生成。",
+      "reason": "资源占用极其克制，0 门槛开箱即用，是管理多台服务器与网站集群健康状态的终极守护者。"
+    }
   },
   {
     "id": "206",
@@ -119,7 +155,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "rustdesk",
-    "desc": "开源远程桌面客户端与自建中继服务，端到端高强度加密安全可控。"
+    "desc": "开源远程桌面客户端与自建中继服务，端到端高强度加密安全可控。",
+    "rec": {
+      "badge": "自建中继神器",
+      "stars": "76k+",
+      "highlight": "端到端高强度加密的完全自主可控远程桌面。支持自建中继服务器与信令网关，无视第三方商业软件限速与隐私风险，流畅低延迟操控云端主机。",
+      "reason": "原生 Rust 编写，内存极小，高并发性能极其强悍，是个人与企业团队必备的远程运维底座。"
+    }
   },
   {
     "id": "207",
@@ -127,7 +169,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "immich",
-    "desc": "自主可控的极速相册备份方案，内置隐私 AI 识别与人脸聚合。"
+    "desc": "自主可控的极速相册备份方案，内置隐私 AI 识别与人脸聚合。",
+    "rec": {
+      "badge": "隐私云相册",
+      "stars": "61k+",
+      "highlight": "全面替代 Google Photos 与 iCloud 的超强开源相册备份。原生配备手机端自动备份、本地离线人脸识别、以图搜图与实况照片完美展示。",
+      "reason": "真正把珍贵的生活回忆锁在自己的服务器里，支持多用户隔离与智能相册聚类，体验极速。"
+    }
   },
   {
     "id": "208",
@@ -135,7 +183,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "n8n",
-    "desc": "可视化拖拽自动化工作流，原生构建私有 AI Agent 智能体。"
+    "desc": "可视化拖拽自动化工作流，原生构建私有 AI Agent 智能体。",
+    "rec": {
+      "badge": "AI Agent 中枢",
+      "stars": "52k+",
+      "highlight": "全球领先的开源工作流自动化平台。支持数百种外部应用打通，内置强大的 LangChain 智能体节点，零代码/低代码实现复杂业务流程自动化。",
+      "reason": "把重复繁琐的人工日常自动化，甚至能作为个人数字分身 24 小时监控并处理数据。"
+    }
   },
   {
     "id": "209",
@@ -143,7 +197,13 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "lobe-chat",
-    "desc": "极致现代化设计，支持语音、视觉多模态与丰富插件市场。"
+    "desc": "极致现代化设计，支持语音、视觉多模态与丰富插件市场。",
+    "rec": {
+      "badge": "现代化多模态助手",
+      "stars": "45k+",
+      "highlight": "视觉与界面设计极具科技感的下一代开源 LLM/Agent 聊天框架。原生支持文生图、语音多模态及丰富插件生态。",
+      "reason": "PWA 支持极佳，交互动画与卡片排版赏心悦目，开箱即拥有媲美商业级 AI 助手体验。"
+    }
   },
   {
     "id": "210",
@@ -151,15 +211,27 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "github",
     "isStar": true,
     "alias": "code-server",
-    "desc": "在远程服务器运行 VS Code，浏览器即开即写。"
+    "desc": "在远程服务器运行 VS Code，浏览器即开即写。",
+    "rec": {
+      "badge": "云端开发工作台",
+      "stars": "68k+",
+      "highlight": "在远程 Linux 服务器上运行标准 VS Code，通过浏览器随时随地编写代码，保持环境高度统一与持久在线。",
+      "reason": "完美解决换机重配环境的痛点，结合云端高带宽，随时随地享受桌面级开发体验。"
+    }
   },
   {
     "id": "1",
     "name": "宝塔面板官方版",
     "category": "ops",
-    "isStar": false,
+    "isStar": true,
     "alias": "bt",
-    "desc": "baota"
+    "desc": "baota",
+    "rec": {
+      "badge": "运维装机必备",
+      "stars": "15k+",
+      "highlight": "国内最成熟、装机量极大的 Linux 服务器可视化运维面板。支持 LNMP/LAMP 环境一键搭建、站点管理与 FTP/数据库全套工具。",
+      "reason": "生态插件极其完备，新手建站与传统运维的不二选择。"
+    }
   },
   {
     "id": "2",
@@ -173,17 +245,29 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "3",
     "name": "1Panel新一代管理面板",
     "category": "ops",
-    "isStar": false,
+    "isStar": true,
     "alias": "1p",
-    "desc": "1panel"
+    "desc": "1panel",
+    "rec": {
+      "badge": "现代化运维首选",
+      "stars": "26k+",
+      "highlight": "开源、轻量且深度拥抱 Docker 容器化理念的现代化运维神器。界面遵循极简几何美学，内置精选应用市场、自动化证书签发、容器生命周期监控与一键容灾备份。",
+      "reason": "彻底摆脱传统面板对系统环境的高侵入性污染，所有服务均在独立沙箱中优雅运行，安全稳定。"
+    }
   },
   {
     "id": "4",
     "name": "NginxProxyManager可视化面板",
     "category": "network",
-    "isStar": false,
+    "isStar": true,
     "alias": "npm",
-    "desc": "一个Nginx反向代理工具面板，不支持添加域名访问。"
+    "desc": "一个Nginx反向代理工具面板，不支持添加域名访问。",
+    "rec": {
+      "badge": "反向代理神器",
+      "stars": "21k+",
+      "highlight": "超高颜值的 Nginx 反向代理与 SSL 证书可视化管理平台。小白也能在 Web 界面轻松配置多域名转发、Let's Encrypt 证书自动续签与访问控制列表。",
+      "reason": "免去手写复杂 nginx.conf 的繁琐与配置报错风险，域名路由管理效率翻倍。"
+    }
   },
   {
     "id": "5",
@@ -205,17 +289,29 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "7",
     "name": "哪吒探针VPS监控面板",
     "category": "ops",
-    "isStar": false,
+    "isStar": true,
     "alias": "nezha",
-    "desc": ""
+    "desc": "",
+    "rec": {
+      "badge": "轻量集群探针",
+      "stars": "18k+",
+      "highlight": "支持多服务器集中监控与大屏看板展示的轻量级探针系统。实时告警 CPU/内存/流量异动，支持多端告警通知。",
+      "reason": "资源占用几乎可以忽略，多节点多 VPS 玩家人手必备的机房大屏看板。"
+    }
   },
   {
     "id": "8",
     "name": "QB离线BT磁力下载面板",
     "category": "media",
-    "isStar": false,
+    "isStar": true,
     "alias": "qb",
-    "desc": "QB"
+    "desc": "QB",
+    "rec": {
+      "badge": "离线下载利器",
+      "stars": "24k+",
+      "highlight": "功能强大的跨平台 BitTorrent/PT 离线下载客户端，配备干净直观的 Web UI。支持 RSS 自动订阅抓取与多用户带宽限速规则。",
+      "reason": "自建影音库与 NAS 离线挂机下载的基石级下载工具。"
+    }
   },
   {
     "id": "9",
@@ -253,25 +349,43 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "13",
     "name": "Cloudreve网盘",
     "category": "storage",
-    "isStar": false,
+    "isStar": true,
     "alias": "cloudreve",
-    "desc": "cloudreve是一个支持多家云存储的网盘系统"
+    "desc": "cloudreve是一个支持多家云存储的网盘系统",
+    "rec": {
+      "badge": "多存储私有网盘",
+      "stars": "28k+",
+      "highlight": "支持本地存储与各类主流对象存储（七牛/又拍/OSS/COS/OneDrive）统一挂载的现代网盘。支持离线下载、WebDAV 与在线音视频预览。",
+      "reason": "单文件部署、极简轻盈，拥有绝佳的桌面端与移动端响应式体验。"
+    }
   },
   {
     "id": "14",
     "name": "简单图床图片管理程序",
     "category": "storage",
-    "isStar": false,
+    "isStar": true,
     "alias": "easyimage",
-    "desc": "简单图床是一个简单的图床程序"
+    "desc": "简单图床是一个简单的图床程序",
+    "rec": {
+      "badge": "极简公共图床",
+      "stars": "6k+",
+      "highlight": "轻量好用的自托管图床管理程序。支持多图上传、图片鉴黄、文件外链管理与一键 Markdown/HTML 链接生成。",
+      "reason": "无需复杂数据库依赖即可迅速跑起，非常适合个人博客与文档配图托管。"
+    }
   },
   {
     "id": "15",
     "name": "emby多媒体管理系统",
     "category": "media",
-    "isStar": false,
+    "isStar": true,
     "alias": "emby",
-    "desc": "emby是一个主从式架构的媒体服务器软件，可以用来整理服务器上的视频和音..."
+    "desc": "emby是一个主从式架构的媒体服务器软件，可以用来整理服务器上的视频和音...",
+    "rec": {
+      "badge": "私有影音媒体库",
+      "stars": "19k+",
+      "highlight": "全平台覆盖的家庭影院与多媒体中心。支持电影、剧集、音乐自动搜刮刮削封面，多设备硬件解码与画质自适应串流播放。",
+      "reason": "打造个人专属 Netflix 的顶流选择，随时随地在手机、电视、网页畅享高清大片。"
+    }
   },
   {
     "id": "16",
@@ -333,9 +447,15 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "23",
     "name": "Memos网页备忘录",
     "category": "office",
-    "isStar": false,
+    "isStar": true,
     "alias": "memos",
-    "desc": "Memos是一款轻量级、自托管的备忘录中心"
+    "desc": "Memos是一款轻量级、自托管的备忘录中心",
+    "rec": {
+      "badge": "碎片灵感看板",
+      "stars": "33k+",
+      "highlight": "支持隐私自托管的极简卡片式灵感备忘录。支持 Markdown、轻量标签、时间轴热力图以及与各类客户端的无缝同步。",
+      "reason": "类似推特/微博的轻量记录形态，是捕捉日常闪光想法与日记记录的绝佳载体。"
+    }
   },
   {
     "id": "24",
@@ -349,9 +469,15 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "25",
     "name": "Nextcloud网盘",
     "category": "storage",
-    "isStar": false,
+    "isStar": true,
     "alias": "nextcloud",
-    "desc": "Nextcloud拥有超过 400,000 个部署，是您可以下载的最受欢..."
+    "desc": "Nextcloud拥有超过 400,000 个部署，是您可以下载的最受欢...",
+    "rec": {
+      "badge": "企业级私有云盘",
+      "stars": "25k+",
+      "highlight": "功能强大的开源自建云办公与数据存储协作套件。集成日程协同、文件同步共享、文档多人在线编辑与全平台客户端支持。",
+      "reason": "数据自主掌控的终极私有云方案，适合对数据隐私有极高要求的个人与团队。"
+    }
   },
   {
     "id": "26",
@@ -613,9 +739,15 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "58",
     "name": "Dify大模型知识库",
     "category": "ai",
-    "isStar": false,
+    "isStar": true,
     "alias": "dify",
-    "desc": "是一款开源的大语言模型(LLM) 应用开发平台。自托管训练数据用于AI生..."
+    "desc": "是一款开源的大语言模型(LLM) 应用开发平台。自托管训练数据用于AI生...",
+    "rec": {
+      "badge": "LLM 知识库开发平台",
+      "stars": "60k+",
+      "highlight": "直观易用且功能完备的 LLM 应用开发平台。内置 RAG 引擎、工作流编排、模型管理与一键 API / WebApp 交付发布。",
+      "reason": "快速构建企业内部问答助手、知识检索与 AI Agent 的行业事实标准平台。"
+    }
   },
   {
     "id": "59",
@@ -629,9 +761,15 @@ export const BUILTIN_APPS: AppItem[] = [
     "id": "60",
     "name": "JumpServer开源堡垒机",
     "category": "ops",
-    "isStar": false,
+    "isStar": true,
     "alias": "jms",
-    "desc": "是一个开源的特权访问管理 (PAM) 工具，该程序占用80端口不支持添加..."
+    "desc": "是一个开源的特权访问管理 (PAM) 工具，该程序占用80端口不支持添加...",
+    "rec": {
+      "badge": "开源堡垒机运维审计",
+      "stars": "25k+",
+      "highlight": "全球首款完全开源的堡垒机与安全运维审计平台。支持 SSH、Windows RDP、Web 终端统一纳管、会话录像与权限精细化控制。",
+      "reason": "多节点资产集中运维与企业合规审计的行业标杆之作。"
+    }
   },
   {
     "id": "61",
