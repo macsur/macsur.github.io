@@ -157,3 +157,29 @@
    - 向 `macsur/source` push 后会自动触发 GitHub Actions，或者由 Muse 发送 `repository_dispatch` (`event_type: update-website`)。
    - 编译完成后 Actions 会自动将静态页面部署到 `main` 分支。
    - 若 Cloudflare Pages 部署卡 queued，在 Cloudflare 控制台或通过 API 点击 Retry。
+3. **固定工作记录 / 交班记录格式（必须遵守）**：
+   - 每次收工、交接、转交 Muse AI / Antigravity 时，记录必须统一使用以下结构，避免遗漏关键信息：
+     ```markdown
+     ## 工作记录（YYYY-MM-DD）
+
+     ### 1. 变更内容
+     - 做了什么；
+     - 改了哪些关键文件；
+     - 保留了哪些兼容入口或旧逻辑。
+
+     ### 2. 验证结果
+     - 执行过的命令，例如：`bun run build`、`bash -n ...`、`node --check ...`；
+     - 验证是否通过；
+     - 构建脚本是否产生无关自动生成数据，若有是否已还原。
+
+     ### 3. 提交与推送
+     - commit hash 与 commit message；
+     - 推送目标必须写明：`macsur/source`；
+     - 明确说明：未推 `origin`，未推 `main`。
+
+     ### 4. 注意事项 / 下一步
+     - 仍需人工操作的外部事项（Cloudflare、Pages、DNS、Actions 等）；
+     - 后续接手必须避免的坑；
+     - 与 Muse AI / Antigravity 协作时的上下文。
+     ```
+   - 如果是简短任务，也必须至少保留这四个标题；可以用“无”填充空项。
