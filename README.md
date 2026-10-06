@@ -2,7 +2,7 @@
 
 <img src="./logo.png" width="130" height="130" alt="Linux生态圈 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
 
-# 🌟 一条 curl，整个开源世界随叫随到
+# 🌟 一条命令，整备一台服务器
 ### Linux生态 · 现代化服务器运维基座与开源应用中心
 
 [![Website](https://img.shields.io/badge/官网主页-x.zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://x.zttz.eu.org)
