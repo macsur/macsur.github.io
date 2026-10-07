@@ -18,33 +18,33 @@ export const DAILY_RECOMMEND_GENERATED_AT = "2026-10-07";
 
 export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   {
-    "id": 3,
-    "cmd": "k app 3",
-    "badge": "现代化运维首选",
-    "name": "1Panel新一代管理面板",
-    "category": "🖥️  服务器运维与探针监控",
-    "stars": "26k+",
-    "highlight": "开源、轻量且深度拥抱 Docker 容器化理念的现代化运维神器。界面遵循极简几何美学，内置精选应用市场、自动化证书签发、容器生命周期监控与一键容灾备份。",
-    "reason": "彻底摆脱传统面板对系统环境的高侵入性污染，所有服务均在独立沙箱中优雅运行，安全稳定。"
+    "id": 119,
+    "cmd": "k app 119",
+    "badge": "多 AI 客户端通用网关",
+    "name": "Agent2API 桌面AI客户端反代网关",
+    "category": "🤖 人工智能与前沿大模型",
+    "stars": "300+",
+    "highlight": "将多家桌面 AI 客户端与 Agent 工具的登录态统一反代包装为 OpenAI / Claude 兼容 API 端点 (127.0.0.1:3065/v1)，支持 token 自动续期与全局 429 降级队列。",
+    "reason": "轻松复用多平台客户端的模型额度，一键打通任意第三方 API 客户端或 CLI 开发工具。"
   },
   {
-    "id": 4,
-    "cmd": "k app 4",
-    "badge": "反向代理神器",
-    "name": "NginxProxyManager可视化面板",
-    "category": "🌐 网络代理与穿透组网",
-    "stars": "21k+",
-    "highlight": "超高颜值的 Nginx 反向代理与 SSL 证书可视化管理平台。小白也能在 Web 界面轻松配置多域名转发、Let's Encrypt 证书自动续签与访问控制列表。",
-    "reason": "免去手写复杂 nginx.conf 的繁琐与配置报错风险，域名路由管理效率翻倍。"
+    "id": 25,
+    "cmd": "k app 25",
+    "badge": "企业级私有云盘",
+    "name": "Nextcloud网盘",
+    "category": "🗄️  私有网盘与数据存储",
+    "stars": "25k+",
+    "highlight": "功能强大的开源自建云办公与数据存储协作套件。集成日程协同、文件同步共享、文档多人在线编辑与全平台客户端支持。",
+    "reason": "数据自主掌控的终极私有云方案，适合对数据隐私有极高要求的个人与团队。"
   },
   {
-    "id": 7,
-    "cmd": "k app 7",
-    "badge": "轻量集群探针",
-    "name": "哪吒探针VPS监控面板",
-    "category": "🖥️  服务器运维与探针监控",
-    "stars": "18k+",
-    "highlight": "支持多服务器集中监控与大屏看板展示的轻量级探针系统。实时告警 CPU/内存/流量异动，支持多端告警通知。",
-    "reason": "资源占用几乎可以忽略，多节点多 VPS 玩家人手必备的机房大屏看板。"
+    "id": 58,
+    "cmd": "k app 58",
+    "badge": "LLM 知识库开发平台",
+    "name": "Dify大模型知识库",
+    "category": "🤖 人工智能与前沿大模型",
+    "stars": "60k+",
+    "highlight": "直观易用且功能完备的 LLM 应用开发平台。内置 RAG 引擎、工作流编排、模型管理与一键 API / WebApp 交付发布。",
+    "reason": "快速构建企业内部问答助手、知识检索与 AI Agent 的行业事实标准平台。"
   }
 ];

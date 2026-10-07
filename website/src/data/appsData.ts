@@ -1236,6 +1236,20 @@ export const BUILTIN_APPS: AppItem[] = [
     "desc": ""
   },
   {
+    "id": "119",
+    "name": "Agent2API 桌面AI客户端反代网关",
+    "category": "ai",
+    "isStar": true,
+    "alias": "agent2api",
+    "desc": "把 WorkBuddy/小浣熊/Trae/Qoder/Cline 等桌面 AI 客户端登录态包装为标准 OpenAI 兼容 API 网关",
+    "rec": {
+      "badge": "多 AI 客户端通用网关",
+      "stars": "300+",
+      "highlight": "将多家桌面 AI 客户端与 Agent 工具的登录态统一反代包装为 OpenAI / Claude 兼容 API 端点 (127.0.0.1:3065/v1)，支持 token 自动续期与全局 429 降级队列。",
+      "reason": "轻松复用多平台客户端的模型额度，一键打通任意第三方 API 客户端或 CLI 开发工具。"
+    }
+  },
+  {
     "id": "AIClient-2-API",
     "name": "AIClient-2-API",
     "category": "custom",

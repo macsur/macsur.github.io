@@ -213,6 +213,36 @@ if (officialCode.includes(caseStartTarget)) {
     officialCode = officialCode.replace(caseStartTarget, caseStartReplacement);
 }
 
+// 补丁 3.0: 注入 119|agent2api Docker 应用
+const agent2apiCode = `	  119|agent2api)
+
+		local app_id="119"
+		local docker_name="agent2api"
+		local docker_img="aimodcc/agent2api:latest"
+		local docker_port=3065
+
+		docker_rum() {
+
+			mkdir -p /home/docker/agent2api && \\
+			docker run -d --name agent2api \\
+				--restart unless-stopped \\
+				-p \${docker_port}:3065 \\
+				-v "/home/docker/agent2api/data":/data \\
+				aimodcc/agent2api:latest
+
+		}
+
+		local docker_describe="多AI桌面客户端反代网关，支持WorkBuddy/小浣熊/Trae/Qoder等包装为OpenAI API"
+		local docker_url="开源仓库: \${gh_https_url}github.com/aimod-cc/agent2api"
+		local docker_use=""
+		local docker_passwd=""
+		local app_size="1"
+		docker_app
+
+		  ;;
+`;
+officialCode = officialCode.replace('	case $sub_choice in', `	case $sub_choice in\n${agent2apiCode}`);
+
 // 增强原版 linux_panel 中的 *) 自定义软件与 J 序号支持
 const caseEndTarget = `	  *)
 		refresh_apps_catalog || return 1
