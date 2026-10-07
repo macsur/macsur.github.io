@@ -21,7 +21,7 @@ fi
 CATEGORY_LIST=(
   "github:A:⭐ 热门开源 TOP10:10"
   "ops:B:🖥️  服务器运维与探针监控:29"
-  "ai:C:🤖 人工智能与前沿大模型:15"
+  "ai:C:🤖 人工智能与前沿大模型:14"
   "network:D:🌐 网络代理与穿透组网:15"
   "storage:E:🗄️  私有网盘与数据存储:14"
   "media:F:🎬 影音媒体与离线下载:14"
@@ -211,8 +211,7 @@ BUILTIN_APPS=(
   "115|Hermes机器人管理工具|ai||hermes|" \
   "116|DeepSeek Harness管理工具|ai||deepseek-harness|DeepSeek-Harness|dsh|" \
   "117|99CDN自建CDN管理平台|network||99cdn|" \
-  "118|99DNS智能调度服务|network||99dns|" \
-  "119|Agent2API桌面AI客户端反代网关|ai|★|agent2api|将WorkBuddy/小浣熊/Trae/Qoder等客户端登录态包装为标准OpenAI API网关"
+  "118|99DNS智能调度服务|network||99dns|"
 )
 
 # 动态加载第三方应用
