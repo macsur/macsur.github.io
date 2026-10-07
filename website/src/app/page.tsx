@@ -1,8 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import Image from 'next/image';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { 
   Copy, 
   Check, 
@@ -26,6 +25,8 @@ import {
   TrendingUp,
   Clock,
   Play,
+  Volume2,
+  VolumeX,
   X
 } from 'lucide-react';
 import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
@@ -62,6 +63,8 @@ export default function Home() {
   // 🌟 【今日推荐】TOP 3 数据由构建时 generate_daily_recommend.js 每日生成
   // 内容铁律：上游有新应用时优先打新上榜，无新内容时随机抽取，每日构建刷新
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [isHeroVideoMuted, setIsHeroVideoMuted] = useState(true);
 
   // 🎯 Hero 广告语轮播 (12条文案，每4秒轮播一次，淡入淡出)
   const heroSlogans = useMemo(() => [
@@ -150,6 +153,21 @@ export default function Home() {
   const resetToAutoTheme = () => {
     localStorage.removeItem('theme_preference');
     applyTheme('auto');
+  };
+
+  // 宣传片默认静音自动播放；用户点击右下角小喇叭后取消静音听到标语
+  const toggleHeroVideoAudio = () => {
+    const video = heroVideoRef.current;
+    if (!video) return;
+    const nextMuted = !video.muted;
+    video.muted = nextMuted;
+    setIsHeroVideoMuted(nextMuted);
+    if (!nextMuted) {
+      video.play().catch(() => {
+        video.muted = true;
+        setIsHeroVideoMuted(true);
+      });
+    }
   };
 
   // 换算北京时间展示友好更新标签（如 "今日 03:00 已更新"）；法定节假日期间提示为假日更新
@@ -632,7 +650,7 @@ export default function Home() {
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3">
             <span className="block text-gradient-gemini font-extrabold tracking-tight">
-              一条命令，整备一台服务器
+              一键脚本，爱上 Linux
             </span>
           </h1>
 
@@ -647,51 +665,68 @@ export default function Home() {
             </span>
           </div>
 
-          {/* 🌟 Hero 品牌创意广告：压在副标题上方，全宽展示 */}
+          {/* 🎬 Hero 宣传片：手机竖屏、桌面横屏，标语使用 HTML 浮层 */}
           <div className="max-w-4xl mx-auto mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
             <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
               <div className="flex items-center space-x-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                <span className="text-[11px] text-slate-300 font-semibold tracking-wide">为什么酷 · 品牌创意</span>
+                <span className="text-[11px] text-slate-300 font-semibold tracking-wide">一键脚本 · 爱上 Linux</span>
               </div>
               <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                <span>极客之选</span>
+                <span>10s 宣传片</span>
               </div>
             </div>
 
-            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80">
-              {/* 桌面端 (>= 768px): 16:9 标准版 */}
-              <div className="hidden md:block aspect-[960/540] relative">
-                <Image
-                  src="/toolbox-ad.gif"
-                  alt="Kejilion 工具箱极客创意广告：从裸机到就绪、一条命令整备一台服务器"
-                  width={960}
-                  height={540}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
+            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video">
+              <video
+                ref={heroVideoRef}
+                autoPlay
+                loop
+                muted={isHeroVideoMuted}
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover"
+                aria-label="一键脚本，爱上 Linux 首页宣传片"
+              >
+                <source
+                  media="(max-width: 768px)"
+                  src="/ads/ad-oneclick-girl-9x16-10s-v5-final.mp4"
+                  type="video/mp4"
                 />
-              </div>
-              {/* 移动端 (< 768px): 1:1 方形版优化排版 */}
-              <div className="block md:hidden aspect-square relative">
-                <Image
-                  src="/toolbox-ad-square.gif"
-                  alt="Kejilion 工具箱极客创意广告 (移动端正方形适配)"
-                  width={800}
-                  height={800}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
+                <source
+                  src="/ads/ad-oneclick-girl-16x9-10s-v5-final.mp4"
+                  type="video/mp4"
                 />
+              </video>
+
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />
+              <div className="absolute left-4 right-16 bottom-4 sm:left-6 sm:bottom-6 pointer-events-none">
+                <p className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.75)]">
+                  一键脚本，爱上 Linux
+                </p>
+                <p className="mt-1 text-xs sm:text-sm text-cyan-100/90 font-medium tracking-wide drop-shadow">
+                  从害怕终端，到离不开终端
+                </p>
               </div>
+              <button
+                type="button"
+                onClick={toggleHeroVideoAudio}
+                title={isHeroVideoMuted ? '点击打开声音，听“一键脚本，爱上 Linux”' : '点击静音'}
+                aria-label={isHeroVideoMuted ? '打开宣传片声音' : '静音宣传片'}
+                className="absolute right-4 bottom-4 sm:right-5 sm:bottom-5 p-2.5 rounded-full bg-slate-950/75 hover:bg-cyan-500/90 text-white border border-white/15 hover:border-cyan-300/70 backdrop-blur-md shadow-lg shadow-black/40 transition-all active:scale-95"
+              >
+                {isHeroVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
             </div>
 
             <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="truncate mr-2">终端之美，效率之诗 · 工具箱在手，运维不愁</span>
-              <span className="font-mono text-cyan-400 shrink-0">~9s 循环</span>
+              <span className="truncate mr-2">复制一条命令，让终端自动搞定服务器</span>
+              <span className="font-mono text-cyan-400 shrink-0">10s 循环</span>
             </div>
           </div>
 
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
-            系统重装、BBR 加速、Docker 部署、160+ 应用一键安装
+          <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
+            第一次打开终端，大多数人的反应都是：关掉它。别怕——这里没有要背的命令，只有一条复制粘贴就能跑的一键脚本。系统重装、BBR 加速、Docker 部署、160+ 应用安装，全在终端里自动搞定。等你发现原来这么简单，Linux 就从“不敢碰”变成了“离不开”。
           </p>
 
           {/* 终端模拟一键安装框 */}
