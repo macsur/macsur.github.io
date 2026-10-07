@@ -251,6 +251,15 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **z-apps 自用生态上架 3 号应用 `WorkBuddy` & 2.conf 生产环境全面就绪**：
+  - **macsur/z-apps 2.conf (claude-mem)**：
+    - 确认已应用最新生产修复（`app_size="1"` 防护框架磁盘校验、覆盖 `check_docker_app` 状态检查以避免 Docker 检测误判、Python3 真卸载 hooks 与数据目录）。
+  - **macsur/z-apps 3.conf (WorkBuddy 账号池网关)**：
+    - 正式引入真实 Docker 应用配置 `3.conf`，面板容器 `docker_name="workbuddy-manager"`，端口 `docker_port="7864"`，无缝契合框架的容器状态探针与端口反代逻辑；
+    - 安装流：动态安全下载 `workbuddy-deploy.sh`，经 `bash -n` 预检后交互式引导用户配置域名与安全密钥；
+    - 更新流：重跑部署脚本 `--auto` 参数实现幂等就地升级；
+    - 卸载流：安全停止并清理两个容器（网关与面板），提供交互式确认是否保留关键凭据数据目录 `/opt/wb2api`；
+    - `bash -n 2.conf` 与 `bash -n 3.conf` 均 100% 验证通过，已直推 `macsur/z-apps` main 分支（Commit: `e2689d1`）。
 - **修复 CLI 插件 check_disk_space 空变量语法错误与 2.conf 生产级完善**：
   - **框架侧修复 (sync_upstream.js)**：
     - 根因：官方框架中 `check_disk_space $app_size /home/docker` 在 CLI 插件未定义 `$app_size` 时为空，导致路径 `/home/docker` 被当做 GB 数字做乘法触发 `line 351: /home/docker: syntax error`。
