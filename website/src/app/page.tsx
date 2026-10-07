@@ -492,7 +492,7 @@ export default function Home() {
 
   // 安装命令
   const installCommands = {
-    enhanced: 'bash <(curl -sL https://zttz.eu.org/x.sh)',
+    enhanced: 'bash <(curl -sL https://zttz.eu.org/z.sh)',
     official: 'bash <(curl -sL kejilion.sh)',
     mirror: 'bash <(curl -sL https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh)'
   };
@@ -588,7 +588,7 @@ export default function Home() {
               <div onClick={toggleTheme} className="cursor-pointer select-none">
                 <span className={`font-bold text-lg tracking-wider transition-colors ${
                   activeTheme === 'dark' ? 'text-white' : 'text-slate-900'
-                }`}>Kejilion 工具箱</span>
+                }`}>Linux 百宝箱</span>
                 <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
                   activeTheme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
                 }`}>v4.5.10</span>
@@ -644,7 +644,7 @@ export default function Home() {
           <div className="inline-flex items-center google-pill mb-8 select-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
             <span className="text-xs text-slate-300 font-medium tracking-wide flex items-center">
-              <span className="text-cyan-400 font-semibold">Linux 服务器工具箱</span>
+              <span className="text-cyan-400 font-semibold">Linux 百宝箱</span>
             </span>
           </div>
 
