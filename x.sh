@@ -33769,7 +33769,11 @@ z_list_apps() {
             return 0
         fi
 
+        # 清空动态序号映射持久化缓存
+        rm -f /tmp/.z_app_disp_map 2>/dev/null || true
+
         local rendered_count=0
+        local disp_idx=0
         for item in "${Z_CATEGORY_LIST[@]}"; do
             local cat_key="${item%%:*}"
             local cat_name="${item#*:}"
@@ -33791,6 +33795,9 @@ z_list_apps() {
                         cat_has_item=1
                     fi
 
+                    disp_idx=$((disp_idx + 1))
+                    echo "${disp_idx}=${conf}" >> /tmp/.z_app_disp_map
+
                     local bname
                     bname=$(basename "$conf" .conf)
                     local aname
@@ -33803,7 +33810,7 @@ z_list_apps() {
 
                     local atext
                     atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-                    printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
+                    printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$disp_idx" "$aname" "$atext"
                     rendered_count=$((rendered_count + 1))
                 fi
             done
@@ -33853,10 +33860,22 @@ z_apps_panel() {
     fi
 
     local conf_path=""
-    if [ -f "$Z_APPS_DIR/${target}.conf" ]; then
-        conf_path="$Z_APPS_DIR/${target}.conf"
-    elif [ -f "./z-apps/${target}.conf" ]; then
-        conf_path="./z-apps/${target}.conf"
+    # 1. 优先在动态显示映射关系集中按渲染序号匹配
+    if [ -f /tmp/.z_app_disp_map ]; then
+        local mapped
+        mapped=$(grep -E "^${target}=" /tmp/.z_app_disp_map 2>/dev/null | cut -d'=' -f2-)
+        if [ -n "$mapped" ] && [ -f "$mapped" ]; then
+            conf_path="$mapped"
+        fi
+    fi
+
+    # 2. 回退匹配配置文件名/别名
+    if [ -z "$conf_path" ]; then
+        if [ -f "$Z_APPS_DIR/${target}.conf" ]; then
+            conf_path="$Z_APPS_DIR/${target}.conf"
+        elif [ -f "./z-apps/${target}.conf" ]; then
+            conf_path="./z-apps/${target}.conf"
+        fi
     fi
 
     if [ -n "$conf_path" ] && [ -f "$conf_path" ]; then
