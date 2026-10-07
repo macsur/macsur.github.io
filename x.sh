@@ -1,5 +1,7 @@
 #!/bin/bash
 sh_v="4.5.11"
+zttz_edition="true"
+zttz_v="1.0.0"
 
 
 gl_hui='\e[37m'
@@ -194,6 +196,8 @@ if ! kpanel_protocol_active; then
 	if [ ! -f ~/kejilion.sh ]; then
 		if [ -f "./kejilion.sh" ]; then
 			cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1
+		elif [ -f "./z.sh" ]; then
+			cp -f ./z.sh ~/kejilion.sh > /dev/null 2>&1
 		elif [ -f "./x.sh" ]; then
 			cp -f ./x.sh ~/kejilion.sh > /dev/null 2>&1
 		elif [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
@@ -205,11 +209,21 @@ if ! kpanel_protocol_active; then
 	CheckFirstRun_true
 	yinsiyuanquan2
 
+	# 清理 k 与 z 的别名劫持 (防范 zoxide 等工具别名冲突)
 	sed -i '/^alias k=/d' ~/.bashrc > /dev/null 2>&1
 	sed -i '/^alias k=/d' ~/.profile > /dev/null 2>&1
 	sed -i '/^alias k=/d' ~/.bash_profile > /dev/null 2>&1
-	[ -f ~/kejilion.sh ] && cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-	[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+	sed -i '/^alias z=/d' ~/.bashrc > /dev/null 2>&1
+	sed -i '/^alias z=/d' ~/.profile > /dev/null 2>&1
+	sed -i '/^alias z=/d' ~/.bash_profile > /dev/null 2>&1
+
+	# 部署 k 与 z 命令入口
+	if [ -f ~/kejilion.sh ]; then
+		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
+		cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+		[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+		[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
+	fi
 fi
 
 
@@ -33347,12 +33361,7 @@ while true; do
 		1)
 			clear
 			local country=$(curl -s --max-time 5 ipinfo.io/country)
-			local download_url
-			if [ "$country" = "CN" ]; then
-				download_url="${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/cn/kejilion.sh"
-			else
-				download_url="${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh"
-			fi
+			local download_url="https://zttz.eu.org/z.sh"
 
 			# 备份当前脚本
 			cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null
@@ -33368,7 +33377,9 @@ while true; do
 				CheckFirstRun_true
 				yinsiyuanquan2
 				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-				ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+				cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
 				echo -e "${gl_lv}脚本已更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
 				send_stats "脚本已经最新$sh_v_new"
 			else
@@ -33594,6 +33605,8 @@ echo "阻止IP              k zzip 177.5.25.36 |k 阻止IP 177.5.25.36"
 echo "命令收藏夹          k fav | k 命令收藏夹"
 echo "应用市场管理        k app"
 echo "应用市场 [分类折叠]  k app+"
+echo "ZTTZ 自用应用市场    z app"
+echo "ZTTZ 自定义应用安装  z app <数字/代号>"
 echo "应用编号快捷管理    k app 26 | k app 1panel | k app npm"
 echo "KPanel管理          k app kpanel"
 echo "fail2ban管理        k fail2ban | k f2b [status|enable|disable]"
@@ -33619,6 +33632,209 @@ kpanel_backup_center_dispatch() {
     [ "$protocol" = '{"protocol":1,"format":1}' ] || { echo "备份适配器协议不兼容" >&2; return 1; }
     "$binary" backup-center "$@"
 }
+
+
+# ==============================================================================
+# ZTTZ 专属自用应用生态与 Z 命令调度引擎
+# 100% 兼容上游，独立管理 ~/z-apps 目录
+# ==============================================================================
+Z_APPS_DIR="${Z_APPS_DIR:-$HOME/z-apps}"
+
+z_init_env() {
+    [ -d "$Z_APPS_DIR" ] || mkdir -p "$Z_APPS_DIR"
+    # 如果初次使用且不存在 1.conf，自动生成示例 1.conf (ZTTZ 状态探针)
+    if [ ! -f "$Z_APPS_DIR/1.conf" ]; then
+        cat > "$Z_APPS_DIR/1.conf" << 'EOF'
+app_id="1"
+app_name="ZTTZ 极简状态探针"
+app_category="tools"
+app_text="自用示例应用：快速检查本机状态与网络环境"
+
+docker_app_install() {
+    clear
+    echo -e "\033[96m==================================================\033[0m"
+    echo -e "\033[32m  🚀 [z app 1] ZTTZ 极简状态探针正在运行...\033[0m"
+    echo -e "\033[96m==================================================\033[0m"
+    echo -e "主机名称: $(hostname)"
+    echo -e "当前用户: $(whoami)"
+    echo -e "系统内核: $(uname -r)"
+    echo -e "运行时间: $(uptime -p 2>/dev/null || uptime)"
+    echo -e "内存使用:"
+    free -m 2>/dev/null || true
+    echo -e "\033[96m--------------------------------------------------\033[0m"
+    echo -e "\033[33m✅ 验证成功！z app 1 自定义应用生态链路完全畅通！\033[0m"
+    echo -e "\033[96m==================================================\033[0m"
+}
+
+docker_app_update() {
+    echo "更新 ZTTZ 状态探针配置..."
+}
+
+docker_app_uninstall() {
+    echo "卸载 ZTTZ 状态探针"
+}
+
+docker_app_plus
+EOF
+        chmod +x "$Z_APPS_DIR/1.conf" 2>/dev/null || true
+    fi
+}
+
+z_list_apps() {
+    z_init_env
+    clear
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+    echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+    echo -e "已收录的自用应用配置："
+    local count=0
+    for conf in "$Z_APPS_DIR"/*.conf; do
+        [ -f "$conf" ] || continue
+        count=$((count + 1))
+        local bname
+        bname=$(basename "$conf" .conf)
+        local aname
+        aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+        [ -z "$aname" ] && aname="$bname"
+        local atext
+        atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
+        printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
+    done
+
+    if [ "$count" -eq 0 ]; then
+        echo -e "${gl_hui}  暂无自定义应用配置，可在 ~/z-apps/ 下添加 [应用名].conf${gl_bai}"
+    fi
+    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+    echo -e "安装或管理应用：${gl_huang}z app <数字/名称>${gl_bai} (例如: z app 1)"
+    echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+}
+
+z_apps_panel() {
+    local target="$1"
+    z_init_env
+    if [ -z "$target" ]; then
+        z_list_apps
+        return 0
+    fi
+
+    local conf_path=""
+    if [ -f "$Z_APPS_DIR/${target}.conf" ]; then
+        conf_path="$Z_APPS_DIR/${target}.conf"
+    elif [ -f "./z-apps/${target}.conf" ]; then
+        conf_path="./z-apps/${target}.conf"
+    fi
+
+    if [ -n "$conf_path" ] && [ -f "$conf_path" ]; then
+        echo -e "${gl_lv}🚀 正在加载 ZTTZ 自定义应用配置: ${conf_path}${gl_bai}"
+        . "$conf_path"
+    else
+        echo -e "${gl_hong}❌ 错误: 未在 ~/z-apps 中找到自定义应用 '${target}' 的配置！${gl_bai}"
+        echo -e "${gl_hui}提示: 自定义配置文件路径应为: ~/z-apps/${target}.conf${gl_bai}"
+        echo -e "${gl_huang}如需安装上游官方应用，请使用命令: k app ${target}${gl_bai}"
+        return 1
+    fi
+}
+
+z_update() {
+    echo -e "${gl_kjlan}🚀 正在从 https://zttz.eu.org/z.sh 更新脚本...${gl_bai}"
+    local tmp_file
+    tmp_file=$(mktemp ~/z_tmp.XXXXXX)
+    if curl -sS --max-time 30 --fail -o "$tmp_file" "https://zttz.eu.org/z.sh" &&        [ -s "$tmp_file" ] && head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
+        chmod +x "$tmp_file"
+        mv -f "$tmp_file" ~/kejilion.sh
+        cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
+        cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+        [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+        [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
+        echo -e "${gl_lv}✅ ZTTZ 融合版脚本已成功更新到最新版本！${gl_bai}"
+    else
+        rm -f "$tmp_file" 2>/dev/null
+        echo -e "${gl_hong}❌ 更新失败，请检查网络连接！${gl_bai}"
+        return 1
+    fi
+}
+
+z_main_menu() {
+    while true; do
+        clear
+        echo -e "${gl_kjlan}==================================================${gl_bai}"
+        echo -e "${gl_huang}      🚀 ZTTZ 自用应用与扩展工作台${gl_bai}"
+        echo -e "${gl_kjlan}==================================================${gl_bai}"
+        echo -e "${gl_kjlan}1. ${gl_bai}自用应用市场列表 (z app)"
+        echo -e "${gl_kjlan}2. ${gl_bai}上游分类折叠市场 (k app+)"
+        echo -e "${gl_kjlan}3. ${gl_bai}切换至上游主菜单 (k)"
+        echo -e "${gl_kjlan}4. ${gl_bai}在线更新脚本 (z update)"
+        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+        echo -e "${gl_kjlan}0. ${gl_bai}退出"
+        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+        read -e -p "请输入你的选择: " z_choice
+        case "$z_choice" in
+            1)
+                z_list_apps
+                break_end
+                ;;
+            2)
+                linux_panel_accordion
+                ;;
+            3)
+                kejilion_sh
+                break
+                ;;
+            4)
+                z_update
+                break_end
+                ;;
+            0)
+                break
+                ;;
+            *)
+                echo "无效的选择"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
+z_dispatch() {
+    local cmd="${1:-}"
+    shift 2>/dev/null || true
+    case "$cmd" in
+        "")
+            z_main_menu
+            ;;
+        app)
+            z_apps_panel "$@"
+            ;;
+        app+|app-cat|app-category)
+            linux_panel_accordion "$@"
+            ;;
+        update|upgrade)
+            z_update
+            ;;
+        help|--help|-h)
+            echo "ZTTZ 脚本用法:"
+            echo "  z                    打开 ZTTZ 自用工作台"
+            echo "  z app                查看自定义应用列表"
+            echo "  z app <数字/代号>    安装自用指定应用"
+            echo "  z app+               打开分类手风琴应用市场"
+            echo "  z update             更新融合版脚本"
+            echo "  k ...                调用上游官方全部原生能力"
+            ;;
+        *)
+            echo -e "${gl_hong}未知的 z 子命令: ${cmd}${gl_bai}"
+            echo "输入 'z help' 查看帮助，或使用 'k ${cmd}' 尝试上游命令"
+            ;;
+    esac
+}
+
+
+# 判别当前调用是否来自 'z' 命令 (软链、二进制名或环境变量强制)
+CURRENT_INVOCATION="$(basename "$0" 2>/dev/null || echo "")"
+if [ "$CURRENT_INVOCATION" = "z" ] || [ "${Z_INVOKE_MODE:-}" = "1" ]; then
+    z_dispatch "$@"
+    exit $?
+fi
 
 if [ "$#" -eq 0 ]; then
 	# 如果没有参数，运行交互式逻辑
