@@ -67,17 +67,23 @@ export default function Home() {
   const [isHeroVideoMuted, setIsHeroVideoMuted] = useState(true);
   const [heroVideoIdx, setHeroVideoIdx] = useState(0);
 
-  // 宣传片双视频源配置
+  // 宣传片多视频源轮播配置
   const heroVideos = useMemo(() => [
     {
-      title: '10s 宣传片 (v7)',
+      title: '10s 品牌片 (v7)',
       sources: [
         { media: '(max-width: 768px)', src: '/ads/ad-oneclick-girl-9x16-10s-v7-final.mp4' },
         { media: '', src: '/ads/ad-oneclick-girl-16x9-10s-v7-final.mp4' }
       ]
     },
     {
-      title: '30s 宣传片',
+      title: '30s 品牌片 (女神版)',
+      sources: [
+        { media: '', src: '/ads/linux-brand-girl-30s-final.mp4' }
+      ]
+    },
+    {
+      title: '30s 品牌片 (极客版)',
       sources: [
         { media: '', src: '/ads/linux-v2-30s-finalC.mp4' }
       ]
