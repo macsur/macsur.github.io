@@ -251,6 +251,10 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **安装命令更新为官方短链 `https://zttz.eu.org/z`**：
+  - 将主页快捷安装命令卡片 (`website/src/app/page.tsx`)、根目录 `README.md` 及 `website/public/README.md` 中的一键安装命令统一由 `https://zttz.eu.org/z.sh` 更新为更精炼的短链 `https://zttz.eu.org/z`（`bash <(curl -sL https://zttz.eu.org/z)`）；
+  - 服务端配置 301 自动跳转至 `z.sh`，`curl -sL` 自动跟随重定向，新旧链接无缝兼容；
+  - 经 `bun run build` 预构建检验通过，全站静态生成顺畅。
 - **首页 Hero 广告视频无损升级为 v7 版 (绿色代码雨内嵌)**：
   - 更新静态资源：下载并替换 `website/public/ads/` 目录下的竖屏 (9x16) 与横屏 (16x9) 广告视频至带新版本名的 `ad-oneclick-girl-*-10s-v7-final.mp4`，彻底移除旧版 v5 视频文件；
   - 更新组件引用：在 `website/src/app/page.tsx` 中同步更新两个 `<source>` 标签的 `src` 路径为 v7，有效击穿 CDN/浏览器端缓存；

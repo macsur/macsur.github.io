@@ -28,7 +28,7 @@
 无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux生态圈**：
 
 ```bash
-bash <(curl -sL https://zttz.eu.org/z.sh)
+bash <(curl -sL https://zttz.eu.org/z)
 ```
 
 > **💡 贴心自愈特性**：

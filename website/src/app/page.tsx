@@ -492,7 +492,7 @@ export default function Home() {
 
   // 安装命令
   const installCommands = {
-    enhanced: 'bash <(curl -sL https://zttz.eu.org/z.sh)',
+    enhanced: 'bash <(curl -sL https://zttz.eu.org/z)',
     official: 'bash <(curl -sL kejilion.sh)',
     mirror: 'bash <(curl -sL https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh)'
   };
