@@ -65,6 +65,37 @@ export default function Home() {
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const [isHeroVideoMuted, setIsHeroVideoMuted] = useState(true);
+  const [heroVideoIdx, setHeroVideoIdx] = useState(0);
+
+  // 宣传片双视频源配置
+  const heroVideos = useMemo(() => [
+    {
+      title: '10s 宣传片 (v7)',
+      sources: [
+        { media: '(max-width: 768px)', src: '/ads/ad-oneclick-girl-9x16-10s-v7-final.mp4' },
+        { media: '', src: '/ads/ad-oneclick-girl-16x9-10s-v7-final.mp4' }
+      ]
+    },
+    {
+      title: '30s 宣传片',
+      sources: [
+        { media: '', src: '/ads/linux-v2-30s-finalC.mp4' }
+      ]
+    }
+  ], []);
+
+  // 视频自然播完切换下一张
+  const handleHeroVideoEnded = () => {
+    setHeroVideoIdx((prev) => (prev + 1) % heroVideos.length);
+  };
+
+  useEffect(() => {
+    const video = heroVideoRef.current;
+    if (video) {
+      video.load();
+      video.play().catch(() => {});
+    }
+  }, [heroVideoIdx]);
 
   // 🎯 Hero 广告语轮播 (12条文案，每4秒轮播一次，淡入淡出)
   const heroSlogans = useMemo(() => [
@@ -672,31 +703,47 @@ export default function Home() {
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
                 <span className="text-[11px] text-slate-300 font-semibold tracking-wide">一键脚本 · 爱上 Linux</span>
               </div>
-              <div className="flex items-center space-x-1 text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                <span>10s 宣传片</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
+                  {heroVideos[heroVideoIdx].title}
+                </span>
+                {/* 小圆点指示器 */}
+                <div className="flex items-center space-x-1.5 ml-2">
+                  {heroVideos.map((item, idx) => (
+                    <button
+                      key={item.title}
+                      type="button"
+                      onClick={() => setHeroVideoIdx(idx)}
+                      title={`切换至第 ${idx + 1} 个视频`}
+                      aria-label={`切换至第 ${idx + 1} 个视频`}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        heroVideoIdx === idx ? 'bg-cyan-400 w-4' : 'bg-slate-600 hover:bg-slate-400'
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video">
+            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video flex items-center justify-center">
               <video
                 ref={heroVideoRef}
                 autoPlay
-                loop
                 muted={isHeroVideoMuted}
                 playsInline
                 preload="metadata"
-                className="w-full h-full object-cover"
+                onEnded={handleHeroVideoEnded}
+                className="w-full h-full object-contain md:object-cover"
                 aria-label="一键脚本，爱上 Linux 首页宣传片"
               >
-                <source
-                  media="(max-width: 768px)"
-                  src="/ads/ad-oneclick-girl-9x16-10s-v7-final.mp4"
-                  type="video/mp4"
-                />
-                <source
-                  src="/ads/ad-oneclick-girl-16x9-10s-v7-final.mp4"
-                  type="video/mp4"
-                />
+                {heroVideos[heroVideoIdx].sources.map((srcItem, sIdx) => (
+                  <source
+                    key={sIdx}
+                    {...(srcItem.media ? { media: srcItem.media } : {})}
+                    src={srcItem.src}
+                    type="video/mp4"
+                  />
+                ))}
               </video>
 
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />

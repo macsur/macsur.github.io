@@ -251,6 +251,15 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **首页 Hero 区实装双视频轮播引擎 (v7 广告片 + 30s 宣传片)**：
+  - 新增静态资源：下载并存入 `website/public/ads/linux-v2-30s-finalC.mp4`（30s 高清宣传片，约 14MB）；
+  - 轮播架构实现：
+    - 在 `website/src/app/page.tsx` 中引入双视频配置项（第 1 张为 v7 广告片，支持手机竖屏 / 桌面横屏自适应切换；第 2 张为 30s 宣传片）；
+    - **自动播放与连播**：每张视频播完触发 `onEnded` 事件自动无缝切入下一张；
+    - **小圆点指示器**：顶部面板配有交互式小圆点，支持用户随时点击手动切换视频；
+    - **通用状态保持**：`muted` 静音自动播放、小喇叭音频切换按钮（作用于当前播放实例）以及标语 HTML 浮层在轮播过程中完整保留；
+    - **手机端排版处理**：针对 30s 宣传片采用 `object-contain` 配合容器黑色背景 letterbox 展现，保证画幅不被裁切。
+  - 经 `bun run build` 预构建校验通过，静态页面生成成功。
 - **安装命令更新为官方短链 `https://zttz.eu.org/z`**：
   - 将主页快捷安装命令卡片 (`website/src/app/page.tsx`)、根目录 `README.md` 及 `website/public/README.md` 中的一键安装命令统一由 `https://zttz.eu.org/z.sh` 更新为更精炼的短链 `https://zttz.eu.org/z`（`bash <(curl -sL https://zttz.eu.org/z)`）；
   - 服务端配置 301 自动跳转至 `z.sh`，`curl -sL` 自动跟随重定向，新旧链接无缝兼容；
