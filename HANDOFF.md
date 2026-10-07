@@ -251,6 +251,16 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **修复 CLI 插件 check_disk_space 空变量语法错误与 2.conf 生产级完善**：
+  - **框架侧修复 (sync_upstream.js)**：
+    - 根因：官方框架中 `check_disk_space $app_size /home/docker` 在 CLI 插件未定义 `$app_size` 时为空，导致路径 `/home/docker` 被当做 GB 数字做乘法触发 `line 351: /home/docker: syntax error`。
+    - 修复：在 `sync_upstream.js` 注入后处理补丁，全量将 `check_disk_space $app_size /home/docker` 替换为 `check_disk_space "${app_size:-1}" /home/docker`（产物中 2 处均已防护），彻底杜绝下次同步上游时被覆盖。
+    - 重新生成 `kejilion.sh`、`z.sh`、`x.sh` 并同步至 `website/public/`。
+  - **macsur/z-apps 2.conf 迭代**：
+    - 显式声明 `app_size="1"`，清空 Docker 容器专属变量 `docker_name=""` 与 `docker_port=""`；
+    - 作用域覆盖 `check_docker_app` 状态检查：只在当前应用中通过 `~/.claude/settings.json` 与 `~/.claude-mem` 判定真实安装状态，其余应用走原版无泄漏；
+    - 升级 `docker_app_uninstall` 为真卸载：`pkill` 残留进程，Python 脚本安全清理 `settings.json` 中的 hooks（带自动备份），清理 `~/.claude-mem/` 数据目录。
+    - 推送至 `macsur/z-apps` main 分支（Commit: `6f81b6a`）。
 - **z-apps 自用生态端到端验证：上线 2 号应用 `claude-mem` (macsur/z-apps)**：
   - 在独立配置仓库 `macsur/z-apps` 新建 `2.conf` 并成功推送至其 `main` 分支。
   - `2.conf` 实现了 `claude-mem 跨会话记忆` 应用生命周期管理（安装、更新、卸载提示）：

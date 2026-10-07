@@ -4032,7 +4032,7 @@ while true; do
 	 case $choice in
 		1)
 			setup_docker_dir
-			check_disk_space $app_size /home/docker
+			check_disk_space "${app_size:-1}" /home/docker
 			kpanel_app_choose_install_port || return 1
 
 			install jq
@@ -4177,7 +4177,7 @@ docker_app_plus() {
 		case $choice in
 			1)
 				setup_docker_dir
-				check_disk_space $app_size /home/docker
+				check_disk_space "${app_size:-1}" /home/docker
 
 				kpanel_app_choose_install_port || return 1
 

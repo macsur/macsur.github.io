@@ -751,6 +751,9 @@ if (officialCode.includes(tailDispatcherTarget)) {
     officialCode = officialCode.replace(tailDispatcherTarget, () => tailDispatcherReplacement);
 }
 
+// 补丁 10: 修复 check_disk_space 在 CLI 插件未定义 app_size 时导致的语法错误
+officialCode = officialCode.replaceAll('check_disk_space $app_size /home/docker', 'check_disk_space "${app_size:-1}" /home/docker');
+
 console.log('💾 [4/5] 写入同步生成的 kejilion.sh 并验证语法...');
 fs.writeFileSync(path.join(ROOT_DIR, 'kejilion.sh'), officialCode, 'utf8');
 
