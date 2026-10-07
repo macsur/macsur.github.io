@@ -33599,6 +33599,14 @@ z_sync_apps() {
         return 0
     fi
 
+    local before_files=()
+    if [ -d "$Z_APPS_DIR" ]; then
+        for conf in "$Z_APPS_DIR"/*.conf; do
+            [ -f "$conf" ] && before_files+=("$(basename "$conf")")
+        done
+    fi
+
+    local sync_ok=0
     # 1. 目录不存在或非 git 目录
     if [ ! -d "$Z_APPS_DIR/.git" ]; then
         echo -e "${gl_hui}正在从 GitHub 克隆自用应用配置库...${gl_bai}"
@@ -33606,29 +33614,111 @@ z_sync_apps() {
         tmp_sync=$(mktemp -d /tmp/z_apps_clone.XXXXXX)
         if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync" 2>/dev/null; then
             mkdir -p "$Z_APPS_DIR"
-            # 增量合并克隆的文件，保留本地独有配置
             cp -r "$tmp_sync"/.git "$Z_APPS_DIR/" 2>/dev/null || true
             cp -n "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
             cp -n "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
             chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
             rm -rf "$tmp_sync"
             echo -e "${gl_lv}✅ 首次同步成功！自用配置已拉取至: $Z_APPS_DIR${gl_bai}"
+            sync_ok=1
         else
             rm -rf "$tmp_sync"
             echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
         fi
-        return 0
+    else
+        # 2. 目录已存在且为 git 目录，执行增量合并
+        echo -e "${gl_hui}正在拉取远端增量更新...${gl_bai}"
+        if timeout 15s git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main >/dev/null 2>&1; then
+            chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
+            echo -e "${gl_lv}✅ 同步成功！自用应用配置已更新至最新。${gl_bai}"
+            sync_ok=1
+        else
+            echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
+        fi
     fi
 
-    # 2. 目录已存在且为 git 目录，执行增量合并 (保留本地独有文件)
-    echo -e "${gl_hui}正在拉取远端增量更新...${gl_bai}"
-    if timeout 15s git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main >/dev/null 2>&1; then
-        chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
-        echo -e "${gl_lv}✅ 同步成功！自用应用配置已更新至最新。${gl_bai}"
-    else
-        echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
+    # 新应用发现播报 (非空目录且同步成功时对比)
+    if [ "$sync_ok" -eq 1 ] && [ "${#before_files[@]}" -gt 0 ]; then
+        local added_names=()
+        for conf in "$Z_APPS_DIR"/*.conf; do
+            [ -f "$conf" ] || continue
+            local fn
+            fn=$(basename "$conf")
+            local is_new=1
+            for bf in "${before_files[@]}"; do
+                if [ "$bf" = "$fn" ]; then
+                    is_new=0
+                    break
+                fi
+            done
+            if [ "$is_new" -eq 1 ]; then
+                local aname
+                aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+                [ -z "$aname" ] && aname=$(basename "$conf" .conf)
+                added_names+=("$aname")
+            fi
+        done
+        if [ "${#added_names[@]}" -gt 0 ]; then
+            local names_str
+            names_str=$(IFS="、"; echo "${added_names[*]}")
+            echo -e "${gl_huang}🎉 发现 ${#added_names[@]} 个新应用：${names_str}${gl_bai}"
+        fi
     fi
+
     return 0
+}
+
+Z_CATEGORY_LIST=(
+    "ai:🤖 人工智能"
+    "ops:🖥️  服务器运维"
+    "network:🌐 网络代理"
+    "storage:🗄️  数据存储"
+    "media:🎬 影音媒体"
+    "office:📝 办公工具"
+    "tools:🔧 实用工具"
+    "other:📦 其他"
+)
+
+z_get_cat_name() {
+    local cid="${1:-other}"
+    for item in "${Z_CATEGORY_LIST[@]}"; do
+        local key="${item%%:*}"
+        local name="${item#*:}"
+        if [ "$key" = "$cid" ]; then
+            echo "$name"
+            return 0
+        fi
+    done
+    echo "📦 其他"
+}
+
+z_norm_category() {
+    local raw_cat
+    raw_cat=$(echo "${1:-other}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+    for item in "${Z_CATEGORY_LIST[@]}"; do
+        local key="${item%%:*}"
+        if [ "$key" = "$raw_cat" ]; then
+            echo "$key"
+            return 0
+        fi
+    done
+    echo "other"
+}
+
+z_is_recent_file() {
+    local f="$1"
+    [ -f "$f" ] || return 1
+    local now mtime diff_sec
+    now=$(date +%s 2>/dev/null || echo 0)
+    mtime=0
+    if stat -c %Y "$f" >/dev/null 2>&1; then
+        mtime=$(stat -c %Y "$f" 2>/dev/null)
+    elif stat -f %m "$f" >/dev/null 2>&1; then
+        mtime=$(stat -f %m "$f" 2>/dev/null)
+    fi
+    [ "$now" -gt 0 ] && [ "$mtime" -gt 0 ] || return 1
+    diff_sec=$((now - mtime))
+    [ "$diff_sec" -ge 0 ] && [ "$diff_sec" -le 604800 ]
 }
 
 z_init_env() {
@@ -33636,13 +33726,36 @@ z_init_env() {
 }
 
 z_list_apps() {
-    local mode="${1:-}"
+    local p1="${1:-}"
+    local p2="${2:-}"
+    local is_interactive=0
+    local filter_cat=""
+
+    if [ "$p1" = "interactive" ]; then
+        is_interactive=1
+        filter_cat=$(z_norm_category "$p2")
+        [ -z "$p2" ] && filter_cat=""
+    else
+        filter_cat=$(z_norm_category "$p1")
+        if [ "$p1" = "other" ] || [ "$filter_cat" != "other" ]; then
+            [ "$p2" = "interactive" ] && is_interactive=1
+        else
+            filter_cat=""
+        fi
+    fi
+
     z_init_env
 
     while true; do
         clear
         echo -e "${gl_kjlan}==================================================${gl_bai}"
-        echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
+        if [ -n "$filter_cat" ]; then
+            local filter_cat_name
+            filter_cat_name=$(z_get_cat_name "$filter_cat")
+            echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 [分类: ${filter_cat_name}]${gl_bai}"
+        else
+            echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
+        fi
         echo -e "${gl_kjlan}==================================================${gl_bai}"
 
         local conf_files=("$Z_APPS_DIR"/*.conf)
@@ -33656,24 +33769,54 @@ z_list_apps() {
             return 0
         fi
 
-        echo -e "已收录的自用应用配置："
-        local count=0
-        for conf in "$Z_APPS_DIR"/*.conf; do
-            [ -f "$conf" ] || continue
-            count=$((count + 1))
-            local bname
-            bname=$(basename "$conf" .conf)
-            local aname
-            aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-            [ -z "$aname" ] && aname="$bname"
-            local atext
-            atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-            printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
+        local rendered_count=0
+        for item in "${Z_CATEGORY_LIST[@]}"; do
+            local cat_key="${item%%:*}"
+            local cat_name="${item#*:}"
+
+            if [ -n "$filter_cat" ] && [ "$cat_key" != "$filter_cat" ]; then
+                continue
+            fi
+
+            local cat_has_item=0
+            for conf in "$Z_APPS_DIR"/*.conf; do
+                [ -f "$conf" ] || continue
+                local acat
+                acat=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+                acat=$(z_norm_category "$acat")
+
+                if [ "$acat" = "$cat_key" ]; then
+                    if [ "$cat_has_item" -eq 0 ]; then
+                        echo -e "${gl_kjlan}▼ [${gl_huang}${cat_name}${gl_kjlan}]${gl_bai}"
+                        cat_has_item=1
+                    fi
+
+                    local bname
+                    bname=$(basename "$conf" .conf)
+                    local aname
+                    aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+                    [ -z "$aname" ] && aname="$bname"
+
+                    if z_is_recent_file "$conf"; then
+                        aname="🆕 ${aname}"
+                    fi
+
+                    local atext
+                    atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
+                    printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
+                    rendered_count=$((rendered_count + 1))
+                fi
+            done
         done
 
+        if [ "$rendered_count" -eq 0 ]; then
+            echo -e "${gl_huang}未找到指定分类下的自用应用。${gl_bai}"
+        fi
+
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-        if [ "$mode" != "interactive" ]; then
+        if [ "$is_interactive" -ne 1 ]; then
             echo -e "安装或管理应用：${gl_huang}z app <数字/名称>${gl_bai} (例如: z app 1)"
+            echo -e "分类过滤浏览：${gl_huang}z app ai / z app ops / z app tools${gl_bai}"
             echo -e "从 GitHub 同步配置：${gl_huang}z app sync${gl_bai}"
             echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
             echo -e "${gl_kjlan}==================================================${gl_bai}"
@@ -33801,7 +33944,23 @@ z_dispatch() {
             z_main_menu
             ;;
         app)
-            z_apps_panel "$@"
+            if [ "$1" = "sync" ]; then
+                z_sync_apps
+            elif [ -n "$1" ]; then
+                local check_cat
+                check_cat=$(z_norm_category "$1")
+                if [ "$1" = "other" ] || [ "$check_cat" != "other" ]; then
+                    if [ -t 0 ]; then
+                        z_list_apps "$1" interactive
+                    else
+                        z_list_apps "$1"
+                    fi
+                else
+                    z_apps_panel "$@"
+                fi
+            else
+                z_apps_panel "$@"
+            fi
             ;;
         app+|app-cat|app-category)
             linux_panel_accordion "$@"
