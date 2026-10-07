@@ -251,6 +251,15 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **P2-1 里程碑落地：实现 `z app sync` 远端 GitHub 配置库同步**：
+  - 在 `sync_upstream.js` 的 `zModuleBlock` 中注入 `z_sync_apps()` 函数与对应分发路由。
+  - 支持 `z app sync`、`z sync` 以及 ZTTZ 主菜单第 2 项（`2. 从 GitHub 同步自用配置 (z app sync)`）。
+  - 同步逻辑安全可靠：
+    - 当 `~/z-apps/.git` 不存在时，通过深度浅克隆 (`git clone --depth=1 https://github.com/macsur/z-apps.git`) 初始化并使用 `cp -n` 增量合入，完整保留本地已有改动与新增 conf；
+    - 当已是 git 仓库时，使用 `git pull --rebase` 并增量补充新增远程模板，保障用户本地配置不被冲掉；
+    - 带有网络异常与未安装 git 优雅回退降级（提示并使用本地缓存）；
+    - `z app` 当检测到 `~/z-apps` 为空时，不再静默或报空，而是给出清晰高亮的 `z app sync` 引导提示。
+  - 重新运行 `node sync_upstream.js`，同步生成 `kejilion.sh`、`z.sh`、`x.sh` 并同步至 `website/public/`。
 - **实现 ZTTZ 融合版脚本与 Z 命令体系**：
   - `sync_upstream.js` 扩展支持 `z` 命令体系：自动清除 `alias z=` 别名劫持，自动部署 `/usr/local/bin/z` 与 `/usr/bin/z`。
   - 尾部分发器新增 `$(basename "$0")` 判断：以 `z` 调用时进入独立的自用管理工作台与 `z app [数字]` 调度逻辑。
