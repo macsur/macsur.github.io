@@ -59,7 +59,7 @@ const fireConfetti = async (options?: ConfettiOptions) => {
 
 export default function Home() {
   // 主题模式：'dark'（默认极客流光暗黑模式）或 'light'（清爽科技白昼模式）
-  // 🌟 【今日推荐】精选 3 款极力推荐的一键部署应用（由 AI 原创精选 & Kejilion 官方深度实测）
+  // 🌟 【今日推荐】精选 3 款极力推荐的一键部署应用（由 AI 原创精选 & 深度实测）
   // 🌟 【今日推荐】TOP 3 数据由构建时 generate_daily_recommend.js 每日生成
   // 内容铁律：上游有新应用时优先打新上榜，无新内容时随机抽取，每日构建刷新
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
@@ -224,7 +224,7 @@ export default function Home() {
   }, []);
 
   // 安装命令源切换 (默认推荐 zttz.eu.org 专属增强版)
-  const [installSource, setInstallSource] = useState<'enhanced' | 'official' | 'mirror'>('enhanced');
+  const [installSource] = useState<'enhanced'>('enhanced');
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
   // 搜索关键字与星标过滤
@@ -524,13 +524,11 @@ export default function Home() {
   // 安装命令
   const installCommands = {
     enhanced: 'bash <(curl -sL https://zttz.eu.org/z)',
-    official: 'bash <(curl -sL kejilion.sh)',
-    mirror: 'bash <(curl -sL https://raw.githubusercontent.com/kejilion/sh/main/kejilion.sh)'
   };
 
   // 常用指令列表
   const quickCommands = [
-    { cmd: 'k', desc: '启动 Kejilion 工具箱主控制面板' },
+    { cmd: 'k', desc: '启动 Linux 百宝箱主控制面板' },
     { cmd: 'k app', desc: '直接呼出智能应用市场' },
     { cmd: 'k app 57', desc: '一键部署 DeepSeek AI 大模型' },
     { cmd: 'k bbr3', desc: 'BBRv3 内核与网络调优' },
@@ -607,7 +605,7 @@ export default function Home() {
               >
                 <img
                   src="/logo.png"
-                  alt="Kejilion 工具箱 zttz.eu.org"
+                  alt="Linux 百宝箱 zttz.eu.org"
                   className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
@@ -790,34 +788,9 @@ export default function Home() {
               {/* 节点切换 */}
               <div className="flex items-center space-x-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-800 text-xs">
                 <button
-                  onClick={() => setInstallSource('enhanced')}
-                  className={`px-2.5 py-1 rounded-md transition-all font-medium flex items-center space-x-1 ${
-                    installSource === 'enhanced'
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                  className="px-2.5 py-1 rounded-md transition-all font-medium flex items-center space-x-1 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
                 >
-                  <span>🌟分类</span>
-                </button>
-                <button
-                  onClick={() => setInstallSource('official')}
-                  className={`px-2.5 py-1 rounded-md transition-all font-medium ${
-                    installSource === 'official'
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  官方
-                </button>
-                <button
-                  onClick={() => setInstallSource('mirror')}
-                  className={`px-2.5 py-1 rounded-md transition-all font-medium ${
-                    installSource === 'mirror'
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  GitHub
+                  <span>🌟一键安装</span>
                 </button>
               </div>
             </div>
@@ -955,7 +928,7 @@ export default function Home() {
               <p className={`text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed transition-colors ${
                 activeTheme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
               }`}>
-                从本站 160+ 现代化应用库与 Kejilion 官方工具箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
+                从本站 160+ 现代化应用库与 Linux 百宝箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
               </p>
             </div>
 
@@ -1357,7 +1330,7 @@ export default function Home() {
             全能高效的 Linux 运维底座
           </h2>
           <p className="text-sm text-slate-400 mt-2">
-            Kejilion 工具箱不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
+            Linux 百宝箱不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
           </p>
         </div>
 
@@ -1691,16 +1664,16 @@ export default function Home() {
               想要让你的开源应用加入工具箱应用市场？
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
-              Kejilion 工具箱应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
+              Linux 百宝箱应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <a 
-                href="https://dev.kejilion.sh" 
+                href="https://github.com/macsur/z-apps" 
                 target="_blank" 
                 rel="noreferrer"
                 className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all shadow-md shadow-cyan-500/20 flex items-center space-x-2"
               >
-                <span>开发者官方开发文档</span>
+                <span>应用配置规范</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
               <a 
@@ -1749,7 +1722,7 @@ export default function Home() {
       <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-300">Kejilion 工具箱 · zttz.eu.org</span>
+            <span className="font-bold text-slate-300">Linux 百宝箱 · zttz.eu.org</span>
             <span>- 现代化服务器运维与开源应用</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
@@ -1770,7 +1743,7 @@ export default function Home() {
 
         {/* 底部最下一列：极不显眼的隐蔽彩蛋入口与节点状态 */}
         <div className="mt-8 pt-5 border-t border-slate-900/80 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
-          <span>© 2026 Kejilion 工具箱 · zttz.eu.org · 保留所有权利</span>
+          <span>© 2026 Linux 百宝箱 · zttz.eu.org · 保留所有权利</span>
           <div className="flex items-center space-x-2.5">
             <span className="text-slate-600/80">Cluster: HK-Edge-01</span>
             <span className="text-slate-800">•</span>

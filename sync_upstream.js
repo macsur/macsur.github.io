@@ -754,6 +754,40 @@ if (officialCode.includes(tailDispatcherTarget)) {
 // 补丁 10: 修复 check_disk_space 在 CLI 插件未定义 app_size 时导致的语法错误
 officialCode = officialCode.replaceAll('check_disk_space $app_size /home/docker', 'check_disk_space "${app_size:-1}" /home/docker');
 
+// 补丁 11: 去痕 - 关闭 send_stats 上报（注入时在函数入口直接返回，后续逻辑成死代码但无害）
+if (officialCode.includes('send_stats() {')) {
+    officialCode = officialCode.replace(
+        'send_stats() {',
+        'send_stats() {\n\treturn 0  # ZTTZ 去痕: 上报已关闭，不再向任何外部发送数据'
+    );
+    console.log('✅ send_stats 上报已关闭');
+} else {
+    console.log('⚠️ 未找到 send_stats() 定义，上报关闭补丁跳过');
+}
+
+// 补丁 12: 去痕 - 用户可见品牌字样替换为 Linux 百宝箱（仅纯展示字符串，不碰函数名/变量名/逻辑）
+const brandReplacements = [
+    ['科技lion脚本工具箱 v$sh_v', 'Linux 百宝箱 v$sh_v'],
+    ['欢迎使用科技lion脚本工具箱', '欢迎使用 Linux 百宝箱'],
+    ['🚀 Kejilion 应用市场 · 8 大分类', '🚀 Linux 百宝箱 · 8 大分类'],
+    ['🔍 Kejilion 应用市场 · 快速搜索', '🔍 Linux 百宝箱 · 快速搜索'],
+    ['➕ Kejilion 新增自定义软件向导', '➕ Linux 百宝箱新增自定义软件向导'],
+    ['卸载科技lion脚本', '卸载百宝箱脚本'],
+    ['将彻底卸载kejilion脚本', '将彻底卸载百宝箱脚本'],
+    ['安装科技lion脚本', '安装百宝箱脚本'],
+    ['访问科技lion官方留言板', '访问官方留言板'],
+];
+let brandOk = 0;
+for (const [oldStr, newStr] of brandReplacements) {
+    if (officialCode.includes(oldStr)) {
+        officialCode = officialCode.split(oldStr).join(newStr);
+        brandOk++;
+    } else {
+        console.log(`⚠️ 去痕: 未找到 "${oldStr}"，跳过`);
+    }
+}
+console.log(`✅ 品牌去痕替换完成 (${brandOk}/${brandReplacements.length})`);
+
 console.log('💾 [4/5] 写入同步生成的 kejilion.sh 并验证语法...');
 fs.writeFileSync(path.join(ROOT_DIR, 'kejilion.sh'), officialCode, 'utf8');
 

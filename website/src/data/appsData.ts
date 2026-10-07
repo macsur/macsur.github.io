@@ -1433,7 +1433,7 @@ export const BUILTIN_APPS: AppItem[] = [
     "category": "custom",
     "isStar": true,
     "alias": "kpanel",
-    "desc": "完全贴合 kejilion.sh 业务的现代化 Linux Web 管理面板"
+    "desc": "完全贴合本工具箱业务的现代化 Linux Web 管理面板"
   },
   {
     "id": "lsky-pro",
