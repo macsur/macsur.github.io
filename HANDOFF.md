@@ -251,6 +251,13 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **z-apps 自用生态端到端验证：上线 2 号应用 `claude-mem` (macsur/z-apps)**：
+  - 在独立配置仓库 `macsur/z-apps` 新建 `2.conf` 并成功推送至其 `main` 分支。
+  - `2.conf` 实现了 `claude-mem 跨会话记忆` 应用生命周期管理（安装、更新、卸载提示）：
+    - 运行前环境智能检测：自动探测 Node.js 20+ 环境，缺失时自动通过 apt / yum / apk 安装；
+    - 执行官方唯一标准接入流：`npx -y claude-mem install`；
+    - 具备 Bash 语法完整性验证（`bash -n 2.conf` 通过，Return Code: 0）。
+  - 端到端使用闭环：用户在装有 `z.sh` 的终端执行 `z app sync` 即可拉取到最新的 `2.conf`，随后 `z app` 即刻可见 2 号应用，执行 `z app 2` 自动走通安装流程。
 - **P2-1 里程碑落地：实现 `z app sync` 远端 GitHub 配置库同步**：
   - 在 `sync_upstream.js` 的 `zModuleBlock` 中注入 `z_sync_apps()` 函数与对应分发路由。
   - 支持 `z app sync`、`z sync` 以及 ZTTZ 主菜单第 2 项（`2. 从 GitHub 同步自用配置 (z app sync)`）。
