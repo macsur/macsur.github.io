@@ -690,11 +690,11 @@ export default function Home() {
               >
                 <source
                   media="(max-width: 768px)"
-                  src="/ads/ad-oneclick-girl-9x16-10s-v5-final.mp4"
+                  src="/ads/ad-oneclick-girl-9x16-10s-v7-final.mp4"
                   type="video/mp4"
                 />
                 <source
-                  src="/ads/ad-oneclick-girl-16x9-10s-v5-final.mp4"
+                  src="/ads/ad-oneclick-girl-16x9-10s-v7-final.mp4"
                   type="video/mp4"
                 />
               </video>

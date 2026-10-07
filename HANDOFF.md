@@ -251,6 +251,11 @@
 ## 工作记录（2026-10-07）
 
 ### 1. 变更内容
+- **首页 Hero 广告视频无损升级为 v7 版 (绿色代码雨内嵌)**：
+  - 更新静态资源：下载并替换 `website/public/ads/` 目录下的竖屏 (9x16) 与横屏 (16x9) 广告视频至带新版本名的 `ad-oneclick-girl-*-10s-v7-final.mp4`，彻底移除旧版 v5 视频文件；
+  - 更新组件引用：在 `website/src/app/page.tsx` 中同步更新两个 `<source>` 标签的 `src` 路径为 v7，有效击穿 CDN/浏览器端缓存；
+  - 保留原有全部交互机制：`media="(max-width: 768px)"` 响应式视口自动切换、`muted` 静音自动播放、小喇叭音频切换按钮、HTML 文字浮层及首屏文案体系完全保持不变；
+  - 经 `bun run build` 预构建并验证静态页面生成无误（First Load JS 维持 ~127 kB）。
 - **z-apps 自用生态上架 3 号应用 `WorkBuddy` & 2.conf 生产环境全面就绪**：
   - **macsur/z-apps 2.conf (claude-mem)**：
     - 确认已应用最新生产修复（`app_size="1"` 防护框架磁盘校验、覆盖 `check_docker_app` 状态检查以避免 Docker 检测误判、Python3 真卸载 hooks 与数据目录）。
