@@ -33664,50 +33664,71 @@ z_init_env() {
 }
 
 z_list_apps() {
+    local mode="${1:-}"
     z_init_env
-    clear
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
-    echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
-    
-    local conf_files=("$Z_APPS_DIR"/*.conf)
-    if [ ! -e "${conf_files[0]}" ]; then
-        echo -e "${gl_huang}💡 提示: ~/z-apps 目录为空或未初始化。${gl_bai}"
-        echo -e "${gl_lv}请先运行同步命令从 GitHub 拉取自用应用配置：${gl_bai}"
-        echo -e "  ${gl_huang}z app sync${gl_bai}"
-        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-        echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
+
+    while true; do
+        clear
         echo -e "${gl_kjlan}==================================================${gl_bai}"
-        return 0
-    fi
+        echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
+        echo -e "${gl_kjlan}==================================================${gl_bai}"
 
-    echo -e "已收录的自用应用配置："
-    local count=0
-    for conf in "$Z_APPS_DIR"/*.conf; do
-        [ -f "$conf" ] || continue
-        count=$((count + 1))
-        local bname
-        bname=$(basename "$conf" .conf)
-        local aname
-        aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-        [ -z "$aname" ] && aname="$bname"
-        local atext
-        atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-        printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
+        local conf_files=("$Z_APPS_DIR"/*.conf)
+        if [ ! -e "${conf_files[0]}" ]; then
+            echo -e "${gl_huang}💡 提示: ~/z-apps 目录为空或未初始化。${gl_bai}"
+            echo -e "${gl_lv}请先运行同步命令从 GitHub 拉取自用应用配置：${gl_bai}"
+            echo -e "  ${gl_huang}z app sync${gl_bai}"
+            echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+            echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
+            echo -e "${gl_kjlan}==================================================${gl_bai}"
+            return 0
+        fi
+
+        echo -e "已收录的自用应用配置："
+        local count=0
+        for conf in "$Z_APPS_DIR"/*.conf; do
+            [ -f "$conf" ] || continue
+            count=$((count + 1))
+            local bname
+            bname=$(basename "$conf" .conf)
+            local aname
+            aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+            [ -z "$aname" ] && aname="$bname"
+            local atext
+            atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
+            printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
+        done
+
+        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+        if [ "$mode" != "interactive" ]; then
+            echo -e "安装或管理应用：${gl_huang}z app <数字/名称>${gl_bai} (例如: z app 1)"
+            echo -e "从 GitHub 同步配置：${gl_huang}z app sync${gl_bai}"
+            echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
+            echo -e "${gl_kjlan}==================================================${gl_bai}"
+            return 0
+        fi
+
+        echo -e "${gl_kjlan}0. ${gl_bai}返回上级菜单"
+        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+        read -e -p "请输入要安装/管理的软件编号 (0 返回): " app_choice
+        if [ -z "$app_choice" ] || [ "$app_choice" = "0" ]; then
+            break
+        fi
+
+        z_apps_panel "$app_choice"
+        break_end
     done
-
-    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-    echo -e "安装或管理应用：${gl_huang}z app <数字/名称>${gl_bai} (例如: z app 1)"
-    echo -e "从 GitHub 同步配置：${gl_huang}z app sync${gl_bai}"
-    echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
 }
 
 z_apps_panel() {
     local target="${1:-}"
     z_init_env
     if [ -z "$target" ]; then
-        z_list_apps
+        if [ -t 0 ]; then
+            z_list_apps interactive
+        else
+            z_list_apps
+        fi
         return 0
     fi
 
@@ -33771,7 +33792,7 @@ z_main_menu() {
         read -e -p "请输入你的选择: " z_choice
         case "$z_choice" in
             1)
-                z_list_apps
+                z_list_apps interactive
                 break_end
                 ;;
             2)
