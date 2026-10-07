@@ -33641,48 +33641,66 @@ kpanel_backup_center_dispatch() {
 
 # ==============================================================================
 # ZTTZ 专属自用应用生态与 Z 命令调度引擎
-# 100% 兼容上游，独立管理 ~/z-apps 目录
+# 100% 兼容上游，独立管理 ~/z-apps 目录与 GitHub (macsur/z-apps) 远端同步
 # ==============================================================================
 Z_APPS_DIR="${Z_APPS_DIR:-$HOME/z-apps}"
+Z_APPS_REPO="https://github.com/macsur/z-apps.git"
+
+z_check_git() {
+    if ! command -v git >/dev/null 2>&1; then
+        echo -e "${gl_hong}❌ 错误: 未检测到 git 命令！${gl_bai}"
+        echo -e "${gl_huang}请先安装 git 后重试：${gl_bai}"
+        echo "  Debian / Ubuntu:  apt update && apt install -y git"
+        echo "  CentOS / RHEL:    yum install -y git"
+        echo "  Alpine:           apk add git"
+        return 1
+    fi
+    return 0
+}
+
+z_sync_apps() {
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+    echo -e "${gl_huang}  🔄 正在同步 ZTTZ 自用应用仓库 (macsur/z-apps)...${gl_bai}"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+
+    if ! z_check_git; then
+        return 0
+    fi
+
+    # 1. 目录不存在或非 git 目录
+    if [ ! -d "$Z_APPS_DIR/.git" ]; then
+        echo -e "${gl_hui}正在从 GitHub 克隆自用应用配置库...${gl_bai}"
+        local tmp_sync
+        tmp_sync=$(mktemp -d /tmp/z_apps_clone.XXXXXX)
+        if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync" 2>/dev/null; then
+            mkdir -p "$Z_APPS_DIR"
+            # 增量合并克隆的文件，保留本地独有配置
+            cp -r "$tmp_sync"/.git "$Z_APPS_DIR/" 2>/dev/null || true
+            cp -n "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
+            cp -n "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
+            chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
+            rm -rf "$tmp_sync"
+            echo -e "${gl_lv}✅ 首次同步成功！自用配置已拉取至: $Z_APPS_DIR${gl_bai}"
+        else
+            rm -rf "$tmp_sync"
+            echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
+        fi
+        return 0
+    fi
+
+    # 2. 目录已存在且为 git 目录，执行增量合并 (保留本地独有文件)
+    echo -e "${gl_hui}正在拉取远端增量更新...${gl_bai}"
+    if timeout 15s git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main >/dev/null 2>&1; then
+        chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
+        echo -e "${gl_lv}✅ 同步成功！自用应用配置已更新至最新。${gl_bai}"
+    else
+        echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
+    fi
+    return 0
+}
 
 z_init_env() {
     [ -d "$Z_APPS_DIR" ] || mkdir -p "$Z_APPS_DIR"
-    # 如果初次使用且不存在 1.conf，自动生成示例 1.conf (ZTTZ 状态探针)
-    if [ ! -f "$Z_APPS_DIR/1.conf" ]; then
-        cat > "$Z_APPS_DIR/1.conf" << 'EOF'
-app_id="1"
-app_name="ZTTZ 极简状态探针"
-app_category="tools"
-app_text="自用示例应用：快速检查本机状态与网络环境"
-
-docker_app_install() {
-    clear
-    echo -e "\033[96m==================================================\033[0m"
-    echo -e "\033[32m  🚀 [z app 1] ZTTZ 极简状态探针正在运行...\033[0m"
-    echo -e "\033[96m==================================================\033[0m"
-    echo -e "主机名称: $(hostname)"
-    echo -e "当前用户: $(whoami)"
-    echo -e "系统内核: $(uname -r)"
-    echo -e "运行时间: $(uptime -p 2>/dev/null || uptime)"
-    echo -e "内存使用:"
-    free -m 2>/dev/null || true
-    echo -e "\033[96m--------------------------------------------------\033[0m"
-    echo -e "\033[33m✅ 验证成功！z app 1 自定义应用生态链路完全畅通！\033[0m"
-    echo -e "\033[96m==================================================\033[0m"
-}
-
-docker_app_update() {
-    echo "更新 ZTTZ 状态探针配置..."
-}
-
-docker_app_uninstall() {
-    echo "卸载 ZTTZ 状态探针"
-}
-
-docker_app_plus
-EOF
-        chmod +x "$Z_APPS_DIR/1.conf" 2>/dev/null || true
-    fi
 }
 
 z_list_apps() {
@@ -33691,6 +33709,18 @@ z_list_apps() {
     echo -e "${gl_kjlan}==================================================${gl_bai}"
     echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
     echo -e "${gl_kjlan}==================================================${gl_bai}"
+    
+    local conf_files=("$Z_APPS_DIR"/*.conf)
+    if [ ! -e "${conf_files[0]}" ]; then
+        echo -e "${gl_huang}💡 提示: ~/z-apps 目录为空或未初始化。${gl_bai}"
+        echo -e "${gl_lv}请先运行同步命令从 GitHub 拉取自用应用配置：${gl_bai}"
+        echo -e "  ${gl_huang}z app sync${gl_bai}"
+        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+        echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
+        echo -e "${gl_kjlan}==================================================${gl_bai}"
+        return 0
+    fi
+
     echo -e "已收录的自用应用配置："
     local count=0
     for conf in "$Z_APPS_DIR"/*.conf; do
@@ -33706,20 +33736,23 @@ z_list_apps() {
         printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$bname" "$aname" "$atext"
     done
 
-    if [ "$count" -eq 0 ]; then
-        echo -e "${gl_hui}  暂无自定义应用配置，可在 ~/z-apps/ 下添加 [应用名].conf${gl_bai}"
-    fi
     echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
     echo -e "安装或管理应用：${gl_huang}z app <数字/名称>${gl_bai} (例如: z app 1)"
+    echo -e "从 GitHub 同步配置：${gl_huang}z app sync${gl_bai}"
     echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
     echo -e "${gl_kjlan}==================================================${gl_bai}"
 }
 
 z_apps_panel() {
-    local target="$1"
+    local target="${1:-}"
     z_init_env
     if [ -z "$target" ]; then
         z_list_apps
+        return 0
+    fi
+
+    if [ "$target" = "sync" ]; then
+        z_sync_apps
         return 0
     fi
 
@@ -33736,6 +33769,7 @@ z_apps_panel() {
     else
         echo -e "${gl_hong}❌ 错误: 未在 ~/z-apps 中找到自定义应用 '${target}' 的配置！${gl_bai}"
         echo -e "${gl_hui}提示: 自定义配置文件路径应为: ~/z-apps/${target}.conf${gl_bai}"
+        echo -e "${gl_lv}可通过 ${gl_huang}z app sync${gl_lv} 从远端拉取最新配置库${gl_bai}"
         echo -e "${gl_huang}如需安装上游官方应用，请使用命令: k app ${target}${gl_bai}"
         return 1
     fi
@@ -33767,9 +33801,10 @@ z_main_menu() {
         echo -e "${gl_huang}      🚀 ZTTZ 自用应用与扩展工作台${gl_bai}"
         echo -e "${gl_kjlan}==================================================${gl_bai}"
         echo -e "${gl_kjlan}1. ${gl_bai}自用应用市场列表 (z app)"
-        echo -e "${gl_kjlan}2. ${gl_bai}上游分类折叠市场 (k app+)"
-        echo -e "${gl_kjlan}3. ${gl_bai}切换至上游主菜单 (k)"
-        echo -e "${gl_kjlan}4. ${gl_bai}在线更新脚本 (z update)"
+        echo -e "${gl_kjlan}2. ${gl_bai}从 GitHub 同步自用配置 (z app sync)"
+        echo -e "${gl_kjlan}3. ${gl_bai}上游分类折叠市场 (k app+)"
+        echo -e "${gl_kjlan}4. ${gl_bai}切换至上游主菜单 (k)"
+        echo -e "${gl_kjlan}5. ${gl_bai}在线更新脚本 (z update)"
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
         echo -e "${gl_kjlan}0. ${gl_bai}退出"
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
@@ -33780,13 +33815,17 @@ z_main_menu() {
                 break_end
                 ;;
             2)
-                linux_panel_accordion
+                z_sync_apps
+                break_end
                 ;;
             3)
+                linux_panel_accordion
+                ;;
+            4)
                 kejilion_sh
                 break
                 ;;
-            4)
+            5)
                 z_update
                 break_end
                 ;;
@@ -33814,14 +33853,18 @@ z_dispatch() {
         app+|app-cat|app-category)
             linux_panel_accordion "$@"
             ;;
+        sync)
+            z_sync_apps
+            ;;
         update|upgrade)
             z_update
             ;;
         help|--help|-h)
             echo "ZTTZ 脚本用法:"
             echo "  z                    打开 ZTTZ 自用工作台"
-            echo "  z app                查看自定义应用列表"
+            echo "  z app                查看自定义应用列表 (为空时引导 sync)"
             echo "  z app <数字/代号>    安装自用指定应用"
+            echo "  z app sync           从 GitHub 同步自用应用配置 (macsur/z-apps)"
             echo "  z app+               打开分类手风琴应用市场"
             echo "  z update             更新融合版脚本"
             echo "  k ...                调用上游官方全部原生能力"
