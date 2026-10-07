@@ -163,6 +163,7 @@ CheckFirstRun_true() {
 
 
 send_stats() {
+	return 0  # ZTTZ 去痕: 上报已关闭，不再向任何外部发送数据
 	if [ "$ENABLE_STATS" == "false" ]; then
 		return
 	fi
@@ -239,7 +240,7 @@ CheckFirstRun_false() {
 # 提示用户同意条款
 UserLicenseAgreement() {
 	clear
-	echo -e "${gl_kjlan}欢迎使用科技lion脚本工具箱${gl_bai}"
+	echo -e "${gl_kjlan}欢迎使用 Linux 百宝箱${gl_bai}"
 	echo "首次使用脚本，请先阅读并同意用户许可协议。"
 	echo "用户许可协议: https://blog.kejilion.pro/user-license-agreement/"
 	echo -e "----------------------"
@@ -26200,7 +26201,7 @@ render_accordion_apps_menu() {
     while true; do
         clear
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
-        echo -e "${gl_huang}  🚀 Kejilion 应用市场 · 8 大分类${gl_bai}"
+        echo -e "${gl_huang}  🚀 Linux 百宝箱 · 8 大分类${gl_bai}"
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
 
         for item in "${CATEGORY_LIST[@]}"; do
@@ -26461,7 +26462,7 @@ render_accordion_apps_menu() {
 search_apps_wizard() {
     clear
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  🔍 Kejilion 应用市场 · 快速搜索${gl_bai}"
+    echo -e "${gl_huang}  🔍 Linux 百宝箱 · 快速搜索${gl_bai}"
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
     read -e -p "请输入应用关键词或拼音 (直接回车取消): " kw
     [ -z "$kw" ] && return 0
@@ -26533,9 +26534,9 @@ search_apps_wizard() {
 new_custom_app_wizard() {
     clear
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  ➕ Kejilion 新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
+    echo -e "${gl_huang}  ➕ Linux 百宝箱新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "本向导将帮助您根据 ${gl_huang}dev.kejilion.sh${gl_bai} 官方规范快速注册一个新应用。"
+    echo -e "本向导将帮助您根据应用配置规范快速注册一个新应用。"
     echo ""
 
     local app_dir="$HOME/apps"
@@ -31745,7 +31746,7 @@ linux_Settings() {
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}61.  ${gl_bai}留言板                             ${gl_kjlan}66.  ${gl_bai}一条龙系统调优 ${gl_huang}★${gl_bai}"
 	  echo -e "${gl_kjlan}99.  ${gl_bai}重启服务器                         ${gl_kjlan}100. ${gl_bai}隐私与安全"
-	  echo -e "${gl_kjlan}101. ${gl_bai}k命令高级用法 ${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}卸载科技lion脚本"
+	  echo -e "${gl_kjlan}101. ${gl_bai}k命令高级用法 ${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}卸载百宝箱脚本"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主菜单"
 	  echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -32666,7 +32667,7 @@ EOF
 		  61)
 			clear
 			send_stats "留言板"
-			echo "访问科技lion官方留言板，您对脚本有任何想法欢迎留言交流！"
+			echo "访问官方留言板，您对脚本有任何想法欢迎留言交流！"
 			echo "https://board.kejilion.pro"
 			echo "公共密码: kejilion.sh"
 			  ;;
@@ -32783,10 +32784,10 @@ EOF
 
 		  102)
 			  clear
-			  send_stats "卸载科技lion脚本"
-			  echo "卸载科技lion脚本"
+			  send_stats "卸载百宝箱脚本"
+			  echo "卸载百宝箱脚本"
 			  echo "------------------------------------------------"
-			  echo "将彻底卸载kejilion脚本，不影响你其他功能"
+			  echo "将彻底卸载百宝箱脚本，不影响你其他功能"
 			  read -e -p "确定继续吗？(Y/N): " choice
 
 			  case "$choice" in
@@ -33082,7 +33083,7 @@ while true; do
 	  echo -e "${gl_kjlan}4.  ${gl_bai}备份集群                 ${gl_kjlan}5.  ${gl_bai}还原集群"
 	  echo -e "${gl_kjlan}------------------------${gl_bai}"
 	  echo -e "${gl_kjlan}批量执行任务${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}安装科技lion脚本         ${gl_kjlan}12. ${gl_bai}更新系统              ${gl_kjlan}13. ${gl_bai}清理系统"
+	  echo -e "${gl_kjlan}11. ${gl_bai}安装百宝箱脚本         ${gl_kjlan}12. ${gl_bai}更新系统              ${gl_kjlan}13. ${gl_bai}清理系统"
 	  echo -e "${gl_kjlan}14. ${gl_bai}安装docker               ${gl_kjlan}15. ${gl_bai}安装BBR3              ${gl_kjlan}16. ${gl_bai}设置1G虚拟内存"
 	  echo -e "${gl_kjlan}17. ${gl_bai}设置时区到上海           ${gl_kjlan}18. ${gl_bai}开放所有端口	       ${gl_kjlan}51. ${gl_bai}自定义指令"
 	  echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -33434,7 +33435,7 @@ echo -e "${gl_kjlan}"
 echo "╦╔═╔═╗ ╦╦╦  ╦╔═╗╔╗╔ ╔═╗╦ ╦"
 echo "╠╩╗║╣  ║║║  ║║ ║║║║ ╚═╗╠═╣"
 echo "╩ ╩╚═╝╚╝╩╩═╝╩╚═╝╝╚╝o╚═╝╩ ╩"
-echo -e "科技lion脚本工具箱 v$sh_v"
+echo -e "Linux 百宝箱 v$sh_v"
 echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"
 echo -e "${gl_huang}11+. ${gl_bai}应用市场 [分类折叠]${gl_bai}"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
