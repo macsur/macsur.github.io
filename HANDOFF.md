@@ -260,6 +260,10 @@
   - 创建并内置 `z-apps/1.conf` 自用极简状态探针示例。
   - 同步脚本 `sync_upstream.sh` 更新：全量生成并同步 `z.sh`、`x.sh`、`kejilion.sh` 至根目录与 `website/public/`。
 - **确立并固化规约**：在 `HANDOFF.md` 写入《小安 ↔ Muse 对接规约 v1.0》。
+- **安装并配置持久记忆系统 `claude-mem` (v13.34.2)**：
+  - 针对 Antigravity 部署 `claude-mem` 插件，关联 hooks 与 MCP 配置；
+  - 启动本地 worker 守护进程（运行在 `127.0.0.1:37701`，提供 Web Viewer 与记忆索引）；
+  - 配置 `~/.claude-mem/settings.json` 为 `"CLAUDE_MEM_MODE": "code--zh"`（支持中文记忆持久化与跨会话恢复）。
 
 ### 2. 验证结果
 - 执行 `node sync_upstream.js` 及 `./sync_upstream.sh`，构建并全量生成分发文件。
@@ -270,6 +274,9 @@
   - `z app 1` 顺利加载 `1.conf` 运行探针；
   - `z app 999` 明确提示未找到并引导使用 `k app 999`；
   - `k help` 验证上游 `k app` 与新增 `z app` 帮助项均正常。
+- `claude-mem` 验证：
+  - `npx claude-mem doctor` 检查全部基础依赖（Bun 1.3.14、uv、sqlite）正常；
+  - `npx claude-mem status` 确认 worker daemon 处于运行状态（PID 活跃，端口 37701 正常监听）。
 
 ### 3. 提交与推送
 - 目标：`macsur/source` 分支。
@@ -278,3 +285,4 @@
 ### 4. 注意事项 / 下一步
 - 待 Muse 在干净隔离容器中执行端到端真实集成冒烟测试（安装、z app 1、z update）。
 - 确认各端工作流已完全对齐《小安 ↔ Muse 对接规约 v1.0》。
+- 本地 `claude-mem` 守护进程已常驻，后续会话可通过 `npx claude-mem search` 或 `http://127.0.0.1:37701` 实时查看并利用跨会话记忆。
