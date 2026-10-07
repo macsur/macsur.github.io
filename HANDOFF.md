@@ -133,7 +133,10 @@
 | 文件路径 | 作用与维护要点 |
 | :--- | :--- |
 | `apps_manager.sh` | **核心源文件**。手风琴应用市场独立脚本，包含 8 核心分类定义、128 款内置应用数据库、动态 ~/apps/*.conf 扫描与 [本地] 标签、文件名 fallback 安装、代号解析与自定义应用向导。 |
-| `sync_upstream.js` | **自动化同步与补丁引擎**。拉取上游原版 `kejilion.sh`，并将 `apps_manager.sh` 的 8 分类手风琴逻辑及守护补丁自动注入，生成分发脚本。 |
+| `sync_upstream.js` | **自动化同步与补丁引擎**。拉取上游原版 `kejilion.sh`，并将 `apps_manager.sh` 8 分类手风琴逻辑及 ZTTZ 自用应用体系（`z`、`z app`、`z-apps`、别名防护、更新锁定）自动注入，生成融合版分发脚本。 |
+| `z.sh` & `website/public/z.sh` | **ZTTZ 融合版主入口脚本**。单文件融合上游 k 与自用 z 生态，支持 `z app 数字` 管理自用配置，更新源锁定为 `zttz.eu.org/z.sh`。 |
+| `x.sh` & `website/public/x.sh` | **向后兼容直达脚本**。与 `z.sh` 同源同步保持一致，保障老用户无缝过渡。 |
+| `z-apps/` | **自用应用配置根目录**。存放 `1.conf` 等自定义应用规范配置，与上游 `~/apps/` 物理隔离。 |
 | `render_demo.py` | **终端演示动画生成脚本**。基于 PIL 与 ffmpeg 逐帧渲染三幕终端演示（含 8 核心分类矩阵与快捷操作），输出到 `website/public/hero-terminal-demo.*`。 |
 | `website/src/app/page.tsx` | **站点核心主页**。Next.js 客户端主页，包含 Slogan、终端演示动画、精简 4 项导航、`🌟分类`/`官方`/`GitHub` 源切换、页脚拓展链接、手风琴 8 分类展示、[H] 社区扩展示例及今日推荐等板块。 |
 | `website/src/app/globals.css` | 全局样式表，包含移动端触屏粘滞修复、双模式高对比度规则及 Google AI 极光背景。 |
@@ -183,3 +186,95 @@
      - 与 Muse AI / Antigravity 协作时的上下文。
      ```
    - 如果是简短任务，也必须至少保留这四个标题；可以用“无”填充空项。
+
+---
+
+## 5. 📜 小安 ↔ Muse 对接规约 v1.0
+
+> **协作角色定位**：
+> - **小安 (Antigravity)**：本地主力架构与工程实施（负责深度重构、代码注入、本地多场景沙盒冒烟验证、前端与构建工程）。
+> - **Muse (云端/运维助手)**：云端自动化调度、容器沙盒真实环境集成测试、GitHub Actions 部署监控与 Cloudflare 状态守护。
+
+### 1. 🚨 核心铁律（双端共同遵守）
+1. **唯一目标仓库与分支**：
+   - 目标仓库：**`macsur/macsur.github.io`**。
+   - 唯一有效工作分支：**`source` 分支**。
+   - **严禁向 `origin` (`kejilion/sh.git`) 推送**。
+   - **严禁向 `main` 分支直接推送**（`main` 为 Actions 云端打包生成的只读发布分支）。
+2. **统一主域名与入口口径**：
+   - 站点主域名为 **`https://zttz.eu.org`**。
+   - 一键入口主推 **`https://zttz.eu.org/z.sh`**，保持 `x.sh` 同源同步向后兼容。
+3. **工具链统一**：
+   - 网站端统一采用 **Bun 1.3.14**（`website/bun.lock` 为唯一锁文件 SSOT）。
+
+### 2. 职责划分与工作流接口
+```
+[小安 (本地实施)]
+       │ 1. 编写与注入补丁 (sync_upstream.js)
+       │ 2. 生成产物 (z.sh, x.sh, website/public/)
+       │ 3. 本地 bash -n 与临时隔离沙盒初验
+       ▼
+[推送至 macsur/source 分支]
+       │
+       ▼
+[Muse (云端/对接验证)]
+       │ 1. 真实容器环境冒烟测试 (k+z 安装、z app 1、z update 链路)
+       │ 2. 调度 Actions / Cloudflare 状态检查
+       │ 3. 产出验证报告并推进下一步
+```
+
+### 3. 对接交付物与验收标准
+#### 小安交付清单：
+- `sync_upstream.js`：已完成官方源码智能打补丁与 Z 体系注入。
+- `sync_upstream.sh`：自动生成并同步下列文件到 `website/public/`：
+  - `z.sh`（主入口）
+  - `x.sh`（兼容入口，内容同 `z.sh`）
+  - `kejilion.sh`（融合版底座）
+  - `apps_manager.sh`（手风琴模块）
+- `z-apps/1.conf`：标准自用应用示例。
+- **本地强校验**：`bash -n` 零语法错误。
+
+#### Muse 验收清单（Checklist）：
+- [ ] **安装测试**：在干净容器中执行 `bash <(curl -sL https://zttz.eu.org/z.sh)` 顺利完成。
+- [ ] **命令双部署**：系统存在 `/usr/local/bin/k` 与 `/usr/local/bin/z`。
+- [ ] **别名防劫持**：`alias k` 与 `alias z` 均被成功清除。
+- [ ] **原生兼容**：执行 `k`、`k app`、`k app 1` 走上游原生逻辑。
+- [ ] **自用隔离**：
+  - `z app` 列出 `~/z-apps/` 应用；
+  - `z app 1` 成功安装并运行示例探针；
+  - `z app 999` 明确提示未找到并引导改用 `k app 999`，不发生降级误装。
+- [ ] **版本标识**：输出中带有 `zttz_edition="true"` 或 `zttz_v="1.0.0"`。
+- [ ] **更新防覆盖**：执行一次 `z update`，更新源为 `zttz.eu.org/z.sh`，更新后 `z` 命令完好无损。
+
+---
+
+## 工作记录（2026-10-07）
+
+### 1. 变更内容
+- **实现 ZTTZ 融合版脚本与 Z 命令体系**：
+  - `sync_upstream.js` 扩展支持 `z` 命令体系：自动清除 `alias z=` 别名劫持，自动部署 `/usr/local/bin/z` 与 `/usr/bin/z`。
+  - 尾部分发器新增 `$(basename "$0")` 判断：以 `z` 调用时进入独立的自用管理工作台与 `z app [数字]` 调度逻辑。
+  - 自用应用生态与上游隔离：`z app [数字]` 调度 `~/z-apps/[数字].conf`；找不到时不自动回退上游，避免编号冲突，清晰引导。
+  - 更新源锁定：重定向到 `https://zttz.eu.org/z.sh`，并在更新完成后自动重建 `z` 命令及软链。
+  - 版本标识注入：在脚本头部新增 `zttz_edition="true"` 与 `zttz_v="1.0.0"`。
+  - 创建并内置 `z-apps/1.conf` 自用极简状态探针示例。
+  - 同步脚本 `sync_upstream.sh` 更新：全量生成并同步 `z.sh`、`x.sh`、`kejilion.sh` 至根目录与 `website/public/`。
+- **确立并固化规约**：在 `HANDOFF.md` 写入《小安 ↔ Muse 对接规约 v1.0》。
+
+### 2. 验证结果
+- 执行 `node sync_upstream.js` 及 `./sync_upstream.sh`，构建并全量生成分发文件。
+- 执行 `bash -n kejilion.sh`、`bash -n z.sh`、`bash -n x.sh`、`bash -n z-apps/1.conf`，语法检查 100% 通过。
+- 在本地隔离临时沙盒中验证：
+  - `z help` 正常输出命令用法；
+  - `z app` 自动初始化并展示自用应用列表；
+  - `z app 1` 顺利加载 `1.conf` 运行探针；
+  - `z app 999` 明确提示未找到并引导使用 `k app 999`；
+  - `k help` 验证上游 `k app` 与新增 `z app` 帮助项均正常。
+
+### 3. 提交与推送
+- 目标：`macsur/source` 分支。
+- 声明：严格遵守铁律，未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 待 Muse 在干净隔离容器中执行端到端真实集成冒烟测试（安装、z app 1、z update）。
+- 确认各端工作流已完全对齐《小安 ↔ Muse 对接规约 v1.0》。

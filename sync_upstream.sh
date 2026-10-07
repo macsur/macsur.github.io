@@ -23,11 +23,13 @@ node sync_upstream.js
 bash -n kejilion.sh
 bash -n apps_manager.sh
 
-# 3. 同步到 website/public/
+# 3. 同步到 website/public/ 及根目录入口
 echo "📁 同步生成物到 website/public/ ..."
 mkdir -p website/public
 cp -f kejilion.sh website/public/kejilion.sh
+cp -f kejilion.sh website/public/z.sh
 cp -f kejilion.sh website/public/x.sh
+cp -f kejilion.sh z.sh
 cp -f kejilion.sh x.sh
 cp -f apps_manager.sh website/public/apps_manager.sh
 
