@@ -151,10 +151,12 @@ const protocolBlockNew = `if ! kpanel_protocol_active; then
 	sed -i '/^alias z=/d' ~/.profile > /dev/null 2>&1
 	sed -i '/^alias z=/d' ~/.bash_profile > /dev/null 2>&1
 
-	# 部署 k 与 z 命令入口
+	# 部署 k 与 z 命令入口并赋予可执行权限
 	if [ -f ~/kejilion.sh ]; then
+		chmod +x ~/kejilion.sh > /dev/null 2>&1
 		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
 		cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+		chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
 		[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 		[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
 	fi
@@ -426,13 +428,62 @@ if (officialCode.includes(updateTaskTarget)) {
 const updateDeployTarget = `				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
 				ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1`;
 
-const updateDeployReplacement = `				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
+const updateDeployReplacement = `				chmod +x ~/kejilion.sh > /dev/null 2>&1
+				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
 				cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+				chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
 				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1`;
 
 if (officialCode.includes(updateDeployTarget)) {
     officialCode = officialCode.replace(updateDeployTarget, updateDeployReplacement);
+}
+
+// 补丁 8.1: 修复定时自动更新任务 (crontab 中的 SH_Update_task) 为 zttz 官方源并双部署 k+z
+const cronTaskTarget = `			SH_Update_task="cd ~ && tmp=\\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \\\"\\$tmp\\\" \${cron_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && [ -s \\\"\\$tmp\\\" ] && head -1 \\\"\\$tmp\\\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \\\"\\$tmp\\\" && mv -f \\\"\\$tmp\\\" ~/kejilion.sh"`;
+
+const cronTaskReplacement = `			SH_Update_task="cd ~ && tmp=\\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \\\"\\$tmp\\\" https://zttz.eu.org/z.sh && [ -s \\\"\\$tmp\\\" ] && head -1 \\\"\\$tmp\\\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \\\"\\$tmp\\\" && mv -f \\\"\\$tmp\\\" ~/kejilion.sh"`;
+
+if (officialCode.includes(cronTaskTarget)) {
+    officialCode = officialCode.replace(cronTaskTarget, cronTaskReplacement);
+}
+
+const cronDeployTarget = `			SH_Update_task="$SH_Update_task; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null"`;
+
+const cronDeployReplacement = `			SH_Update_task="$SH_Update_task; chmod +x ~/kejilion.sh 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null; chmod +x /usr/local/bin/k /usr/local/bin/z 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null; ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null"`;
+
+if (officialCode.includes(cronDeployTarget)) {
+    officialCode = officialCode.replace(cronDeployTarget, cronDeployReplacement);
+}
+
+// 补丁 8.2: 优化更新菜单顶部的版本号对比提示文案
+const versionNoticeTarget = `	local sh_v_new=$(curl -s --max-time 15 -r 0-200 \${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh | grep -o 'sh_v="[0-9.]*"' | head -1 | cut -d '"' -f 2)
+
+	if [ -z "$sh_v_new" ]; then
+		echo -e "\${gl_hong}无法获取最新版本信息，请检查网络连接\${gl_bai}"
+	elif [ "$sh_v" = "$sh_v_new" ]; then
+		echo -e "\${gl_lv}你已经是最新版本！\${gl_huang}v$sh_v\${gl_bai}"
+		send_stats "脚本已经最新了，无需更新"
+	else
+		echo "发现新版本！"
+		echo -e "当前版本 v$sh_v        最新版本 \${gl_huang}v$sh_v_new\${gl_bai}"
+	fi`;
+
+const versionNoticeReplacement = `	local sh_v_new=$(curl -s --max-time 15 -r 0-300 https://zttz.eu.org/z.sh | grep -o 'zttz_v="[0-9.]*"' | head -1 | cut -d '"' -f 2)
+	local cur_display_v="\${zttz_v:-$sh_v}"
+
+	if [ -z "$sh_v_new" ]; then
+		echo -e "\${gl_hong}无法获取最新版本信息，请检查网络连接\${gl_bai}"
+	elif [ "\${zttz_v:-}" = "$sh_v_new" ]; then
+		echo -e "\${gl_lv}你已经是 ZTTZ 融合版最新版本！\${gl_huang}v$cur_display_v\${gl_bai}"
+		send_stats "脚本已经最新了，无需更新"
+	else
+		echo "发现新版本！"
+		echo -e "当前版本 v$cur_display_v        最新版本 \${gl_huang}v$sh_v_new\${gl_bai}"
+	fi`;
+
+if (officialCode.includes(versionNoticeTarget)) {
+    officialCode = officialCode.replace(versionNoticeTarget, versionNoticeReplacement);
 }
 
 // 补丁 9: 注入 Z 自定义体系函数与 tail 分流器

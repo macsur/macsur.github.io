@@ -217,10 +217,12 @@ if ! kpanel_protocol_active; then
 	sed -i '/^alias z=/d' ~/.profile > /dev/null 2>&1
 	sed -i '/^alias z=/d' ~/.bash_profile > /dev/null 2>&1
 
-	# 部署 k 与 z 命令入口
+	# 部署 k 与 z 命令入口并赋予可执行权限
 	if [ -f ~/kejilion.sh ]; then
+		chmod +x ~/kejilion.sh > /dev/null 2>&1
 		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
 		cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+		chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
 		[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 		[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
 	fi
@@ -33330,16 +33332,17 @@ while true; do
 
 	curl -s --max-time 15 ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion_sh_log.txt | tail -n 30
 	# 只下载前5行获取版本号，避免下载整个脚本
-	local sh_v_new=$(curl -s --max-time 15 -r 0-200 ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh | grep -o 'sh_v="[0-9.]*"' | head -1 | cut -d '"' -f 2)
+	local sh_v_new=$(curl -s --max-time 15 -r 0-300 https://zttz.eu.org/z.sh | grep -o 'zttz_v="[0-9.]*"' | head -1 | cut -d '"' -f 2)
+	local cur_display_v="${zttz_v:-$sh_v}"
 
 	if [ -z "$sh_v_new" ]; then
 		echo -e "${gl_hong}无法获取最新版本信息，请检查网络连接${gl_bai}"
-	elif [ "$sh_v" = "$sh_v_new" ]; then
-		echo -e "${gl_lv}你已经是最新版本！${gl_huang}v$sh_v${gl_bai}"
+	elif [ "${zttz_v:-}" = "$sh_v_new" ]; then
+		echo -e "${gl_lv}你已经是 ZTTZ 融合版最新版本！${gl_huang}v$cur_display_v${gl_bai}"
 		send_stats "脚本已经最新了，无需更新"
 	else
 		echo "发现新版本！"
-		echo -e "当前版本 v$sh_v        最新版本 ${gl_huang}v$sh_v_new${gl_bai}"
+		echo -e "当前版本 v$cur_display_v        最新版本 ${gl_huang}v$sh_v_new${gl_bai}"
 	fi
 
 
@@ -33376,8 +33379,10 @@ while true; do
 				canshu_v6
 				CheckFirstRun_true
 				yinsiyuanquan2
+				chmod +x ~/kejilion.sh > /dev/null 2>&1
 				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
 				cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+				chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
 				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
 				echo -e "${gl_lv}脚本已更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
@@ -33412,7 +33417,7 @@ while true; do
 			fi
 
 			# 构建健壮的自动更新命令：下载到临时文件 → 校验 → 备份 → 替换 → 恢复本地设置 → 部署
-			SH_Update_task="cd ~ && tmp=\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \"\$tmp\" ${cron_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && [ -s \"\$tmp\" ] && head -1 \"\$tmp\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \"\$tmp\" && mv -f \"\$tmp\" ~/kejilion.sh"
+			SH_Update_task="cd ~ && tmp=\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \"\$tmp\" https://zttz.eu.org/z.sh && [ -s \"\$tmp\" ] && head -1 \"\$tmp\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \"\$tmp\" && mv -f \"\$tmp\" ~/kejilion.sh"
 			# 追加设置恢复
 			if [ -n "$cron_sed_cmd" ]; then
 				SH_Update_task="$SH_Update_task && $cron_sed_cmd"
@@ -33420,7 +33425,7 @@ while true; do
 			# 从旧脚本恢复 permission_granted 和 ENABLE_STATS 设置
 			SH_Update_task="$SH_Update_task && grep -q 'permission_granted=\"true\"' ~/kejilion.sh.bak 2>/dev/null && sed -i 's/permission_granted=\"false\"/permission_granted=\"true\"/' ~/kejilion.sh; grep -q 'ENABLE_STATS=\"false\"' ~/kejilion.sh.bak 2>/dev/null && sed -i 's/ENABLE_STATS=\"true\"/ENABLE_STATS=\"false\"/' ~/kejilion.sh"
 			# 部署到 /usr/local/bin/k 和 /usr/bin/k
-			SH_Update_task="$SH_Update_task; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null"
+			SH_Update_task="$SH_Update_task; chmod +x ~/kejilion.sh 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null; chmod +x /usr/local/bin/k /usr/local/bin/z 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null; ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null"
 			# 下载失败时清理临时文件
 			SH_Update_task="$SH_Update_task || rm -f \"\$tmp\" 2>/dev/null"
 

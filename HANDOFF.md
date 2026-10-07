@@ -260,6 +260,10 @@
   - 创建并内置 `z-apps/1.conf` 自用极简状态探针示例。
   - 同步脚本 `sync_upstream.sh` 更新：全量生成并同步 `z.sh`、`x.sh`、`kejilion.sh` 至根目录与 `website/public/`。
 - **确立并固化规约**：在 `HANDOFF.md` 写入《小安 ↔ Muse 对接规约 v1.0》。
+- **修复 2 项 Ship-blocker 与优化版本比对 (2026-10-07 回归打补丁)**：
+  1. **执行权限修复**：在自存部署逻辑中，补全 `chmod +x ~/kejilion.sh` 以及 `chmod +x /usr/local/bin/k /usr/local/bin/z`，彻底根除整包直灌执行后出现的 `Permission denied`（644 权限硬伤）；
+  2. **自动更新任务 (Cron) 官方源脱钩与双部署**：修改 `kejilion_update()` 选项 2 中 `SH_Update_task` 下载 URL 为 `https://zttz.eu.org/z.sh`，并在定时任务中部署 `k` 和 `z` 双命令软链，彻底杜绝次日凌晨自动更新把 `z` 洗回官方版；
+  3. **版本比对优化**：更新菜单头部检测最新版本逻辑调整为比对 `zttz.eu.org/z.sh` 的 `zttz_v`，保持 ZTTZ 融合版语义纯正。
 - **安装并配置持久记忆系统 `claude-mem` (v13.34.2)**：
   - 针对 Antigravity 部署 `claude-mem` 插件，关联 hooks 与 MCP 配置；
   - 启动本地 worker 守护进程（运行在 `127.0.0.1:37701`，提供 Web Viewer 与记忆索引）；
@@ -267,7 +271,9 @@
 
 ### 2. 验证结果
 - 执行 `node sync_upstream.js` 及 `./sync_upstream.sh`，构建并全量生成分发文件。
-- 执行 `bash -n kejilion.sh`、`bash -n z.sh`、`bash -n x.sh`、`bash -n z-apps/1.conf`，语法检查 100% 通过。
+- 执行 `bash -n kejilion.sh`、`bash -n z.sh`、`bash -n x.sh` 三件套语法检查 100% 通过。
+- 权限实测：模拟无执行权限整包直灌执行，部署后 `~/kejilion.sh` 自动获得 `755` 权限，`/usr/local/bin/k` 与 `/usr/local/bin/z` 均具备可执行权限。
+- 自动更新实测：检查生成的 `SH_Update_task`，确认更新源为 `https://zttz.eu.org/z.sh` 且包含 `cp k && cp z && ln k && ln z` 双部署。
 - 在本地隔离临时沙盒中验证：
   - `z help` 正常输出命令用法；
   - `z app` 自动初始化并展示自用应用列表；
@@ -283,6 +289,5 @@
 - 声明：严格遵守铁律，未推 `origin`，未推 `main`。
 
 ### 4. 注意事项 / 下一步
-- 待 Muse 在干净隔离容器中执行端到端真实集成冒烟测试（安装、z app 1、z update）。
-- 确认各端工作流已完全对齐《小安 ↔ Muse 对接规约 v1.0》。
-- 本地 `claude-mem` 守护进程已常驻，后续会话可通过 `npx claude-mem search` 或 `http://127.0.0.1:37701` 实时查看并利用跨会话记忆。
+- 待 Muse 在干净隔离容器中重跑冒烟测试（安装、直接执行 k/z、z app 1、z update、cron 自动更新任务验证）。
+- 冒烟全部通过后由 Muse 触发发布链路。
