@@ -33617,29 +33617,56 @@ z_sync_apps() {
         echo -e "${gl_hui}正在从 GitHub 克隆自用应用配置库...${gl_bai}"
         local tmp_sync
         tmp_sync=$(mktemp -d /tmp/z_apps_clone.XXXXXX)
-        if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync" 2>/dev/null; then
+        if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync"; then
             mkdir -p "$Z_APPS_DIR"
             cp -r "$tmp_sync"/.git "$Z_APPS_DIR/" 2>/dev/null || true
-            cp -n "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
-            cp -n "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
+            cp -f "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
+            cp -f "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
             chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
             rm -rf "$tmp_sync"
             echo -e "${gl_lv}✅ 首次同步成功！自用配置已拉取至: $Z_APPS_DIR${gl_bai}"
             sync_ok=1
         else
             rm -rf "$tmp_sync"
-            echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
+            echo -e "${gl_hong}❌ 克隆失败，请检查网络连接或 GitHub 访问！${gl_bai}"
+            return 1
         fi
     else
-        # 2. 目录已存在且为 git 目录，执行增量合并
-        echo -e "${gl_hui}正在拉取远端增量更新...${gl_bai}"
-        if timeout 15s git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main >/dev/null 2>&1; then
+        # 2. 目录已存在且为 git 目录，首先恢复本地工作区被删改的配置文件，杜绝假成功
+        echo -e "${gl_hui}正在核对本地文件状态并拉取远端更新...${gl_bai}"
+        git -C "$Z_APPS_DIR" checkout -f HEAD 2>/dev/null || git -C "$Z_APPS_DIR" restore . 2>/dev/null || true
+        git -C "$Z_APPS_DIR" clean -fd 2>/dev/null || true
+
+        local pull_err=""
+        if pull_err=$(git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main 2>&1); then
             chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
             echo -e "${gl_lv}✅ 同步成功！自用应用配置已更新至最新。${gl_bai}"
             sync_ok=1
         else
-            echo -e "${gl_huang}⚠️ 网络不可用，使用本地缓存${gl_bai}"
+            echo -e "${gl_huang}⚠️ 增量更新拉取异常: ${pull_err}，尝试重新克隆兜底...${gl_bai}"
+            local tmp_sync
+            tmp_sync=$(mktemp -d /tmp/z_apps_clone.XXXXXX)
+            if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync"; then
+                cp -r "$tmp_sync"/.git "$Z_APPS_DIR/" 2>/dev/null || true
+                cp -f "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
+                cp -f "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
+                chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
+                rm -rf "$tmp_sync"
+                echo -e "${gl_lv}✅ 兜底克隆同步成功！${gl_bai}"
+                sync_ok=1
+            else
+                rm -rf "$tmp_sync"
+                echo -e "${gl_hong}❌ 同步失败: 无法连接到 GitHub 配置库，请检查网络后重试！${gl_bai}"
+                return 1
+            fi
         fi
+    fi
+
+    # 完整性校验：同步完成后必须确保有 .conf 配置文件，否则决不允许假报成功
+    local check_confs=("$Z_APPS_DIR"/*.conf)
+    if [ ! -e "${check_confs[0]}" ]; then
+        echo -e "${gl_hong}❌ 错误: 同步完成但未在 $Z_APPS_DIR 检测到任何 .conf 应用配置！${gl_bai}"
+        return 1
     fi
 
     # 新应用发现播报 (非空目录且同步成功时对比)

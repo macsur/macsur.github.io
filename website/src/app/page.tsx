@@ -428,8 +428,11 @@ export default function Home() {
   // 记录是否已经触发过首次满屏大礼花
   const [hasCelebrated, setHasCelebrated] = useState(false);
 
-  // 🎆 第一次打开：超级满屏盛大烟花礼炮 (双侧加农炮对冲 + 中央爆裂流星雨)
+  // 🎆 节日专属满屏盛大烟花礼炮 (只在法定节假日期间触发，平时仅有超新星粒子冲击波与跃迁音效)
   const triggerGrandFireworks = () => {
+    // 严守规则：只在法定节假日期间放礼花，平日不放
+    if (!isHolidayToday()) return;
+
     // 1. 中央主礼炮炸裂
     fireConfetti({
       particleCount: 120,
@@ -1152,17 +1155,20 @@ export default function Home() {
 
                 {/* 筛选按钮组 */}
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-                  <button
-                    onClick={() => {
-                      triggerGrandFireworks();
-                      playSciFiAudio();
-                    }}
-                    title="触发满屏礼花"
-                    className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-cyan-300 border border-slate-700/80 hover:border-cyan-500/40 bg-slate-900/60 transition-all shadow-sm active:scale-95"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-300" />
-                    <span>放礼花</span>
-                  </button>
+                  {/* 节日专属：仅在法定节假日开放「放礼花」按钮 */}
+                  {isHolidayToday() && (
+                    <button
+                      onClick={() => {
+                        triggerGrandFireworks();
+                        playSciFiAudio();
+                      }}
+                      title="节日专属：触发满屏礼花"
+                      className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-cyan-300 border border-slate-700/80 hover:border-cyan-500/40 bg-slate-900/60 transition-all shadow-sm active:scale-95"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:text-cyan-300" />
+                      <span>放礼花</span>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => setOnlyStar(!onlyStar)}
