@@ -357,15 +357,20 @@ linux_panel_accordion() {
 officialCode = officialCode.substring(0, linuxWorkIdx) + accordionBlock + '\n\n' + officialCode.substring(linuxWorkIdx);
 
 // 补丁 4: 主菜单 kejilion_sh() 顶部注入 11+. 应用市场 [分类折叠] 快捷入口
-const mainMenuTopTarget = 'echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"\n' +
-'echo -e "${gl_kjlan}------------------------${gl_bai}"';
+// 目标：在「命令行输入k」下面的分隔线之后、第 1 项（系统信息查询）之前插入 11+ 快捷入口行
+const mainMenuTopTarget = 'echo -e "${gl_kjlan}------------------------${gl_bai}"\n' +
+'echo -e "${gl_kjlan}1.   ${gl_bai}系统信息查询"';
 
-const mainMenuTopReplacement = 'echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"\n' +
+const mainMenuTopReplacement = 'echo -e "${gl_kjlan}------------------------${gl_bai}"\n' +
 'echo -e "${gl_huang}11+. ${gl_bai}应用市场 [分类折叠]${gl_bai}"\n' +
-'echo -e "${gl_kjlan}------------------------${gl_bai}"';
+'echo -e "${gl_kjlan}------------------------${gl_bai}"\n' +
+'echo -e "${gl_kjlan}1.   ${gl_bai}系统信息查询"';
 
 if (officialCode.includes(mainMenuTopTarget)) {
     officialCode = officialCode.replace(mainMenuTopTarget, mainMenuTopReplacement);
+    console.log('  ✅ 补丁4: 主菜单顶部 11+ 快捷入口注入成功');
+} else {
+    console.warn('  ⚠️  补丁4: 主菜单 target 未命中，请检查上游格式是否变化');
 }
 
 // 补丁 5: 主菜单分支注入
