@@ -21569,15 +21569,15 @@ print("✅ 多智能体健康检查完成")
 		echo "修改选项（留空跳过）："
 		read -e -p "  新名称: " new_name
 		read -e -p "  新 Emoji: " new_emoji
-		local cmd="openclaw agents set-identity --agent $agent_id"
-		[ -n "$new_name" ] && cmd="$cmd --name $new_name"
-		[ -n "$new_emoji" ] && cmd="$cmd --emoji $new_emoji"
+		local cmd_args=("openclaw" "agents" "set-identity" "--agent" "$agent_id")
+		[ -n "$new_name" ] && cmd_args+=("--name" "$new_name")
+		[ -n "$new_emoji" ] && cmd_args+=("--emoji" "$new_emoji")
 		echo "也可以从 IDENTITY.md 自动读取身份信息。"
 		read -e -p "是否从 IDENTITY.md 读取？(y/n): " from_id
 		if [ "$from_id" = "y" ]; then
-			cmd="openclaw agents set-identity --agent $agent_id --from-identity"
+			cmd_args=("openclaw" "agents" "set-identity" "--agent" "$agent_id" "--from-identity")
 		fi
-		eval "$cmd"
+		"${cmd_args[@]}"
 	}
 
 	openclaw_multiagent_cleanup_sessions() {

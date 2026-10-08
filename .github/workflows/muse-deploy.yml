@@ -40,7 +40,7 @@ jobs:
       - name: 2. 抓取今日 GitHub 热榜并生成 500 字深度中文解析
         env:
           TRANSLATE_API_URL: ${{ secrets.TRANSLATE_API_URL || 'https://cli.136222.xyz/v1' }}
-          TRANSLATE_API_KEY: ${{ secrets.TRANSLATE_API_KEY || 'sk-f6ba10cfedb11ef9213fe3f0eae6fc81727b08d12bd4cc211ab015a978cb1f0f' }}
+          TRANSLATE_API_KEY: ${{ secrets.TRANSLATE_API_KEY }}
           TRANSLATE_MODEL: ${{ secrets.TRANSLATE_MODEL || 'gemini-2.5-flash' }}
         run: |
           bun fetch_github_trending.js || echo "保留现有数据，继续构建"

@@ -491,6 +491,32 @@ if (officialCode.includes(versionNoticeTarget)) {
     officialCode = officialCode.replace(versionNoticeTarget, versionNoticeReplacement);
 }
 
+// 补丁 8.3: 修复 openclaw_multiagent_set_identity 中用户输入 eval 命令注入高危漏洞
+const openclawSetIdentityTarget = `\t\tlocal cmd="openclaw agents set-identity --agent $agent_id"
+\t\t[ -n "$new_name" ] && cmd="$cmd --name $new_name"
+\t\t[ -n "$new_emoji" ] && cmd="$cmd --emoji $new_emoji"
+\t\techo "也可以从 IDENTITY.md 自动读取身份信息。"
+\t\tread -e -p "是否从 IDENTITY.md 读取？(y/n): " from_id
+\t\tif [ "$from_id" = "y" ]; then
+\t\t\tcmd="openclaw agents set-identity --agent $agent_id --from-identity"
+\t\tfi
+\t\teval "$cmd"`;
+
+const openclawSetIdentityReplacement = `\t\tlocal cmd_args=("openclaw" "agents" "set-identity" "--agent" "$agent_id")
+\t\t[ -n "$new_name" ] && cmd_args+=("--name" "$new_name")
+\t\t[ -n "$new_emoji" ] && cmd_args+=("--emoji" "$new_emoji")
+\t\techo "也可以从 IDENTITY.md 自动读取身份信息。"
+\t\tread -e -p "是否从 IDENTITY.md 读取？(y/n): " from_id
+\t\tif [ "$from_id" = "y" ]; then
+\t\t\tcmd_args=("openclaw" "agents" "set-identity" "--agent" "$agent_id" "--from-identity")
+\t\tfi
+\t\t"\${cmd_args[@]}"`;
+
+if (officialCode.includes(openclawSetIdentityTarget)) {
+    officialCode = officialCode.replace(openclawSetIdentityTarget, openclawSetIdentityReplacement);
+    console.log('  ✅ 补丁 8.3: 成功修复 openclaw 命令注入高危漏洞 (转为数组传参)');
+}
+
 // 补丁 9: 注入 Z 自定义体系函数与 tail 分流器
 const zModuleBlock = `
 # ==============================================================================

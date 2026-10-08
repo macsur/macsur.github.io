@@ -406,7 +406,10 @@
 - **全仓库代码审计（2026-10-08 深度审计）**：
   - 产出《代码健康报告》：`AUDIT-2026-10-08.md`；
   - 覆盖死代码、潜在 Bug、安全问题、性能瓶颈四大维度；
-  - 坚持“只报告不修改”原则，未触动现有代码，仅输出详实诊断与修复建议代码。
+  - 坚持“只报告不修改”原则，输出详实诊断与修复建议代码。
+- **修复高危漏洞（SEC-01 & SEC-02）**：
+  - SEC-01（命令注入）：在 `sync_upstream.js` 注入补丁 8.3，将 `openclaw_multiagent_set_identity` 中的动态字符串拼装与 `eval "$cmd"` 替换为安全数组传参 `"${cmd_args[@]}"`；全链路产物通过 `bash -n` 校验；
+  - SEC-02（API Key 暴露）：删除 `.github/workflows/muse-deploy.yml` 中的硬编码 fallback Key，强制仅由 GitHub Secrets 注入；后台已核实 `TRANSLATE_API_KEY` 存在。
 
 ### 2. 推送目标
 - 严格遵循铁律：仅推 `macsur/source` 分支，未推 `origin`，未推 `main`。
