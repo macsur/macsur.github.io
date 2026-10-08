@@ -411,6 +411,12 @@
   - SEC-01（命令注入）：在 `sync_upstream.js` 注入补丁 8.3，将 `openclaw_multiagent_set_identity` 中的动态字符串拼装与 `eval "$cmd"` 替换为安全数组传参 `"${cmd_args[@]}"`；全链路产物通过 `bash -n` 校验；
   - SEC-02（API Key 暴露）：删除 `.github/workflows/muse-deploy.yml` 中的硬编码 fallback Key，强制仅由 GitHub Secrets 注入；后台已核实 `TRANSLATE_API_KEY` 存在。
 
+- **工作台 3 号位插入第三方与社区扩展应用入口**：
+  - 在 `sync_upstream.js` 的 `z_main_menu` 注入补丁，第 3 位插入 `3. 第三方与社区扩展应用 [${custom_cnt} 款]`；
+  - 动态统计本地/上游第三方配置数量（默认兜底 48 款，实时跟随上游新应用扩展，拒绝写死）；
+  - 点击直达 `linux_panel_accordion "custom"`，自动展开第三方应用折叠列表；
+  - 原 3/4/5 项顺延至 4/5/6 项，全套脚本通过 `bash -n` 检验。
+
 ### 2. 推送目标
 - 严格遵循铁律：仅推 `macsur/source` 分支，未推 `origin`，未推 `main`。
 

@@ -26679,6 +26679,10 @@ linux_panel_accordion() {
 }
 
 linux_panel_accordion() {
+    local init_mode="${1:-}"
+    if [ "$init_mode" = "custom" ] || [ "$init_mode" = "H" ] || [ "$init_mode" = "h" ]; then
+        EXPANDED_CATEGORIES=" custom "
+    fi
     local target_app=""
     while true; do
         render_accordion_apps_menu
@@ -33913,14 +33917,20 @@ z_update() {
 z_main_menu() {
     while true; do
         clear
+        local custom_cnt=48
+        if declare -f load_custom_apps >/dev/null 2>&1; then
+            load_custom_apps 2>/dev/null || true
+            [ "${#CUSTOM_APPS[@]}" -gt 0 ] && custom_cnt="${#CUSTOM_APPS[@]}"
+        fi
         echo -e "${gl_kjlan}==================================================${gl_bai}"
         echo -e "${gl_huang}      🚀 ZTTZ 自用应用与扩展工作台${gl_bai}"
         echo -e "${gl_kjlan}==================================================${gl_bai}"
         echo -e "${gl_kjlan}1. ${gl_bai}自用应用市场列表 (z app)"
         echo -e "${gl_kjlan}2. ${gl_bai}从 GitHub 同步自用配置 (z app sync)"
-        echo -e "${gl_kjlan}3. ${gl_bai}上游分类折叠市场 (k app+)"
-        echo -e "${gl_kjlan}4. ${gl_bai}切换至上游主菜单 (k)"
-        echo -e "${gl_kjlan}5. ${gl_bai}在线更新脚本 (z update)"
+        echo -e "${gl_kjlan}3. ${gl_bai}第三方与社区扩展应用 [${custom_cnt} 款]"
+        echo -e "${gl_kjlan}4. ${gl_bai}上游分类折叠市场 (k app+)"
+        echo -e "${gl_kjlan}5. ${gl_bai}切换至上游主菜单 (k)"
+        echo -e "${gl_kjlan}6. ${gl_bai}在线更新脚本 (z update)"
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
         echo -e "${gl_kjlan}0. ${gl_bai}退出"
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
@@ -33935,13 +33945,16 @@ z_main_menu() {
                 break_end
                 ;;
             3)
-                linux_panel_accordion
+                linux_panel_accordion "custom"
                 ;;
             4)
+                linux_panel_accordion
+                ;;
+            5)
                 kejilion_sh
                 break
                 ;;
-            5)
+            6)
                 z_update
                 break_end
                 ;;
