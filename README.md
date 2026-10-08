@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="./logo.png" width="130" height="130" alt="Linux生态圈 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
+<img src="./logo.png" width="130" height="130" alt="Linux 百宝箱 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
 
 # 🌟 一条命令，整备一台服务器
-### Linux生态 · 现代化服务器运维基座与开源应用中心
+### Linux 百宝箱 · 现代化服务器运维基座与开源应用大厅
 
 [![Website](https://img.shields.io/badge/官网主页-zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
@@ -14,10 +14,10 @@
 
 <p align="center">
   <b>专为开发者与极客打造的现代化命令行底座，体验前所未有的纯净与高效。</b><br>
-  涵盖 160+ 精选开源与社区扩展应用、8 核心分类手风琴智能折叠市场、GitHub Trending 官方趋势榜自动汉化同步、BBRv3 极限网络加速与纯净系统一键自愈。
+  涵盖 160+ 精选开源与社区扩展应用、主菜单顶部 11+ 快捷入口、8 核心分类手风琴智能折叠市场、ZTTZ 自用工作台 (z)、GitHub Trending 每日深度汉化、BBRv3 极限网络加速与纯净系统一键自愈。
 </p>
 
-[🌐 访问官方主站](https://zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🔥 Github乐园](#-github乐园--每日官方趋势榜-top-10) • [📦 8 核心分类市场](#-8-核心分类应用市场--手风琴智能折叠) • [⚡ 快捷指令](#-常用快捷指令速查)
+[🌐 访问官方主站](https://zttz.eu.org) • [🚀 极速一键部署](#-极速一键安装) • [🗂️ 11+ 快捷市场](#-11-应用市场--手风琴智能分类折叠) • [🚀 ZTTZ 自用生态](#-zttz-专属自用工作台与扩展生态-z) • [⚡ 快捷指令](#-常用快捷指令速查)
 
 ---
 
@@ -25,29 +25,23 @@
 
 ## 🚀 极速一键安装
 
-无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux生态圈**：
+无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux 百宝箱**：
 
 ```bash
 bash <(curl -sL https://zttz.eu.org/z)
 ```
 
 > **💡 贴心自愈特性**：
-> - 自动检测并完成环境依赖自举，在 `/usr/local/bin/k` 创建全局快捷别名；
-> - 以后在任何路径只需输入 `k` 即可瞬间呼出主控面板，输入 `k app` 或 `k app+` 秒进应用市场。
+> - 自动检测并完成环境依赖自举，在 `/usr/local/bin` 生成 `k`（官方原生全能）与 `z`（ZTTZ 自用工作台）双命令；
+> - 输入 `k` 呼出主菜单（顶部带 11+ 快捷入口），输入 `z` 直达自用管理工作台；
+> - 自动守护定时更新任务为 `https://zttz.eu.org/z.sh`，杜绝官方更新洗回。
 
 ---
 
 ## 🌟 核心精华特色
 
-### 1. 🚀 [Github乐园] · 每日官方趋势榜 TOP 10 自动汉化同步
-- **100% 真实同步**：直接从 GitHub 官方趋势榜（`github.com/trending`）每日定时抓取全球星标增速最快的前 10 大开源神作；
-- **智能全中文转译**：接入自动化翻译引擎与开源领域专业术语库，将英文项目名、核心定位及深度特性介绍一键润色为高质感地道中文；
-- **火焰指标高亮**：实时呈现当日暴增星标（如 `🔥 +2,608 今日新增`）、开发语言色块、总 Stars、总 Forks 与一键克隆安装指令；
-- **双端联动体验**：网页端提供流光卡片展示，服务器终端输入 `k app+` 按 `K` 键亦可直接直达。
-
----
-
-### 2. 🗂️ 7+. 应用市场 · 手风琴智能分类折叠
+### 1. 🗂️ 11+. 应用市场 · 手风琴智能分类折叠 (双入口直达)
+- **主菜单顶部快捷直达**：主菜单进入后，第 1 项之前即是 `11+. 应用市场 [分类折叠]`，配合原有的 11 选项形成双入口体系；
 - **分类折叠，告别滚屏**：彻底终结原版 118+ 应用平铺滚屏的繁琐体验，引入全新手风琴折叠交互；
 - **独占展开机制**：展开新分类时自动智能折叠上一个分类，保持终端始终清爽极简；
 - **A ~ H 专属字母代号**：为各大分类应用赋予专属排序编号（如 `A1` DeepSeek、`B1` 宝塔、`H1` KPanel），支持按键直选安装；
@@ -56,36 +50,64 @@ bash <(curl -sL https://zttz.eu.org/z)
 
 ---
 
+### 2. 🚀 ZTTZ 专属自用工作台与扩展生态 (`z`)
+独立于上游官方应用市场，提供专属于团队与个人的生态分发工作台（输入 `z` 启动）：
+```text
+==================================================
+      🚀 ZTTZ 自用应用与扩展工作台
+==================================================
+1. 自用应用市场列表 (z app)
+2. 从 GitHub 同步自用配置 (z app sync)
+3. 第三方与社区扩展应用 [48 款]    ← 直达分类手风琴
+4. 上游分类折叠市场 (k app+)
+5. 切换至上游主菜单 (k)
+6. 在线更新脚本 (z update)
+--------------------------------------------------
+0. 退出
+```
+- **配置云端同步 (`z app sync`)**：直连独立的 `macsur/z-apps` GitHub 配置库，实现本地自用应用增量更新；
+- **动态编号映射**：支持“随时删除，自动对齐”，无论配置文件编号如何跳变，展示始终按 `1..N` 动态重排；
+- **3 号位第三方扩展入口**：动态自适应探测第三方应用款数，点击直达展开手风琴 H 类别。
+
+---
+
 ### 3. 🖥️ 8 核心分类矩阵与 160+ 精选开源服务
 
 | 分类键 | 分类名称与核心定位 | 收录数量 | 代表性开源应用举例 |
 | :---: | :--- | :---: | :--- |
-| **[A]** | **🌟 [Github乐园] 热门开源TOP10** | 10 款 | 紧随全球开源趋势，今日星标增长最猛的 TOP 10 顶流神作 (DeepSeek, Ollama, OpenWebUI 等) |
+| **[A]** | **🌟 热门开源 TOP10** | 10 款 | 紧随全球开源趋势，今日星标增长最猛的 TOP 10 顶流神作 (DeepSeek, Ollama, OpenWebUI 等) |
 | **[B]** | **🖥️ 服务器运维与探针监控** | 29 款 | 宝塔面板、aaPanel 国际版、1Panel、哪吒探针、Uptime Kuma、Prometheus、RustDesk中继、WebSSH 等 |
 | **[C]** | **🤖 人工智能与前沿大模型** | 14 款 | DeepSeek-V3/R1、Ollama、OpenWebUI、Dify 知识库、RAGFlow、AstrBot、NewAPI 等 |
 | **[D]** | **🌐 网络代理与穿透组网** | 15 款 | NginxProxyManager、雷池 WAF、FRP (服务端/客户端)、WireGuard、ddns-go、Lucky、99CDN 等 |
 | **[E]** | **🗄️ 私有网盘与数据存储** | 14 款 | Cloudreve、Nextcloud、PhotoPrism、SFTPGo、简单图床、Syncthing 同步、ZFile 等 |
 | **[F]** | **🎬 影音媒体与离线下载** | 14 款 | qBittorrent 离线下载、Emby 影音中心、Jellyfin、Navidrome 音乐库、yt-dlp、SyncTV 等 |
 | **[G]** | **📝 协作办公与实用工具** | 32 款 | OnlyOffice、思源笔记、VScode网页版、Poste邮件、RocketChat、Bitwarden密码库、It-Tools 等 |
-| **[H]** | **📦 第三方与社区扩展应用** | 41+ 款 | KPanel面板、CLIProxyAPI、Antigravity Manager、CoPaw、Grok2API、EasyTier等社区扩展，输入 `+` 支持快速添加向导 |
+| **[H]** | **📦 第三方与社区扩展应用** | 48 款 | WorkBuddy网关、Agent2API、KPanel、CLIProxyAPI、Antigravity Manager、CoPaw、Grok2API等 |
 
 ---
 
-### 4. ⚡ 现代化 Linux 运维基座与系统调优
+### 4. 🎬 首页双视频轮播视觉引擎 (零黑屏闪烁)
+- **多规格无缝轮播**：集成 10s 品牌短片（手机 9:16 / 桌面 16:9 自适应）+ 30s 宣传片（女神版 / 极客版高清原画）；
+- **全流媒体 faststart 加速**：所有 MP4 文件元数据前置（`+faststart`），首帧秒开加载；
+- **Poster 封面保护**：绑定精选第 2 秒画面专属高清封面海报，彻底告别浏览器黑屏等待；
+- **静音自动播放与音量切换**：遵从现代浏览器 autoplay 规范，保留随时开启声音交互。
 
-- **BBRv3 极致拥塞调优**：内置最新 Google BBRv3 内核算法与 TCP 协议栈调优，显著降低丢包率与网络延迟；
-- **全方位垃圾清理**：一键彻底清理系统缓存、旧内核、无效依赖与日志垃圾，扩展 SWAP 虚拟内存；
-- **Docker 容器全生命周期管理**：自动解决端口冲突检测、版本升级、日志轮转与一键跨机打包迁移；
-- **安全加固体系**：集成 Fail2ban 暴力破解防御、SSH 密钥导入与安全强化、iptables 端口精准放行。
+---
+
+### 5. 🛡️ 企业级代码加固与安全审计
+- **命令注入杜绝**：彻底消除 `eval` 字符串命令拼装隐患，全量使用安全 Bash 数组传参；
+- **敏感凭据脱敏**：CI/CD 自动化构建与代码工程零硬编码密钥，严格通过 GitHub Secrets 安全注入；
+- **全仓健康报告**：配备详细的自动化审计报告（`AUDIT-2026-10-08.md`），持续跟踪代码品质。
 
 ---
 
 ## ⚡ 常用快捷指令速查
 
-安装完成后，无需层层翻找菜单，直接在终端执行快捷子命令即可秒级直达：
+无需层层翻找菜单，直接在终端执行快捷子命令即可秒级直达：
 
 ```bash
-k               # 呼出 Linux生态圈 主控制面板
+# --- 官方原生全能指令 (k) ---
+k               # 呼出 Linux 百宝箱 主控制面板 (顶部带 11+ 快捷入口)
 k app           # 直接进入经典平铺应用市场
 k app+          # 打开增强版 11+. 应用市场 [分类折叠]
 k app 57        # 一键极速部署 DeepSeek AI 大模型
@@ -93,7 +115,14 @@ k bbr3          # 安装并开启最新 BBRv3 网络极限加速
 k clean         # 一键深度清理服务器缓存与旧冗余内核
 k dd            # 纯净版官方 Linux 系统一键重装
 k backup        # 全自动打包备份全部 Docker 容器与数据库
-k update        # 无缝检测并更新工具箱至最新版本
+
+# --- ZTTZ 自用扩展指令 (z) ---
+z               # 打开 ZTTZ 自用应用与扩展工作台
+z app           # 浏览自用应用市场列表 (为空时引导 sync)
+z app sync      # 从 GitHub 同步自用配置 (macsur/z-apps)
+z app <数字>    # 安装自用指定应用 (如 z app 1 安装 WorkBuddy)
+z app+          # 打开分类折叠市场
+z update        # 在线更新融合版最新脚本
 ```
 
 ---
@@ -101,11 +130,8 @@ k update        # 无缝检测并更新工具箱至最新版本
 ## 🛠️ 自动化流水线与代码工程
 
 - **前端技术栈**：采用 **Next.js 14 (App Router)** + **Tailwind CSS** 构建，全静态导出（SSG）极速秒开；
-- **Bun.sh 1.3.14 统一工具链**：网站端 `website/` 已固定使用 `website/.bun-version` 与 `website/bun.lock`，本地和 GitHub Actions 均通过 `bun install --frozen-lockfile`、`bun run build` 完成依赖安装与生产构建；
-- **更快的安装与构建链路**：Bun 的包管理器、运行时与脚本执行器合一，减少 Node/npm 多工具切换成本，CI 中无需再维护 `package-lock.json` 与 npm 缓存策略，依赖解析更稳定；
-- **预构建脚本原生化**：`prebuild` 已切换为 `bun fetch_vpngate.js && bun generate_daily_recommend.js`，VPNGate 彩蛋节点更新、每日推荐打新、Next.js 构建统一由 Bun 驱动，降低脚本启动开销；
-- **云端发布更可靠**：`.github/workflows/muse-deploy.yml` 使用 `oven-sh/setup-bun@v1` 固定 Bun 1.3.14，避免云端 Actions 因 npm 锁文件缺失或版本漂移导致自动同步停摆；
-- **自动化同步引擎**：包含官方源码自动同步脚本 `sync_upstream.sh` 与 `sync_upstream.js`，可平滑跟进上游更新并保持分类折叠特性零冲突；
+- **Bun.sh 1.3.14 统一工具链**：前端 `website/` 固定使用 `website/.bun-version` 与 `website/bun.lock`，CI 编译与预构建全由 Bun 驱动；
+- **自动化同步引擎**：包含官方源码自动同步脚本 `sync_upstream.sh` 与 `sync_upstream.js`，补丁架构平滑跟进上游；
 - **每日热榜抓取器**：`fetch_github_trending.js` 自动抓取 GitHub 官方趋势榜，智能翻译后即时渲染；
 - **高颜值视觉系统**：配备专属圆形机甲猫咪 Logo、标准 180×180 Apple Touch Icon 与 Favicon 图标集。
 
@@ -115,10 +141,5 @@ k update        # 无缝检测并更新工具箱至最新版本
 
 - **主页域名**：[https://zttz.eu.org](https://zttz.eu.org)
 - **GitHub 源码仓库**：[https://github.com/macsur/macsur.github.io](https://github.com/macsur/macsur.github.io)
+- **自用应用库**：[https://github.com/macsur/z-apps](https://github.com/macsur/z-apps)
 - **上游官方项目**：[kejilion/sh](https://github.com/kejilion/sh)
-
----
-
-<div align="center">
-  <sub>Linux生态圈 · 让 Linux 运维与开源自建变得前所未有的简单与优雅 ❤️</sub>
-</div>
