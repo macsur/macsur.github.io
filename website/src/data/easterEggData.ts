@@ -91,7 +91,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 7,
-    "text": "38.34.239.132",
+    "text": "104.28.228.110",
     "url": null,
     "isReal": true,
     "label": "[US] L2TP/IPsec 节点 (0 Sessions)",
@@ -103,7 +103,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 8,
-    "text": "176.124.116.232",
+    "text": "178.211.187.164",
     "url": null,
     "isReal": true,
     "label": "[RU] L2TP/IPsec 节点 (0 Sessions)",
@@ -115,10 +115,10 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 9,
-    "text": "217.178.200.109",
+    "text": "220.65.174.249",
     "url": null,
     "isReal": true,
-    "label": "[JP] L2TP/IPsec 节点 (0 Sessions)",
+    "label": "[KR] L2TP/IPsec 节点 (0 Sessions)",
     "delay": "0.52s",
     "floatDelay": "2.4s",
     "color": "from-emerald-500/25 to-teal-600/10",

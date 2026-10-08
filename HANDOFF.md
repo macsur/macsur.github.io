@@ -416,6 +416,10 @@
   - 动态统计本地/上游第三方配置数量（默认兜底 48 款，实时跟随上游新应用扩展，拒绝写死）；
   - 点击直达 `linux_panel_accordion "custom"`，自动展开第三方应用折叠列表；
   - 原 3/4/5 项顺延至 4/5/6 项，全套脚本通过 `bash -n` 检验。
+- **README.md 与部署源全量同步升级**：
+  - 更新根目录 `README.md` 与 `website/public/README.md` 为全新版本；
+  - 完整呈现 11+ 快捷入口、ZTTZ 工作台 6 大菜单体系（含 3 号位第三方扩展）、Hero 双视频无黑屏引擎、安全审计与加固，以及 `k` 与 `z` 双轨速查指令集；
+  - 本地经 `bun run build` 生成验证，`website/out/README.md` 即刻反映最新版本，准备由 Actions 发布至 `main`。
 
 ### 2. 推送目标
 - 严格遵循铁律：仅推 `macsur/source` 分支，未推 `origin`，未推 `main`。
