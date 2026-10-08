@@ -71,6 +71,7 @@ export default function Home() {
   const heroVideos = useMemo(() => [
     {
       title: '10s 品牌片 (v7)',
+      poster: '/ads/ad-oneclick-girl-16x9-poster.jpg',
       sources: [
         { media: '(max-width: 768px)', src: '/ads/ad-oneclick-girl-9x16-10s-v7-final.mp4' },
         { media: '', src: '/ads/ad-oneclick-girl-16x9-10s-v7-final.mp4' }
@@ -78,12 +79,14 @@ export default function Home() {
     },
     {
       title: '30s 品牌片 (女神版)',
+      poster: '/ads/linux-brand-girl-30s-poster.jpg',
       sources: [
         { media: '', src: '/ads/linux-brand-girl-30s-final.mp4' }
       ]
     },
     {
       title: '30s 品牌片 (极客版)',
+      poster: '/ads/linux-v2-30s-poster.jpg',
       sources: [
         { media: '', src: '/ads/linux-v2-30s-finalC.mp4' }
       ]
@@ -736,6 +739,7 @@ export default function Home() {
                 muted={isHeroVideoMuted}
                 playsInline
                 preload="metadata"
+                poster={heroVideos[heroVideoIdx].poster}
                 onEnded={handleHeroVideoEnded}
                 className="w-full h-full object-contain md:object-cover"
                 aria-label="一键脚本，爱上 Linux 首页宣传片"
