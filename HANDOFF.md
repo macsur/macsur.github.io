@@ -436,3 +436,41 @@
 ### 2. 推送目标
 - 严格遵循铁律：仅推 `macsur/source` 分支，未推 `origin`，未推 `main`。
 
+---
+
+## 📋 Muse 交办任务（2026-10-09，用户拍板）
+
+**任务：网站标题更换**
+
+- 新标题（用户钦定，逐字为准）：**用代码 · 爱上Linux**
+  - 中间为间隔号「·」，点号两侧各留一个空格；「Linux」紧跟「爱上」、不加空格。
+- 改动范围：
+  1. 首页 Hero 主标题（现为「一条命令，整备一台服务器」）改为新标题；
+  2. 浏览器标题 `<title>` 及 metadata（重点查 `website/src/app/layout.tsx`）同步改为新标题；
+  3. 根 `README.md` 与 `website/public/README.md` 的标题按仓库惯例与首页标题保持一致，同步更换。
+- 品牌 slogan 同步更换（用户 2026-10-09 21:07 补充拍板）：品牌 slogan 与标题统一为同一句「用代码 · 爱上Linux」。全站及两个 README 中，凡出现旧主标题「一条命令，整备一台服务器」与旧 slogan「一键脚本，爱上 Linux」的位置，一并替换为新句。脚本产物（z.sh / x.sh / kejilion.sh）中若有相同字样，先在回执中列明位置与数量，不要擅自改动，等用户确认。其余文案、安装命令不动。
+- 执行要求：本地 `bun run build` 通过后只推 `macsur/source`；提交前还原构建自动生成的无关数据文件（dailyRecommend 等）。
+- 回执要求：完成后按本文件「工作记录」四段格式补记一段，并在 `MUSE-留言.md` 里回一句告知 Muse。
+- 验收（Muse 负责，小安不用管）：CI 成功 → main 更新 → Cloudflare 部署（卡 idle 由 Muse retry）→ 线上首页标题与 `<title>` 实测核验。
+
+## 工作记录（2026-10-09）
+
+### 1. 变更内容
+- 将网站品牌标题与 slogan 统一为「用代码 · 爱上Linux」。
+- 更新首页 Hero 主标题、Hero 宣传片浮层文案、宣传片 aria-label、声音按钮提示文案。
+- 确认根 `README.md` 与 `website/public/README.md` 标题已为「用代码 · 爱上Linux」。
+- 确认 `website/src/app/layout.tsx` 的 `<title>` / metadata description 已为「用代码 · 爱上Linux」。
+- 脚本产物扫描：`z.sh`、`website/public/z.sh`、`x.sh`、`website/public/x.sh`、`kejilion.sh` 中未命中「一条命令，整备一台服务器」「一键脚本，爱上 Linux」「一键脚本 · 爱上 Linux」，未改动脚本产物。
+
+### 2. 验证结果
+- 执行 `bun run build`，构建通过。
+- 构建刷新了 `website/src/data/easterEggData.ts` 与 `website/src/data/recommendManifest.json`，均为本次任务无关的自动生成数据，已还原，未混入提交。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse：CI 成功 → main 更新 → Cloudflare 部署与线上核验。
+- 脚本产物未改，等待用户后续确认是否需要同步新标题。

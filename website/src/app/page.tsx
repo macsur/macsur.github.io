@@ -704,7 +704,7 @@ export default function Home() {
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3">
             <span className="block text-gradient-gemini font-extrabold tracking-tight">
-              一键脚本，爱上 Linux
+              用代码 · 爱上Linux
             </span>
           </h1>
 
@@ -724,7 +724,7 @@ export default function Home() {
             <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
               <div className="flex items-center space-x-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                <span className="text-[11px] text-slate-300 font-semibold tracking-wide">一键脚本 · 爱上 Linux</span>
+                <span className="text-[11px] text-slate-300 font-semibold tracking-wide">用代码 · 爱上Linux</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
@@ -765,7 +765,7 @@ export default function Home() {
                   poster={heroVideos[heroVideoIdx].poster}
                   onEnded={handleHeroVideoEnded}
                   className="w-full h-full object-contain md:object-cover"
-                  aria-label="一键脚本，爱上 Linux 首页宣传片"
+                  aria-label="用代码 · 爱上Linux 首页宣传片"
                 >
                   {heroVideos[heroVideoIdx].sources?.map((srcItem, sIdx) => (
                     <source
@@ -781,7 +781,7 @@ export default function Home() {
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />
               <div className="absolute left-4 right-16 bottom-4 sm:left-6 sm:bottom-6 pointer-events-none">
                 <p className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.75)]">
-                  一键脚本，爱上 Linux
+                  用代码 · 爱上Linux
                 </p>
                 <p className="mt-1 text-xs sm:text-sm text-cyan-100/90 font-medium tracking-wide drop-shadow">
                   从害怕终端，到离不开终端
@@ -791,7 +791,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={toggleHeroVideoAudio}
-                  title={isHeroVideoMuted ? '点击打开声音，听“一键脚本，爱上 Linux”' : '点击静音'}
+                  title={isHeroVideoMuted ? '点击打开声音，听“用代码 · 爱上Linux”' : '点击静音'}
                   aria-label={isHeroVideoMuted ? '打开宣传片声音' : '静音宣传片'}
                   className="absolute right-4 bottom-4 sm:right-5 sm:bottom-5 p-2.5 rounded-full bg-slate-950/75 hover:bg-cyan-500/90 text-white border border-white/15 hover:border-cyan-300/70 backdrop-blur-md shadow-lg shadow-black/40 transition-all active:scale-95"
                 >
@@ -1948,4 +1948,3 @@ export default function Home() {
     </div>
   );
 }
-
