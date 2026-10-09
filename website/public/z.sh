@@ -34226,6 +34226,8 @@ z_main_menu() {
         echo -e "${gl_kjlan}==================================================${gl_bai}"
         echo -e "${gl_huang}      🚀 ZTTZ 自用应用与扩展工作台${gl_bai}"
         echo -e "${gl_kjlan}==================================================${gl_bai}"
+        echo -e "${gl_lv}CODE MATRIX REVOLUTION${gl_bai}"
+        echo -e "${gl_bai}欢迎来到代码矩阵，矩阵已就位，只等你敲下回车${gl_bai}"
         echo -e "${gl_kjlan}1. ${gl_bai}自用应用市场列表 (z app)"
         echo -e "${gl_kjlan}2. ${gl_bai}从 GitHub 同步自用配置 (z app sync)"
         echo -e "${gl_kjlan}3. ${gl_bai}第三方与社区扩展应用 [${custom_cnt} 款]"
