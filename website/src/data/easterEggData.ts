@@ -1,6 +1,6 @@
 /**
  * 🌟 ✦ 量子礼花 · 猜你喜欢 ✦ 彩蛋专属数据
- * 包含：6 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 L2TP/IPsec 优质节点
+ * 包含：5 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 L2TP/IPsec 优质节点
  */
 
 export interface EasterEggItem {
@@ -19,18 +19,6 @@ export interface EasterEggItem {
 export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   {
     "id": 1,
-    "text": "kejilion.sh",
-    "url": "https://kejilion.sh",
-    "isReal": false,
-    "label": "科技Lion · kejilion.sh",
-    "delay": "0.04s",
-    "floatDelay": "0s",
-    "color": "from-cyan-500/20 to-blue-600/10",
-    "border": "border-cyan-500/40",
-    "glow": "shadow-cyan-500/20"
-  },
-  {
-    "id": 2,
     "text": "apple.com",
     "url": "https://apple.com",
     "isReal": false,
@@ -42,7 +30,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-violet-500/20"
   },
   {
-    "id": 3,
+    "id": 2,
     "text": "sina.com.cn",
     "url": "https://sina.com.cn",
     "isReal": false,
@@ -54,7 +42,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-indigo-500/20"
   },
   {
-    "id": 4,
+    "id": 3,
     "text": "zttz.eu.org",
     "url": "https://zttz.eu.org",
     "isReal": false,
@@ -66,7 +54,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-sky-500/20"
   },
   {
-    "id": 5,
+    "id": 4,
     "text": "bbs.pcbeta.com",
     "url": "https://bbs.pcbeta.com",
     "isReal": false,
@@ -78,7 +66,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-teal-500/20"
   },
   {
-    "id": 6,
+    "id": 5,
     "text": "feishu.cn",
     "url": "https://feishu.cn",
     "isReal": false,
@@ -90,7 +78,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-blue-500/20"
   },
   {
-    "id": 7,
+    "id": 6,
     "text": "47.153.119.84",
     "url": null,
     "isReal": true,
@@ -102,7 +90,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-rose-500/30"
   },
   {
-    "id": 8,
+    "id": 7,
     "text": "149.54.251.114",
     "url": null,
     "isReal": true,
@@ -114,7 +102,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-amber-500/30"
   },
   {
-    "id": 9,
+    "id": 8,
     "text": "91.235.246.66",
     "url": null,
     "isReal": true,

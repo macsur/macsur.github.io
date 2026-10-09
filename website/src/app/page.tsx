@@ -481,14 +481,14 @@ export default function Home() {
 
   // 常用指令列表
   const quickCommands = [
-    { cmd: 'k', desc: '启动 Linux 百宝箱主控制面板' },
-    { cmd: 'k app', desc: '直接呼出智能应用市场' },
-    { cmd: 'k app 57', desc: '一键部署 DeepSeek AI 大模型' },
-    { cmd: 'k bbr3', desc: 'BBRv3 内核与网络调优' },
-    { cmd: 'k clean', desc: '一键深度清理系统冗余缓存' },
-    { cmd: 'k dd', desc: '纯净版 Linux 系统一键重装' },
-    { cmd: 'k backup', desc: '全自动 Docker 数据备份' },
-    { cmd: 'k update', desc: '无缝更新工具箱至最新版本' }
+    { cmd: 'z', desc: '打开 Linux 百宝箱自用工作台' },
+    { cmd: 'z app+', desc: '打开分类手风琴应用市场' },
+    { cmd: 'z app+', desc: '进入应用市场后选择 DeepSeek AI 应用' },
+    { cmd: 'z bbr3', desc: 'BBRv3 内核与网络调优' },
+    { cmd: 'z clean', desc: '一键深度清理系统冗余缓存' },
+    { cmd: 'z dd', desc: '纯净版 Linux 系统一键重装' },
+    { cmd: 'z backup', desc: '全自动 Docker 数据备份' },
+    { cmd: 'z update', desc: '无缝更新工具箱至最新版本' }
   ];
 
   // 筛选应用
@@ -732,7 +732,7 @@ export default function Home() {
             </div>
 
             <div className="mt-3 flex items-center justify-between text-xs text-slate-400 px-1">
-              <span>✨ 提示：安装后在任何终端输入快捷指令 <code className="px-1.5 py-0.5 bg-slate-800 text-cyan-300 rounded font-mono">k</code> 即可启动主控制台</span>
+              <span>✨ 提示：安装后在任何终端输入快捷指令 <code className="px-1.5 py-0.5 bg-slate-800 text-cyan-300 rounded font-mono">z</code> 即可打开自用工作台</span>
               <span className="font-mono text-slate-500">100% Free & Open Source</span>
             </div>
           </div>
@@ -802,7 +802,7 @@ export default function Home() {
                 </video>
               </div>
               <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span>三幕流程：一键安装 → 呼出 k → 直达常用与分类</span>
+                <span>三幕流程：一键安装 → 打开 z 工作台 → 直达常用与分类</span>
                 <span className="font-mono text-cyan-400">11.4s 循环</span>
               </div>
             </div>
@@ -1177,14 +1177,14 @@ export default function Home() {
 
                                 <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
                                   <span className="text-[11px] text-slate-500 font-mono">
-                                    {cat.id === 'custom' ? `终端指令: k app` : `指令: k app ${app.id}`}
+                                    {cat.id === 'custom' ? `终端指令: z app+` : `应用编号 #${app.id} · 终端指令: z app+`}
                                   </span>
                                   {cat.id === 'custom' ? (
                                     <button
-                                      onClick={() => handleCopy(`k app`)}
+                                      onClick={() => handleCopy(`z app+`)}
                                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                                     >
-                                      {copiedText === `k app` ? (
+                                      {copiedText === `z app+` ? (
                                         <>
                                           <Check className="w-3 h-3 text-emerald-400" />
                                           <span>已复制</span>
@@ -1198,10 +1198,10 @@ export default function Home() {
                                     </button>
                                   ) : (
                                     <button
-                                      onClick={() => handleCopy(`k app ${app.id}`)}
+                                      onClick={() => handleCopy(`z app+`)}
                                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                                     >
-                                      {copiedText === `k app ${app.id}` ? (
+                                      {copiedText === `z app+` ? (
                                         <>
                                           <Check className="w-3 h-3 text-emerald-400" />
                                           <span>已复制</span>

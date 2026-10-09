@@ -19,7 +19,7 @@ export const DAILY_RECOMMEND_GENERATED_AT = "2026-10-09";
 export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   {
     "id": 15,
-    "cmd": "k app 15",
+    "cmd": "z app+",
     "badge": "私有影音媒体库",
     "name": "emby多媒体管理系统",
     "category": "🎬 影音媒体与离线下载",
@@ -29,7 +29,7 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   },
   {
     "id": 23,
-    "cmd": "k app 23",
+    "cmd": "z app+",
     "badge": "碎片灵感看板",
     "name": "Memos网页备忘录",
     "category": "📝 协作办公与实用工具",
@@ -39,7 +39,7 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = [
   },
   {
     "id": 25,
-    "cmd": "k app 25",
+    "cmd": "z app+",
     "badge": "企业级私有云盘",
     "name": "Nextcloud网盘",
     "category": "🗄️  私有网盘与数据存储",
