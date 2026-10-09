@@ -377,6 +377,25 @@ if (officialCode.includes(mainMenuTopTarget)) {
     console.warn('  ⚠️  补丁4: 主菜单 target 未命中，请检查上游格式是否变化');
 }
 
+// 补丁 4.1: 主菜单入口层接入平台闸门，非 Linux 环境不进入 GNU 专用命令
+const menuChoiceGateTarget = `read -e -p "请输入你的选择: " choice
+
+case $choice in`;
+const menuChoiceGateReplacement = `read -e -p "请输入你的选择: " choice
+
+if ! z_platform_guard_menu_choice "$choice"; then
+    break_end
+    continue
+fi
+
+case $choice in`;
+if (officialCode.includes(menuChoiceGateTarget)) {
+    officialCode = officialCode.replace(menuChoiceGateTarget, menuChoiceGateReplacement);
+    console.log('  ✅ 补丁4.1: 主菜单入口平台闸门注入成功');
+} else {
+    console.warn('  ⚠️  补丁4.1: 主菜单 choice target 未命中，请检查上游格式是否变化');
+}
+
 // 补丁 5: 主菜单分支注入
 const choiceTarget = `  10) linux_ldnmp ;;
   11) linux_panel ;;
@@ -579,6 +598,96 @@ const zModuleBlock = `
 # ==============================================================================
 Z_APPS_DIR="\${Z_APPS_DIR:-$HOME/z-apps}"
 Z_APPS_REPO="https://github.com/macsur/z-apps.git"
+
+z_platform_detect() {
+    if [ -n "\${Z_FORCE_PLATFORM:-}" ]; then
+        Z_OS="\$(echo "\$Z_FORCE_PLATFORM" | tr '[:upper:]' '[:lower:]')"
+    elif [ "\$(uname -s 2>/dev/null || true)" = "Darwin" ]; then
+        Z_OS="macos"
+    elif [ "\$(uname -s 2>/dev/null || true)" = "Linux" ]; then
+        if grep -Eiq 'microsoft|wsl' /proc/sys/kernel/osrelease /proc/version 2>/dev/null; then
+            Z_OS="wsl"
+        else
+            Z_OS="linux"
+        fi
+    else
+        local uname_out
+        uname_out="\$(uname -s 2>/dev/null || true)"
+        case "\$uname_out" in
+            MINGW*|MSYS*|CYGWIN*) Z_OS="windows" ;;
+            *) Z_OS="unknown" ;;
+        esac
+    fi
+
+    case "\$Z_OS" in
+        linux|wsl)
+            if [ "\$Z_OS" = "linux" ] && [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+                Z_HAS_SYSTEMD="yes"
+            elif [ "\$Z_OS" = "wsl" ] && systemctl is-system-running >/dev/null 2>&1; then
+                Z_HAS_SYSTEMD="yes"
+            else
+                Z_HAS_SYSTEMD="no"
+            fi
+            ;;
+        *)
+            Z_HAS_SYSTEMD="no"
+            ;;
+    esac
+}
+
+z_platform_notice() {
+    case "\$Z_OS" in
+        macos)
+            echo -e "\${gl_huang}检测到 macOS：系统级功能仅支持 Linux，本机仅提供有限支持\${gl_bai}"
+            ;;
+        windows)
+            echo -e "\${gl_hong}请在 WSL 里运行本脚本，原生 Windows 暂不提供完整支持。\${gl_bai}"
+            ;;
+        wsl)
+            if [ "\$Z_HAS_SYSTEMD" = "no" ]; then
+                echo -e "\${gl_huang}当前 WSL 未启用 systemd；可在 .wslconfig 中启用 systemd 后重试服务类功能。\${gl_bai}"
+            fi
+            ;;
+        *)
+            ;;
+    esac
+}
+
+z_require_linux() {
+    if [ "\$Z_OS" != "linux" ] && [ "\$Z_OS" != "wsl" ]; then
+        echo -e "\${gl_hong}此功能仅支持 Linux\${gl_bai}"
+        return 1
+    fi
+    return 0
+}
+
+z_require_systemd() {
+    if [ "\$Z_OS" = "wsl" ] && [ "\$Z_HAS_SYSTEMD" = "no" ]; then
+        echo -e "\${gl_huang}当前 WSL 未启用 systemd，此功能不可用；可在 .wslconfig 启用 systemd 后重试\${gl_bai}"
+        return 1
+    fi
+    return 0
+}
+
+z_platform_guard_menu_choice() {
+    local choice="\${1:-}"
+    case "\$choice" in
+        1|15|00|0)
+            return 0
+            ;;
+    esac
+    if ! z_require_linux; then
+        return 1
+    fi
+    if [ "\$Z_OS" = "wsl" ] && [ "\$Z_HAS_SYSTEMD" = "no" ]; then
+        case "\$choice" in
+            2|3|4|5|6|7|9|10|11|11+|11p|12|13|14|16|17)
+                z_require_systemd || return 1
+                ;;
+        esac
+    fi
+    return 0
+}
 
 zttz_update_rollback() {
     local msg="\${1:-更新失败}"
@@ -1110,6 +1219,7 @@ z_dispatch() {
             fi
             ;;
         app+|app-cat|app-category)
+            z_require_linux || return 0
             linux_panel_accordion "$@"
             ;;
         sync)
@@ -1143,6 +1253,13 @@ const tailDispatcherTarget = `if [ "$#" -eq 0 ]; then
 else`;
 
 const tailDispatcherReplacement = `${zModuleBlock}
+
+# 平台识别与入口级降级提示
+z_platform_detect
+z_platform_notice
+if [ "\$Z_OS" = "windows" ]; then
+    exit 1
+fi
 
 # 判别当前调用是否来自 'z' 命令 (软链、二进制名或环境变量强制)
 CURRENT_INVOCATION="$(basename "\$0" 2>/dev/null || echo "")"
