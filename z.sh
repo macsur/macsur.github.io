@@ -34192,7 +34192,7 @@ z_apps_panel() {
         echo -e "${gl_hong}❌ 错误: 未在 ~/z-apps 中找到自定义应用 '${target}' 的配置！${gl_bai}"
         echo -e "${gl_hui}提示: 自定义配置文件路径应为: ~/z-apps/${target}.conf${gl_bai}"
         echo -e "${gl_lv}可通过 ${gl_huang}z app sync${gl_lv} 从远端拉取最新配置库${gl_bai}"
-        echo -e "${gl_huang}如需安装上游官方应用，请使用命令: k app ${target}${gl_bai}"
+        echo -e "${gl_huang}如为官方应用编号，请直接使用: z app ${target}${gl_bai}"
         return 1
     fi
 }
@@ -34276,7 +34276,13 @@ z_dispatch() {
                         z_list_apps "$1"
                     fi
                 else
-                    z_apps_panel "$@"
+                    if z_apps_panel "$@"; then
+                        :
+                    elif [[ "$1" =~ ^[0-9]+$ ]]; then
+                        echo -e "${gl_huang}未命中自用配置，转由官方应用编号直达安装。${gl_bai}"
+                        z_require_linux || return 0
+                        linux_panel "$@"
+                    fi
                 fi
             else
                 z_apps_panel "$@"
@@ -34296,7 +34302,7 @@ z_dispatch() {
             echo "ZTTZ 脚本用法:"
             echo "  z                    打开 ZTTZ 自用工作台"
             echo "  z app                查看自定义应用列表 (为空时引导 sync)"
-            echo "  z app <数字/代号>    安装自用指定应用"
+            echo "  z app <数字/代号>    优先安装自用指定应用；未命中时按官方编号直达"
             echo "  z app sync           从 GitHub 同步自用应用配置 (macsur/z-apps)"
             echo "  z app+               打开分类手风琴应用市场"
             echo "  z update             更新融合版脚本"
