@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element */
 
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   Copy, 
   Check, 
@@ -25,8 +25,6 @@ import {
   TrendingUp,
   Clock,
   Play,
-  Volume2,
-  VolumeX,
   X
 } from 'lucide-react';
 import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
@@ -63,61 +61,31 @@ export default function Home() {
   // 🌟 【今日推荐】TOP 3 数据由构建时 generate_daily_recommend.js 每日生成
   // 内容铁律：上游有新应用时优先打新上榜，无新内容时随机抽取，每日构建刷新
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
-  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
-  const [isHeroVideoMuted, setIsHeroVideoMuted] = useState(true);
-  const [heroVideoIdx, setHeroVideoIdx] = useState(0);
+  const [heroAdIdx, setHeroAdIdx] = useState(0);
 
-  // 宣传片多视频源轮播配置
-  const heroVideos = useMemo(() => [
+  // 首页广告轮播配置：仅保留 2026-10-09 上线的 v2 / v3 两个逐行广告
+  const heroAds = useMemo(() => [
     {
       title: '百宝箱广告 (v2)',
-      isGif: true,
       src: '/ads/linux-baibaoxiang-linebyline-v2.gif'
     },
     {
-      title: '10s 品牌片 (v7)',
-      poster: '/ads/ad-oneclick-girl-16x9-poster.jpg',
-      sources: [
-        { media: '(max-width: 768px)', src: '/ads/ad-oneclick-girl-9x16-10s-v7-final.mp4' },
-        { media: '', src: '/ads/ad-oneclick-girl-16x9-10s-v7-final.mp4' }
-      ]
-    },
-    {
-      title: '30s 品牌片 (女神版)',
-      poster: '/ads/linux-brand-girl-30s-poster.jpg',
-      sources: [
-        { media: '', src: '/ads/linux-brand-girl-30s-final.mp4' }
-      ]
-    },
-    {
-      title: '30s 品牌片 (极客版)',
-      poster: '/ads/linux-v2-30s-poster.jpg',
-      sources: [
-        { media: '', src: '/ads/linux-v2-30s-finalC.mp4' }
-      ]
+      title: '百宝箱广告 (v3)',
+      src: '/ads/linux-baibaoxiang-linebyline-v3.gif'
     }
   ], []);
 
-  // 视频/广告自然播完切换下一张 (GIF 播放约 10 秒后自动切换到下一个视频)
-  const handleHeroVideoEnded = useCallback(() => {
-    setHeroVideoIdx((prev) => (prev + 1) % heroVideos.length);
-  }, [heroVideos.length]);
+  // GIF 广告播放约 10 秒后自动切换到下一张
+  const handleHeroAdEnded = useCallback(() => {
+    setHeroAdIdx((prev) => (prev + 1) % heroAds.length);
+  }, [heroAds.length]);
 
   useEffect(() => {
-    const currentItem = heroVideos[heroVideoIdx];
-    if (currentItem.isGif) {
-      const timer = setTimeout(() => {
-        handleHeroVideoEnded();
-      }, 10000);
-      return () => clearTimeout(timer);
-    } else {
-      const video = heroVideoRef.current;
-      if (video) {
-        video.load();
-        video.play().catch(() => {});
-      }
-    }
-  }, [heroVideoIdx, heroVideos, handleHeroVideoEnded]);
+    const timer = setTimeout(() => {
+      handleHeroAdEnded();
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [heroAdIdx, heroAds.length, handleHeroAdEnded]);
 
   // 🎯 Hero 广告语轮播 (12条文案，每4秒轮播一次，淡入淡出)
   const heroSlogans = useMemo(() => [
@@ -206,21 +174,6 @@ export default function Home() {
   const resetToAutoTheme = () => {
     localStorage.removeItem('theme_preference');
     applyTheme('auto');
-  };
-
-  // 宣传片默认静音自动播放；用户点击右下角小喇叭后取消静音听到标语
-  const toggleHeroVideoAudio = () => {
-    const video = heroVideoRef.current;
-    if (!video) return;
-    const nextMuted = !video.muted;
-    video.muted = nextMuted;
-    setIsHeroVideoMuted(nextMuted);
-    if (!nextMuted) {
-      video.play().catch(() => {
-        video.muted = true;
-        setIsHeroVideoMuted(true);
-      });
-    }
   };
 
   // 换算北京时间展示友好更新标签（如 "今日 03:00 已更新"）；法定节假日期间提示为假日更新
@@ -728,19 +681,19 @@ export default function Home() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                  {heroVideos[heroVideoIdx].title}
+                  {heroAds[heroAdIdx].title}
                 </span>
                 {/* 小圆点指示器 */}
                 <div className="flex items-center space-x-1.5 ml-2">
-                  {heroVideos.map((item, idx) => (
+                  {heroAds.map((item, idx) => (
                     <button
                       key={item.title}
                       type="button"
-                      onClick={() => setHeroVideoIdx(idx)}
-                      title={`切换至第 ${idx + 1} 个视频`}
-                      aria-label={`切换至第 ${idx + 1} 个视频`}
+                      onClick={() => setHeroAdIdx(idx)}
+                      title={`切换至第 ${idx + 1} 个广告`}
+                      aria-label={`切换至第 ${idx + 1} 个广告`}
                       className={`w-2 h-2 rounded-full transition-all ${
-                        heroVideoIdx === idx ? 'bg-cyan-400 w-4' : 'bg-slate-600 hover:bg-slate-400'
+                        heroAdIdx === idx ? 'bg-cyan-400 w-4' : 'bg-slate-600 hover:bg-slate-400'
                       }`}
                     />
                   ))}
@@ -749,34 +702,11 @@ export default function Home() {
             </div>
 
             <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video flex items-center justify-center">
-              {heroVideos[heroVideoIdx].isGif ? (
-                <img
-                  src={heroVideos[heroVideoIdx].src}
-                  alt="Linux 百宝箱 终端创意广告"
-                  className="w-full h-full object-contain md:object-cover"
-                />
-              ) : (
-                <video
-                  ref={heroVideoRef}
-                  autoPlay
-                  muted={isHeroVideoMuted}
-                  playsInline
-                  preload="metadata"
-                  poster={heroVideos[heroVideoIdx].poster}
-                  onEnded={handleHeroVideoEnded}
-                  className="w-full h-full object-contain md:object-cover"
-                  aria-label="用代码 · 爱上Linux 首页宣传片"
-                >
-                  {heroVideos[heroVideoIdx].sources?.map((srcItem, sIdx) => (
-                    <source
-                      key={sIdx}
-                      {...(srcItem.media ? { media: srcItem.media } : {})}
-                      src={srcItem.src}
-                      type="video/mp4"
-                    />
-                  ))}
-                </video>
-              )}
+              <img
+                src={heroAds[heroAdIdx].src}
+                alt="Linux 百宝箱 终端创意广告"
+                className="w-full h-full object-contain md:object-cover"
+              />
 
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />
               <div className="absolute left-4 right-16 bottom-4 sm:left-6 sm:bottom-6 pointer-events-none">
@@ -787,17 +717,6 @@ export default function Home() {
                   从害怕终端，到离不开终端
                 </p>
               </div>
-              {!heroVideos[heroVideoIdx].isGif && (
-                <button
-                  type="button"
-                  onClick={toggleHeroVideoAudio}
-                  title={isHeroVideoMuted ? '点击打开声音，听“用代码 · 爱上Linux”' : '点击静音'}
-                  aria-label={isHeroVideoMuted ? '打开宣传片声音' : '静音宣传片'}
-                  className="absolute right-4 bottom-4 sm:right-5 sm:bottom-5 p-2.5 rounded-full bg-slate-950/75 hover:bg-cyan-500/90 text-white border border-white/15 hover:border-cyan-300/70 backdrop-blur-md shadow-lg shadow-black/40 transition-all active:scale-95"
-                >
-                  {isHeroVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-              )}
             </div>
 
             <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">

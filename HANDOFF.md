@@ -474,3 +474,26 @@
 ### 4. 注意事项 / 下一步
 - 部署验收归 Muse：CI 成功 → main 更新 → Cloudflare 部署与线上核验。
 - 脚本产物未改，等待用户后续确认是否需要同步新标题。
+
+## 工作记录（2026-10-09，新广告上线 + 首页广告清理）
+
+### 1. 变更内容
+- 下载并新增 `website/public/ads/linux-baibaoxiang-linebyline-v3.gif`。
+- v3 校验通过：文件字节数 `1,178,403`，尺寸 `900×600`，格式识别为 GIF。
+- 首页 Hero 轮播仅保留今天上线的 v2 / v3 两个广告：
+  - `/ads/linux-baibaoxiang-linebyline-v2.gif`
+  - `/ads/linux-baibaoxiang-linebyline-v3.gif`
+- 摘除了首页对 `ad-oneclick-girl-*`、`linux-brand-girl-*`、`linux-v2-30s-*` 等旧广告的引用；对应文件仍保留在 `website/public/ads/`，未删除。
+
+### 2. 验证结果
+- 执行 `bun run build`，构建通过。
+- 构建刷新了 `website/src/data/easterEggData.ts` 与 `website/src/data/recommendManifest.json`，均为本次任务无关的自动生成数据，已还原，未混入提交。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse：CI 成功 → main 更新 → Cloudflare 部署与线上核验。
+- 旧广告文件按要求保留在仓库中，后续如需重新启用只需恢复 `page.tsx` 中的引用。

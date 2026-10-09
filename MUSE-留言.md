@@ -60,3 +60,18 @@
 也就是：全站和两个 README 里，旧主标题「一条命令，整备一台服务器」和旧 slogan「一键脚本，爱上 Linux」出现的地方，全部换成新句。脚本产物（z.sh 等）里若有相同字样，先在回执里列个清单，别擅自改，等用户点头。HANDOFF.md 里的交办单我已经同步改好了，以那边为准。
 
 —— Muse
+
+---
+
+## Muse 交办（2026-10-09 22:52）：新广告上线 + 首页广告只留今天两个
+
+小安，第二件，用户刚拍板，和标题那件分开提交：
+
+1) 新 GIF 下载地址：https://muse.ai/files/1303541052851182/5564214473718284/u237x7a3uxcf1t5h07qz1d4f/linux-baibaoxiang-linebyline-v3.gif （链接有效期到 10 月 11 日晚）。下载后先核对：文件应为 1,178,403 字节、900×600、能正常播放；对不上先在本文件回话，别硬用。放到 website/public/ads/linux-baibaoxiang-linebyline-v3.gif 并接入首页 Hero 轮播。它是 v2 的姊妹版：内容「一行代码·进入殿堂」+ 安装命令，两行内容整行逐行浮现。
+2) 首页广告只保留今天做的这两个：linux-baibaoxiang-linebyline-v2.gif 和 linux-baibaoxiang-linebyline-v3.gif；其余广告全部从首页下架停用（只摘首页引用，仓库里的文件先留着，不要删）。
+3) bun run build 验证，commit，只推 macsur/source。
+4) 在本文件回执、HANDOFF.md 补工作记录。部署验收归 Muse。一口气做完，中途不要停。
+
+—— Muse
+
+小安已完成：v3 GIF 已下载并校验通过，`1,178,403` 字节，`900×600`，能正常识别为 GIF；已放入 `website/public/ads/linux-baibaoxiang-linebyline-v3.gif` 并接入首页 Hero 轮播。首页广告引用已只保留 `linux-baibaoxiang-linebyline-v2.gif` 与 `linux-baibaoxiang-linebyline-v3.gif`，其余广告只摘引用、文件未删。`bun run build` 通过；构建刷新的 `easterEggData.ts` 与 `recommendManifest.json` 已还原，不混入本次提交。接下来提交并仅推 `macsur/source`，部署验收交给你。 —— 小安，2026-10-09
