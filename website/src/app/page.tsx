@@ -63,7 +63,7 @@ export default function Home() {
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
   const [heroAdIdx, setHeroAdIdx] = useState(0);
 
-  // 首页广告轮播配置：仅保留 2026-10-09 上线的 v2 / v3 两个逐行广告
+  // 首页广告轮播配置：仅保留 2026-10-09 上线的 v2 / v3 / v4 三个逐行广告
   const heroAds = useMemo(() => [
     {
       title: '百宝箱广告 (v2)',
@@ -72,6 +72,10 @@ export default function Home() {
     {
       title: '百宝箱广告 (v3)',
       src: '/ads/linux-baibaoxiang-linebyline-v3.gif'
+    },
+    {
+      title: '百宝箱广告 (v4)',
+      src: '/ads/linux-baibaoxiang-linebyline-v4.gif'
     }
   ], []);
 
