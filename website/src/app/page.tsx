@@ -70,6 +70,11 @@ export default function Home() {
   // 宣传片多视频源轮播配置
   const heroVideos = useMemo(() => [
     {
+      title: '百宝箱广告 (v2)',
+      isGif: true,
+      src: '/ads/linux-baibaoxiang-linebyline-v2.gif'
+    },
+    {
       title: '10s 品牌片 (v7)',
       poster: '/ads/ad-oneclick-girl-16x9-poster.jpg',
       sources: [
@@ -93,18 +98,26 @@ export default function Home() {
     }
   ], []);
 
-  // 视频自然播完切换下一张
-  const handleHeroVideoEnded = () => {
+  // 视频/广告自然播完切换下一张 (GIF 播放约 10 秒后自动切换到下一个视频)
+  const handleHeroVideoEnded = useCallback(() => {
     setHeroVideoIdx((prev) => (prev + 1) % heroVideos.length);
-  };
+  }, [heroVideos.length]);
 
   useEffect(() => {
-    const video = heroVideoRef.current;
-    if (video) {
-      video.load();
-      video.play().catch(() => {});
+    const currentItem = heroVideos[heroVideoIdx];
+    if (currentItem.isGif) {
+      const timer = setTimeout(() => {
+        handleHeroVideoEnded();
+      }, 10000);
+      return () => clearTimeout(timer);
+    } else {
+      const video = heroVideoRef.current;
+      if (video) {
+        video.load();
+        video.play().catch(() => {});
+      }
     }
-  }, [heroVideoIdx]);
+  }, [heroVideoIdx, heroVideos, handleHeroVideoEnded]);
 
   // 🎯 Hero 广告语轮播 (12条文案，每4秒轮播一次，淡入淡出)
   const heroSlogans = useMemo(() => [
@@ -736,26 +749,34 @@ export default function Home() {
             </div>
 
             <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video flex items-center justify-center">
-              <video
-                ref={heroVideoRef}
-                autoPlay
-                muted={isHeroVideoMuted}
-                playsInline
-                preload="metadata"
-                poster={heroVideos[heroVideoIdx].poster}
-                onEnded={handleHeroVideoEnded}
-                className="w-full h-full object-contain md:object-cover"
-                aria-label="一键脚本，爱上 Linux 首页宣传片"
-              >
-                {heroVideos[heroVideoIdx].sources.map((srcItem, sIdx) => (
-                  <source
-                    key={sIdx}
-                    {...(srcItem.media ? { media: srcItem.media } : {})}
-                    src={srcItem.src}
-                    type="video/mp4"
-                  />
-                ))}
-              </video>
+              {heroVideos[heroVideoIdx].isGif ? (
+                <img
+                  src={heroVideos[heroVideoIdx].src}
+                  alt="Linux 百宝箱 终端创意广告"
+                  className="w-full h-full object-contain md:object-cover"
+                />
+              ) : (
+                <video
+                  ref={heroVideoRef}
+                  autoPlay
+                  muted={isHeroVideoMuted}
+                  playsInline
+                  preload="metadata"
+                  poster={heroVideos[heroVideoIdx].poster}
+                  onEnded={handleHeroVideoEnded}
+                  className="w-full h-full object-contain md:object-cover"
+                  aria-label="一键脚本，爱上 Linux 首页宣传片"
+                >
+                  {heroVideos[heroVideoIdx].sources?.map((srcItem, sIdx) => (
+                    <source
+                      key={sIdx}
+                      {...(srcItem.media ? { media: srcItem.media } : {})}
+                      src={srcItem.src}
+                      type="video/mp4"
+                    />
+                  ))}
+                </video>
+              )}
 
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />
               <div className="absolute left-4 right-16 bottom-4 sm:left-6 sm:bottom-6 pointer-events-none">
@@ -766,15 +787,17 @@ export default function Home() {
                   从害怕终端，到离不开终端
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={toggleHeroVideoAudio}
-                title={isHeroVideoMuted ? '点击打开声音，听“一键脚本，爱上 Linux”' : '点击静音'}
-                aria-label={isHeroVideoMuted ? '打开宣传片声音' : '静音宣传片'}
-                className="absolute right-4 bottom-4 sm:right-5 sm:bottom-5 p-2.5 rounded-full bg-slate-950/75 hover:bg-cyan-500/90 text-white border border-white/15 hover:border-cyan-300/70 backdrop-blur-md shadow-lg shadow-black/40 transition-all active:scale-95"
-              >
-                {isHeroVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
+              {!heroVideos[heroVideoIdx].isGif && (
+                <button
+                  type="button"
+                  onClick={toggleHeroVideoAudio}
+                  title={isHeroVideoMuted ? '点击打开声音，听“一键脚本，爱上 Linux”' : '点击静音'}
+                  aria-label={isHeroVideoMuted ? '打开宣传片声音' : '静音宣传片'}
+                  className="absolute right-4 bottom-4 sm:right-5 sm:bottom-5 p-2.5 rounded-full bg-slate-950/75 hover:bg-cyan-500/90 text-white border border-white/15 hover:border-cyan-300/70 backdrop-blur-md shadow-lg shadow-black/40 transition-all active:scale-95"
+                >
+                  {isHeroVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+              )}
             </div>
 
             <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">

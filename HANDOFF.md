@@ -427,6 +427,12 @@
   - 本地实测模拟复现（删 1.conf 后跑 sync 100% 成功拉回）；
   - 修复网站礼花规则：严格限定在法定节假日期间才放礼花（`isHolidayToday()`），平时仅展示超新星粒子冲击波与跃迁音效，移除平日的放礼花按钮。
 
+- **挂载 Hero 首页全新动态广告 GIF**：
+  - 下载并存入 `website/public/ads/linux-baibaoxiang-linebyline-v2.gif`（900x600 高清动态逐行广告）；
+  - 在 `website/src/app/page.tsx` 中将第一张轮播卡片指定为该广告素材（`isGif: true`，引用路径 `/ads/linux-baibaoxiang-linebyline-v2.gif`）；
+  - 自动轮播逻辑增强：GIF 呈现 10 秒后平滑自动无缝切入后续视频，保留手动小圆点随时切换；
+  - 本地经 `bun run build` 预构建静态打包 100% 通过（零报错、零警告）。
+
 ### 2. 推送目标
 - 严格遵循铁律：仅推 `macsur/source` 分支，未推 `origin`，未推 `main`。
 
