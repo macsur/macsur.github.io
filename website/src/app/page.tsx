@@ -91,35 +91,6 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [heroAdIdx, heroAds.length, handleHeroAdEnded]);
 
-  // 🎯 Hero 广告语轮播 (12条文案，每4秒轮播一次，淡入淡出)
-  const heroSlogans = useMemo(() => [
-    '终端之美，效率之诗',
-    '极简之美，一键即达',
-    '运维的艺术，极客的浪漫',
-    '工具箱在手，运维不愁',
-    '少点点击，多点掌控',
-    '不装面板，不将就',
-    '一行命令，万事俱备',
-    '把复杂留给脚本，把优雅留给你',
-    '省下的时间，拿去写诗',
-    '从裸机到就绪，只差一条命令',
-    '重装不求人，部署不熬夜',
-    '开箱即用，开箱即酷'
-  ], []);
-  const [sloganIdx, setSloganIdx] = useState(0);
-  const [sloganFade, setSloganFade] = useState(true);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSloganFade(false);
-      setTimeout(() => {
-        setSloganIdx((prev) => (prev + 1) % heroSlogans.length);
-        setSloganFade(true);
-      }, 400);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [heroSlogans.length]);
-
   // 主题模式状态机：'auto' | 'light' | 'dark'，默认 'auto'
   const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
   // 实际生效的展示样式：'dark' | 'light'
@@ -665,24 +636,10 @@ export default function Home() {
             </span>
           </h1>
 
-          {/* 🎯 Hero 广告语轮播（情绪层） */}
-          <div className="h-6 mb-4 flex items-center justify-center select-none">
-            <span
-              className={`text-xs sm:text-sm font-medium tracking-wider text-cyan-400/80 transition-opacity duration-500 ease-in-out ${
-                sloganFade ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              ✦ {heroSlogans[sloganIdx]} ✦
-            </span>
-          </div>
-
-          {/* 🎬 Hero 宣传片：手机竖屏、桌面横屏，标语使用 HTML 浮层 */}
-          <div className="max-w-4xl mx-auto mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
+          {/* 🎬 Hero 宣传片：手机竖屏、桌面横屏 */}
+          <div className="max-w-4xl mx-auto mt-8 mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
             <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
-              <div className="flex items-center space-x-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                <span className="text-[11px] text-slate-300 font-semibold tracking-wide">用代码 · 爱上Linux</span>
-              </div>
+              <div className="w-3.5" />
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
                   {heroAds[heroAdIdx].title}
@@ -713,14 +670,6 @@ export default function Home() {
               />
 
               <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />
-              <div className="absolute left-4 right-16 bottom-4 sm:left-6 sm:bottom-6 pointer-events-none">
-                <p className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.75)]">
-                  用代码 · 爱上Linux
-                </p>
-                <p className="mt-1 text-xs sm:text-sm text-cyan-100/90 font-medium tracking-wide drop-shadow">
-                  从害怕终端，到离不开终端
-                </p>
-              </div>
             </div>
 
             <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
@@ -730,7 +679,7 @@ export default function Home() {
           </div>
 
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
-            第一次打开终端，大多数人的反应都是：关掉它。别怕——这里没有要背的命令，只有一条复制粘贴就能跑的一键脚本。系统重装、BBR 加速、Docker 部署、160+ 应用安装，全在终端里自动搞定。等你发现原来这么简单，Linux 就从“不敢碰”变成了“离不开”。
+            爱上 Linux，只需要一行命令。粘贴、回车，剩下的全自动：系统重装、BBR 加速、Docker 部署、160 多个应用一键装齐。曾经高不可攀的服务器，从此任你差遣——这种掌控一切的快感，试过一次，就上头。
           </p>
 
           {/* 终端模拟一键安装框 */}
