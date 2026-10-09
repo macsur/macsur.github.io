@@ -1177,14 +1177,14 @@ export default function Home() {
 
                                 <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
                                   <span className="text-[11px] text-slate-500 font-mono">
-                                    {cat.id === 'custom' ? `终端指令: z app+` : `应用编号 #${app.id} · 终端指令: z app+`}
+                                    {cat.id === 'custom' ? `终端指令: z app` : `指令: z app ${app.id}`}
                                   </span>
                                   {cat.id === 'custom' ? (
                                     <button
-                                      onClick={() => handleCopy(`z app+`)}
+                                      onClick={() => handleCopy(`z app`)}
                                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                                     >
-                                      {copiedText === `z app+` ? (
+                                      {copiedText === `z app` ? (
                                         <>
                                           <Check className="w-3 h-3 text-emerald-400" />
                                           <span>已复制</span>
@@ -1198,10 +1198,10 @@ export default function Home() {
                                     </button>
                                   ) : (
                                     <button
-                                      onClick={() => handleCopy(`z app+`)}
+                                      onClick={() => handleCopy(`z app ${app.id}`)}
                                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                                     >
-                                      {copiedText === `z app+` ? (
+                                      {copiedText === `z app ${app.id}` ? (
                                         <>
                                           <Check className="w-3 h-3 text-emerald-400" />
                                           <span>已复制</span>

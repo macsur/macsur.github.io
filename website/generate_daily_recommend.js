@@ -102,7 +102,7 @@ function main() {
   // 4. 标准字段映射
   const formattedPicked = picked.map(app => ({
     id: Number(app.id),
-    cmd: `z app+`,
+    cmd: `z app ${app.id}`,
     badge: app.rec.badge,
     name: app.name,
     category: catMap[app.category] || "🖥️ 服务器运维与探针监控",
