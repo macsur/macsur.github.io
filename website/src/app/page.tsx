@@ -1633,8 +1633,10 @@ export default function Home() {
       <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-300">Linux 百宝箱 · zttz.eu.org</span>
-            <span>- 现代化服务器运维与开源应用</span>
+            <div className="flex flex-col items-start">
+              <span className="font-bold text-slate-300">用代码 · 爱上Linux</span>
+              <span className="text-[10px] tracking-[0.18em] text-slate-500">CODE MATRIX REVOLUTION</span>
+            </div>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
             <a href="#daily-recommend" className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center space-x-1">
