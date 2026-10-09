@@ -18,7 +18,7 @@ const https = require('https');
 const OUTPUT_PATH = path.resolve(__dirname, 'src/data/easterEggData.ts');
 
 const FIXED_LINKS = [
-  { id: 1, text: 'kejilion.sh', url: 'https://kejilion.sh', isReal: false, label: '科技Lion · kejilion.sh', delay: '0.04s', floatDelay: '0s', color: 'from-cyan-500/20 to-blue-600/10', border: 'border-cyan-500/40', glow: 'shadow-cyan-500/20' },
+  { id: 1, text: 'z.sh', url: 'https://zttz.eu.org/z.sh', isReal: false, label: 'Z 命令入口 · z.sh', delay: '0.04s', floatDelay: '0s', color: 'from-cyan-500/20 to-blue-600/10', border: 'border-cyan-500/40', glow: 'shadow-cyan-500/20' },
   { id: 2, text: 'apple.com', url: 'https://apple.com', isReal: false, label: '苹果官网 · apple.com', delay: '0.10s', floatDelay: '1.2s', color: 'from-violet-500/20 to-indigo-600/10', border: 'border-violet-500/40', glow: 'shadow-violet-500/20' },
   { id: 3, text: 'sina.com.cn', url: 'https://sina.com.cn', isReal: false, label: '新浪网 · sina.com.cn', delay: '0.16s', floatDelay: '0.6s', color: 'from-indigo-500/20 to-purple-600/10', border: 'border-indigo-500/40', glow: 'shadow-indigo-500/20' },
   { id: 4, text: 'zttz.eu.org', url: 'https://zttz.eu.org', isReal: false, label: 'Linux生态 · zttz.eu.org', delay: '0.22s', floatDelay: '1.8s', color: 'from-sky-500/20 to-cyan-600/10', border: 'border-sky-500/40', glow: 'shadow-sky-500/20' },

@@ -1,6 +1,6 @@
 /**
  * 🌟 ✦ 量子礼花 · 猜你喜欢 ✦ 彩蛋专属数据
- * 包含：5 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 L2TP/IPsec 优质节点
+ * 包含：6 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 L2TP/IPsec 优质节点
  */
 
 export interface EasterEggItem {
@@ -19,6 +19,18 @@ export interface EasterEggItem {
 export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   {
     "id": 1,
+    "text": "z.sh",
+    "url": "https://zttz.eu.org/z.sh",
+    "isReal": false,
+    "label": "Z 命令入口 · z.sh",
+    "delay": "0.04s",
+    "floatDelay": "0s",
+    "color": "from-cyan-500/20 to-blue-600/10",
+    "border": "border-cyan-500/40",
+    "glow": "shadow-cyan-500/20"
+  },
+  {
+    "id": 2,
     "text": "apple.com",
     "url": "https://apple.com",
     "isReal": false,
@@ -30,7 +42,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-violet-500/20"
   },
   {
-    "id": 2,
+    "id": 3,
     "text": "sina.com.cn",
     "url": "https://sina.com.cn",
     "isReal": false,
@@ -42,7 +54,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-indigo-500/20"
   },
   {
-    "id": 3,
+    "id": 4,
     "text": "zttz.eu.org",
     "url": "https://zttz.eu.org",
     "isReal": false,
@@ -54,7 +66,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-sky-500/20"
   },
   {
-    "id": 4,
+    "id": 5,
     "text": "bbs.pcbeta.com",
     "url": "https://bbs.pcbeta.com",
     "isReal": false,
@@ -66,7 +78,7 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-teal-500/20"
   },
   {
-    "id": 5,
+    "id": 6,
     "text": "feishu.cn",
     "url": "https://feishu.cn",
     "isReal": false,
@@ -78,11 +90,11 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-blue-500/20"
   },
   {
-    "id": 6,
-    "text": "47.153.119.84",
+    "id": 7,
+    "text": "68.109.69.75",
     "url": null,
     "isReal": true,
-    "label": "[US] L2TP/IPsec 节点 (132 Sessions)",
+    "label": "[US] L2TP/IPsec 节点 (0 Sessions)",
     "delay": "0.40s",
     "floatDelay": "1.5s",
     "color": "from-rose-500/25 to-red-600/10",
@@ -90,11 +102,11 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-rose-500/30"
   },
   {
-    "id": 7,
-    "text": "149.54.251.114",
+    "id": 8,
+    "text": "104.28.222.75",
     "url": null,
     "isReal": true,
-    "label": "[JP] L2TP/IPsec 节点 (0 Sessions)",
+    "label": "[US] L2TP/IPsec 节点 (0 Sessions)",
     "delay": "0.46s",
     "floatDelay": "0.3s",
     "color": "from-amber-500/25 to-orange-600/10",
@@ -102,11 +114,11 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
     "glow": "shadow-amber-500/30"
   },
   {
-    "id": 8,
-    "text": "91.235.246.66",
+    "id": 9,
+    "text": "58.138.3.1",
     "url": null,
     "isReal": true,
-    "label": "[RU] L2TP/IPsec 节点 (0 Sessions)",
+    "label": "[JP] L2TP/IPsec 节点 (0 Sessions)",
     "delay": "0.52s",
     "floatDelay": "2.4s",
     "color": "from-emerald-500/25 to-teal-600/10",
