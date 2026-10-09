@@ -197,19 +197,22 @@ yinsiyuanquan2() {
 if ! kpanel_protocol_active; then
 	if [ ! -f ~/kejilion.sh ]; then
 		if [ -f "./kejilion.sh" ]; then
-			cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1
+			cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./kejilion.sh 到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
 		elif [ -f "./z.sh" ]; then
-			cp -f ./z.sh ~/kejilion.sh > /dev/null 2>&1
+			cp -f ./z.sh ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./z.sh 到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
 		elif [ -f "./x.sh" ]; then
-			cp -f ./x.sh ~/kejilion.sh > /dev/null 2>&1
+			cp -f ./x.sh ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./x.sh 到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
 		elif [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
-			cp -f "${BASH_SOURCE[0]}" ~/kejilion.sh > /dev/null 2>&1
+			cp -f "${BASH_SOURCE[0]}" ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制当前脚本到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
+		else
+			echo -e "${gl_hong}❌ 自举失败：未找到可用脚本文件，已中止。${gl_bai}"
+			exit 1
 		fi
 	fi
 
-	canshu_v6
-	CheckFirstRun_true
-	yinsiyuanquan2
+	canshu_v6 || { echo -e "${gl_hong}❌ 自举失败：恢复区域参数失败，已中止。${gl_bai}"; exit 1; }
+	CheckFirstRun_true || { echo -e "${gl_hong}❌ 自举失败：恢复授权参数失败，已中止。${gl_bai}"; exit 1; }
+	yinsiyuanquan2 || { echo -e "${gl_hong}❌ 自举失败：恢复隐私参数失败，已中止。${gl_bai}"; exit 1; }
 
 	# 清理 k 与 z 的别名劫持 (防范 zoxide 等工具别名冲突)
 	sed -i '/^alias k=/d' ~/.bashrc > /dev/null 2>&1
@@ -221,10 +224,10 @@ if ! kpanel_protocol_active; then
 
 	# 部署 k 与 z 命令入口并赋予可执行权限
 	if [ -f ~/kejilion.sh ]; then
-		chmod +x ~/kejilion.sh > /dev/null 2>&1
-		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-		cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
-		chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
+		chmod +x ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
+		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/k 失败，已中止。${gl_bai}"; exit 1; }
+		cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/z 失败，已中止。${gl_bai}"; exit 1; }
+		chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod /usr/local/bin/k/z 失败，已中止。${gl_bai}"; exit 1; }
 		[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 		[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
 	fi
@@ -33909,8 +33912,13 @@ z_sync_apps() {
     else
         # 2. 目录已存在且为 git 目录，首先恢复本地工作区被删改的配置文件，杜绝假成功
         echo -e "${gl_hui}正在核对本地文件状态并拉取远端更新...${gl_bai}"
-        git -C "$Z_APPS_DIR" checkout -f HEAD 2>/dev/null || git -C "$Z_APPS_DIR" restore . 2>/dev/null || true
-        git -C "$Z_APPS_DIR" clean -fd 2>/dev/null || true
+        if ! git -C "$Z_APPS_DIR" checkout -f HEAD 2>/dev/null; then
+            if ! git -C "$Z_APPS_DIR" restore . 2>/dev/null; then
+                echo -e "${gl_hong}❌ 同步失败：恢复本地被删改的 .conf 失败，已中止。${gl_bai}"
+                return 1
+            fi
+        fi
+        git -C "$Z_APPS_DIR" clean -fd >/dev/null 2>&1 || { echo -e "${gl_hong}❌ 同步失败：清理未跟踪文件失败，已中止。${gl_bai}"; return 1; }
 
         local pull_err=""
         if pull_err=$(git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main 2>&1); then
@@ -33918,29 +33926,24 @@ z_sync_apps() {
             echo -e "${gl_lv}✅ 同步成功！自用应用配置已更新至最新。${gl_bai}"
             sync_ok=1
         else
-            echo -e "${gl_huang}⚠️ 增量更新拉取异常: ${pull_err}，尝试重新克隆兜底...${gl_bai}"
-            local tmp_sync
-            tmp_sync=$(mktemp -d /tmp/z_apps_clone.XXXXXX)
-            if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync"; then
-                cp -r "$tmp_sync"/.git "$Z_APPS_DIR/" 2>/dev/null || true
-                cp -f "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
-                cp -f "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
-                chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
-                rm -rf "$tmp_sync"
-                echo -e "${gl_lv}✅ 兜底克隆同步成功！${gl_bai}"
-                sync_ok=1
-            else
-                rm -rf "$tmp_sync"
-                echo -e "${gl_hong}❌ 同步失败: 无法连接到 GitHub 配置库，请检查网络后重试！${gl_bai}"
-                return 1
-            fi
+            echo -e "${gl_hong}❌ 同步失败：git pull --ff-only 拉取失败，已中止。${gl_bai}"
+            echo -e "${gl_hui}详情: ${pull_err}${gl_bai}"
+            return 1
         fi
     fi
 
     # 完整性校验：同步完成后必须确保有 .conf 配置文件，否则决不允许假报成功
+    local local_conf_count remote_conf_count
+    local_conf_count=$(find "$Z_APPS_DIR" -maxdepth 1 -name '*.conf' -type f 2>/dev/null | wc -l | tr -d ' ')
+    remote_conf_count=$(git -C "$Z_APPS_DIR" ls-tree -r --name-only HEAD 2>/dev/null | grep -c '.conf$' || true)
+    remote_conf_count=$(echo "$remote_conf_count" | tr -d ' ')
     local check_confs=("$Z_APPS_DIR"/*.conf)
     if [ ! -e "${check_confs[0]}" ]; then
         echo -e "${gl_hong}❌ 错误: 同步完成但未在 $Z_APPS_DIR 检测到任何 .conf 应用配置！${gl_bai}"
+        return 1
+    fi
+    if [ -n "$remote_conf_count" ] && [ "$local_conf_count" != "$remote_conf_count" ]; then
+        echo -e "${gl_hong}❌ 错误: 本地 .conf 数量($local_conf_count)与远端($remote_conf_count)不一致，拒绝视为同步成功。${gl_bai}"
         return 1
     fi
 
@@ -34201,6 +34204,17 @@ z_update() {
     zttz_safe_update
 }
 
+z_run_checked() {
+    local label="${1:-命令}"
+    shift
+    "$@"
+    local rc=$?
+    if [ "$rc" -ne 0 ]; then
+        echo -e "${gl_hong}❌ 命令失败: ${label} (退出码 $rc)${gl_bai}"
+    fi
+    return "$rc"
+}
+
 z_main_menu() {
     while true; do
         clear
@@ -34224,25 +34238,25 @@ z_main_menu() {
         read -e -p "请输入你的选择: " z_choice
         case "$z_choice" in
             1)
-                z_list_apps interactive
+                z_run_checked "z app 列表" z_list_apps interactive
                 break_end
                 ;;
             2)
-                z_sync_apps
+                z_run_checked "z app sync" z_sync_apps
                 break_end
                 ;;
             3)
-                linux_panel_accordion "custom"
+                z_run_checked "第三方应用市场" linux_panel_accordion "custom"
                 ;;
             4)
-                linux_panel_accordion
+                z_run_checked "上游分类市场" linux_panel_accordion
                 ;;
             5)
                 kejilion_sh
                 break
                 ;;
             6)
-                z_update
+                z_run_checked "z update" z_update
                 break_end
                 ;;
             0)
@@ -34265,7 +34279,7 @@ z_dispatch() {
             ;;
         app)
             if [ "$1" = "sync" ]; then
-                z_sync_apps
+                z_run_checked "z app sync" z_sync_apps
             elif [ -n "$1" ]; then
                 local check_cat
                 check_cat=$(z_norm_category "$1")
@@ -34293,10 +34307,10 @@ z_dispatch() {
             linux_panel_accordion "$@"
             ;;
         sync)
-            z_sync_apps
+            z_run_checked "z app sync" z_sync_apps
             ;;
         update|upgrade)
-            z_update
+            z_run_checked "z update" z_update
             ;;
         help|--help|-h)
             echo "ZTTZ 脚本用法:"
