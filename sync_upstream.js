@@ -448,10 +448,60 @@ if (officialCode.includes(updateDeployTarget)) {
     officialCode = officialCode.replace(updateDeployTarget, updateDeployReplacement);
 }
 
+// 补丁 8.0: 手动更新入口统一走 zttz_safe_update，避免下载、校验、部署任一步失败后继续报喜
+const manualUpdateBodyTarget = `			# 备份当前脚本
+			cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null
+
+			# 下载到临时文件，校验后再替换
+			local tmp_file=$(mktemp ~/kejilion_tmp.XXXXXX)
+			if curl -sS --max-time 60 --fail -o "$tmp_file" "$download_url" && \\
+			   [ -s "$tmp_file" ] && \\
+			   head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
+				chmod +x "$tmp_file"
+				mv -f "$tmp_file" ~/kejilion.sh
+				canshu_v6
+				CheckFirstRun_true
+				yinsiyuanquan2
+				chmod +x ~/kejilion.sh > /dev/null 2>&1
+				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
+				cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
+				chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
+				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
+				echo -e "\${gl_lv}脚本已更新到最新版本！\${gl_huang}v$sh_v_new\${gl_bai}"
+				send_stats "脚本已经最新$sh_v_new"
+			else
+				rm -f "$tmp_file"
+				# 恢复备份
+				if [ -f ~/kejilion.sh.bak ]; then
+					mv -f ~/kejilion.sh.bak ~/kejilion.sh
+				fi
+				echo -e "\${gl_hong}更新失败！下载出错或文件校验不通过，已恢复原版本\${gl_bai}"
+				send_stats "脚本更新失败"
+			fi`;
+
+const manualUpdateBodyReplacement = `			if zttz_safe_update; then
+				canshu_v6
+				CheckFirstRun_true
+				yinsiyuanquan2
+				echo -e "\${gl_lv}脚本已安全更新到最新版本！\${gl_huang}v$sh_v_new\${gl_bai}"
+				send_stats "脚本已经最新$sh_v_new"
+			else
+				echo -e "\${gl_hong}更新失败，旧版本已自动恢复。\${gl_bai}"
+				send_stats "脚本更新失败"
+			fi`;
+
+if (officialCode.includes(manualUpdateBodyTarget)) {
+    officialCode = officialCode.replace(manualUpdateBodyTarget, manualUpdateBodyReplacement);
+    console.log('  ✅ 补丁 8.0: 手动更新入口已接入安全更新流程');
+} else {
+    console.log('  ⚠️ 补丁 8.0: 未找到手动更新块，跳过');
+}
+
 // 补丁 8.1: 修复定时自动更新任务 (crontab 中的 SH_Update_task) 为 zttz 官方源并双部署 k+z
 const cronTaskTarget = `			SH_Update_task="cd ~ && tmp=\\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \\\"\\$tmp\\\" \${cron_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion.sh && [ -s \\\"\\$tmp\\\" ] && head -1 \\\"\\$tmp\\\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \\\"\\$tmp\\\" && mv -f \\\"\\$tmp\\\" ~/kejilion.sh"`;
 
-const cronTaskReplacement = `			SH_Update_task="cd ~ && tmp=\\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \\\"\\$tmp\\\" https://zttz.eu.org/z.sh && [ -s \\\"\\$tmp\\\" ] && head -1 \\\"\\$tmp\\\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \\\"\\$tmp\\\" && mv -f \\\"\\$tmp\\\" ~/kejilion.sh"`;
+const cronTaskReplacement = `			SH_Update_task="cd ~ && bash ~/kejilion.sh zttz-safe-update"`;
 
 if (officialCode.includes(cronTaskTarget)) {
     officialCode = officialCode.replace(cronTaskTarget, cronTaskReplacement);
@@ -459,7 +509,7 @@ if (officialCode.includes(cronTaskTarget)) {
 
 const cronDeployTarget = `			SH_Update_task="$SH_Update_task; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null"`;
 
-const cronDeployReplacement = `			SH_Update_task="$SH_Update_task; chmod +x ~/kejilion.sh 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null; chmod +x /usr/local/bin/k /usr/local/bin/z 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null; ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null"`;
+const cronDeployReplacement = `			SH_Update_task="$SH_Update_task"`;
 
 if (officialCode.includes(cronDeployTarget)) {
     officialCode = officialCode.replace(cronDeployTarget, cronDeployReplacement);
@@ -529,6 +579,111 @@ const zModuleBlock = `
 # ==============================================================================
 Z_APPS_DIR="\${Z_APPS_DIR:-$HOME/z-apps}"
 Z_APPS_REPO="https://github.com/macsur/z-apps.git"
+
+zttz_update_rollback() {
+    local msg="\${1:-更新失败}"
+    echo -e "\${gl_hong}❌ \${msg}\${gl_bai}"
+    rm -f "\${tmp_file:-}" "\${checksum_file:-}" 2>/dev/null || true
+    if [ -f ~/kejilion.sh.bak ]; then
+        if mv -f ~/kejilion.sh.bak ~/kejilion.sh; then
+            chmod +x ~/kejilion.sh 2>/dev/null || true
+            cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null || true
+            cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null || true
+            [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
+            [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
+            echo -e "\${gl_huang}已回滚到更新前备份版本。\${gl_bai}"
+        else
+            echo -e "\${gl_hong}回滚失败，请人工检查 ~/kejilion.sh 与 ~/kejilion.sh.bak。\${gl_bai}"
+        fi
+    fi
+    return 1
+}
+
+zttz_download_with_retry() {
+    local url="\$1" output="\$2" max_time="\${3:-30}" attempts="\${4:-3}"
+    local n=0
+    while [ "\$n" -lt "\$attempts" ]; do
+        n=\$((n + 1))
+        if curl -fsSL --connect-timeout 10 --max-time "\$max_time" --retry 2 -o "\$output" "\$url"; then
+            return 0
+        fi
+        echo -e "\${gl_huang}⚠️ 下载失败，正在重试 (\$n/\$attempts): \${url}\${gl_bai}"
+        sleep 2
+    done
+    return 1
+}
+
+zttz_safe_update() {
+    local download_url="https://zttz.eu.org/z.sh"
+    local checksum_url="\${download_url}.sha256"
+    local tmp_file="" checksum_file=""
+    local got_checksum=0 expected actual
+
+    echo -e "\${gl_kjlan}🚀 正在从 \${download_url} 安全更新脚本...\${gl_bai}"
+
+    if ! cp -f ~/kejilion.sh ~/kejilion.sh.bak; then
+        echo -e "\${gl_hong}❌ 更新前备份失败，已中止更新。\${gl_bai}"
+        return 1
+    fi
+
+    tmp_file=\$(mktemp ~/zttz_update.XXXXXX) || zttz_update_rollback "创建临时脚本文件失败"
+    checksum_file=\$(mktemp ~/zttz_sha.XXXXXX) || zttz_update_rollback "创建临时校验文件失败"
+
+    if ! zttz_download_with_retry "\$download_url" "\$tmp_file" 30 3; then
+        zttz_update_rollback "脚本下载失败，已恢复原版本"
+        return 1
+    fi
+
+    if zttz_download_with_retry "\$checksum_url" "\$checksum_file" 20 3; then
+        got_checksum=1
+    else
+        echo -e "\${gl_huang}⚠️ 未获取到 sha256 校验文件，降级为警告模式：备份后继续更新。\${gl_bai}"
+    fi
+
+    if [ ! -s "\$tmp_file" ] || ! head -1 "\$tmp_file" | grep -q '^#!/bin/bash'; then
+        zttz_update_rollback "下载内容不是有效 shell 脚本，已恢复原版本"
+        return 1
+    fi
+
+    if ! bash -n "\$tmp_file"; then
+        zttz_update_rollback "新版脚本 bash -n 语法检查失败，已恢复原版本"
+        return 1
+    fi
+
+    if [ "\$got_checksum" -eq 1 ] && [ -s "\$checksum_file" ]; then
+        expected=\$(awk '{print \$1}' "\$checksum_file" | head -1 | tr -d '\r')
+        if [ -n "\$expected" ]; then
+            if command -v sha256sum >/dev/null 2>&1; then
+                actual=\$(sha256sum "\$tmp_file" | awk '{print \$1}')
+            else
+                actual=""
+            fi
+            if [ -z "\$actual" ] || [ "\$actual" != "\$expected" ]; then
+                zttz_update_rollback "sha256 校验失败，坏文件已拒绝替换，旧版已恢复"
+                return 1
+            fi
+        else
+            echo -e "\${gl_huang}⚠️ sha256 校验文件内容为空，降级为警告模式继续更新。\${gl_bai}"
+        fi
+    fi
+
+    if ! mv -f "\$tmp_file" ~/kejilion.sh; then
+        zttz_update_rollback "替换新版脚本失败，已恢复原版本"
+        return 1
+    fi
+    tmp_file=""
+
+    chmod +x ~/kejilion.sh || zttz_update_rollback "设置新版脚本可执行权限失败，已回滚"
+    cp -f ~/kejilion.sh /usr/local/bin/k || zttz_update_rollback "部署 /usr/local/bin/k 失败，已回滚"
+    cp -f ~/kejilion.sh /usr/local/bin/z || zttz_update_rollback "部署 /usr/local/bin/z 失败，已回滚"
+    chmod +x /usr/local/bin/k /usr/local/bin/z || zttz_update_rollback "设置命令执行权限失败，已回滚"
+    [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
+    [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
+
+    rm -f "\$checksum_file" 2>/dev/null || true
+    echo -e "\${gl_lv}✅ ZTTZ 融合版脚本已安全更新到最新版本！\${gl_bai}"
+    return 0
+}
 
 z_check_git() {
     if ! command -v git >/dev/null 2>&1; then
@@ -870,23 +1025,7 @@ z_apps_panel() {
 }
 
 z_update() {
-    echo -e "\${gl_kjlan}🚀 正在从 https://zttz.eu.org/z.sh 更新脚本...\${gl_bai}"
-    local tmp_file
-    tmp_file=$(mktemp ~/z_tmp.XXXXXX)
-    if curl -sS --max-time 30 --fail -o "$tmp_file" "https://zttz.eu.org/z.sh" && \
-       [ -s "$tmp_file" ] && head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
-        chmod +x "$tmp_file"
-        mv -f "$tmp_file" ~/kejilion.sh
-        cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-        cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
-        [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
-        [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
-        echo -e "\${gl_lv}✅ ZTTZ 融合版脚本已成功更新到最新版本！\${gl_bai}"
-    else
-        rm -f "$tmp_file" 2>/dev/null
-        echo -e "\${gl_hong}❌ 更新失败，请检查网络连接！\${gl_bai}"
-        return 1
-    fi
+    zttz_safe_update
 }
 
 z_main_menu() {
@@ -1012,6 +1151,13 @@ if [ "\$CURRENT_INVOCATION" = "z" ] || [ "\${Z_INVOKE_MODE:-}" = "1" ]; then
     exit $?
 fi
 
+case "\${1:-}" in
+    zttz-safe-update)
+        zttz_safe_update
+        exit $?
+        ;;
+esac
+
 if [ "$#" -eq 0 ]; then
 	# 如果没有参数，运行交互式逻辑
 	kejilion_sh
@@ -1060,6 +1206,22 @@ console.log(`✅ 品牌去痕替换完成 (${brandOk}/${brandReplacements.length
 
 console.log('💾 [4/5] 写入同步生成的 kejilion.sh 并验证语法...');
 fs.writeFileSync(path.join(ROOT_DIR, 'kejilion.sh'), officialCode, 'utf8');
+fs.writeFileSync(path.join(ROOT_DIR, 'z.sh'), officialCode, 'utf8');
+fs.writeFileSync(path.join(ROOT_DIR, 'x.sh'), officialCode, 'utf8');
+
+const websitePublicDir = path.join(ROOT_DIR, 'website', 'public');
+if (fs.existsSync(websitePublicDir)) {
+    fs.writeFileSync(path.join(websitePublicDir, 'kejilion.sh'), officialCode, 'utf8');
+    fs.writeFileSync(path.join(websitePublicDir, 'x.sh'), officialCode, 'utf8');
+    fs.writeFileSync(path.join(websitePublicDir, 'z.sh'), officialCode, 'utf8');
+}
+
+const crypto = require('crypto');
+const zshSha256 = crypto.createHash('sha256').update(officialCode).digest('hex');
+fs.writeFileSync(path.join(ROOT_DIR, 'z.sh.sha256'), `${zshSha256}  z.sh\n`, 'utf8');
+if (fs.existsSync(websitePublicDir)) {
+    fs.writeFileSync(path.join(websitePublicDir, 'z.sh.sha256'), `${zshSha256}  z.sh\n`, 'utf8');
+}
 
 try {
     cp.execSync('bash -n kejilion.sh', { cwd: ROOT_DIR });

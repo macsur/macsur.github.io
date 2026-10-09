@@ -19,6 +19,7 @@ permission_granted="false"
 ENABLE_STATS="true"
 KPANEL_WEB_CERTIFICATE_PROTOCOL_VERSION="1"
 KPANEL_WEB_CERTIFICATE_REPLACE_PROTOCOL_VERSION="1"
+KPANEL_WEB_CERTIFICATE_FORCE_RENEW_PROTOCOL_VERSION="1"
 KPANEL_APP_CONCURRENCY_PROTOCOL_VERSION="1"
 unset KJ_APP_LOCKS_HELD
 
@@ -2012,6 +2013,91 @@ kpanel_web_replace_certificate() (
 	kpanel_web_replace_certificate_transaction "$@"
 )
 
+# KPanel manual renewal (`k ssl <domain>` with KJ_WEB_FORCE_RENEW=1). Re-issues a
+# Let's Encrypt pair with the same standalone flow as `k ssl`, but only publishes
+# once a valid replacement exists, so a failed attempt leaves the served pair
+# untouched. Prints fixed receipts only, never certificate or key material.
+kpanel_web_force_renew_certificate() (
+	set +x
+	umask 077
+	local yuming="${1:-}"
+	[[ "$yuming" =~ ^[a-z0-9][a-z0-9.-]*\.[a-z0-9]+$ && "$yuming" != *..* && ! "$yuming" =~ ^[0-9.]+$ ]] || { echo 'KPANEL_CERTIFICATE invalid'; return 2; }
+	local dir=/home/web/certs config="/home/web/conf.d/$yuming.conf"
+	local cert="$dir/${yuming}_cert.pem" key="$dir/${yuming}_key.pem"
+	local path
+	for path in /home /home/web /home/web/conf.d "$dir"; do
+		[ -d "$path" ] && [ ! -L "$path" ] || { echo 'KPANEL_CERTIFICATE unavailable'; return 2; }
+	done
+	for path in "$config" "$cert" "$key"; do
+		[ -f "$path" ] && [ ! -L "$path" ] || { echo 'KPANEL_CERTIFICATE unavailable'; return 2; }
+	done
+	if [ -e "$dir/${yuming}.custom" ] || [ -L "$dir/${yuming}.custom" ]; then
+		echo 'KPANEL_CERTIFICATE custom'; return 2
+	fi
+	# Never replace material this tool did not obtain from Let's Encrypt.
+	openssl x509 -in "$cert" -noout -issuer 2>/dev/null | grep -qF "Let's Encrypt" || { echo 'KPANEL_CERTIFICATE not_managed'; return 2; }
+	# Legacy cron workers do not take the certificate lock. Upgrade only known
+	# renewal scripts and reject unknown policies or an already-running worker.
+	kpanel_web_upgrade_certificate_renewal || { echo 'KPANEL_CERTIFICATE unavailable'; return 2; }
+	# Standalone validation needs port 80; the running Nginx container is the only holder.
+	docker ps -q --filter name='^/nginx$' 2>/dev/null | grep -q . || { echo 'KPANEL_CERTIFICATE unavailable'; return 2; }
+	command -v flock >/dev/null 2>&1 || { echo 'KPANEL_CERTIFICATE unavailable'; return 2; }
+	[ ! -L "$dir/.kpanel-certificate.lock" ] || { echo 'KPANEL_CERTIFICATE unavailable'; return 2; }
+	exec 9>"$dir/.kpanel-certificate.lock" || return 1
+	flock -w 10 9 || { echo 'KPANEL_CERTIFICATE busy'; return 5; }
+
+	local live_cert="/etc/letsencrypt/live/$yuming/fullchain.pem"
+	local live_key="/etc/letsencrypt/live/$yuming/privkey.pem"
+	local old_cert_hash old_key_hash work="" nginx_stopped=0 nginx_serving_new=0 published=0 retain=0 receipt='KPANEL_CERTIFICATE failed'
+	old_cert_hash=$(sha256sum "$cert" | awk '{print $1}') || return 1
+	old_key_hash=$(sha256sum "$key" | awk '{print $1}') || return 1
+	kpanel_web_force_renew_cleanup() {
+		local status=$?
+		trap - EXIT INT TERM
+		if [ "$published" = 1 ] && [ "$receipt" != "KPANEL_CERTIFICATE renewed $yuming" ] && [ -n "$work" ]; then
+			if [ ! -L "$cert" ] && [ ! -L "$key" ] &&
+			   mv -f "$work/old-cert" "$cert" && mv -f "$work/old-key" "$key"; then
+				published=0
+			else
+				retain=1
+			fi
+		fi
+		# A server that already loaded the rejected pair must return to the old one.
+		if [ "$retain" = 0 ] && [ "$nginx_serving_new" = 1 ] &&
+		   ! { docker exec nginx nginx -t >/dev/null 2>&1 && docker exec nginx nginx -s reload >/dev/null 2>&1; }; then retain=1; fi
+		if [ "$nginx_stopped" = 1 ] && ! docker start nginx >/dev/null 2>&1; then retain=1; fi
+		if [ "$retain" = 1 ]; then
+			echo 'KPANEL_CERTIFICATE needs_attention'
+			status=4
+		else
+			[ -z "$work" ] || rm -rf -- "$work"
+			echo "$receipt"
+		fi
+		exit "$status"
+	}
+	trap kpanel_web_force_renew_cleanup EXIT
+	trap 'exit 1' INT TERM
+	work=$(mktemp -d "$dir/.kpanel-renew.XXXXXX") || return 1
+	docker stop nginx >/dev/null 2>&1 || return 1
+	nginx_stopped=1
+	timeout 300 docker run --rm -p 80:80 -v /etc/letsencrypt/:/etc/letsencrypt certbot/certbot certonly --standalone --cert-name "$yuming" -d "$yuming" --email your@email.com --agree-tos --no-eff-email --force-renewal --key-type ecdsa >/dev/null 2>&1 || return 1
+	kpanel_web_certificate_pair_valid "$live_cert" "$live_key" "$yuming" || return 1
+	[ "$(sha256sum "$live_cert" | awk '{print $1}')" != "$old_cert_hash" ] || return 1
+	cp -p "$cert" "$work/old-cert" && cp -p "$key" "$work/old-key" || return 1
+	cp "$live_cert" "$work/new-cert" && cp "$live_key" "$work/new-key" || return 1
+	chmod 644 "$work/new-cert" && chmod 600 "$work/new-key" || return 1
+	[ "$(sha256sum "$cert" | awk '{print $1}')" = "$old_cert_hash" ] && [ "$(sha256sum "$key" | awk '{print $1}')" = "$old_key_hash" ] || return 1
+	published=1
+	mv -f "$work/new-cert" "$cert" && mv -f "$work/new-key" "$key" || return 1
+	docker start nginx >/dev/null 2>&1 || return 1
+	nginx_stopped=0
+	nginx_serving_new=1
+	docker exec nginx nginx -t >/dev/null 2>&1 && docker exec nginx nginx -s reload >/dev/null 2>&1 || return 1
+	published=0
+	receipt="KPANEL_CERTIFICATE renewed $yuming"
+	return 0
+)
+
 install_ssltls() {
 	if kpanel_web_http_mode; then return 0; fi
 	if [ "${KJ_APP_CONCURRENCY:-}" = "1" ] && ! kpanel_app_lock_held system; then
@@ -2099,6 +2185,10 @@ install_ssltls_text() {
 
 
 add_ssl() {
+if [ "${KJ_WEB_FORCE_RENEW:-0}" = "1" ]; then
+	kpanel_web_force_renew_certificate "${1:-}"
+	return $?
+fi
 echo -e "${gl_huang}快速申请SSL证书，过期前自动续签${gl_bai}"
 yuming="${1:-}"
 if [ -z "$yuming" ]; then
@@ -33339,34 +33429,14 @@ while true; do
 			local country=$(curl -s --max-time 5 ipinfo.io/country)
 			local download_url="https://zttz.eu.org/z.sh"
 
-			# 备份当前脚本
-			cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null
-
-			# 下载到临时文件，校验后再替换
-			local tmp_file=$(mktemp ~/kejilion_tmp.XXXXXX)
-			if curl -sS --max-time 60 --fail -o "$tmp_file" "$download_url" && \
-			   [ -s "$tmp_file" ] && \
-			   head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
-				chmod +x "$tmp_file"
-				mv -f "$tmp_file" ~/kejilion.sh
+			if zttz_safe_update; then
 				canshu_v6
 				CheckFirstRun_true
 				yinsiyuanquan2
-				chmod +x ~/kejilion.sh > /dev/null 2>&1
-				cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-				cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
-				chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1
-				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
-				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
-				echo -e "${gl_lv}脚本已更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
+				echo -e "${gl_lv}脚本已安全更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
 				send_stats "脚本已经最新$sh_v_new"
 			else
-				rm -f "$tmp_file"
-				# 恢复备份
-				if [ -f ~/kejilion.sh.bak ]; then
-					mv -f ~/kejilion.sh.bak ~/kejilion.sh
-				fi
-				echo -e "${gl_hong}更新失败！下载出错或文件校验不通过，已恢复原版本${gl_bai}"
+				echo -e "${gl_hong}更新失败，旧版本已自动恢复。${gl_bai}"
 				send_stats "脚本更新失败"
 			fi
 			break_end
@@ -33390,7 +33460,7 @@ while true; do
 			fi
 
 			# 构建健壮的自动更新命令：下载到临时文件 → 校验 → 备份 → 替换 → 恢复本地设置 → 部署
-			SH_Update_task="cd ~ && tmp=\$(mktemp ~/kejilion_tmp.XXXXXX) && curl -sS --max-time 60 --fail -o \"\$tmp\" https://zttz.eu.org/z.sh && [ -s \"\$tmp\" ] && head -1 \"\$tmp\" | grep -q '^#!/bin/bash' && cp -f ~/kejilion.sh ~/kejilion.sh.bak 2>/dev/null && chmod +x \"\$tmp\" && mv -f \"\$tmp\" ~/kejilion.sh"
+			SH_Update_task="cd ~ && bash ~/kejilion.sh zttz-safe-update"
 			# 追加设置恢复
 			if [ -n "$cron_sed_cmd" ]; then
 				SH_Update_task="$SH_Update_task && $cron_sed_cmd"
@@ -33398,7 +33468,7 @@ while true; do
 			# 从旧脚本恢复 permission_granted 和 ENABLE_STATS 设置
 			SH_Update_task="$SH_Update_task && grep -q 'permission_granted=\"true\"' ~/kejilion.sh.bak 2>/dev/null && sed -i 's/permission_granted=\"false\"/permission_granted=\"true\"/' ~/kejilion.sh; grep -q 'ENABLE_STATS=\"false\"' ~/kejilion.sh.bak 2>/dev/null && sed -i 's/ENABLE_STATS=\"true\"/ENABLE_STATS=\"false\"/' ~/kejilion.sh"
 			# 部署到 /usr/local/bin/k 和 /usr/bin/k
-			SH_Update_task="$SH_Update_task; chmod +x ~/kejilion.sh 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null; cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null; chmod +x /usr/local/bin/k /usr/local/bin/z 2>/dev/null; ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null; ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null"
+			SH_Update_task="$SH_Update_task"
 			# 下载失败时清理临时文件
 			SH_Update_task="$SH_Update_task || rm -f \"\$tmp\" 2>/dev/null"
 
@@ -33582,6 +33652,111 @@ kpanel_backup_center_dispatch() {
 # ==============================================================================
 Z_APPS_DIR="${Z_APPS_DIR:-$HOME/z-apps}"
 Z_APPS_REPO="https://github.com/macsur/z-apps.git"
+
+zttz_update_rollback() {
+    local msg="${1:-更新失败}"
+    echo -e "${gl_hong}❌ ${msg}${gl_bai}"
+    rm -f "${tmp_file:-}" "${checksum_file:-}" 2>/dev/null || true
+    if [ -f ~/kejilion.sh.bak ]; then
+        if mv -f ~/kejilion.sh.bak ~/kejilion.sh; then
+            chmod +x ~/kejilion.sh 2>/dev/null || true
+            cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null || true
+            cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null || true
+            [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
+            [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
+            echo -e "${gl_huang}已回滚到更新前备份版本。${gl_bai}"
+        else
+            echo -e "${gl_hong}回滚失败，请人工检查 ~/kejilion.sh 与 ~/kejilion.sh.bak。${gl_bai}"
+        fi
+    fi
+    return 1
+}
+
+zttz_download_with_retry() {
+    local url="$1" output="$2" max_time="${3:-30}" attempts="${4:-3}"
+    local n=0
+    while [ "$n" -lt "$attempts" ]; do
+        n=$((n + 1))
+        if curl -fsSL --connect-timeout 10 --max-time "$max_time" --retry 2 -o "$output" "$url"; then
+            return 0
+        fi
+        echo -e "${gl_huang}⚠️ 下载失败，正在重试 ($n/$attempts): ${url}${gl_bai}"
+        sleep 2
+    done
+    return 1
+}
+
+zttz_safe_update() {
+    local download_url="https://zttz.eu.org/z.sh"
+    local checksum_url="${download_url}.sha256"
+    local tmp_file="" checksum_file=""
+    local got_checksum=0 expected actual
+
+    echo -e "${gl_kjlan}🚀 正在从 ${download_url} 安全更新脚本...${gl_bai}"
+
+    if ! cp -f ~/kejilion.sh ~/kejilion.sh.bak; then
+        echo -e "${gl_hong}❌ 更新前备份失败，已中止更新。${gl_bai}"
+        return 1
+    fi
+
+    tmp_file=$(mktemp ~/zttz_update.XXXXXX) || zttz_update_rollback "创建临时脚本文件失败"
+    checksum_file=$(mktemp ~/zttz_sha.XXXXXX) || zttz_update_rollback "创建临时校验文件失败"
+
+    if ! zttz_download_with_retry "$download_url" "$tmp_file" 30 3; then
+        zttz_update_rollback "脚本下载失败，已恢复原版本"
+        return 1
+    fi
+
+    if zttz_download_with_retry "$checksum_url" "$checksum_file" 20 3; then
+        got_checksum=1
+    else
+        echo -e "${gl_huang}⚠️ 未获取到 sha256 校验文件，降级为警告模式：备份后继续更新。${gl_bai}"
+    fi
+
+    if [ ! -s "$tmp_file" ] || ! head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
+        zttz_update_rollback "下载内容不是有效 shell 脚本，已恢复原版本"
+        return 1
+    fi
+
+    if ! bash -n "$tmp_file"; then
+        zttz_update_rollback "新版脚本 bash -n 语法检查失败，已恢复原版本"
+        return 1
+    fi
+
+    if [ "$got_checksum" -eq 1 ] && [ -s "$checksum_file" ]; then
+        expected=$(awk '{print $1}' "$checksum_file" | head -1 | tr -d '')
+        if [ -n "$expected" ]; then
+            if command -v sha256sum >/dev/null 2>&1; then
+                actual=$(sha256sum "$tmp_file" | awk '{print $1}')
+            else
+                actual=""
+            fi
+            if [ -z "$actual" ] || [ "$actual" != "$expected" ]; then
+                zttz_update_rollback "sha256 校验失败，坏文件已拒绝替换，旧版已恢复"
+                return 1
+            fi
+        else
+            echo -e "${gl_huang}⚠️ sha256 校验文件内容为空，降级为警告模式继续更新。${gl_bai}"
+        fi
+    fi
+
+    if ! mv -f "$tmp_file" ~/kejilion.sh; then
+        zttz_update_rollback "替换新版脚本失败，已恢复原版本"
+        return 1
+    fi
+    tmp_file=""
+
+    chmod +x ~/kejilion.sh || zttz_update_rollback "设置新版脚本可执行权限失败，已回滚"
+    cp -f ~/kejilion.sh /usr/local/bin/k || zttz_update_rollback "部署 /usr/local/bin/k 失败，已回滚"
+    cp -f ~/kejilion.sh /usr/local/bin/z || zttz_update_rollback "部署 /usr/local/bin/z 失败，已回滚"
+    chmod +x /usr/local/bin/k /usr/local/bin/z || zttz_update_rollback "设置命令执行权限失败，已回滚"
+    [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
+    [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
+
+    rm -f "$checksum_file" 2>/dev/null || true
+    echo -e "${gl_lv}✅ ZTTZ 融合版脚本已安全更新到最新版本！${gl_bai}"
+    return 0
+}
 
 z_check_git() {
     if ! command -v git >/dev/null 2>&1; then
@@ -33923,22 +34098,7 @@ z_apps_panel() {
 }
 
 z_update() {
-    echo -e "${gl_kjlan}🚀 正在从 https://zttz.eu.org/z.sh 更新脚本...${gl_bai}"
-    local tmp_file
-    tmp_file=$(mktemp ~/z_tmp.XXXXXX)
-    if curl -sS --max-time 30 --fail -o "$tmp_file" "https://zttz.eu.org/z.sh" &&        [ -s "$tmp_file" ] && head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
-        chmod +x "$tmp_file"
-        mv -f "$tmp_file" ~/kejilion.sh
-        cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1
-        cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1
-        [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
-        [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
-        echo -e "${gl_lv}✅ ZTTZ 融合版脚本已成功更新到最新版本！${gl_bai}"
-    else
-        rm -f "$tmp_file" 2>/dev/null
-        echo -e "${gl_hong}❌ 更新失败，请检查网络连接！${gl_bai}"
-        return 1
-    fi
+    zttz_safe_update
 }
 
 z_main_menu() {
@@ -34055,6 +34215,13 @@ if [ "$CURRENT_INVOCATION" = "z" ] || [ "${Z_INVOKE_MODE:-}" = "1" ]; then
     z_dispatch "$@"
     exit $?
 fi
+
+case "${1:-}" in
+    zttz-safe-update)
+        zttz_safe_update
+        exit $?
+        ;;
+esac
 
 if [ "$#" -eq 0 ]; then
 	# 如果没有参数，运行交互式逻辑
@@ -34314,6 +34481,10 @@ else
 
 		ssl)
 			shift
+			if [ "${KJ_WEB_FORCE_RENEW:-0}" = "1" ]; then
+				add_ssl "${1:-}"
+				exit $?
+			fi
 			if [ "$1" = "ps" ]; then
 				send_stats "查看证书状态"
 				ssl_ps
