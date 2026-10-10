@@ -66,15 +66,15 @@ export default function Home() {
   // 首页广告轮播配置：仅保留 2026-10-09 上线的 v2 / v3 / v4 三个逐行广告
   const heroAds = useMemo(() => [
     {
-      title: '百宝箱广告 (v2)',
+      title: '代码矩阵广告 (v2)',
       src: '/ads/linux-baibaoxiang-linebyline-v2.gif'
     },
     {
-      title: '百宝箱广告 (v3)',
+      title: '代码矩阵广告 (v3)',
       src: '/ads/linux-baibaoxiang-linebyline-v3.gif'
     },
     {
-      title: '百宝箱广告 (v4)',
+      title: '代码矩阵广告 (v4)',
       src: '/ads/linux-baibaoxiang-linebyline-v4.gif'
     }
   ], []);
@@ -481,7 +481,7 @@ export default function Home() {
 
   // 常用指令列表
   const quickCommands = [
-    { cmd: 'z', desc: '打开 Linux 百宝箱自用工作台' },
+    { cmd: 'z', desc: '打开 CODE MATRIX 代码矩阵工作台' },
     { cmd: 'z app+', desc: '打开分类手风琴应用市场' },
     { cmd: 'z app+', desc: '进入应用市场后选择 DeepSeek AI 应用' },
     { cmd: 'z bbr3', desc: 'BBRv3 内核与网络调优' },
@@ -558,7 +558,7 @@ export default function Home() {
               >
                 <img
                   src="/logo.png"
-                  alt="Linux 百宝箱 zttz.eu.org"
+                  alt="CODE MATRIX 代码矩阵 zttz.eu.org"
                   className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
@@ -570,7 +570,7 @@ export default function Home() {
               <div onClick={toggleTheme} className="cursor-pointer select-none">
                 <span className={`font-bold text-lg tracking-wider transition-colors ${
                   activeTheme === 'dark' ? 'text-white' : 'text-slate-900'
-                }`}>Linux 百宝箱</span>
+                }`}>CODE MATRIX 代码矩阵</span>
                 <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
                   activeTheme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
                 }`}>v4.5.10</span>
@@ -626,7 +626,7 @@ export default function Home() {
           <div className="inline-flex items-center google-pill mb-8 select-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
             <span className="text-xs text-slate-300 font-medium tracking-wide flex items-center">
-              <span className="text-cyan-400 font-semibold">Linux 百宝箱</span>
+              <span className="text-cyan-400 font-semibold">CODE MATRIX 代码矩阵</span>
             </span>
           </div>
 
@@ -665,7 +665,7 @@ export default function Home() {
             <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video flex items-center justify-center">
               <img
                 src={heroAds[heroAdIdx].src}
-                alt="Linux 百宝箱 终端创意广告"
+                alt="CODE MATRIX 代码矩阵 终端创意广告"
                 className="w-full h-full object-contain md:object-cover"
               />
 
@@ -836,7 +836,7 @@ export default function Home() {
               <p className={`text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed transition-colors ${
                 activeTheme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
               }`}>
-                从本站 160+ 现代化应用库与 Linux 百宝箱中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
+                从本站 160+ 现代化应用库与 CODE MATRIX 代码矩阵中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
               </p>
             </div>
 
@@ -1241,7 +1241,7 @@ export default function Home() {
             全能高效的 Linux 运维底座
           </h2>
           <p className="text-sm text-slate-400 mt-2">
-            Linux 百宝箱不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
+            CODE MATRIX 代码矩阵不仅是应用市场，更是一整套经过实战检验的服务器全周期管理方案。
           </p>
         </div>
 
@@ -1575,7 +1575,7 @@ export default function Home() {
               想要让你的开源应用加入工具箱应用市场？
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
-              Linux 百宝箱应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
+              CODE MATRIX 代码矩阵应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <a 
@@ -1634,6 +1634,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
             <div className="flex flex-col items-start">
+              <span className="font-bold text-slate-300">CODE MATRIX 代码矩阵</span>
               <span className="font-bold text-slate-300">用代码 · 爱上Linux</span>
               <span className="text-[10px] tracking-[0.18em] text-slate-500">CODE MATRIX REVOLUTION</span>
             </div>
@@ -1656,7 +1657,7 @@ export default function Home() {
 
         {/* 底部最下一列：极不显眼的隐蔽彩蛋入口与节点状态 */}
         <div className="mt-8 pt-5 border-t border-slate-900/80 max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-600 gap-2">
-          <span>© 2026 Linux 百宝箱 · zttz.eu.org · 保留所有权利</span>
+          <span>© 2026 CODE MATRIX 代码矩阵 · zttz.eu.org · 保留所有权利</span>
           <div className="flex items-center space-x-2.5">
             <span className="text-slate-600/80">Cluster: HK-Edge-01</span>
             <span className="text-slate-800">•</span>

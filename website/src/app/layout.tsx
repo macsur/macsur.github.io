@@ -8,10 +8,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "用代码 · 爱上Linux",
-  description: "Linux 百宝箱 (zttz.eu.org) - 用代码 · 爱上Linux。管理 Linux 服务器、网络调优、建站、Docker 容器与 160+ 现代化应用市场及 [GitHub乐园]，100% 开源兼容。",
+  title: "CODE MATRIX 代码矩阵 | 用代码 · 爱上Linux",
+  description: "CODE MATRIX 代码矩阵 (zttz.eu.org) - 用代码 · 爱上Linux。管理 Linux 服务器、网络调优、建站、Docker 容器与 160+ 现代化应用市场及 [GitHub乐园]，100% 开源兼容。",
   keywords: ["Linux生态", "Github乐园", "Linux脚本", "应用市场", "Docker管理", "BBRv3", "手风琴菜单", "1Panel", "Deepseek"],
-  authors: [{ name: "Linux 百宝箱", url: "https://zttz.eu.org" }],
+  authors: [{ name: "CODE MATRIX 代码矩阵", url: "https://zttz.eu.org" }],
   metadataBase: new URL("https://zttz.eu.org"),
   icons: {
     icon: [
