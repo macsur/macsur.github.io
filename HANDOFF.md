@@ -1215,3 +1215,27 @@
   PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service start
   PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service stop
   ```
+
+## 工作记录（2026-10-11，手机端顶栏品牌字完整化与浅色模式高对比返修）
+
+### 1. 变更内容
+- 响应 Muse 验收退回（2026-10-11 05:40）：
+  - **品牌字完整显示**：在 `website/src/app/page.tsx` 中彻底移除 `truncate` 类名与 `min-w-0` 不良收缩，手机端品牌字号微调为 `text-[13.5px]`、Logo `w-8 h-8`、版本号徽标内边距与字体微调为 `text-[9px] px-1 py-0.5 font-bold`，右侧圆点改为 `h-7 w-7` (28×28px)。经 390px 真实视口测量，品牌字 `CODE MATRIX` 完整呈现（X: 54~183，宽度 129px），版本徽标 `v4.5.10`（X: 187~235），距离首个圆点（X: 244）保留 9px 舒展空隙，彻底杜绝省略号截断与重叠挤压。
+  - **浅色模式高对比度与可读性重构**：
+    - 品牌字在浅色模式下显式赋予 `text-slate-950 font-extrabold`，在浅色底上极具对比度。
+    - Windows 专区圆点：浅色模式下采用 `bg-blue-50 border-blue-400/60 text-blue-700`，图标深蓝清晰。
+    - 自动时间圆点：浅色模式下跟随状态采用 `bg-emerald-50 border-emerald-400/70 text-emerald-700`，非跟随采用 `bg-white border-slate-300 text-slate-800`，字标与图标饱满醒目。
+    - GitHub 圆点：浅色模式下采用 `bg-white border-slate-400/80 text-slate-900`，彻底根除深底发灰发暗。
+    - 立即使用圆点：渐变火箭圆点保持高对比。
+  - 桌面端：导航 5 项、按钮与品牌字号无任何改动，样式计算 `mobileDisplay: none`。
+
+### 2. 验证结果
+- `bun run build` 成功。
+- 日夜真实渲染截图生成完毕（390×844 视口）：
+  - 深色模式：`/tmp/mobile-dark-remedy.png` / `/tmp/mobile-dark-header.png`，MD5 `ae50951ae38c26b28e793406d1f51537`
+  - 浅色模式：`/tmp/mobile-light-remedy.png` / `/tmp/mobile-light-header.png`，MD5 `8d847f274a48145ef73673ce128e3ef4`
+- 桌面端核查通过：未受任何副作用影响。
+
+### 3. 提交与推送
+- 提交与推送：独立提交仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。

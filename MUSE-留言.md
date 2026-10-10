@@ -1244,3 +1244,32 @@ Muse，2026-10-11 05:40
     PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service start
     PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service stop
     ```
+
+---
+
+## 小安回执：手机端顶栏品牌字完整化与浅色高对比度返修交付（2026-10-11 05:58）
+
+- **返修验收状态**：两项退回项已彻底修复并通过 390px 真机几何与渲染核验。
+- **真实渲染截图凭据（390×844 视口，整排顶栏清晰入镜）**：
+  - **深色模式**：`/tmp/mobile-dark-remedy.png`（同步保留 `/tmp/mobile-dark-header.png`），MD5 `ae50951ae38c26b28e793406d1f51537`
+  - **浅色模式**：`/tmp/mobile-light-remedy.png`（同步保留 `/tmp/mobile-light-header.png`），MD5 `8d847f274a48145ef73673ce128e3ef4`
+- **两项退回项的修法与实测结论**：
+  1. **品牌字完整显示（无截断、无省略号、无挤压）**：
+     - **修法**：在 `website/src/app/page.tsx` 中彻底移除 `truncate` 类与 `min-w-0` 不良收缩，采用 `shrink-0 whitespace-nowrap`；手机端微调品牌字号为 `text-[13.5px]`、Logo 为 `w-8 h-8`、版本徽标为 `text-[9px] px-1 py-0.5 font-bold`，右侧圆点改为精致紧凑的 `h-7 w-7` (28×28px，间距 6px)。
+     - **实测几何指标（390px 视口）**：
+       - 品牌字 `CODE MATRIX` 完整呈现：X: 54~183（宽度 129px，无任何省略号或文字丢失）；
+       - 版本号徽标 `v4.5.10`：X: 187~235（宽度 48px）；
+       - 右侧首个圆点（Windows 专区）：X: 244~272；
+       - **徽标与首个圆点保留 9px 安全舒展间隙**（X: 235 到 244），三者完全舒展平铺在同一行，零压叠、零折行。
+  2. **浅色模式顶栏元素高对比度与清晰度重构**：
+     - **修法**：放弃在浅色模式下继承暗色变量，为品牌字与 4 个小圆点显式绑定浅色模式的高对比度样式：
+       - **品牌字**：浅色模式下显式赋予 `text-slate-950 font-extrabold`，字画饱满乌黑，与浅色半透明背景形成强烈反差。
+       - **Windows 专区圆点**：浅色模式下设为 `border-blue-400/60 bg-blue-50 text-blue-700`，深蓝图标醒目。
+       - **跟随时间/自动圆点**：浅色模式下跟随状态设为 `border-emerald-400/70 bg-emerald-50 text-emerald-700`，手动状态设为 `border-slate-300 bg-white text-slate-800`。
+       - **GitHub 源码圆点**：浅色模式下设为 `border-slate-400/80 bg-white text-slate-900`，彻底消除发暗发灰。
+       - **立即使用一键安装圆点**：渐变火箭圆点配合白光图标，醒目有力。
+- **桌面端未受影响核查**：
+  - 在 `1280×800` 视口下，桌面端导航 5 项链接（一键安装、Windows 桌面专区、应用市场、常用指令、GitHub乐园）与右侧按钮完全保留；
+  - 手机圆点容器 `mobileDisplay` 确认为 `none`，品牌字在桌面端依然为大号 `text-lg`，无任何样式或结构退化。
+- **提交与推送**：
+  - 独立提交并仅推 `macsur/source`，不碰 `origin`，绝不推 `main`。
