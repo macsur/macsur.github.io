@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import FloatingScrollDots from "@/components/FloatingScrollDots";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -67,6 +68,7 @@ export default function RootLayout({
       </head>
       <body className="bg-[#080b11] text-slate-100 min-h-screen antialiased selection:bg-cyan-500 selection:text-white transition-colors duration-300">
         {children}
+        <FloatingScrollDots />
       </body>
     </html>
   );
