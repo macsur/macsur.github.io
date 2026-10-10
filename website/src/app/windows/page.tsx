@@ -33,9 +33,9 @@ function CommandChip({ command }: { command: string }) {
     }
   };
   return (
-    <span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/25 px-2.5 py-1.5 font-mono text-xs text-cyan-300">
+    <span className="inline-flex items-center gap-2 rounded-lg border border-cyan-200/30 bg-cyan-300/10 px-2.5 py-1.5 font-mono text-xs text-cyan-100">
       <span>{command}</span>
-      <button type="button" onClick={copy} className="text-slate-400 hover:text-cyan-200">{copied ? '已复制' : '复制'}</button>
+      <button type="button" onClick={copy} className="text-cyan-200 hover:text-white">{copied ? '已复制' : '复制'}</button>
     </span>
   );
 }
@@ -201,7 +201,7 @@ export default function WindowsPage() {
                   >
                     <span className="font-semibold" style={{ color: '#67e8f9' }}>视频教程</span>
                     <span className="mt-1 block" style={{ color: '#f1f5f9' }}>超详细的WSL教程：Windows上的Linux子系统 · 技术爬爬虾</span>
-                    <span className="mt-1 block text-xs text-slate-400">https://www.bilibili.com/video/BV1tW42197za</span>
+                    <span className="mt-1 block text-xs" style={{ color: '#67e8f9' }}>https://www.bilibili.com/video/BV1tW42197za</span>
                   </a>
                   <ol className="space-y-4 text-sm leading-relaxed" style={{ color: '#f1f5f9' }}>
                     <li><strong style={{ color: '#ffffff' }}>WSL 是什么：</strong>Windows 官方 Linux 子系统，适合开发、运维和本站 Linux 生态衔接。</li>
