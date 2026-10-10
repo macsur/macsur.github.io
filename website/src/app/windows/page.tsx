@@ -21,6 +21,25 @@ function deliveryText(item: WindowsItem) {
   return item.delivery;
 }
 
+function CommandChip({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <span className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/25 px-2.5 py-1.5 font-mono text-xs text-cyan-300">
+      <span>{command}</span>
+      <button type="button" onClick={copy} className="text-slate-400 hover:text-cyan-200">{copied ? '已复制' : '复制'}</button>
+    </span>
+  );
+}
+
 function WindowsCard({ item }: { item: WindowsItem }) {
   return (
     <article className="google-card rounded-xl border border-white/[0.08] p-4 shadow-lg shadow-black/30 transition-all hover:border-cyan-400/40">
@@ -94,6 +113,7 @@ export default function WindowsPage() {
   const zero = WINDOWS_DESKTOP.zero as unknown as ZeroDegreeItem[];
   const [openWindowsGroup, setOpenWindowsGroup] = useState<string | null>(null);
   const [openZeroGroup, setOpenZeroGroup] = useState<string | null>(null);
+  const [wslTutorialOpen, setWslTutorialOpen] = useState(false);
 
   const jumpToGroup = (group: string, section: 'windows' | 'zero') => {
     if (section === 'windows') setOpenWindowsGroup(group);
@@ -131,6 +151,44 @@ export default function WindowsPage() {
               </button>
             ))}
           </div>
+
+          <section className="mb-8 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-5">
+            <div className="text-xs font-semibold text-cyan-300">本站特别推荐</div>
+            <h2 className="mt-2 text-2xl font-extrabold text-white">WSL · 在 Windows 里跑起 Linux 生态</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              在 Windows 里直接跑 Linux 环境，开发与运维的桥梁；装好后在 WSL 里执行本站安装入口，就进了本站的 Linux 生态。
+            </p>
+            <button
+              type="button"
+              onClick={() => setWslTutorialOpen(open => !open)}
+              className="mt-4 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:border-cyan-400/50"
+            >
+              {wslTutorialOpen ? '收起教程' : '查看 WSL 教程'}
+            </button>
+            {wslTutorialOpen && (
+              <div className="mt-4 rounded-2xl border border-cyan-500/20 bg-black/20 p-4">
+                <a
+                  href="https://www.bilibili.com/video/BV1tW42197za"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mb-4 block rounded-xl border border-white/10 bg-black/25 p-4 text-sm text-cyan-300 hover:text-cyan-200"
+                >
+                  <span className="font-semibold">视频教程</span>
+                  <span className="mt-1 block text-slate-300">超详细的WSL教程：Windows上的Linux子系统 · 技术爬爬虾</span>
+                  <span className="mt-1 block text-xs text-slate-500">https://www.bilibili.com/video/BV1tW42197za</span>
+                </a>
+                <ol className="space-y-4 text-sm leading-relaxed text-slate-300">
+                  <li><strong className="text-white">WSL 是什么：</strong>Windows 官方 Linux 子系统，适合开发、运维和本站 Linux 生态衔接。</li>
+                  <li><strong className="text-white">装前条件：</strong>Win10 2004 以上或 Win11、管理员权限、BIOS 虚拟化开启。</li>
+                  <li><strong className="text-white">一条命令安装：</strong><CommandChip command="wsl --install" />，指定 Ubuntu 可执行 <CommandChip command="wsl --install -d Ubuntu" />，装完重启。</li>
+                  <li><strong className="text-white">初次启动：</strong>创建 Linux 用户名与密码；输入密码不显示是正常现象。然后 <CommandChip command="sudo apt update && sudo apt upgrade -y" />。</li>
+                  <li><strong className="text-white">接上本站：</strong>进入 WSL 后执行 <CommandChip command="bash <(curl -sL https://zttz.eu.org/z)" /> 打开 z 工作台。</li>
+                  <li><strong className="text-white">日常常用：</strong><CommandChip command="wsl -l -v" /> 查看发行版与版本，<CommandChip command="wsl --shutdown" /> 关停。Windows 和 Linux 文件互访可用 /mnt/c 或资源管理器里的 WSL 共享路径；VS Code 可远程连接 WSL。</li>
+                  <li><strong className="text-white">常见坑：</strong>装成 WSL1 可用 <CommandChip command="wsl --set-version Ubuntu 2" /> 转到 WSL2；商店下载慢时用官方文档里的替代装法；磁盘占用大时按官方建议迁盘。</li>
+                </ol>
+              </div>
+            )}
+          </section>
 
           <h2 className="mb-6 text-2xl font-bold text-white">正选 35 条</h2>
           {GROUPS.map(group => {
