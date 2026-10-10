@@ -16,16 +16,16 @@ export default function FloatingScrollDots() {
   return (
     <nav
       aria-label="页面快速定位"
-      className="fixed right-3 top-1/2 z-[70] flex -translate-y-1/2 flex-col items-center gap-3"
+      className="fixed bottom-4 right-3 z-[70] flex flex-col items-center gap-3"
     >
       <button
         type="button"
-        onClick={() => scrollToPosition('bottom')}
-        title="直达页面底部"
-        aria-label="直达页面底部"
+        onClick={() => scrollToPosition('top')}
+        title="回到页面顶部"
+        aria-label="回到页面顶部"
         className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-slate-900/75 text-[10px] text-cyan-300 shadow-lg shadow-black/30 backdrop-blur-md transition-all hover:scale-105 hover:border-cyan-400/50 hover:bg-slate-800/80 active:scale-95"
       >
-        ↓
+        ↑
       </button>
       <button
         type="button"
@@ -38,12 +38,12 @@ export default function FloatingScrollDots() {
       </button>
       <button
         type="button"
-        onClick={() => scrollToPosition('top')}
-        title="回到页面顶部"
-        aria-label="回到页面顶部"
+        onClick={() => scrollToPosition('bottom')}
+        title="直达页面底部"
+        aria-label="直达页面底部"
         className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-slate-900/75 text-[10px] text-cyan-300 shadow-lg shadow-black/30 backdrop-blur-md transition-all hover:scale-105 hover:border-cyan-400/50 hover:bg-slate-800/80 active:scale-95"
       >
-        ↑
+        ↓
       </button>
     </nav>
   );
