@@ -164,9 +164,9 @@ export default function WindowsPage() {
             <div className="relative z-10">
               <span className="inline-flex rounded-full border border-amber-300/40 bg-amber-400 px-3 py-1 text-[11px] font-bold text-slate-950 shadow-lg shadow-amber-500/20">本站特别推荐</span>
               <div className="mt-4 text-3xl font-black tracking-tight" style={{ color: '#ffffff' }}>WSL · 在 Windows 里跑起 Linux 生态</div>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: '#e2f4ff' }}>
+              <div className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: '#e2f4ff' }}>
                 在 Windows 里直接跑 Linux 环境，开发与运维的桥梁；装好后在 WSL 里执行本站安装入口，就进了本站的 Linux 生态。
-              </p>
+              </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium" style={{ color: '#f8fafc' }}>一条命令装好</span>
