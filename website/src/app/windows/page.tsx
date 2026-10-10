@@ -23,7 +23,7 @@ function deliveryText(item: WindowsItem) {
 
 function WindowsCard({ item }: { item: WindowsItem }) {
   return (
-    <article className="google-card rounded-xl border border-white/[0.08] bg-[#0d1017]/80 p-4 shadow-lg shadow-black/30 transition-all hover:border-cyan-400/40">
+    <article className="google-card rounded-xl border border-white/[0.08] p-4 shadow-lg shadow-black/30 transition-all hover:border-cyan-400/40">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -50,7 +50,7 @@ function WindowsCard({ item }: { item: WindowsItem }) {
         <div><span className="text-slate-500">维护：</span>{item.maintenance}</div>
       </div>
 
-      <div className="mt-3 rounded-lg bg-black/25 border border-white/[0.06] p-3 text-[11px] text-slate-400">
+      <div className="mt-3 rounded-lg bg-[var(--terminal-bg)] border-[var(--card-border)] p-3 text-[11px] text-slate-400">
         <div className="font-medium text-slate-300">风险说明</div>
         <p className="mt-1 leading-relaxed">{item.risk}</p>
       </div>
@@ -65,7 +65,7 @@ function WindowsCard({ item }: { item: WindowsItem }) {
 
 function ZeroCard({ item }: { item: ZeroDegreeItem }) {
   return (
-    <article className="google-card rounded-xl border border-white/[0.08] bg-[#0d1017]/80 p-4 shadow-lg shadow-black/30 transition-all hover:border-amber-400/40">
+    <article className="google-card rounded-xl border border-white/[0.08] p-4 shadow-lg shadow-black/30 transition-all hover:border-amber-400/40">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -102,7 +102,7 @@ export default function WindowsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-slate-100">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="fixed inset-0 google-ai-mesh pointer-events-none z-0" />
       <div className="fixed inset-0 google-subtle-grid pointer-events-none z-0" />
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
@@ -113,7 +113,7 @@ export default function WindowsPage() {
         </header>
 
         <section className="mb-12">
-          <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-4 text-sm leading-relaxed text-amber-100/80">
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm leading-relaxed text-[var(--foreground)]">
             {WINDOWS_DESKTOP.fixedRiskNotice}
           </div>
         </section>
@@ -138,7 +138,7 @@ export default function WindowsPage() {
             if (!items.length) return null;
             const open = openWindowsGroup === group;
             return (
-              <section key={group} id={`windows-${group}`} className="mb-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+              <section key={group} id={`windows-${group}`} className="mb-4 rounded-2xl border-[var(--card-border)] bg-[var(--card-bg)]">
                 <button type="button" onClick={() => setOpenWindowsGroup(open ? null : group)} className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
                   <span>
                     <span className="block text-base font-bold text-cyan-300">{group} <span className="text-slate-500">({items.length} 条)</span></span>
@@ -160,10 +160,10 @@ export default function WindowsPage() {
 
         <section className="mt-14">
           <h2 className="mb-6 text-2xl font-bold text-white">零度解说推荐</h2>
-          <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs leading-relaxed text-slate-400">
+          <div className="mb-6 rounded-xl border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-xs leading-relaxed text-slate-400">
             闭源条目带「博主推荐」标签。此为零度解说的个人推荐，本站未做代码审计，下载请认准官方渠道。
           </div>
-          <div className="mb-8 rounded-2xl border border-amber-500/20 bg-amber-500/[0.06] p-5">
+          <div className="mb-8 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5">
             <div className="text-xs text-amber-300/80">特别推荐</div>
             <h3 className="mt-2 text-xl font-bold text-white">Windows 10/11 优化天花板</h3>
             <a href="https://www.youtube.com/watch?v=HSn9E31L4gc" target="_blank" rel="noreferrer" className="mt-3 inline-flex text-sm text-cyan-300 hover:text-cyan-200">观看视频教程</a>
@@ -178,7 +178,7 @@ export default function WindowsPage() {
             if (!items.length) return null;
             const open = openZeroGroup === group;
             return (
-              <section key={group} id={`zero-${group}`} className="mb-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+              <section key={group} id={`zero-${group}`} className="mb-4 rounded-2xl border-[var(--card-border)] bg-[var(--card-bg)]">
                 <button type="button" onClick={() => setOpenZeroGroup(open ? null : group)} className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
                   <span>
                     <span className="block text-base font-bold text-amber-300">{group} <span className="text-slate-500">({items.length} 条)</span></span>
