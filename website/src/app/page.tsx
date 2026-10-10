@@ -488,7 +488,7 @@ export default function Home() {
     { cmd: 'z clean', desc: '一键深度清理系统冗余缓存' },
     { cmd: 'z dd', desc: '纯净版 Linux 系统一键重装' },
     { cmd: 'z backup', desc: '全自动 Docker 数据备份' },
-    { cmd: 'z update', desc: '无缝更新工具箱至最新版本' }
+    { cmd: 'z update', desc: '无缝更新代码矩阵至最新版本' }
   ];
 
   // 筛选应用
@@ -635,6 +635,15 @@ export default function Home() {
               用代码 · 爱上Linux
             </span>
           </h1>
+
+          <div className="mb-4">
+            <p className="text-xs sm:text-sm font-semibold tracking-[0.28em] text-emerald-300/90 uppercase">
+              FOR GENERATION X: THE MATRIX REOPENS
+            </p>
+            <p className="mt-1 text-sm sm:text-base font-medium text-white/90">
+              献给 X 世代：矩阵为你重开
+            </p>
+          </div>
 
           {/* 🎬 Hero 宣传片：手机竖屏、桌面横屏 */}
           <div className="max-w-4xl mx-auto mt-8 mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
@@ -830,13 +839,13 @@ export default function Home() {
               <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight flex items-center space-x-3">
                 <span>【今日推荐】</span>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-indigo-300">
-                  顶级神作 一键部署 TOP 3
+                  练手三部曲
                 </span>
               </h2>
               <p className={`text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed transition-colors ${
                 activeTheme === "dark" ? "text-slate-400" : "text-slate-700 font-medium"
               }`}>
-                从本站 160+ 现代化应用库与 CODE MATRIX 代码矩阵中精选出的 3 款必装神器。由 AI 原创深度解读架构特色与实战推荐理由，开箱即用，装机首选。
+                每日从 160+ 应用中精选 3 款，专为练手而选：门槛低、装得快、成就感来得早。AI 原创深度解读，照着装一遍，Linux 就入了门。
               </p>
             </div>
 
@@ -990,7 +999,7 @@ export default function Home() {
                     </span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-center sm:justify-start space-x-2.5">
-                    <span>工具箱 · 应用市场</span>
+                    <span>代码矩阵 · 应用市场</span>
                     {isMasterMarketOpen && (
                       <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-500/30 animate-pulse">
                         已激活
@@ -1572,7 +1581,7 @@ export default function Home() {
               <span>开放社区生态</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
-              想要让你的开源应用加入工具箱应用市场？
+              想要让你的开源应用加入代码矩阵？
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
               CODE MATRIX 代码矩阵应用市场遵循规范化开放标准。任何开发者只需根据官方规范编写一份简明的应用配置文件（<code className="text-cyan-300 font-mono">apps/*.conf</code>），即可无缝接入全球数十万服务器终端。
