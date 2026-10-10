@@ -568,7 +568,7 @@ export default function Home() {
                 </span>
               </div>
               <div onClick={toggleTheme} className="cursor-pointer select-none">
-                <span className={`font-bold text-lg tracking-wider transition-colors ${
+                <span className={`brand-script font-bold text-lg tracking-wider transition-colors ${
                   activeTheme === 'dark' ? 'text-white' : 'text-slate-900'
                 }`}>CODE MATRIX 代码矩阵</span>
                 <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
@@ -1648,7 +1648,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
             <div className="flex flex-col items-start">
-              <span className="font-bold text-slate-300">CODE MATRIX 代码矩阵</span>
+              <span className="brand-script font-bold text-slate-300">CODE MATRIX 代码矩阵</span>
               <span className="font-bold text-slate-300">用代码 · 爱上Linux</span>
               <span className="text-[10px] tracking-[0.18em] text-slate-500">CODE MATRIX REVOLUTION</span>
             </div>

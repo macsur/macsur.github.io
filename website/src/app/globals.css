@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Brand Script En';
+  src: url('/fonts/GreatVibes-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Brand Script Zh';
+  src: url('/fonts/MaShanZheng-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.brand-script {
+  font-family: 'Brand Script En', 'Brand Script Zh', cursive;
+  letter-spacing: 0.01em;
+}
+
 :root {
   /* 严格复刻 https://ai.google.dev 标志性黑夜深度科技色调 */
   --background: #090a0f;
