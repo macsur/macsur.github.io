@@ -592,6 +592,7 @@ export default function Home() {
 
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
+              <a href="/windows/" className="text-slate-300 hover:text-cyan-400 transition-colors">Windows 桌面专区</a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用市场 (160+)</a>
               <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">常用指令</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
