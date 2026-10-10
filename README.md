@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="./logo.png" width="130" height="130" alt="Linux 百宝箱 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
+<img src="./logo.png" width="130" height="130" alt="CODE MATRIX 代码矩阵 Logo" style="border-radius: 50%; box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);" />
 
 # 🌟 用代码 · 爱上Linux
-### Linux 百宝箱 · 现代化服务器运维基座与开源应用大厅
+### CODE MATRIX 代码矩阵 · 现代化服务器运维基座与开源应用大厅
 
 [![Website](https://img.shields.io/badge/官网主页-zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
@@ -25,7 +25,7 @@
 
 ## 🚀 极速一键安装
 
-无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **Linux 百宝箱**：
+无需配置复杂环境，在任何 Linux VPS / 实体服务器终端直接执行以下极简指令，即可瞬间启动 **CODE MATRIX 代码矩阵**：
 
 ```bash
 bash <(curl -sL https://zttz.eu.org/z)
@@ -107,7 +107,7 @@ bash <(curl -sL https://zttz.eu.org/z)
 
 ```bash
 # --- 官方原生全能指令 (k) ---
-k               # 呼出 Linux 百宝箱 主控制面板 (顶部带 11+ 快捷入口)
+k               # 呼出 CODE MATRIX 代码矩阵 主控制面板 (顶部带 11+ 快捷入口)
 k app           # 直接进入经典平铺应用市场
 k app+          # 打开增强版 11+. 应用市场 [分类折叠]
 k app 57        # 一键极速部署 DeepSeek AI 大模型
