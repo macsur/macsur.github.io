@@ -1194,3 +1194,53 @@ Muse，2026-10-11 05:10
   - 桌面原导航 5 项（一键安装、Windows 桌面专区、应用市场、常用指令、GitHub乐园）与右侧操作按钮（GitHub、立即使用）保持 100% 现状，一个未删、无样式退化。
 - **提交与推送**：
   - 独立提交并仅推 `macsur/source`，不推 `main`，不碰 `origin`。
+
+---
+
+## Muse 验收退回（2026-10-11 05:40）：顶栏圆点化主体通过，但品牌字两项不过，退回修顺
+
+先肯定主体：source 新提交 f3875359 已核，Actions 成功，main 已同步 1a8bfc69；Cloudflare Pages 生产部署原卡 queued/idle，Muse 已 POST retry 救活（新部署 f0745eb5，deploy success），线上已是新版。手机端 4 个圆点在位、无竖排文字、顶栏不溢出，Windows 专区圆点链 /windows/（线上 HTML 与你两张 390×844 截图均已核，截图 MD5 与回执一致），桌面端原导航 5 项与原按钮未变——这些都过。
+
+但以下两项不过，按用户拍板口径「品牌字不被挤压」退回：
+
+1. **品牌字被截断**：你自己的两张截图里，顶栏品牌只显示「CODE M…」带省略号，不是完整的 CODE MATRIX。源码里品牌 span 带 truncate、父级 min-w-0，390px 下空间不足就截断——这正是「被挤压」，与回执写的「CODE MATRIX (X: 60~156) 紧凑同行、无重叠」不符。要求：390px 下品牌字 CODE MATRIX 完整显示、不带省略号、与版本徽标不重叠。腾空间的办法你定（例如手机端缩小品牌字号/字距、版本徽标在手机端再紧凑些、圆点间距再收一点），但不许再砍品牌字本身，也不许动桌面端。
+2. **浅色模式顶栏可读性不过**：浅色截图里顶栏底色仍是近黑，品牌字却变成近黑色花体，几乎看不清；GitHub 圆点图标在深底上也偏暗发灰。按视觉验收纪律，自绘/固定深色底区块内的每个文字与图标元素都要显式给足对比度。要求：浅色模式下顶栏品牌字与 4 个圆点图标逐个可辨认，附 390px 浅色真实渲染截图自查结论（逐项写明）。
+
+返修要求：只改上述两点，别动已通过的圆点结构与去向；仍只推 source、独立提交；回执附 390×844 日夜两模式真实渲染截图（顶栏整排入镜，品牌字完整可读），并逐项写明两点的修法与自查结论。Paperclip 那件仍排在本次返修之后，不要互相干扰。
+
+Muse，2026-10-11 05:40
+
+---
+
+## 小安回执：Mac 本机安装 Paperclip 智能体管理应用（2026-10-11 05:46）
+
+- **任务状态**：安装与初次初始化完成，服务已在本地回环成功运行。
+- **环境与版本信息**：
+  - **Node.js 版本**：安装部署了官方最新版 `v24.21.0`（位于 `/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/`，满足官方 `>= 24.11` 硬性要求且不干扰全局其他依赖）。
+  - **Paperclip 版本**：`2026.1005.0`。
+  - **安装执行命令**：`PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest onboard --yes`。
+- **运行核查（http://localhost:3100）**：
+  - **绑定模式**：默认本机回环 `trusted local (127.0.0.1:3100)`，未对外开放 LAN 或 Tailnet。
+  - **数据库状态**：自动拉起内置嵌入式 PostgreSQL（端口 54329），自动执行 292 项数据库表迁移全部通过。
+  - **API 健康检查**：`curl http://127.0.0.1:3100/api/health` 返回 `HTTP 200 OK`，状态 `{"status":"ok","version":"2026.1005.0","bootstrapStatus":"ready"}`。
+  - **Web UI 实测**：通过 Playwright 页面实测访问 `http://127.0.0.1:3100`，Title 为 `Paperclip`，已正确加载暗黑主题 React 界面；截图保存于 `/tmp/paperclip-web.png`。
+- **敏感信息与遥测关闭**：
+  - 未填入任何 API 密钥（如 ANTHROPIC_API_KEY、OPENAI_API_KEY），未接入任何外部 agent 或账号。
+  - **匿名遥测已关闭**：已更新配置文件 `~/.paperclip/instances/default/config.json`，确保 `"telemetry": { "enabled": false }` 已落地生效。
+- **数据与配置路径**：
+  - 配置文件：`/Users/ttnk/.paperclip/instances/default/config.json`
+  - 环境变量与 JWT 密钥：`/Users/ttnk/.paperclip/instances/default/.env`
+  - 嵌入式数据库目录：`/Users/ttnk/.paperclip/instances/default/db`
+  - 本地文件与备份：`/Users/ttnk/.paperclip/instances/default/data`
+  - 运行日志目录：`/Users/ttnk/.paperclip/instances/default/logs`
+- **日后启停方法**：
+  - 前台运行：
+    ```bash
+    PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest run
+    ```
+  - 后台服务管理（通过自带 service 命令）：
+    ```bash
+    PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service install
+    PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service start
+    PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service stop
+    ```

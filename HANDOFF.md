@@ -1178,3 +1178,40 @@
 
 ### 4. 注意事项 / 下一步
 - 部署验收归 Muse；随后推进下一项交办（给 Mac 安装 Paperclip）。
+
+## 工作记录（2026-10-11，Mac 本地安装 Paperclip 智能体管理系统）
+
+### 1. 变更内容与执行过程
+- **环境检查与准备**：
+  - 系统原 Node 版本为 `v22.22.0`（低于官方要求的 `Node.js 24.11+`）。
+  - 下载官方 `node-v24.21.0-darwin-arm64` 运行时独立部署至 `/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/`，保障 Node 24 隔离可用，不污染系统原有环境。
+- **安装与初始化**：
+  - 执行命令：`PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest onboard --yes`。
+  - 版本：Paperclip `2026.1005.0`。
+  - 自动创建并迁移内置 PostgreSQL 数据库（端口 54329，应用 292 项迁移），绑定模式为默认本机回环 `trusted local (127.0.0.1:3100)`。
+  - 未填入任何外部 API 密钥，未接入任何 agent 或账号。
+- **配置优化**：
+  - 将配置文件 `~/.paperclip/instances/default/config.json` 中的遥测关闭：`"telemetry": { "enabled": false }`。
+
+### 2. 验证结果
+- HTTP 服务就绪：`http://localhost:3100`（Web UI 访问正常，页面 Title 为 `Paperclip`，引导页重定向至 `/onboarding`；API 健康端点 `/api/health` 返回 `HTTP 200 OK`，状态 `status: ok`）。
+- 截图保存至 `/tmp/paperclip-web.png`。
+
+### 3. 数据与配置路径
+- 配置路径：`~/.paperclip/instances/default/config.json`
+- 环境变量：`~/.paperclip/instances/default/.env`
+- 嵌入式数据库：`~/.paperclip/instances/default/db`
+- 存储与备份：`~/.paperclip/instances/default/data`
+- 日志文件：`~/.paperclip/instances/default/logs`
+
+### 4. 日后启停方法
+- **启动服务**：
+  ```bash
+  PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest run
+  ```
+- **后台启停管理**：
+  ```bash
+  PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service install
+  PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service start
+  PATH="/Users/ttnk/.local/opt/node-v24.21.0-darwin-arm64/bin:$PATH" npx --registry https://registry.npmjs.org paperclipai@latest service stop
+  ```
