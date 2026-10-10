@@ -21,6 +21,8 @@ import {
   Zap,
   FolderGit2,
   Flame,
+  AppWindow,
+  Rocket,
   GitFork,
   TrendingUp,
   Clock,
@@ -549,17 +551,18 @@ export default function Home() {
           activeTheme === 'dark' ? 'bg-[#090a0f]/80 border-white/[0.08]' : 'bg-[#f6f8fb]/85 border-slate-200'
         }`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            {/* 左侧品牌区：使用 min-w-0 与 shrink-1 防挤压，手机端仅展示主标语与徽标 */}
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
               {/* 点击左上角 Logo 实现白天/夜间主题切换，带有轻微点击反馈与模式指示器 */}
               <div
                 onClick={toggleTheme}
                 title={activeTheme === 'dark' ? '点击切换为清新白天模式 ☀️' : '点击切换为默认极客暗黑模式 🌙'}
-                className="relative group cursor-pointer"
+                className="relative group cursor-pointer shrink-0"
               >
                 <img
                   src="/logo.png"
                   alt="CODE MATRIX 代码矩阵 zttz.eu.org"
-                  className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
                 />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[8px] transition-all ${
                   activeTheme === 'dark' ? 'bg-amber-400 text-slate-950 ring-2 ring-[#090a0f]' : 'bg-blue-600 text-white ring-2 ring-white'
@@ -567,19 +570,19 @@ export default function Home() {
                   {activeTheme === 'dark' ? '🌙' : '☀️'}
                 </span>
               </div>
-              <div onClick={toggleTheme} className="cursor-pointer select-none">
-                <span className={`brand-script font-bold text-lg tracking-wider transition-colors ${
+              <div onClick={toggleTheme} className="cursor-pointer select-none min-w-0 flex items-center">
+                <span className={`brand-script font-bold text-base sm:text-lg tracking-wider transition-colors whitespace-nowrap truncate ${
                   activeTheme === 'dark' ? 'text-white' : 'text-slate-900'
-                }`}>CODE MATRIX 代码矩阵</span>
-                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full font-mono transition-colors ${
+                }`}>CODE MATRIX</span>
+                <span className={`ml-1.5 text-[11px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-mono transition-colors shrink-0 ${
                   activeTheme === 'dark' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
                 }`}>v4.5.10</span>
               </div>
-              {/* 跟随时间自动模式指示器与恢复按钮 */}
+              {/* 跟随时间自动模式指示器与恢复按钮：桌面端保持 pill，手机端移至右侧小圆点 */}
               <button
                 onClick={resetToAutoTheme}
                 title={themeMode === 'auto' ? '当前已跟随北京时间自动切换 (06:00~18:00 白天，其余夜晚)' : '点击恢复为跟随北京时间自动切换'}
-                className={`ml-1 flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all ${
+                className={`hidden md:flex items-center space-x-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all ${
                   themeMode === 'auto'
                     ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                     : 'bg-slate-800/60 hover:bg-slate-700/80 text-slate-400 hover:text-slate-200 border border-slate-700/60'
@@ -590,6 +593,7 @@ export default function Home() {
               </button>
             </div>
 
+            {/* 桌面端标准导航链接：保持现状 */}
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
               <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
               <a href="/windows/" className="text-slate-300 hover:text-cyan-400 transition-colors">Windows 桌面专区</a>
@@ -601,7 +605,8 @@ export default function Home() {
               </a>
             </nav>
 
-            <div className="flex items-center space-x-3">
+            {/* 桌面端右侧操作区 (md 及以上显示) */}
+            <div className="hidden md:flex items-center space-x-3">
               <a 
                 href="https://github.com/macsur/macsur.github.io" 
                 target="_blank" 
@@ -616,6 +621,56 @@ export default function Home() {
                 className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-xs font-semibold text-white shadow-md shadow-cyan-500/25 transition-all"
               >
                 立即使用
+              </a>
+            </div>
+
+            {/* 手机端专属右侧小圆点矩阵 (< md 显示，与浮动定位圆点同一视觉家族，圆形紧凑无文字) */}
+            <div className="flex md:hidden items-center space-x-2 shrink-0">
+              {/* 1. Windows 桌面专区圆点 */}
+              <a
+                href="/windows/"
+                title="进入 Windows 桌面专区"
+                aria-label="进入 Windows 桌面专区"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/30 bg-cyan-500/10 text-cyan-400 shadow-sm shadow-cyan-500/20 backdrop-blur-md transition-all hover:scale-105 active:scale-95 hover:bg-cyan-500/20"
+              >
+                <AppWindow className="w-4 h-4" />
+              </a>
+
+              {/* 2. 跟随时间 / 恢复自动模式圆点 */}
+              <button
+                type="button"
+                onClick={resetToAutoTheme}
+                title={themeMode === 'auto' ? '当前已跟随北京时间自动切换 (06:00~18:00 白天，其余夜晚)' : '点击恢复为跟随北京时间自动切换'}
+                aria-label={themeMode === 'auto' ? '当前跟随北京时间自动切换' : '点击恢复跟随时间'}
+                className={`flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur-md transition-all hover:scale-105 active:scale-95 ${
+                  themeMode === 'auto'
+                    ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-400 shadow-sm shadow-emerald-500/20'
+                    : 'border-slate-700/60 bg-slate-800/75 text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                }`}
+              >
+                <Clock className="w-4 h-4" />
+              </button>
+
+              {/* 3. GitHub 源码仓库圆点 */}
+              <a
+                href="https://github.com/macsur/macsur.github.io"
+                target="_blank"
+                rel="noreferrer"
+                title="查看 GitHub 源码仓库"
+                aria-label="查看 GitHub 源码仓库"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-slate-900/75 text-slate-300 shadow-sm shadow-black/20 backdrop-blur-md transition-all hover:scale-105 active:scale-95 hover:border-cyan-400/40 hover:text-cyan-300 hover:bg-slate-800"
+              >
+                <FolderGit2 className="w-4 h-4" />
+              </a>
+
+              {/* 4. 立即使用一键安装锚点圆点 */}
+              <a
+                href="#install"
+                title="立即使用：直达一键安装"
+                aria-label="立即使用：直达一键安装"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95"
+              >
+                <Rocket className="w-4 h-4" />
               </a>
             </div>
           </div>

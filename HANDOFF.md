@@ -497,3 +497,684 @@
 ### 4. 注意事项 / 下一步
 - 部署验收归 Muse：CI 成功 → main 更新 → Cloudflare 部署与线上核验。
 - 旧广告文件按要求保留在仓库中，后续如需重新启用只需恢复 `page.tsx` 中的引用。
+
+## 工作记录（2026-10-09，v3 广告同路径换文案版）
+
+### 1. 变更内容
+- 用新版 `linux-baibaoxiang-linebyline-v3.gif` 同路径覆盖旧版，主标语换为「常用工具 · 一键装齐」；首页代码未改。
+
+### 2. 验证结果
+- 新版文件校验通过：`1,155,313` 字节、`900×600`；执行 `bun run build` 通过；自动生成数据已还原。
+
+### 3. 提交与推送
+- commit 仅包含 `website/public/ads/linux-baibaoxiang-linebyline-v3.gif`；仅推 `macsur/source`；未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，零度解说推荐 3 件橱窗）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` 零度专栏顶部改为 3 件橱窗。
+- 选品：Wintoys 头牌，加 qBittorrent、LocalSend。
+- 非头牌橱窗卡入口定位并高亮对应原卡。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 日夜截图已生成：`/tmp/windows-light-shelves.png`、`/tmp/windows-dark-shelves.png`。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，本站特别推荐 3 件橱窗）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` 本站特别推荐扩展为 3 件橱窗。
+- 选品：WSL 头牌，加 PowerToys、Ditto。
+- WSL 教程展开时整行全宽，另两张卡入口点击展开并高亮对应原卡。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 日夜真实渲染截图已生成，路径与 MD5 写入留言回执。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，WSL 简介浅色模式修复）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` WSL 简介元素从 `p` 改为 `div`，避免全局浅色 `p` 规则覆盖内联浅色。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- WSL 面板内排查无其他同类全局覆盖命中。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，WSL 双模式渲染自查补充）
+
+### 1. 变更内容
+- 无代码变更。
+- 补充真实渲染截图：`/tmp/wsl-light-real.png`、`/tmp/wsl-dark-real.png`，教程区已展开。
+
+### 2. 验证结果
+- 浅色/深色截图 MD5 不同：`fc92e75652ccb6e67c29c302d40d6462` / `a73ee51735eacde9cce04a6cca9a2b2a`。
+- 像素采样确认页面背景分别为浅色 `[239,244,250]` 与深色 `[22,16,35]`。
+- 当前环境不能直接目视图片，已用渲染截图 + 像素采样 + 颜色逐项核对作为替代。
+
+### 3. 提交与推送
+- 无代码提交，无推送。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse；截图文件由 Muse 复取复核。
+
+## 工作记录（2026-10-10，WSL 特别推荐位对比度修复）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` 命令条与视频链接地址提亮。
+- 次级文字不再使用过暗 muted 色，确保深色面板内可读。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 已生成 `/tmp/wsl-dark.png`、`/tmp/wsl-light.png` 渲染截图；当前模型环境不能直接目视图片，视觉复核仍需 Muse/用户线上确认。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，WSL 特别推荐位美化升级）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` WSL 特别推荐位样式升级为渐变矩阵面板。
+- 增加金色徽章、主标题强化、命令行条带、亮点三连、品牌按钮与内卡层次。
+- 内容、教程、视频、展开逻辑未变。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 静态双模式检查：深色渐变面板在浅色/深色页均作为对比层存在。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，W027 WSL 本站特别推荐位）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` 正选区顶部新增 WSL 特别推荐位。
+- 推荐位含教程展开区，默认收起；命令带复制按钮。
+- 视频教程：B 站《超详细的WSL教程：Windows上的Linux子系统》，UP 主技术爬爬虾，链接 `https://www.bilibili.com/video/BV1tW42197za`。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- W027 原卡保留，正选 35 + 零度 18 卡数不变。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，中文书法字体换成刘建毛草）
+
+### 1. 变更内容
+- 中文字体从 `Ma Shan Zheng` 换成 `Liu Jian Mao Cao`。
+- `Brand Script Zh` 的 `@font-face` 改为新文件。
+- 移除旧 `MaShanZheng-Regular.ttf`。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- `fc-query` 覆盖自查：关键中文文案用字均在新字体 charset 中。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，Windows 专区页日夜主题接入）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` 去掉写死深色背景，改为主题变量与 `google-card`。
+- 折叠组、分类标签、风险提示、零度专栏区一并跟随全局日夜主题。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 静态自测：源码与产物无写死 `#090a0f`、`#0d1017`；产物 CSS 含 `html.light` 与主题变量；`windows/index.html` 根节点使用 `var(--background)`。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，首页首屏大字书法字体）
+
+### 1. 变更内容
+- `website/src/app/page.tsx` 首屏四处文字套用 `brand-script`。
+- 复用现有书法字体，未重复引入字体。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+- 英文全大写行按原样套用；Great Vibes 全大写辨认度偏弱，已在留言回执说明。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，Windows 专区页手风琴折叠）
+
+### 1. 变更内容
+- `website/src/app/windows/page.tsx` 正选六组与零度三组改为手风琴折叠。
+- 增加顶部分类小标签跳转并展开对应组。
+- 零度特别推荐位常驻展示 Wintoys L01。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 自测结构：默认收起、两组独立单开互斥、标签跳转展开、Wintoys 常驻、卡片数 35/18。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，logo 字体文件路径修复）
+
+### 1. 变更内容
+- 将书法字体文件从 `src/app/fonts` 移到 `website/public/fonts`。
+- CSS 路径保持 `/fonts/...` 不变。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- `website/out/fonts/GreatVibes-Regular.ttf`、`website/out/fonts/MaShanZheng-Regular.ttf` 存在。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，logo 品牌字书法字体）
+
+### 1. 变更内容
+- 新增自托管字体：中文 `Ma Shan Zheng`、英文 `Great Vibes`。
+- `globals.css` 增加 `@font-face` 与 `brand-script` 类。
+- 页眉与页脚品牌字应用书法字体，内容和交互不变。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+- 字体来源：Google Fonts OFL；加载方式：本地 `@font-face` 自托管。
+
+## 工作记录（2026-10-10，浮动导航圆点位置方向调整）
+
+### 1. 变更内容
+- `website/src/components/FloatingScrollDots.tsx` 从右侧中段改为右下角竖排。
+- 三点方向改为位置与去向一致：上点顶部、中点中间、下点底部。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 自测目标值：顶部 `0`、中间 `1000`、底部 `2000`。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，首页页脚配色修复）
+
+### 1. 变更内容
+- `website/src/app/page.tsx` 页脚从半透明背景改为实色：暗色近黑，浅色浅底深字。
+- 页脚信息结构与彩蛋按钮未动。
+
+### 2. 验证结果
+- `bun run build` 通过；构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，全站浮动导航圆点）
+
+### 1. 变更内容
+- 新增 `website/src/components/FloatingScrollDots.tsx` 全局浮动导航组件。
+- 在 `website/src/app/layout.tsx` 挂载，全站页面生效。
+- 三圆点方向为：上到底部、中到中间、下到顶部，平滑滚动。
+
+### 2. 验证结果
+- `bun run build` 通过。
+- 自测 scrollTo 目标值：顶部 `0`、底部 `2000`、中间 `1000`。
+- 构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，Windows 桌面专区立项开发）
+
+### 1. 变更内容
+- 新增 `/windows/` 独立页，页名「Windows 桌面专区」。
+- 首页顶部导航新增 Windows 桌面专区入口，未动 Hero 与献词。
+- 新增数据生成脚本与源数据：正选 35 条、零度专栏 18 条。
+- 页面实现正选区、零度专栏、风险提示与特别推荐位。
+
+### 2. 验证结果
+- `bun run build` 通过，路由 7/7。
+- 数据解析验证：正选 `35`、零度 `18`。
+- 构建刷新的 `easterEggData.ts` 与 `recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 数据提交：`4a8f554 feat(windows): add desktop zone data`。
+- 页面提交：`19ebe05 feat(website): add windows desktop zone page`。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+- 图片/链接、专栏内容以 `website/src/data/windows-audit/` 与生成后的 `windowsDesktop.ts` 为准。
+
+## 工作记录（2026-10-10，CFnew 部署准备未完成 Cloudflare 侧）
+
+### 1. 变更内容
+- 拉取 byJoey/cfnew 仓库，确认「明文源吗」为 `455,568` 字节。
+- 本地复制为 `/tmp/cfnew-upload/_worker.js`。
+- 生成 CFnew 环境变量 `u` 候选 UUID：`4D3DADE9-891D-41FC-B546-35E9E89AA340`。
+- 未创建 Cloudflare Pages/KV/绑定，未访问 pages.dev，未导入节点。
+
+### 2. 验证结果
+- 本地文件大小和名称已验证。
+- Cloudflare 侧未能验证，因缺少 wrangler 登录态或 API token。
+
+### 3. 提交与推送
+- 无代码提交，无推送。
+
+### 4. 注意事项 / 下一步
+- 需 Muse 提供 Cloudflare 授权通道或确认改由用户浏览器完成 Pages/KV 操作。
+- 完成后需按 14:12 交办四项自测逐项回执。
+
+## 工作记录（2026-10-10，首页献词落位与文案调整）
+
+### 1. 变更内容
+- Hero H1 下方新增献词两行：`FOR GENERATION X: THE MATRIX REOPENS` 与「献给 X 世代：矩阵为你重开」。
+- 今日推荐副标改为「练手三部曲」，说明段替换为定版文案。
+- 底部 CTA 改为「想要让你的开源应用加入代码矩阵？」。
+- 「工具箱 · 应用市场」改为「代码矩阵 · 应用市场」；`z update` 描述改为「无缝更新代码矩阵至最新版本」；自定义应用描述「本工具箱业务」改为「代码矩阵业务」。
+
+### 2. 验证结果
+- `bun run build` 通过；构建刷新的 `easterEggData.ts` 与 `recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，README/apps_manager 百宝箱清零）
+
+### 1. 变更内容
+- 替换 `README.md`、`website/public/README.md`、`apps_manager.sh`、`website/public/apps_manager.sh` 中品牌文案与注释为 CODE MATRIX 代码矩阵口径。
+- 变量名、路径、文件名等结构性内容未动。
+
+### 2. 验证结果
+- `rg 百宝箱` 在相关文件中 0 命中。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，三条广告 GIF 更名新版替换）
+
+### 1. 变更内容
+- 同名覆盖 `website/public/ads/linux-baibaoxiang-linebyline-v2.gif`、`v3.gif`、`v4.gif`。
+
+### 2. 验证结果
+- v2 `932,443` 字节、v3 `1,158,035` 字节、v4 `1,198,746` 字节，与交办一致。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，品牌更名：网站文字 CODE MATRIX 代码矩阵）
+
+### 1. 变更内容
+- `website/src/app/layout.tsx` 浏览器标题、meta description、author 改为 CODE MATRIX 代码矩阵口径。
+- `website/src/app/page.tsx` 顶部品牌区、播放器广告标识、图片 alt、页脚品牌区、版权行、介绍段落等用户可见「百宝箱」清零。
+
+### 2. 验证结果
+- `bun run build` 通过；构建刷新的 `easterEggData.ts` 与 `recommendManifest.json` 已还原。
+- `website/src` 内 `rg 百宝箱` 0 命中。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+- README、apps_manager、历史审计与交接文档中的「百宝箱」为文档性/非本次网站运行时文本，已在留言回执中列明。
+
+## 工作记录（2026-10-10，品牌更名：z.sh 文字 CODE MATRIX 代码矩阵）
+
+### 1. 变更内容
+- `sync_upstream.js` 注入 `z_main_menu` 标题行改为「🚀 CODE MATRIX 代码矩阵工作台」。
+- 用户可见的脚本品牌文案从 Linux 百宝箱/百宝箱替换为 CODE MATRIX 代码矩阵或代码矩阵。
+
+### 2. 验证结果
+- `bash -n` 全部通过。
+- `z_main_menu` 顶部横幅与标题行验证通过。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，代码矩阵意境：网页页脚英文副标）
+
+### 1. 变更内容
+- `website/src/app/page.tsx` 页脚品牌区新增英文副标 `CODE MATRIX REVOLUTION`，与中文主标「用代码 · 爱上Linux」成对显示。
+
+### 2. 验证结果
+- 执行 `bun run build`，构建通过；构建刷新的 `recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，代码矩阵意境：z.sh 主菜单横幅）
+
+### 1. 变更内容
+- `sync_upstream.js` 注入 `z_main_menu` 顶部横幅：`CODE MATRIX REVOLUTION` 与欢迎语。
+- 横幅只出现在 z 主菜单入口，子命令路径不输出。
+
+### 2. 验证结果
+- `bash -n` 全部通过。
+- 抽取 `z_main_menu` 运行，横幅原文出现在菜单顶部；`z help` 等子命令路径未混入横幅。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，S2 假成功治理补做）
+
+### 1. 变更内容
+- 生成层注入自举部署逐项检查，复制、chmod、部署 k/z 等任一步失败即报错中止。
+- `z_sync_apps` 改为恢复被删 `.conf` 失败即报错、`git pull --ff-only` 失败直接返回、同步后本地/远端 `.conf` 数量核对。
+- Z 工作台菜单关键入口统一走 `z_run_checked`，失败打印命令与退出码。
+
+### 2. 验证结果
+- `bash -n` 全部通过。
+- 临时 git 仓库删除 `1.conf` 后跑同步：恢复成功；远端不可达时同步报错退出，`1.conf` 已恢复。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，彩蛋源头修复）
+
+### 1. 变更内容
+- `website/fetch_vpngate.js` 的 `FIXED_LINKS` 第 1 条从 `kejilion.sh` 改为 `z.sh` / `https://zttz.eu.org/z.sh`。
+- 运行 `bun fetch_vpngate.js` 同步生成 `website/src/data/easterEggData.ts`。
+
+### 2. 验证结果
+- 扫描 `website/fetch_vpngate.js` 与 `website/src/data/easterEggData.ts`，`kejilion` 0 命中。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-10，D1 官方应用 z 编号直达）
+
+### 1. 变更内容
+- `sync_upstream.js` 中 `z_dispatch app` 分支增加官方编号回退：自用配置未命中且参数为数字时，调用上游 `linux_panel "$@"` 直达官方安装流。
+- `z_apps_panel` 缺失提示从 `k app <编号>` 改为 `z app <编号>`，不再带 k 字面。
+- 网站官方应用卡标签与复制命令改为 `z app ${app.id}`，自用卡保持 `z app`。
+- `generate_daily_recommend.js` 模板与当前 `dailyRecommend.ts` 改为 `z app ${app.id}`。
+
+### 2. 验证结果
+- `bash -n` 全部通过。
+- 实测 `Z_FORCE_PLATFORM=linux z app 23`：先报未命中自用、转官方编号，随后进入 Memos 安装/更新/卸载菜单，确认到达正确安装流。
+- `bun run build` 通过；构建刷新的 `easterEggData.ts` 与 `recommendManifest.json` 已还原。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+- 命名空间：自用配置优先，官方编号只在自用未命中时生效。
+
+## 工作记录（2026-10-10，S3 平台识别与优雅降级框架）
+
+### 1. 变更内容
+- `sync_upstream.js` 注入 `z_platform_detect`：识别 `linux/macos/wsl/windows/unknown`，并判断 `Z_HAS_SYSTEMD`。
+- 注入 `z_require_linux`、`z_require_systemd` 与菜单入口闸门，macOS/WSL 无 systemd 场景下礼貌拦截 Linux/服务类入口。
+- 尾部入口执行平台检测与提示，原生 Windows 提示 WSL 指引后退出。
+- 保留 `Z_FORCE_PLATFORM` 测试开关。
+
+### 2. 验证结果
+- `bash -n` 全部通过。
+- Mac 上 `Z_FORCE_PLATFORM=macos` 实跑 `z app+`：输出 macOS 有限支持提示与「此功能仅支持 Linux」，无 GNU 报错。
+- `Z_FORCE_PLATFORM=wsl` 无 systemd：服务类 choice 6 拦截返回 1，只读 choice 1 放行返回 0，并输出 `.wslconfig` 指引。
+- `Z_FORCE_PLATFORM=linux`：菜单可正常进入并退出。
+- 补测 `Z_FORCE_PLATFORM=windows`：输出 WSL 指引并退出码 1。
+
+### 3. 提交与推送
+- 提交包含 `sync_upstream.js` 与生成产物；仅推 `macsur/source`；未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+- 本次同步上游顺带带入最新上游应用市场条目，属于生成器正常结果。
+
+## 工作记录（2026-10-09，S1 z.sh 更新链安全加固）
+
+### 1. 变更内容
+- 在生成层 `sync_upstream.js` 注入 `zttz_safe_update`：更新前备份 `.bak`，下载到临时文件，`bash -n`，sha256 校验，通过后替换并部署，失败自动回滚报错。
+- `z_update` 与上游 `kejilion_update` 手动更新入口统一调用安全更新流程。
+- 定时更新 crontab 改为 `bash ~/kejilion.sh zttz-safe-update`，避免内联命令脆弱。
+- `sync_upstream.js` 生成根目录与 `website/public` 的 `z.sh`、`x.sh`、`kejilion.sh`，并发布 `z.sh.sha256`。
+
+### 2. 验证结果
+- 前置对齐：本地 `source` 与 `macsur/source` 同点；跑同步前 z.sh md5 与线上一致 `fe306e10ed2e99e316895a725272bdbe`。
+- 执行 `bun sync_upstream.js` 后生成 md5 `de2e19fbe6a4c1e8a67e8a209b58093c`，`bash -n` 全通过。
+- 自测错误 sha256：更新失败退出码 1，坏文件未替换，旧版自动恢复。
+- 自测正确 sha256：更新成功，新版脚本替换生效。
+
+### 3. 提交与推送
+- 提交将包含 `sync_upstream.js` 与生成产物：`kejilion.sh`、`z.sh`、`x.sh`、`website/public/*`、`z.sh.sha256`、`website/public/z.sh.sha256`。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+- `z.sh.sha256` 随构建/CI 从 `sync_upstream.js` 生成，不要手工维护。
+
+## 工作记录（2026-10-09，首页去 k 化第一批）
+
+### 1. 变更内容
+- 首页用户可见 k 字面清零：常用指令、终端提示、演示脚注、应用卡命令、今日推荐命令均改为 z 口径。
+- 应用卡与今日推荐统一复制 `z app+`，不编造 `z app <官方编号>`。
+- 今日推荐生成模板同步改为 `z app+`。
+- 彩蛋 `kejilion.sh` 条目整条下架，不再指向 `https://kejilion.sh`。
+
+### 2. 验证结果
+- 执行 `bun run build`，构建通过。
+- `website/src/data/recommendManifest.json` 由构建刷新，已还原，未混入提交。
+- 源码范围扫描无 `k app` / `kejilion` 等 A 类字面残留。
+
+### 3. 提交与推送
+- 提交与推送将在本次工作收尾时执行。
+- 推送目标：仅推 `macsur/source`。
+- 未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 待确认：官方应用卡未改为 `z app 编号` 直达，因为 `z app` 仅管理 `~/z-apps` 自定义应用；当前用 `z app+` 打开分类市场保真。
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-09，v4 广告错别字紧急纠错）
+
+### 1. 变更内容
+- 修正版 `linux-baibaoxiang-linebyline-v4.gif` 同路径覆盖旧版，修正文案「想你所相」为「想你所想」；代码未改。
+
+### 2. 验证结果
+- 修正版文件校验通过：`1,200,674` 字节、`900×600`。
+
+### 3. 提交与推送
+- commit 仅包含 `website/public/ads/linux-baibaoxiang-linebyline-v4.gif`；仅推 `macsur/source`；未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-09，Hero 首屏减法优化 + 介绍文案更换）
+
+### 1. 变更内容
+- 删除播放器内大字浮层、播放器左上角重复小标签、H1 下方小字行；介绍段替换为用户最终版新文案。
+
+### 2. 验证结果
+- 执行 `bun run build` 通过；自动生成数据已还原。
+
+### 3. 提交与推送
+- 提交仅包含 `website/src/app/page.tsx`；仅推 `macsur/source`；未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-09，新增 v4 第三条广告）
+
+### 1. 变更内容
+- 新增 `website/public/ads/linux-baibaoxiang-linebyline-v4.gif`，并追加为首页 Hero 轮播第三张；首页广告引用为 v2、v3、v4 三条。
+
+### 2. 验证结果
+- v4 文件校验通过：`1,204,977` 字节、`900×600`；执行 `bun run build` 通过；自动生成数据已还原。
+
+### 3. 提交与推送
+- 提交包含 `website/public/ads/linux-baibaoxiang-linebyline-v4.gif` 与 `website/src/app/page.tsx`；仅推 `macsur/source`；未推 `origin`，未推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse。
+
+## 工作记录（2026-10-11，首页手机端顶栏右侧圆点化与 Windows 专区补全）
+
+### 1. 变更内容
+- `website/src/app/page.tsx`：
+  - 手机端（`< md` 断点）：右侧操作区统一改造为小圆形图标按钮矩阵（与全站浮动导航圆点同一视觉家族，圆形、紧凑、各带 title 与 aria-label）。
+  - 新增 Windows 专区小圆点（`AppWindow` 窗口图标，指向 `/windows/`），首屏直接可见可点。
+  - 主题自动恢复按钮在手机端收拢为圆点（`Clock` 时钟图标，支持一键切换并同步指示）。
+  - GitHub 仓库按钮在手机端收拢为圆点（`FolderGit2` 图标，外链新窗口）。
+  - 立即使用安装按钮在手机端收拢为圆点（`Rocket` 火箭渐变图标，直达 `#install` 锚点）。
+  - 优化左侧品牌与版本号徽标布局，添加 `min-w-0` 与截断弹性保护，彻底杜绝 390px 视口下的挤压、折行与文字竖排。
+  - 桌面端（`>= md` 断点）：保持原样完整不动，5 项导航链接与右侧操作按钮不受任何影响。
+
+### 2. 验证结果
+- `bun run build` 通过；构建刷新的 `easterEggData.ts`、`recommendManifest.json` 已还原。
+- 日夜两模式真实渲染截图已生成（390×844 视口）：
+  - 深色模式：`/tmp/mobile-dark-header.png`，MD5 `affa7537f7828f36093904b91428341b`
+  - 浅色模式：`/tmp/mobile-light-header.png`，MD5 `3bd7a7b552d2df6a0ae905061c9f2663`
+- 视口测量：顶栏高度稳定 65px，4 个圆点均匀排布在右侧（X: 222, 262, 302, 342），无任何溢出，品牌与版本号无重叠。
+- 桌面端（1280×800）核查确认：手机圆点容器 `display: none`，桌面端导航与按钮完全正常。
+
+### 3. 提交与推送
+- 提交与推送：独立提交 `feat(website): convert mobile header right actions to icon dots and add windows zone entry`。
+- 推送目标：仅推 `macsur/source`。
+- 严格杜绝推 `origin`，绝不推 `main`。
+
+### 4. 注意事项 / 下一步
+- 部署验收归 Muse；随后推进下一项交办（给 Mac 安装 Paperclip）。
