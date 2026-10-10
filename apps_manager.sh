@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Linux 百宝箱应用市场增强版模块 (apps_manager.sh)
+# CODE MATRIX 代码矩阵应用市场增强版模块 (apps_manager.sh)
 # 采用手风琴折叠分类菜单、动态扩展自定义软件生态与一键生成向导
 # 100% 兼容 Bash 3.2+ (macOS) 与 Bash 4/5 (Linux)
 # ==============================================================================
@@ -289,7 +289,7 @@ render_accordion_apps_menu() {
     while true; do
         clear
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
-        echo -e "${gl_huang}  🚀 Linux 百宝箱 · 8 大分类${gl_bai}"
+        echo -e "${gl_huang}  🚀 CODE MATRIX 代码矩阵 · 8 大分类${gl_bai}"
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
 
         for item in "${CATEGORY_LIST[@]}"; do
@@ -550,7 +550,7 @@ render_accordion_apps_menu() {
 search_apps_wizard() {
     clear
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  🔍 Linux 百宝箱 · 快速搜索${gl_bai}"
+    echo -e "${gl_huang}  🔍 CODE MATRIX 代码矩阵 · 快速搜索${gl_bai}"
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
     read -e -p "请输入应用关键词或拼音 (直接回车取消): " kw
     [ -z "$kw" ] && return 0
@@ -622,7 +622,7 @@ search_apps_wizard() {
 new_custom_app_wizard() {
     clear
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  ➕ Linux 百宝箱新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
+    echo -e "${gl_huang}  ➕ CODE MATRIX 代码矩阵新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
     echo -e "本向导将帮助您根据应用配置规范快速注册一个新应用。"
     echo ""
@@ -765,4 +765,3 @@ linux_panel_accordion() {
         esac
     done
 }
-
