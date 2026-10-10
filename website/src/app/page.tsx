@@ -627,21 +627,21 @@ export default function Home() {
           <div className="inline-flex items-center google-pill mb-8 select-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
             <span className="text-xs text-slate-300 font-medium tracking-wide flex items-center">
-              <span className="text-cyan-400 font-semibold">CODE MATRIX 代码矩阵</span>
+              <span className="brand-script text-cyan-400 font-semibold">CODE MATRIX 代码矩阵</span>
             </span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-3">
-            <span className="block text-gradient-gemini font-extrabold tracking-tight">
+            <span className="brand-script block text-gradient-gemini font-extrabold tracking-tight">
               用代码 · 爱上Linux
             </span>
           </h1>
 
           <div className="mb-4">
-            <p className="text-xs sm:text-sm font-semibold tracking-[0.28em] text-emerald-300/90 uppercase">
+            <p className="brand-script text-xs sm:text-sm font-semibold tracking-[0.28em] text-emerald-300/90 uppercase">
               FOR GENERATION X: THE MATRIX REOPENS
             </p>
-            <p className="mt-1 text-sm sm:text-base font-medium text-white/90">
+            <p className="brand-script mt-1 text-sm sm:text-base font-medium text-white/90">
               献给 X 世代：矩阵为你重开
             </p>
           </div>
