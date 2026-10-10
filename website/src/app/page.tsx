@@ -1640,7 +1640,11 @@ export default function Home() {
       </section>
 
       {/* 底部 Footer */}
-      <footer className="border-t border-white/[0.08] py-14 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 bg-[#07080c]/60 backdrop-blur-xl">
+      <footer className={`border-t py-14 px-4 sm:px-6 lg:px-8 text-center text-xs ${
+        activeTheme === "dark"
+          ? "border-white/[0.08] bg-[#07080c] text-slate-400"
+          : "border-slate-200 bg-[#f6f8fb] text-slate-700"
+      }`}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-2">
             <div className="flex flex-col items-start">
