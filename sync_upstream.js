@@ -1160,7 +1160,7 @@ z_main_menu() {
             [ "\${#CUSTOM_APPS[@]}" -gt 0 ] && custom_cnt="\${#CUSTOM_APPS[@]}"
         fi
         echo -e "\${gl_kjlan}==================================================\${gl_bai}"
-        echo -e "\${gl_huang}      🚀 ZTTZ 自用应用与扩展工作台\${gl_bai}"
+        echo -e "\${gl_huang}      🚀 CODE MATRIX 代码矩阵工作台\${gl_bai}"
         echo -e "\${gl_kjlan}==================================================\${gl_bai}"
         echo -e "\${gl_lv}CODE MATRIX REVOLUTION\${gl_bai}"
         echo -e "\${gl_bai}欢迎来到代码矩阵，矩阵已就位，只等你敲下回车\${gl_bai}"
@@ -1322,14 +1322,17 @@ if (officialCode.includes('send_stats() {')) {
 
 // 补丁 12: 去痕 - 用户可见品牌字样替换为 Linux 百宝箱（仅纯展示字符串，不碰函数名/变量名/逻辑）
 const brandReplacements = [
-    ['科技lion脚本工具箱 v$sh_v', 'Linux 百宝箱 v$sh_v'],
-    ['欢迎使用科技lion脚本工具箱', '欢迎使用 Linux 百宝箱'],
-    ['🚀 Kejilion 应用市场 · 8 大分类', '🚀 Linux 百宝箱 · 8 大分类'],
-    ['🔍 Kejilion 应用市场 · 快速搜索', '🔍 Linux 百宝箱 · 快速搜索'],
-    ['➕ Kejilion 新增自定义软件向导', '➕ Linux 百宝箱新增自定义软件向导'],
-    ['卸载科技lion脚本', '卸载百宝箱脚本'],
-    ['将彻底卸载kejilion脚本', '将彻底卸载百宝箱脚本'],
-    ['安装科技lion脚本', '安装百宝箱脚本'],
+    ['科技lion脚本工具箱 v$sh_v', 'CODE MATRIX 代码矩阵 v$sh_v'],
+    ['欢迎使用科技lion脚本工具箱', '欢迎使用 CODE MATRIX 代码矩阵'],
+    ['🚀 Kejilion 应用市场 · 8 大分类', '🚀 CODE MATRIX 代码矩阵 · 8 大分类'],
+    ['🔍 Kejilion 应用市场 · 快速搜索', '🔍 CODE MATRIX 代码矩阵 · 快速搜索'],
+    ['➕ Kejilion 新增自定义软件向导', '➕ CODE MATRIX 代码矩阵新增自定义软件向导'],
+    ['🚀 Linux 百宝箱 · 8 大分类', '🚀 CODE MATRIX 代码矩阵 · 8 大分类'],
+    ['🔍 Linux 百宝箱 · 快速搜索', '🔍 CODE MATRIX 代码矩阵 · 快速搜索'],
+    ['➕ Linux 百宝箱新增自定义软件向导', '➕ CODE MATRIX 代码矩阵新增自定义软件向导'],
+    ['卸载科技lion脚本', '卸载代码矩阵脚本'],
+    ['将彻底卸载kejilion脚本', '将彻底卸载代码矩阵脚本'],
+    ['安装科技lion脚本', '安装代码矩阵脚本'],
     ['访问科技lion官方留言板', '访问官方留言板'],
 ];
 let brandOk = 0;

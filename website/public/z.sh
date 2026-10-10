@@ -244,7 +244,7 @@ CheckFirstRun_false() {
 # 提示用户同意条款
 UserLicenseAgreement() {
 	clear
-	echo -e "${gl_kjlan}欢迎使用 Linux 百宝箱${gl_bai}"
+	echo -e "${gl_kjlan}欢迎使用 CODE MATRIX 代码矩阵${gl_bai}"
 	echo "首次使用脚本，请先阅读并同意用户许可协议。"
 	echo "用户许可协议: https://blog.kejilion.pro/user-license-agreement/"
 	echo -e "----------------------"
@@ -26299,7 +26299,7 @@ render_accordion_apps_menu() {
     while true; do
         clear
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
-        echo -e "${gl_huang}  🚀 Linux 百宝箱 · 8 大分类${gl_bai}"
+        echo -e "${gl_huang}  🚀 CODE MATRIX 代码矩阵 · 8 大分类${gl_bai}"
         echo -e "${gl_kjlan}========================================================================${gl_bai}"
 
         for item in "${CATEGORY_LIST[@]}"; do
@@ -26560,7 +26560,7 @@ render_accordion_apps_menu() {
 search_apps_wizard() {
     clear
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  🔍 Linux 百宝箱 · 快速搜索${gl_bai}"
+    echo -e "${gl_huang}  🔍 CODE MATRIX 代码矩阵 · 快速搜索${gl_bai}"
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
     read -e -p "请输入应用关键词或拼音 (直接回车取消): " kw
     [ -z "$kw" ] && return 0
@@ -26632,7 +26632,7 @@ search_apps_wizard() {
 new_custom_app_wizard() {
     clear
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
-    echo -e "${gl_huang}  ➕ Linux 百宝箱新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
+    echo -e "${gl_huang}  ➕ CODE MATRIX 代码矩阵新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
     echo -e "${gl_kjlan}========================================================================${gl_bai}"
     echo -e "本向导将帮助您根据应用配置规范快速注册一个新应用。"
     echo ""
@@ -31848,7 +31848,7 @@ linux_Settings() {
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}61.  ${gl_bai}留言板                             ${gl_kjlan}66.  ${gl_bai}一条龙系统调优 ${gl_huang}★${gl_bai}"
 	  echo -e "${gl_kjlan}99.  ${gl_bai}重启服务器                         ${gl_kjlan}100. ${gl_bai}隐私与安全"
-	  echo -e "${gl_kjlan}101. ${gl_bai}k命令高级用法 ${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}卸载百宝箱脚本"
+	  echo -e "${gl_kjlan}101. ${gl_bai}k命令高级用法 ${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}卸载代码矩阵脚本"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主菜单"
 	  echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -32886,10 +32886,10 @@ EOF
 
 		  102)
 			  clear
-			  send_stats "卸载百宝箱脚本"
-			  echo "卸载百宝箱脚本"
+			  send_stats "卸载代码矩阵脚本"
+			  echo "卸载代码矩阵脚本"
 			  echo "------------------------------------------------"
-			  echo "将彻底卸载百宝箱脚本，不影响你其他功能"
+			  echo "将彻底卸载代码矩阵脚本，不影响你其他功能"
 			  read -e -p "确定继续吗？(Y/N): " choice
 
 			  case "$choice" in
@@ -33185,7 +33185,7 @@ while true; do
 	  echo -e "${gl_kjlan}4.  ${gl_bai}备份集群                 ${gl_kjlan}5.  ${gl_bai}还原集群"
 	  echo -e "${gl_kjlan}------------------------${gl_bai}"
 	  echo -e "${gl_kjlan}批量执行任务${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}安装百宝箱脚本         ${gl_kjlan}12. ${gl_bai}更新系统              ${gl_kjlan}13. ${gl_bai}清理系统"
+	  echo -e "${gl_kjlan}11. ${gl_bai}安装代码矩阵脚本         ${gl_kjlan}12. ${gl_bai}更新系统              ${gl_kjlan}13. ${gl_bai}清理系统"
 	  echo -e "${gl_kjlan}14. ${gl_bai}安装docker               ${gl_kjlan}15. ${gl_bai}安装BBR3              ${gl_kjlan}16. ${gl_bai}设置1G虚拟内存"
 	  echo -e "${gl_kjlan}17. ${gl_bai}设置时区到上海           ${gl_kjlan}18. ${gl_bai}开放所有端口	       ${gl_kjlan}51. ${gl_bai}自定义指令"
 	  echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -33517,7 +33517,7 @@ echo -e "${gl_kjlan}"
 echo "╦╔═╔═╗ ╦╦╦  ╦╔═╗╔╗╔ ╔═╗╦ ╦"
 echo "╠╩╗║╣  ║║║  ║║ ║║║║ ╚═╗╠═╣"
 echo "╩ ╩╚═╝╚╝╩╩═╝╩╚═╝╝╚╝o╚═╝╩ ╩"
-echo -e "Linux 百宝箱 v$sh_v"
+echo -e "CODE MATRIX 代码矩阵 v$sh_v"
 echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
 echo -e "${gl_huang}11+. ${gl_bai}应用市场 [分类折叠]${gl_bai}"
@@ -34224,7 +34224,7 @@ z_main_menu() {
             [ "${#CUSTOM_APPS[@]}" -gt 0 ] && custom_cnt="${#CUSTOM_APPS[@]}"
         fi
         echo -e "${gl_kjlan}==================================================${gl_bai}"
-        echo -e "${gl_huang}      🚀 ZTTZ 自用应用与扩展工作台${gl_bai}"
+        echo -e "${gl_huang}      🚀 CODE MATRIX 代码矩阵工作台${gl_bai}"
         echo -e "${gl_kjlan}==================================================${gl_bai}"
         echo -e "${gl_lv}CODE MATRIX REVOLUTION${gl_bai}"
         echo -e "${gl_bai}欢迎来到代码矩阵，矩阵已就位，只等你敲下回车${gl_bai}"
