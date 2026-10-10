@@ -152,42 +152,69 @@ export default function WindowsPage() {
             ))}
           </div>
 
-          <section className="mb-8 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-5">
-            <div className="text-xs font-semibold text-cyan-300">本站特别推荐</div>
-            <h2 className="mt-2 text-2xl font-extrabold text-white">WSL · 在 Windows 里跑起 Linux 生态</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400">
-              在 Windows 里直接跑 Linux 环境，开发与运维的桥梁；装好后在 WSL 里执行本站安装入口，就进了本站的 Linux 生态。
-            </p>
-            <button
-              type="button"
-              onClick={() => setWslTutorialOpen(open => !open)}
-              className="mt-4 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:border-cyan-400/50"
-            >
-              {wslTutorialOpen ? '收起教程' : '查看 WSL 教程'}
-            </button>
-            {wslTutorialOpen && (
-              <div className="mt-4 rounded-2xl border border-cyan-500/20 bg-black/20 p-4">
-                <a
-                  href="https://www.bilibili.com/video/BV1tW42197za"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mb-4 block rounded-xl border border-white/10 bg-black/25 p-4 text-sm text-cyan-300 hover:text-cyan-200"
-                >
-                  <span className="font-semibold">视频教程</span>
-                  <span className="mt-1 block text-slate-300">超详细的WSL教程：Windows上的Linux子系统 · 技术爬爬虾</span>
-                  <span className="mt-1 block text-xs text-slate-500">https://www.bilibili.com/video/BV1tW42197za</span>
-                </a>
-                <ol className="space-y-4 text-sm leading-relaxed text-slate-300">
-                  <li><strong className="text-white">WSL 是什么：</strong>Windows 官方 Linux 子系统，适合开发、运维和本站 Linux 生态衔接。</li>
-                  <li><strong className="text-white">装前条件：</strong>Win10 2004 以上或 Win11、管理员权限、BIOS 虚拟化开启。</li>
-                  <li><strong className="text-white">一条命令安装：</strong><CommandChip command="wsl --install" />，指定 Ubuntu 可执行 <CommandChip command="wsl --install -d Ubuntu" />，装完重启。</li>
-                  <li><strong className="text-white">初次启动：</strong>创建 Linux 用户名与密码；输入密码不显示是正常现象。然后 <CommandChip command="sudo apt update && sudo apt upgrade -y" />。</li>
-                  <li><strong className="text-white">接上本站：</strong>进入 WSL 后执行 <CommandChip command="bash <(curl -sL https://zttz.eu.org/z)" /> 打开 z 工作台。</li>
-                  <li><strong className="text-white">日常常用：</strong><CommandChip command="wsl -l -v" /> 查看发行版与版本，<CommandChip command="wsl --shutdown" /> 关停。Windows 和 Linux 文件互访可用 /mnt/c 或资源管理器里的 WSL 共享路径；VS Code 可远程连接 WSL。</li>
-                  <li><strong className="text-white">常见坑：</strong>装成 WSL1 可用 <CommandChip command="wsl --set-version Ubuntu 2" /> 转到 WSL2；商店下载慢时用官方文档里的替代装法；磁盘占用大时按官方建议迁盘。</li>
-                </ol>
+          <section className="relative mb-8 overflow-hidden rounded-3xl border border-cyan-400/30 bg-[radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.28),transparent_35%),linear-gradient(135deg,#07121e_0%,#0b3350_52%,#073f4a_100%)] p-5 shadow-2xl shadow-cyan-950/30">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-15"
+              style={{
+                backgroundImage:
+                  'linear-gradient(90deg, rgba(34,211,238,0.25) 1px, transparent 1px), linear-gradient(180deg, rgba(34,211,238,0.25) 1px, transparent 1px)',
+                backgroundSize: '34px 34px',
+              }}
+            />
+            <div className="relative z-10">
+              <span className="inline-flex rounded-full border border-amber-300/40 bg-amber-400 px-3 py-1 text-[11px] font-bold text-slate-950 shadow-lg shadow-amber-500/20">本站特别推荐</span>
+              <div className="mt-4 text-3xl font-black tracking-tight" style={{ color: '#ffffff' }}>WSL · 在 Windows 里跑起 Linux 生态</div>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: '#e2f4ff' }}>
+                在 Windows 里直接跑 Linux 环境，开发与运维的桥梁；装好后在 WSL 里执行本站安装入口，就进了本站的 Linux 生态。
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium" style={{ color: '#f8fafc' }}>一条命令装好</span>
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium" style={{ color: '#f8fafc' }}>不用虚拟机和双系统</span>
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium" style={{ color: '#f8fafc' }}>装好直通本站 Linux 生态</span>
               </div>
-            )}
+
+              <div className="mt-5 rounded-2xl border border-white/15 bg-black/25 p-4 backdrop-blur-md">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 font-mono text-sm" style={{ color: '#e0f2fe' }}>
+                    <span className="text-cyan-300">$</span>
+                    <span>wsl --install</span>
+                  </div>
+                  <CommandChip command="wsl --install" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWslTutorialOpen(open => !open)}
+                  className="mt-4 rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400 active:scale-95"
+                >
+                  {wslTutorialOpen ? '收起教程' : '查看 WSL 教程'}
+                </button>
+              </div>
+
+              {wslTutorialOpen && (
+                <div className="mt-4 rounded-2xl border border-white/15 bg-black/25 p-4 backdrop-blur-md">
+                  <a
+                    href="https://www.bilibili.com/video/BV1tW42197za"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mb-4 block rounded-xl border border-white/10 bg-black/25 p-4 text-sm"
+                  >
+                    <span className="font-semibold" style={{ color: '#67e8f9' }}>视频教程</span>
+                    <span className="mt-1 block" style={{ color: '#f1f5f9' }}>超详细的WSL教程：Windows上的Linux子系统 · 技术爬爬虾</span>
+                    <span className="mt-1 block text-xs text-slate-400">https://www.bilibili.com/video/BV1tW42197za</span>
+                  </a>
+                  <ol className="space-y-4 text-sm leading-relaxed" style={{ color: '#f1f5f9' }}>
+                    <li><strong style={{ color: '#ffffff' }}>WSL 是什么：</strong>Windows 官方 Linux 子系统，适合开发、运维和本站 Linux 生态衔接。</li>
+                    <li><strong style={{ color: '#ffffff' }}>装前条件：</strong>Win10 2004 以上或 Win11、管理员权限、BIOS 虚拟化开启。</li>
+                    <li><strong style={{ color: '#ffffff' }}>一条命令安装：</strong><CommandChip command="wsl --install" />，指定 Ubuntu 可执行 <CommandChip command="wsl --install -d Ubuntu" />，装完重启。</li>
+                    <li><strong style={{ color: '#ffffff' }}>初次启动：</strong>创建 Linux 用户名与密码；输入密码不显示是正常现象。然后 <CommandChip command="sudo apt update && sudo apt upgrade -y" />。</li>
+                    <li><strong style={{ color: '#ffffff' }}>接上本站：</strong>进入 WSL 后执行 <CommandChip command="bash <(curl -sL https://zttz.eu.org/z)" /> 打开 z 工作台。</li>
+                    <li><strong style={{ color: '#ffffff' }}>日常常用：</strong><CommandChip command="wsl -l -v" /> 查看发行版与版本，<CommandChip command="wsl --shutdown" /> 关停。Windows 和 Linux 文件互访可用 /mnt/c 或资源管理器里的 WSL 共享路径；VS Code 可远程连接 WSL。</li>
+                    <li><strong style={{ color: '#ffffff' }}>常见坑：</strong>装成 WSL1 可用 <CommandChip command="wsl --set-version Ubuntu 2" /> 转到 WSL2；商店下载慢时用官方文档里的替代装法；磁盘占用大时按官方建议迁盘。</li>
+                  </ol>
+                </div>
+              )}
+            </div>
           </section>
 
           <h2 className="mb-6 text-2xl font-bold text-white">正选 35 条</h2>
