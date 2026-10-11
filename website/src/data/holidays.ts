@@ -44,3 +44,16 @@ export function isHolidayToday(customDate?: Date | string): boolean {
     return targetDate >= h.startDate && targetDate <= h.endDate;
   });
 }
+
+/**
+ * 判断指定日期（默认当前北京时间）是否落在春节法定假期区间 (2026-02-15 ~ 2026-02-23)
+ */
+export function isSpringFestivalToday(customDate?: Date | string): boolean {
+  const targetDate = typeof customDate === 'string' 
+    ? customDate 
+    : getBeijingDateString(customDate);
+
+  const springHoliday = OFFICIAL_HOLIDAYS_2026.find(h => h.name === '春节');
+  if (!springHoliday) return false;
+  return targetDate >= springHoliday.startDate && targetDate <= springHoliday.endDate;
+}

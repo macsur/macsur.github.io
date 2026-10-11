@@ -1239,3 +1239,37 @@
 ### 3. 提交与推送
 - 提交与推送：独立提交仅推 `macsur/source`。
 - 未推 `origin`，未推 `main`。
+
+## 工作记录（2026-10-11，全站视觉特效与礼花统一收拢至春节专属闸门）
+
+### 1. 变更内容
+- **盘点全站视觉与交互特效**：
+  1. 满屏盛大烟花礼炮 (`triggerGrandFireworks`，基于 `canvas-confetti`)
+  2. 搜索栏旁边的专属「放礼花」按钮（`<Sparkles /> 放礼花`）
+  3. 生态大厅与 GitHub 乐园展开时的赛博爆炸粒子散布 (`burstParticles`、`parkBurstParticles`，基于 DOM 节点动画)
+  4. 生态大厅与 GitHub 乐园展开时的全息能量冲击波与发光流光 (`animate-shockwave`、`animate-cyber-flash`)
+  5. 生态大厅与乐园展开时的 Web Audio 科幻跃迁充能音效 (`playSciFiAudio`)
+  6. 量子星芒彩蛋弹窗及星芒粒子礼花 (`triggerEasterEgg`、`playEasterEggAudio`、`showEasterEgg`)
+- **对齐春节闸门**：
+  - 在 `website/src/data/holidays.ts` 中基于官方国务院假期区间，新增 `isSpringFestivalToday()` 判断（2026年春节区间：`2026-02-15` 至 `2026-02-23`）。
+  - 在 `website/src/app/page.tsx` 中：
+    - `fireConfetti` 库动态加载函数入口加入春节前置守卫：非春节期间直接 return，杜绝执行动态 `import('canvas-confetti')`，彻底节省网络带宽与内存占用；
+    - `triggerGrandFireworks`、搜索栏「放礼花」按钮展示统一收拢至 `isSpringFestivalToday()`；
+    - `triggerExplosion`、冲击波动效类注入、`playSciFiAudio` 统一受限为仅在春节生效；
+    - 彩蛋弹窗及音效 `triggerEasterEgg` 统一受限为仅在春节响应。
+- **现行口径如实标注说明**：
+  - 原礼花函数内部使用了 `isHolidayToday()`，该闸门覆盖元旦、春节、清明、劳动节、端午、中秋、国庆全量 7 大法定节假日（共 27 天）；按本次用户指令，现已精准收拢至纯春节区间（9 天），春节以外一律不展示。
+
+### 2. 验证结果
+- `bun run build` 成功。
+- 双场景（春节以外 vs 春节期间）桌面端与手机端真实渲染核查：
+  - **春节以外 (2026-10-11)**：
+    - 桌面端：展开市场无粒子（数量 0），无冲击波 class，无「放礼花」按钮，点击彩蛋不弹窗，截图 `/tmp/effects-desk-outside.png` (MD5: `23741f9e5c556a3257354640e85fdb46`)；
+    - 手机端：点击彩蛋不弹窗，截图 `/tmp/effects-mob-outside.png` (MD5: `6c506a6bed05729450fce1e42255a150`)。
+  - **春节期间 (模拟 2026-02-18)**：
+    - 桌面端：展开市场显示「放礼花」按钮，展开伴随粒子与冲击波，点击彩蛋正常弹出数据礼花弹窗，截图 `/tmp/effects-desk-inside.png` (MD5: `55f4b8402d1f9a2e536ef1a60af1b6b2`)；
+    - 手机端：点击彩蛋正常弹出数据礼花弹窗，截图 `/tmp/effects-mob-inside.png` (MD5: `83b694c2297274c7d3c10e4eba93bd1c`)。
+
+### 3. 提交与推送
+- 提交与推送：独立提交 `feat(website): unify all visual effects under Spring Festival gatekeeper`。
+- 仅推 `macsur/source`，不推 `main`，不碰 `origin`。

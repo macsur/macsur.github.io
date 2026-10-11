@@ -33,7 +33,7 @@ import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
 import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
 import { DAILY_RECOMMEND } from '@/data/dailyRecommend';
 import { EASTER_EGG_ITEMS, EasterEggItem } from '@/data/easterEggData';
-import { isHolidayToday } from '@/data/holidays';
+import { isHolidayToday, isSpringFestivalToday } from '@/data/holidays';
 
 interface RecommendedAppItem {
   id: number;
@@ -49,6 +49,8 @@ interface RecommendedAppItem {
 // 动态按需加载 confetti 特效库，降低首屏 Bundle 体积
 import type { Options as ConfettiOptions } from 'canvas-confetti';
 const fireConfetti = async (options?: ConfettiOptions) => {
+  // 严守指令：非春节期间完全拦截，杜绝加载 canvas-confetti 资源与带宽占用
+  if (!isSpringFestivalToday()) return;
   try {
     const confettiModule = (await import('canvas-confetti')).default;
     return confettiModule(options);
@@ -218,6 +220,7 @@ export default function Home() {
 
   // 播放彩蛋数据礼花专属音效
   const playEasterEggAudio = () => {
+    if (!isSpringFestivalToday()) return;
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
@@ -279,8 +282,9 @@ export default function Home() {
     }, 2200);
   };
 
-  // 触发彩蛋
+  // 触发彩蛋 (特效与礼花同闸门：仅在春节期间展示与响应，平时完全静默)
   const triggerEasterEgg = () => {
+    if (!isSpringFestivalToday()) return;
     setShowEasterEgg(true);
     playEasterEggAudio();
     // 释放专属“星芒粒子礼花”
@@ -297,8 +301,9 @@ export default function Home() {
     });
   };
 
-  // 纯原生 Web Audio 极客科幻跃迁充能音效 (零外部资源加载，0ms延迟)
+  // 纯原生 Web Audio 极客科幻跃迁充能音效 (仅在春节期间生效，春节以外不发声)
   const playSciFiAudio = () => {
+    if (!isSpringFestivalToday()) return;
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
@@ -337,8 +342,9 @@ export default function Home() {
     }
   };
 
-  // 生成粒子爆炸效果
+  // 生成粒子爆炸效果 (仅在春节期间生效，春节以外不生成粒子)
   const triggerExplosion = (isPark = false) => {
+    if (!isSpringFestivalToday()) return;
     const colors = isPark
       ? ['#f59e0b', '#ec4899', '#06b6d4', '#10b981', '#fbbf24', '#f97316']
       : ['#06b6d4', '#818cf8', '#10b981', '#f59e0b', '#ec4899', '#38bdf8', '#a855f7'];
@@ -371,10 +377,10 @@ export default function Home() {
   // 记录是否已经触发过首次满屏大礼花
   const [hasCelebrated, setHasCelebrated] = useState(false);
 
-  // 🎆 节日专属满屏盛大烟花礼炮 (只在法定节假日期间触发，平时仅有超新星粒子冲击波与跃迁音效)
+  // 🎆 节日专属满屏盛大烟花礼炮 (仅在春节期间展示，春节以外完全拦截)
   const triggerGrandFireworks = () => {
-    // 严守规则：只在法定节假日期间放礼花，平日不放
-    if (!isHolidayToday()) return;
+    // 严守规则：特效与礼花同闸门，仅春节期间展示，春节以外完全拦截
+    if (!isSpringFestivalToday()) return;
 
     // 1. 中央主礼炮炸裂
     fireConfetti({
@@ -418,14 +424,16 @@ export default function Home() {
   // 展开/收起【Github乐园】总折叠 (伴随量子彩蛋礼花、粒子冲击波与科幻跃迁音效)
   const handleToggleGithubPark = () => {
     if (!isGithubParkOpen) {
-      if (!hasCelebratedPark) {
-        setHasCelebratedPark(true);
-        triggerGrandFireworks();
+      if (isSpringFestivalToday()) {
+        if (!hasCelebratedPark) {
+          setHasCelebratedPark(true);
+          triggerGrandFireworks();
+        }
+        setIsParkShockwaveActive(true);
+        triggerExplosion(true);
+        playSciFiAudio();
+        setTimeout(() => setIsParkShockwaveActive(false), 1200);
       }
-      setIsParkShockwaveActive(true);
-      triggerExplosion(true);
-      playSciFiAudio();
-      setTimeout(() => setIsParkShockwaveActive(false), 1200);
       setIsGithubParkOpen(true);
     } else {
       setIsGithubParkOpen(false);
@@ -435,16 +443,18 @@ export default function Home() {
   // 展开/收起生态大厅总折叠 (第一次打开满屏大礼花，第二次打开保持现有超新星粒子设计)
   const handleToggleMasterMarket = () => {
     if (!isMasterMarketOpen) {
-      if (!hasCelebrated) {
-        // 🎆 第一次打开：满屏超级大礼花
-        setHasCelebrated(true);
-        triggerGrandFireworks();
+      if (isSpringFestivalToday()) {
+        if (!hasCelebrated) {
+          // 🎆 第一次打开：满屏超级大礼花
+          setHasCelebrated(true);
+          triggerGrandFireworks();
+        }
+        // 伴随赛博粒子爆炸、能量冲击波与跃迁音效 (仅春节生效)
+        setIsShockwaveActive(true);
+        triggerExplosion();
+        playSciFiAudio();
+        setTimeout(() => setIsShockwaveActive(false), 1200);
       }
-      // 无论是第一次还是第二次打开，均伴随原有的赛博粒子爆炸、能量冲击波与跃迁音效
-      setIsShockwaveActive(true);
-      triggerExplosion();
-      playSciFiAudio();
-      setTimeout(() => setIsShockwaveActive(false), 1200);
       setIsMasterMarketOpen(true);
     } else {
       setIsMasterMarketOpen(false);
@@ -1127,14 +1137,14 @@ export default function Home() {
 
                 {/* 筛选按钮组 */}
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-                  {/* 节日专属：仅在法定节假日开放「放礼花」按钮 */}
-                  {isHolidayToday() && (
+                  {/* 春节专属：仅在春节假期期间开放「放礼花」按钮 */}
+                  {isSpringFestivalToday() && (
                     <button
                       onClick={() => {
                         triggerGrandFireworks();
                         playSciFiAudio();
                       }}
-                      title="节日专属：触发满屏礼花"
+                      title="春节专属：触发满屏礼花"
                       className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-cyan-300 border border-slate-700/80 hover:border-cyan-500/40 bg-slate-900/60 transition-all shadow-sm active:scale-95"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:text-cyan-300" />
