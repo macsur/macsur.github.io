@@ -27,7 +27,8 @@ import {
   TrendingUp,
   Clock,
   Play,
-  X
+  X,
+  BookOpen
 } from 'lucide-react';
 import { CATEGORIES, BUILTIN_APPS, AppItem, Category } from '@/data/appsData';
 import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/data/trendingData';
@@ -613,6 +614,7 @@ export default function Home() {
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
                 <span>GitHub乐园</span>
               </a>
+              <a href="/tutorials/" className="text-slate-300 hover:text-cyan-400 transition-colors">个人教程</a>
             </nav>
 
             {/* 桌面端右侧操作区 (md 及以上显示) */}
@@ -1393,6 +1395,30 @@ export default function Home() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* 🌟 [个人教程] 入口区块：站主亲测实战手记，链接到 /tutorials/ */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <a
+          href="/tutorials/"
+          className="group flex flex-col gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md sm:flex-row sm:items-center sm:p-8 dark:border-white/10 dark:bg-[#10131c]"
+        >
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-500/15 to-cyan-500/15 border border-blue-500/30 text-blue-600 group-hover:scale-105 transition-transform dark:text-cyan-300">
+            <BookOpen className="h-7 w-7" />
+          </div>
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">个人教程</h2>
+              <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-cyan-300">实战手记</span>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              站主亲测的工具部署与工作流搭建手记：Paperclip 一人 AI 公司、双平台雇员配置与日常管理心法。
+            </p>
+          </div>
+          <span className="shrink-0 text-sm font-semibold text-blue-600 group-hover:text-blue-700 dark:text-cyan-300 dark:group-hover:text-cyan-200">
+            进入教程 → 
+          </span>
+        </a>
       </section>
 
       {/* 🌟 [Github乐园] 实时官方热榜 TOP 10 专区 (默认折叠，点击展开呈现量子数据礼花与震撼冲击波) */}
