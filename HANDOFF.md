@@ -1273,3 +1273,39 @@
 ### 3. 提交与推送
 - 提交与推送：独立提交 `feat(website): unify all visual effects under Spring Festival gatekeeper`。
 - 仅推 `macsur/source`，不推 `main`，不碰 `origin`。
+
+## 工作记录（2026-10-11，激光流光边框动效归入春节闸门返修交付）
+
+### 1. 变更内容
+- 响应 Muse 验收退回（2026-10-11 08:55 第 1 项）：
+  - 在 `website/src/app/page.tsx` 中，将生态大厅（约 1035 行）与 GitHub 乐园（约 1429 行）展开时的高速彩色激光流光旋转边框 (`animate-laser-rotate`) 统一追加 `isSpringFestivalToday()` 渲染条件保护：
+    ```tsx
+    {isMasterMarketOpen && isSpringFestivalToday() && (
+      <div className="absolute -inset-[150%] ... animate-laser-rotate ..." />
+    )}
+    ```
+    ```tsx
+    {isGithubParkOpen && isSpringFestivalToday() && (
+      <div className="absolute -inset-[150%] ... animate-laser-rotate ..." />
+    )}
+    ```
+  - **全站装饰性动效二次排查**：
+    - `animate-laser-rotate`：流光旋转边框，现已设闸；
+    - `animate-holo-scan`：全息激光扫掠，挂载于 `isShockwaveActive` / `isParkShockwaveActive`，由于触发源已在上一轮设闸，春节外已不触发；
+    - `animate-shockwave` / `animate-cyber-flash`：能量冲击波与高亮闪烁，春节外已完全不触发；
+    - 状态指示类微动画（如当前在线小绿点 `animate-pulse` / `animate-ping`、小箭头折叠提示 `animate-bounce`）属于功能指示微动，按口径予以保留。
+  - **第 2 项礼花口径**：按交办纪律保持现状待用户批示，未改动任何逻辑。
+
+### 2. 验证结果
+- `bun run build` 成功。
+- 春节内外、桌面与手机、两区均展开状态真实渲染核查：
+  - **春节以外 (2026-10-11，两区均展开)**：
+    - 桌面端：`animate-laser-rotate` 元素数量为 0；全息光束为 0；截图 `/tmp/remedy-desk-outside-expanded.png` (MD5: `eecd886ab31c8483ed4d2b3c3d82afeb`)；
+    - 手机端：`animate-laser-rotate` 元素数量为 0；全息光束为 0；截图 `/tmp/remedy-mob-outside-expanded.png` (MD5: `5f91b71351fab5d43d7bc28f2040344f`)。
+  - **春节期间 (模拟 2026-02-18，两区均展开)**：
+    - 桌面端：两区正常渲染彩色激光流光旋转边框（数量 2）；截图 `/tmp/remedy-desk-inside-expanded.png` (MD5: `0d297101c2e20eaa0cad05579070996f`)；
+    - 手机端：两区正常渲染彩色激光流光旋转边框（数量 2）；截图 `/tmp/remedy-mob-inside-expanded.png` (MD5: `2390b1825f3c90eac15601bc89b8b9f8`)。
+
+### 3. 提交与推送
+- 提交与推送：独立提交 `fix(website): gate laser rotation border effects under Spring Festival`。
+- 仅推 `macsur/source`，不推 `main`，不碰 `origin`。

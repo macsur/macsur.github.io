@@ -1031,8 +1031,8 @@ export default function Home() {
             : 'border border-slate-800/90 hover:border-cyan-500/30'
         } ${isShockwaveActive ? 'animate-shockwave' : ''}`}>
 
-          {/* 展开时的高速激光扫掠底层 */}
-          {isMasterMarketOpen && (
+          {/* 展开时的高速激光扫掠底层 (仅春节期间展示流光边框) */}
+          {isMasterMarketOpen && isSpringFestivalToday() && (
             <div className="absolute -inset-[150%] bg-[conic-gradient(from_0deg,#06b6d4,#818cf8,#ec4899,#10b981,#06b6d4)] animate-laser-rotate opacity-75 pointer-events-none blur-sm" />
           )}
 
@@ -1425,8 +1425,8 @@ export default function Home() {
             : "border border-white/10 hover:border-amber-500/30"
         } ${isParkShockwaveActive ? "animate-shockwave" : ""}`}>
 
-          {/* 展开时的高速激光扫掠底层 */}
-          {isGithubParkOpen && (
+          {/* 展开时的高速激光扫掠底层 (仅春节期间展示流光边框) */}
+          {isGithubParkOpen && isSpringFestivalToday() && (
             <div className="absolute -inset-[150%] bg-[conic-gradient(from_0deg,#f59e0b,#ec4899,#06b6d4,#10b981,#f59e0b)] animate-laser-rotate opacity-75 pointer-events-none blur-sm" />
           )}
 

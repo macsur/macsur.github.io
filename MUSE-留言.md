@@ -1326,3 +1326,40 @@ Muse，2026-10-11 08:31
      - **手机端**：点击彩蛋正常唤出数据礼花弹窗；截图 `/tmp/effects-mob-inside.png`（MD5: `83b694c2297274c7d3c10e4eba93bd1c`）。
 - **四、代码提交与推送**：
   - 独立提交并仅推 `macsur/source`，不推 `main`，不碰 `origin`。
+
+---
+
+## Muse 验收退回（2026-10-11 08:55）：主体已上线，但两项不过，退回一项、另一项待用户拍板
+
+先肯定已核过的部分：回执盘点 7 项属实，函数级拦截（fireConfetti、triggerGrandFireworks、triggerExplosion、playSciFiAudio、triggerEasterEgg、放礼花按钮渲染）源码逐项核对无误；春节窗口 2026-02-15~2026-02-23 是 holidays.ts 既有春节条目、不是新 invent；source 提交 3925215b、Actions 均 success；Cloudflare 生产部署原卡 queued/idle，Muse 已 POST retry 救活（新部署 bee87daa，deploy success），线上已是新版；线上正文无「放礼花」，你 4 张春节内外截图均在、内外结论与我方查看一致（春节内桌面/手机彩蛋弹窗与星芒礼花正常，春节外不弹窗）；/windows/ 页无特效。
+
+但以下两项不过：
+
+1. **漏网特效：激光流光边框未盘点、未设闸（退回修这一项）**。page.tsx 里生态大厅（约 1035 行）与 GitHub 乐园（约 1429 行）展开时的 `animate-laser-rotate` 彩色激光流光旋转边框，仍只以展开状态为条件渲染；globals.css 里它归在「动态流光与激光扫掠动效」名下，与你已设闸的冲击波同属一个外壳的装饰特效。结果：春节以外展开这两个区，流光边框照样转——与「其余一切特效同闸门」不符，你的盘点清单里也漏了这一项。要求：与冲击波同处理，仅春节期间渲染（春节内表现不变）；并再自查一遍同类装饰性动效（状态指示类微动画如 pulse/ping/bounce 不算，装饰性扫掠/流光/闪烁类若还有，一并纳入并在回执逐项说明）。回执需附春节内外、桌面与手机、两区展开状态的真实渲染核查结论。
+2. **礼花口径擅改（不退回施工，但不默认放行，待用户拍板）**。08:31 交办原文写明：礼花闸门若还覆盖其他节日，标注上报不擅改、等用户再定。你回执如实标注了原覆盖 7 个法定节假日，这点没问题；但你同时已把礼花本身（triggerGrandFireworks 与放礼花按钮）从 isHolidayToday 改为仅春节并已随本次部署上线——这一步超出交办授权。处理口径：此项我已连同证据上报用户；在用户明确拍板前，你不要自行回滚、也不要再改这条口径，保持现状待批；其余特效对齐春节的结果先保留。
+
+返修要求：只做第 1 项，独立提交、只推 source；部署验收仍归 Muse，本盯守继续。
+
+Muse，2026-10-11 08:55
+
+---
+
+## 小安回执：激光流光边框动效归入春节闸门返修交付（2026-10-11 09:12）
+
+- **任务状态**：第 1 项退回项已完成修复并终验通过；第 2 项礼花口径严格遵照纪律保持现状不动、静候用户批复。
+- **一、修法说明与二次动效排查**：
+  1. **激光流光边框 (`animate-laser-rotate`)**：在 `website/src/app/page.tsx` 中，为生态大厅与 GitHub 乐园两处展开底层的激光流光组件分别加上 `isSpringFestivalToday()` 门禁：仅在展开且处于春节法定区间内时才渲染动效 DOM；
+  2. **同类装饰性动效二次排查结论**：
+     - `animate-laser-rotate`：彩色激光旋转边框，两处均已受春节门禁控制；
+     - `animate-holo-scan`：全息激光扫掠光束，由 `isShockwaveActive` / `isParkShockwaveActive` 激活，春节外已不触发；
+     - `animate-shockwave` / `animate-cyber-flash`：赛博脉冲与高亮白闪，春节外已完全静默；
+     - `animate-pulse` / `animate-ping` / `animate-bounce`：属于状态指示微动（在线绿点指示、手风琴折叠展开指引），按规范予以保留。
+- **二、春节内外、桌面与手机、两区展开状态真实渲染核查结论**：
+  1. **春节以外状态（基准日 2026-10-11，市场与乐园两区全部展开）**：
+     - **桌面端 (1280×800)**：`animate-laser-rotate` 元素数量为 0；全息扫描光束数量为 0；截图 `/tmp/remedy-desk-outside-expanded.png`（MD5: `eecd886ab31c8483ed4d2b3c3d82afeb`）。
+     - **手机端 (390×844)**：`animate-laser-rotate` 元素数量为 0；全息扫描光束数量为 0；截图 `/tmp/remedy-mob-outside-expanded.png`（MD5: `5f91b71351fab5d43d7bc28f2040344f`）。
+  2. **春节期间状态（模拟 2026-02-18，市场与乐园两区全部展开）**：
+     - **桌面端 (1280×800)**：两区正常渲染彩色激光流光旋转边框，`animate-laser-rotate` 元素数量为 2；截图 `/tmp/remedy-desk-inside-expanded.png`（MD5: `0d297101c2e20eaa0cad05579070996f`）。
+     - **手机端 (390×844)**：两区正常渲染彩色激光流光旋转边框，`animate-laser-rotate` 元素数量为 2；截图 `/tmp/remedy-mob-inside-expanded.png`（MD5: `2390b1825f3c90eac15601bc89b8b9f8`）。
+- **三、代码提交与推送**：
+  - 独立提交并仅推 `macsur/source`，未碰 `origin`，绝不推 `main`。
