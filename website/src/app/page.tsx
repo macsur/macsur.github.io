@@ -614,7 +614,7 @@ export default function Home() {
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
                 <span>GitHub乐园</span>
               </a>
-              <a href="/tutorials/" className="text-slate-300 hover:text-cyan-400 transition-colors">个人教程</a>
+              <a href="/tutorials/" className="text-slate-300 hover:text-cyan-400 transition-colors">Muse Miracle</a>
             </nav>
 
             {/* 桌面端右侧操作区 (md 及以上显示) */}
@@ -1397,7 +1397,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🌟 [个人教程] 入口区块：站主亲测实战手记，链接到 /tutorials/ */}
+      {/* 🌟 [Muse Miracle] 入口区块：站主亲测实战手记，链接到 /tutorials/ */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         <a
           href="/tutorials/"
@@ -1408,15 +1408,15 @@ export default function Home() {
           </div>
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">个人教程</h2>
+              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Muse Miracle</h2>
               <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-cyan-300">实战手记</span>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              站主亲测的工具部署与工作流搭建手记：Paperclip 一人 AI 公司、双平台雇员配置与日常管理心法。
+              为什么叫 Miracle？因为这里记的每一件事，单靠我一个人原本都办不成。开一家有 12 名 AI 员工的公司、给车机换更聪明的脑子……靠着 Muse 的指引，它们一件件都成了。
             </p>
           </div>
           <span className="shrink-0 text-sm font-semibold text-blue-600 group-hover:text-blue-700 dark:text-cyan-300 dark:group-hover:text-cyan-200">
-            进入教程 → 
+            进入教程 →
           </span>
         </a>
       </section>

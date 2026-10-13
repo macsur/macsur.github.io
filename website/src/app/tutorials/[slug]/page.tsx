@@ -8,9 +8,9 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const item = TUTORIALS_DATA.find(t => t.slug === params.slug);
-  if (!item) return { title: '个人教程 | CODE MATRIX 代码矩阵' };
+  if (!item) return { title: 'Muse Miracle | CODE MATRIX 代码矩阵' };
   return {
-    title: `${item.title} | 个人教程`,
+    title: `${item.title} | Muse Miracle`,
     description: item.summary,
   };
 }

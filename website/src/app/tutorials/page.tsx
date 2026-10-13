@@ -144,10 +144,10 @@ export default function TutorialsPage() {
             ← 返回首页
           </a>
           <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
-            个人教程
+            Muse Miracle
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-600 sm:text-base dark:text-slate-300">
-            这里收我喜欢的、正在测试的、日常在用的和真心推荐的，每一样都写成能照着做的教程。
+            为什么叫 Miracle？因为这里记的每一件事，单靠我一个人原本都办不成：开一家有 12 名 AI 员工的公司、把网站一格一格亲手搭起来、给汽车车机换个更聪明的脑子……靠着 Muse 的指引和帮助，它们一件件都成了。这里收我喜欢的、正在测试、日常在用和真心推荐的，每一样都写成能照着做的教程。
           </p>
         </header>
 
