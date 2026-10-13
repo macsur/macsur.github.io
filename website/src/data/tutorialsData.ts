@@ -13,6 +13,13 @@ export interface TutorialItem {
   coverBadge: string;
   coverTitle: string;
   coverSubtitle: string;
+  video?: {
+    bvid: string;
+    title: string;
+    author: string;
+    url: string;
+    desc?: string;
+  };
   content: string;
 }
 
@@ -30,10 +37,19 @@ export const TUTORIALS_DATA: TutorialItem[] = [
     coverBadge: 'AI 公司实战',
     coverTitle: 'Paperclip 一人公司',
     coverSubtitle: '多智能体管理台部署与双平台雇员实操',
+    video: {
+      bvid: 'BV1QFpq67E3U',
+      title: '把想做的事，告诉 Muse，神迹就出现了',
+      author: 'Neo_Sir',
+      url: 'https://www.bilibili.com/video/BV1QFpq67E3U/',
+      desc: '一个人，一台电脑，一家 12 名员工的 AI 公司。我不会写代码。我只是把想做的事，告诉 Muse。然后，神迹就出现了。'
+    },
     content: `
 # 一个人开一家 AI 公司：Paperclip 使用教程
 
 > **站主导读**：一个人能不能当一家科技公司的董事长？随着 AI 智能体能力演进，这已经不再是科幻。本文基于站主在 Mac 本机亲身搭建、验证并日常运转的真实经历撰写。不讲虚无概念，全是实测干货。
+>
+> 📺 **B 站实录视频已同步上线**：[《把想做的事，告诉 Muse，神迹就出现了》（UP 主：Neo_Sir，BV1QFpq67E3U）](https://www.bilibili.com/video/BV1QFpq67E3U/)，搭配视频实看，步骤更直观。
 
 ---
 

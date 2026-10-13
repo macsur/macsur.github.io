@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { TUTORIALS_DATA, TutorialTag, TutorialItem } from '@/data/tutorialsData';
+import { Tv } from 'lucide-react';
 
 const ALL_TAGS: TutorialTag[] = ['我喜欢的', '测试中', '正在用', '推荐'];
 
@@ -64,6 +65,12 @@ function FeaturedCard({ item }: { item: TutorialItem }) {
             <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-800 dark:bg-cyan-500/15 dark:text-cyan-300">
               置顶精选
             </span>
+            {item.video && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[11px] font-semibold text-rose-700 dark:bg-rose-500/15 dark:border-rose-500/30 dark:text-rose-300">
+                <Tv className="w-3 h-3 text-rose-500" />
+                <span>B站实录视频</span>
+              </span>
+            )}
             {item.tags.map(tag => (
               <TutorialTagChip key={tag} tag={tag} />
             ))}
