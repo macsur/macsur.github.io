@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { TUTORIALS_DATA } from '@/data/tutorialsData';
 import MarkdownContent from '@/components/MarkdownContent';
-import { Play, ExternalLink, Tv } from 'lucide-react';
+import { ExternalLink, Tv } from 'lucide-react';
 
 export function generateStaticParams() {
   return TUTORIALS_DATA.map(item => ({ slug: item.slug }));
@@ -69,57 +69,49 @@ export default function TutorialArticlePage({ params }: { params: { slug: string
           </div>
         </header>
 
-        {/* 🎬 官方 B 站同步视频教程 */}
+        {/* 🎬 官方 B 站同步视频（9:16 竖屏短片，桌面居中限宽，手机 390px 完整适配） */}
         {item.video && (
-          <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md dark:border-white/10 dark:bg-[#10131c]">
-            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-2.5 dark:border-white/10 dark:bg-white/[0.03]">
-              <div className="flex items-center space-x-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
-                <Tv className="h-4 w-4 text-rose-500" />
-                <span>B 站实录教程 · {item.video.bvid}</span>
+          <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-md dark:border-white/10 dark:bg-[#10131c]">
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3 dark:border-white/10">
+              <div>
+                <div className="inline-flex items-center space-x-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-bold text-rose-600 dark:bg-rose-500/15 dark:text-rose-300">
+                  <Tv className="h-3.5 w-3.5" />
+                  <span>先看 10 秒：本篇实录宣传片</span>
+                </div>
+                <h3 className="mt-1.5 text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                  {item.video.title}
+                </h3>
               </div>
               <a
                 href={item.video.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center space-x-1 text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-cyan-300 dark:hover:text-cyan-200"
+                className="inline-flex shrink-0 items-center space-x-1 text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
               >
-                <span>前往 B 站观看</span>
+                <span>在 B 站打开 ({item.video.bvid})</span>
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>
-            {/* 16:9 高清播放器容器 */}
-            <div className="relative aspect-video w-full bg-black">
-              <iframe
-                src={`//player.bilibili.com/player.html?bvid=${item.video.bvid}&page=1&high_quality=1&danmaku=0`}
-                scrolling="no"
-                frameBorder="0"
-                allowFullScreen={true}
-                className="h-full w-full"
-                sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"
-              />
-            </div>
-            <div className="p-4 sm:p-5">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                    {item.video.title}
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    UP 主：<span className="font-medium text-slate-700 dark:text-slate-200">{item.video.author}</span>
-                    {item.video.desc && <span className="ml-2 hidden sm:inline text-slate-400">· {item.video.desc}</span>}
-                  </p>
-                </div>
-                <a
-                  href={item.video.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex shrink-0 items-center justify-center space-x-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-500 hover:text-white transition-all dark:bg-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500 dark:hover:text-white"
-                >
-                  <Play className="h-3 w-3 fill-current" />
-                  <span>B 站高清播放</span>
-                </a>
+
+            {/* 9:16 竖屏播放器：桌面端居中限宽，手机端自适应，零拉伸零黑边 */}
+            <div className="mx-auto w-full max-w-[320px] sm:max-w-[340px]">
+              <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl border border-slate-800 bg-black shadow-xl">
+                <iframe
+                  src={`//player.bilibili.com/player.html?bvid=${item.video.bvid}&page=1&high_quality=1&danmaku=0`}
+                  scrolling="no"
+                  frameBorder="0"
+                  allowFullScreen={true}
+                  className="h-full w-full"
+                  sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"
+                />
               </div>
             </div>
+
+            <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+              UP 主：<span className="font-semibold text-slate-700 dark:text-slate-200">{item.video.author}</span>
+              <span className="mx-2">·</span>
+              <span>10 秒竖屏实录短片，看完即懂</span>
+            </p>
           </div>
         )}
 
