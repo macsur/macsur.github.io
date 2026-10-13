@@ -605,13 +605,13 @@ export default function Home() {
 
             {/* 桌面端标准导航链接 */}
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
+              <a href="/tutorials/" className="text-slate-300 hover:text-cyan-400 transition-colors">Muse Miracle</a>
               <a href="/windows/" className="text-slate-300 hover:text-cyan-400 transition-colors">Windows 桌面专区</a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用市场 (160+)</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
                 <span>GitHub乐园</span>
               </a>
-              <a href="/tutorials/" className="text-slate-300 hover:text-cyan-400 transition-colors">Muse Miracle</a>
             </nav>
 
             {/* 桌面端右侧操作区 (md 及以上显示) */}
@@ -704,6 +704,30 @@ export default function Home() {
             <p className="brand-script mt-1 text-sm sm:text-base font-medium text-white/90">
               献给 X 世代：矩阵为你重开
             </p>
+          </div>
+
+          {/* 🌟 [Muse Miracle] 入口：站主亲测实战手记，链接到 /tutorials/。前置到 Hero 视频之上，确保 390px 手机首屏可见 */}
+          <div className="max-w-3xl mx-auto text-left mb-8">
+            <a
+              href="/tutorials/"
+              className="group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md sm:flex-row sm:items-center sm:p-6 dark:border-white/10 dark:bg-[#10131c]"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-500/15 to-cyan-500/15 border border-blue-500/30 text-blue-600 group-hover:scale-105 transition-transform dark:text-cyan-300">
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">Muse Miracle</h2>
+                  <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-cyan-300">实战手记</span>
+                </div>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  为什么叫 Miracle？因为这里记的每一件事，单靠我一个人原本都办不成。开一家有 12 名 AI 员工的公司、给车机换更聪明的脑子……靠着 Muse 的指引，它们一件件都成了。
+                </p>
+              </div>
+              <span className="shrink-0 text-sm font-semibold text-blue-600 group-hover:text-blue-700 dark:text-cyan-300 dark:group-hover:text-cyan-200">
+                进入教程 →
+              </span>
+            </a>
           </div>
 
           {/* 🎬 Hero 宣传片：手机竖屏、桌面横屏 */}
@@ -1375,30 +1399,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </section>
-
-      {/* 🌟 [Muse Miracle] 入口区块：站主亲测实战手记，链接到 /tutorials/ */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-        <a
-          href="/tutorials/"
-          className="group flex flex-col gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md sm:flex-row sm:items-center sm:p-8 dark:border-white/10 dark:bg-[#10131c]"
-        >
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-500/15 to-cyan-500/15 border border-blue-500/30 text-blue-600 group-hover:scale-105 transition-transform dark:text-cyan-300">
-            <BookOpen className="h-7 w-7" />
-          </div>
-          <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Muse Miracle</h2>
-              <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[11px] font-medium text-blue-700 dark:text-cyan-300">实战手记</span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-              为什么叫 Miracle？因为这里记的每一件事，单靠我一个人原本都办不成。开一家有 12 名 AI 员工的公司、给车机换更聪明的脑子……靠着 Muse 的指引，它们一件件都成了。
-            </p>
-          </div>
-          <span className="shrink-0 text-sm font-semibold text-blue-600 group-hover:text-blue-700 dark:text-cyan-300 dark:group-hover:text-cyan-200">
-            进入教程 →
-          </span>
-        </a>
       </section>
 
       {/* 🌟 [Github乐园] 实时官方热榜 TOP 10 专区 (默认折叠，点击展开呈现量子数据礼花与震撼冲击波) */}
