@@ -12,17 +12,16 @@ import {
   Search, 
   Star, 
   ExternalLink, 
-  Cpu, 
-  ShieldCheck, 
-  Globe, 
-  Database, 
-  Bot, 
+  Cpu,
+  ShieldCheck,
+  Globe,
+  Database,
+  Bot,
   Server,
   Zap,
   FolderGit2,
   Flame,
   AppWindow,
-  Rocket,
   GitFork,
   TrendingUp,
   Clock,
@@ -604,12 +603,10 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 桌面端标准导航链接：保持现状 */}
+            {/* 桌面端标准导航链接 */}
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
-              <a href="#install" className="text-slate-300 hover:text-cyan-400 transition-colors">一键安装</a>
               <a href="/windows/" className="text-slate-300 hover:text-cyan-400 transition-colors">Windows 桌面专区</a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用市场 (160+)</a>
-              <a href="#commands" className="text-slate-300 hover:text-cyan-400 transition-colors">常用指令</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
                 <span>GitHub乐园</span>
@@ -619,20 +616,14 @@ export default function Home() {
 
             {/* 桌面端右侧操作区 (md 及以上显示) */}
             <div className="hidden md:flex items-center space-x-3">
-              <a 
-                href="https://github.com/macsur/macsur.github.io" 
-                target="_blank" 
+              <a
+                href="https://github.com/macsur/macsur.github.io"
+                target="_blank"
                 rel="noreferrer"
                 className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 transition-all hover:border-slate-500"
               >
                 <FolderGit2 className="w-3.5 h-3.5 text-slate-400" />
                 <span>GitHub</span>
-              </a>
-              <a 
-                href="#install" 
-                className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-xs font-semibold text-white shadow-md shadow-cyan-500/25 transition-all"
-              >
-                立即使用
               </a>
             </div>
 
@@ -685,16 +676,6 @@ export default function Home() {
                 }`}
               >
                 <FolderGit2 className="w-3.5 h-3.5" />
-              </a>
-
-              {/* 4. 立即使用一键安装锚点圆点 */}
-              <a
-                href="#install"
-                title="立即使用：直达一键安装"
-                aria-label="立即使用：直达一键安装"
-                className="flex h-7 w-7 items-center justify-center rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/30 transition-all hover:scale-105 active:scale-95"
-              >
-                <Rocket className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
@@ -898,7 +879,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
 
       {/* 🌟 【今日推荐】专区：精选本站极力推荐使用的 3 款一键部署神作 */}
       <section id="daily-recommend" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
