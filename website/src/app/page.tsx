@@ -202,6 +202,9 @@ export default function Home() {
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [copiedEasterId, setCopiedEasterId] = useState<number | null>(null);
 
+  // 🔗 友情链接弹窗状态 (最右下角独立文字入口，20 个名额网格布局，与彩蛋完全独立)
+  const [showFriendLinks, setShowFriendLinks] = useState(false);
+
   // 彩蛋数据：6个固定精选链接 + 3个来自 VPNGate 的 L2TP/IPsec 节点
   const easterEggItems: EasterEggItem[] = useMemo(() => EASTER_EGG_ITEMS, []);
 
@@ -210,13 +213,14 @@ export default function Home() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setShowEasterEgg(false);
+        setShowFriendLinks(false);
       }
     };
-    if (showEasterEgg) {
+    if (showEasterEgg || showFriendLinks) {
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showEasterEgg]);
+  }, [showEasterEgg, showFriendLinks]);
 
   // 播放彩蛋数据礼花专属音效 (彩蛋放开：全年点击均可发声)
   const playEasterEggAudio = () => {
@@ -1767,6 +1771,15 @@ export default function Home() {
             >
               <Sparkles className="w-3 h-3 opacity-30 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)] transition-opacity" />
             </button>
+            <span className="text-slate-800">•</span>
+            {/* 网页最下方最右下角「友情链接」文字入口 (站主 16:32 定版：纯文字、低调、与页脚协调、日夜可读) */}
+            <button
+              type="button"
+              onClick={() => setShowFriendLinks(true)}
+              className="text-slate-500 hover:text-cyan-400 dark:text-slate-400 dark:hover:text-cyan-300 transition-colors cursor-pointer text-[11px] font-medium"
+            >
+              友情链接
+            </button>
           </div>
         </div>
       </footer>
@@ -1915,6 +1928,64 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 🔗 友情链接弹窗 (站主 16:32 定版：20 个名额网格布局，桌面 5 列 4 行，手机 2 列 10 行，空位占位呈现) */}
+      {showFriendLinks && (
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-xl animate-fadeIn"
+          onClick={() => setShowFriendLinks(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl rounded-3xl border border-white/15 bg-white dark:bg-[#0d1017] shadow-2xl shadow-cyan-500/10 backdrop-blur-2xl p-6 sm:p-8 overflow-hidden z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 顶部标题区 */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
+                  友情链接 <span className="text-cyan-500">·</span> 开源互联
+                </h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  携手优质开源项目与独立极客站点，共建开放互通的数字生态。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFriendLinks(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors"
+                title="关闭 (ESC)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 20 个友链名额网格：桌面 5 列 × 4 行，手机 2 列 × 10 行 */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[60vh] overflow-y-auto">
+              {Array.from({ length: 20 }).map((_, idx) => {
+                const num = String(idx + 1).padStart(2, '0');
+                return (
+                  <div
+                    key={idx}
+                    className="flex flex-col items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.03] p-4 text-center transition-colors hover:border-cyan-400/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/10"
+                  >
+                    <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 mb-1">#{num}</span>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">虚位以待</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">欢迎优质项目入驻</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 底部提示 */}
+            <div className="mt-5 pt-4 border-t border-slate-200 dark:border-white/10 text-center">
+              <span className="text-xs text-slate-400 dark:text-slate-500">
+                共 20 个友链名额 · 站点名单由站主后续指定 · 当前为占位展示
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
