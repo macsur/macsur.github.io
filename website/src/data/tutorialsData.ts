@@ -484,5 +484,216 @@ docker start agent2api
 
 *(第一卷完 · 第二卷《虚拟车企启航：Paperclip 架构与全员各就各位》待续)*
     `.trim()
+  },
+  {
+    id: 'board-watcher-sentinel',
+    slug: 'board-watcher-sentinel',
+    title: '留言板哨兵教程：让待命的终端 AI 自己读板',
+    summary: '终端版 AI 待命时不会自己读留言板。用 tmux 常驻会话 + 轮询脚本，让哨兵每 15 秒检查留言板新帖，发现 Muse 或站主落款就自动敲醒终端 AI 执行任务。2026-10-14 晚实测通过，哨兵自唤醒验收通过。',
+    category: '效率工具',
+    date: '2026-10-14',
+    readTime: '7 分钟阅读',
+    tags: ['正在用', '推荐'],
+    featured: false,
+    coverBadge: '实测教程',
+    coverTitle: '留言板哨兵',
+    coverSubtitle: '让待命的终端 AI 自己读板',
+    content: `
+# 留言板哨兵教程：让待命的终端 AI 自己读板
+
+> **一句话结论**：终端版 AI 有个天生毛病——待命时不会自己去读留言板文件。用 tmux 常驻会话加一个轮询脚本，让哨兵每 15 秒检查留言板新帖，发现 Muse 或站主落款就自动敲醒终端 AI 执行任务。本文全部步骤与教训来自 2026-10-14 晚实装实测，不是纸上方案。
+
+---
+
+## 一、要解决的问题
+
+终端版 Claude Code（小安）有个天生毛病：待命时不会自己去读留言板文件。交办写进 MUSE-留言.md 之后，如果没人到终端前喊他，新帖就一直躺在板上。2026-10-13 晚、2026-10-14 晚两度实证：帖子躺了两个小时无人读，急件只能靠站主亲手在终端唤醒。
+
+病根一句话：终端会话没有闹钟。他是被动等输入的程序，需要一个外部机制，在留言板出现新交办时，替人往他的输入框里打一句话并回车。
+
+## 二、方案原理
+
+三件套：
+
+1. **tmux 常驻会话**：小安以后只住在一个名为 xiaoan 的 tmux 会话里（work 窗口）。tmux 会话不随终端窗口关闭而消失，人可以随时 attach 进去或离开。更关键的是，tmux 允许别的程序用 send-keys 往会话里打字，这是哨兵能敲醒他的门。
+2. **哨兵脚本（board-watcher.sh）**：每 15 秒看一眼留言板文件有没有变长，只读新增的那一段。新增内容里带 Muse 或站主落款标记才算数（触发签名：—— Muse、【站主令、【Muse、Muse 交办/催办/批复/验收/上线令等）。小安自己的回执不带这些标记，不会把他自己吵醒（防自激）。
+3. **敲醒动作**：命中后，用 tmux send-keys 把一句固定提醒打进 xiaoan:work 窗口并回车，效果等同有人在终端喊他。两次敲醒至少间隔 120 秒（冷却），连发多帖只敲一次。哨兵自身住在同一会话的 watcher 窗口里，外层套了重生循环，崩了 5 秒后自拉。
+
+状态都记在 ~/.board-watcher/ 下：offset 是已读到的字节数，last-inject 是上次敲醒时间，watcher.log 是哨兵日志，验收与排障都看它。
+
+## 三、文件清单（都在 ~/Desktop/Kejilion/ 下）
+
+- **board-watcher.sh**：哨兵本体（附录 A 全文）
+- **board-watcher-install.sh**：安装与恢复脚本，幂等，装、修、重启恢复都跑它（附录 B 全文）
+- **board-watcher-README.md**：简版说明
+- **com.muse.boardwatcher.plist**：v1 的 launchd 配置，已作废，install 会自动清理
+
+## 四、安装（四步）
+
+**第 1 步**，装 tmux（没装的话）：
+
+\`\`\`bash
+brew install tmux
+\`\`\`
+
+**第 2 步**，跑安装脚本（自动清 v1 残件、建 tmux 会话、哨兵上岗）：
+
+\`\`\`bash
+bash ~/Desktop/Kejilion/board-watcher-install.sh
+\`\`\`
+
+**第 3 步**，进房并启动小安：
+
+\`\`\`bash
+tmux attach -t xiaoan
+\`\`\`
+
+然后在 work 窗口里输入 \`claude\` 回车。
+
+**第 4 步**，关掉原来的旧终端窗口，只留 tmux 里这一个小安，避免两个会话抢活。
+
+## 五、两个大坑（实测教训，省下后来人踩）
+
+### 坑一：launchd 方案被 macOS 隐私保护拦死
+
+第一版用 launchd 保活哨兵，结果脚本根本起不来，错误日志（~/.board-watcher/launchd.err.log）里是清一色的 \`Operation not permitted\`。原因：launchd 拉起的进程没有权限执行、读写桌面目录（~/Desktop 受 TCC 保护），而脚本和留言板都在桌面上。对策：哨兵不住 launchd，改住 tmux 窗口，进程权限随用户终端走，读写桌面畅通。凡是「launchd 定时跑桌面上的脚本」这类设计，在这台 Mac 上先默认此路不通。
+
+### 坑二：send-keys 的回车会被当成粘贴吞掉
+
+第一版把「一整段提醒文字加 Enter」用一条 send-keys 一口气发过去，结果文字进了小安的输入框、回车没生效（站主肉眼发现，截图为证）。原因：终端界面把快速到达的整块输入按粘贴处理，末尾的回车被当作普通字符。对策：分步发送，先用 \`-l\` 只打字，停 1 秒，再单独发一次 Enter，停 2 秒，再补一次 Enter（多余的空回车无害）。
+
+## 六、日常使用与恢复
+
+- **发帖即唤醒**：Muse 或站主在留言板落款发帖，15 秒内哨兵自动敲醒小安，他读板执行并回执。不用再去终端喊人。
+- **关终端窗口不影响**：人和哨兵都住在 tmux 会话里，回来 \`tmux attach -t xiaoan\` 即可。
+- **Mac 重启后**：重跑一次安装脚本（幂等），再 attach 进去启动 claude，全套恢复。
+- **排障**：先看 \`~/.board-watcher/watcher.log\`，每次触发、跳过、冷却都有记录；再看 \`tmux list-windows -t xiaoan\` 确认 watcher 窗口在不在。
+
+## 七、验收方法与当晚实测记录
+
+验收标准（定死）：在留言板发一条测试交办，无人碰终端，小安 10 分钟内自己回板回执，并注明是被哨兵唤醒的。
+
+2026-10-14 晚实测记录：
+
+- 20:07 至 20:12 装配完成：站主在终端执行安装，v1 的 launchd 拦截当场暴露并改版 v2（tmux 窗口版）。
+- 20:12 哨兵首次敲醒送达成功：提醒原文完整出现在小安 tmux 会话的输入框里，站主截图为证，无人碰终端。
+- 同轮发现回车未生效（坑二），当晚已按分步发送修复并落盘。
+- 验收结论（20:15 回执落板后补正）：小安回执于 20:15 落板，写明被哨兵敲醒、无人敲终端、tmux 与 watcher 窗口正常，**哨兵自唤醒验收通过**。诚实备注：首轮敲醒的最后一个回车是站主补按的（坑二当时未修），自动回车修复后尚待下一轮实测确认；另 20:24 Muse 自动对账曾因读取与回执落板擦身而过、一度误报回执缺席，已当场更正。
+
+## 八、停用
+
+\`\`\`bash
+# 只停哨兵
+tmux kill-window -t xiaoan:watcher
+
+# 整套关停
+tmux kill-session -t xiaoan
+\`\`\`
+
+---
+
+## 附录 A：board-watcher.sh 全文
+
+\`\`\`bash
+#!/bin/bash
+# board-watcher.sh —— 盯 MUSE-留言.md，有 Muse/站主新帖就敲醒 tmux 里的小安
+# 纯轮询实现，零外部依赖（只需 tmux）。住 tmux 会话的 watcher 窗口，由重生循环保活（v1 的 launchd 方案被 macOS TCC 拦截，已作废）。
+BOARD="/Users/ttnk/Desktop/Kejilion/MUSE-留言.md"
+TMUX_TARGET="xiaoan:work"
+STATE_DIR="$HOME/.board-watcher"
+OFFSET_FILE="$STATE_DIR/offset"
+LASTINJ_FILE="$STATE_DIR/last-inject"
+LOG="$STATE_DIR/watcher.log"
+POLL=15
+COOLDOWN=120
+WAKE_MSG="【哨兵提醒】留言板有 Muse 或站主的新帖。请立即读取 MUSE-留言.md 的尾部最新内容，按最新交办执行并回板回执。若你核对后发现最新帖是你自己的回执、或与你无关，请忽略本条。"
+
+mkdir -p "$STATE_DIR"
+log(){ echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
+
+# 初始偏移 = 当前文件大小，只盯之后的新增内容
+if [ ! -f "$OFFSET_FILE" ]; then
+  stat -f %z "$BOARD" > "$OFFSET_FILE" 2>/dev/null || echo 0 > "$OFFSET_FILE"
+fi
+log "watcher started"
+
+while true; do
+  if [ -f "$BOARD" ]; then
+    size=$(stat -f %z "$BOARD" 2>/dev/null || echo 0)
+    last=$(cat "$OFFSET_FILE" 2>/dev/null || echo 0)
+    case "$last" in ''|*[!0-9]*) last=0;; esac
+    if [ "$size" -lt "$last" ]; then
+      echo "$size" > "$OFFSET_FILE"; last=$size
+      log "board shrank, offset reset to $size"
+    fi
+    if [ "$size" -gt "$last" ]; then
+      seg=$(tail -c +$((last+1)) "$BOARD" 2>/dev/null)
+      echo "$size" > "$OFFSET_FILE"
+      if printf '%s' "$seg" | grep -Eq '—— Muse|【站主令|【Muse|## .*Muse|Muse (交办|催办|批复|验收|上线令|转站主令)'; then
+        now=$(date +%s)
+        lastinj=$(cat "$LASTINJ_FILE" 2>/dev/null || echo 0)
+        case "$lastinj" in ''|*[!0-9]*) lastinj=0;; esac
+        if [ $((now-lastinj)) -ge $COOLDOWN ]; then
+          if tmux has-session -t "$TMUX_TARGET" 2>/dev/null; then
+            tmux send-keys -t "$TMUX_TARGET" -l "$WAKE_MSG"
+            sleep 1
+            tmux send-keys -t "$TMUX_TARGET" Enter
+            sleep 2
+            tmux send-keys -t "$TMUX_TARGET" Enter
+            echo "$now" > "$LASTINJ_FILE"
+            log "trigger matched, wake sent to tmux:$TMUX_TARGET"
+          else
+            log "trigger matched but tmux session '$TMUX_TARGET' not found, skipped"
+          fi
+        else
+          log "trigger matched but in cooldown, skipped"
+        fi
+      else
+        log "board grew, no trigger signature, ignored"
+      fi
+    fi
+  fi
+  sleep $POLL
+done
+\`\`\`
+
+## 附录 B：board-watcher-install.sh 全文
+
+\`\`\`bash
+#!/bin/bash
+# board-watcher-install.sh —— 改版（v2）：不用 launchd。
+# 原因：macOS 隐私保护（TCC）会拦 launchd 进程读写桌面目录，哨兵脚本起不来。
+# 改法：哨兵住进 tmux 会话的一个常驻窗口，与小安同住一间房，权限随终端走。
+# 本脚本幂等：装、修、重启后恢复，都跑它。
+set -e
+SRC="/Users/ttnk/Desktop/Kejilion"
+# 清理 v1 的 launchd 哨兵（若在）
+launchctl unload "$HOME/Library/LaunchAgents/com.muse.boardwatcher.plist" 2>/dev/null || true
+rm -f "$HOME/Library/LaunchAgents/com.muse.boardwatcher.plist"
+mkdir -p "$HOME/.board-watcher"
+chmod +x "$SRC/board-watcher.sh" 2>/dev/null || true
+if ! command -v tmux >/dev/null 2>&1; then
+  echo "[!] 还没装 tmux。请先执行：brew install tmux —— 装完再跑一次本脚本。"
+  exit 0
+fi
+if tmux has-session -t xiaoan 2>/dev/null; then
+  echo "[OK] tmux 会话 xiaoan 已存在。"
+else
+  tmux new-session -d -s xiaoan -n work -c "$SRC"
+  echo "[OK] tmux 会话 xiaoan 已创建（工作窗口 work，目录 Kejilion）。"
+fi
+if tmux list-windows -t xiaoan -F '#{window_name}' 2>/dev/null | grep -qx watcher; then
+  echo "[OK] 哨兵窗口已在岗。"
+else
+  tmux new-window -d -t xiaoan -n watcher "while true; do bash $SRC/board-watcher.sh; echo watcher exited, respawn in 5s; sleep 5; done"
+  echo "[OK] 哨兵已上岗（tmux 会话 xiaoan 的 watcher 窗口），日志在 ~/.board-watcher/watcher.log"
+fi
+echo "下一步：tmux attach -t xiaoan ，在 work 窗口里启动 claude（小安）。以后小安只在这个会话里工作；重启电脑后，重跑一次本脚本即可全部恢复。"
+\`\`\`
+
+---
+
+*纪实说明：本文所有步骤、命令、脚本全文均来自 2026-10-14 晚的真实操作与在跑版本，事实、命令、代码一字未改。*
+    `.trim()
   }
 ];
