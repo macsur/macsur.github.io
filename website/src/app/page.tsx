@@ -48,9 +48,9 @@ interface RecommendedAppItem {
 
 // 动态按需加载 confetti 特效库，降低首屏 Bundle 体积
 import type { Options as ConfettiOptions } from 'canvas-confetti';
-const fireConfetti = async (options?: ConfettiOptions) => {
-  // 严守指令：非春节期间完全拦截，杜绝加载 canvas-confetti 资源与带宽占用
-  if (!isSpringFestivalToday()) return;
+const fireConfetti = async (options?: ConfettiOptions, force: boolean = false) => {
+  // 严守指令：非春节期间拦截全局大礼花；彩蛋专属触发传 force=true 允许全年放开
+  if (!force && !isSpringFestivalToday()) return;
   try {
     const confettiModule = (await import('canvas-confetti')).default;
     return confettiModule(options);
@@ -218,9 +218,8 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showEasterEgg]);
 
-  // 播放彩蛋数据礼花专属音效
+  // 播放彩蛋数据礼花专属音效 (彩蛋放开：全年点击均可发声)
   const playEasterEggAudio = () => {
-    if (!isSpringFestivalToday()) return;
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
@@ -282,12 +281,11 @@ export default function Home() {
     }, 2200);
   };
 
-  // 触发彩蛋 (特效与礼花同闸门：仅在春节期间展示与响应，平时完全静默)
+  // 触发彩蛋 (站主特别口径：彩蛋正式放开，全年每天可点触发，呈现量子数据礼花弹窗，与友链完全独立)
   const triggerEasterEgg = () => {
-    if (!isSpringFestivalToday()) return;
     setShowEasterEgg(true);
     playEasterEggAudio();
-    // 释放专属“星芒粒子礼花”
+    // 释放专属“星芒粒子礼花” (force 模式确保全年可触发)
     fireConfetti({
       particleCount: 90,
       spread: 360,
@@ -298,7 +296,7 @@ export default function Home() {
       ticks: 220,
       gravity: 0.65,
       zIndex: 100000
-    });
+    }, true);
   };
 
   // 纯原生 Web Audio 极客科幻跃迁充能音效 (仅在春节期间生效，春节以外不发声)
