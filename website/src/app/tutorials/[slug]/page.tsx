@@ -93,17 +93,18 @@ export default function TutorialArticlePage({ params }: { params: { slug: string
               </a>
             </div>
 
-            {/* 9:16 竖屏播放器：桌面端居中限宽，手机端自适应，零拉伸零黑边 */}
+            {/* 9:16 竖屏原生自托管播放器：桌面端居中限宽，手机端自适应，零拉伸零黑边，100% 畅通播放 */}
             <div className="mx-auto w-full max-w-[320px] sm:max-w-[340px]">
               <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl border border-slate-800 bg-black shadow-xl">
-                <iframe
-                  src={`//player.bilibili.com/player.html?bvid=${item.video.bvid}&page=1&high_quality=1&danmaku=0`}
-                  scrolling="no"
-                  frameBorder="0"
-                  allowFullScreen={true}
-                  className="h-full w-full"
-                  sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"
-                />
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="h-full w-full object-cover"
+                >
+                  <source src="/videos/muse-miracle-promo-final.mp4" type="video/mp4" />
+                  您的浏览器不支持视频播放。
+                </video>
               </div>
             </div>
 
