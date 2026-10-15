@@ -20,6 +20,11 @@ export interface TutorialItem {
     url: string;
     desc?: string;
   };
+  externalVideo?: {
+    bvid: string;
+    title: string;
+    desc: string;
+  };
   content: string;
 }
 
@@ -43,6 +48,11 @@ export const TUTORIALS_DATA: TutorialItem[] = [
       author: 'Neo_Sir',
       url: 'https://www.bilibili.com/video/BV1QFpq67E3U/',
       desc: '一个人，一台电脑，一家 12 名员工的 AI 公司。我不会写代码。我只是把想做的事，告诉 Muse。然后，神迹就出现了。'
+    },
+    externalVideo: {
+      bvid: 'BV1GbH469Erp',
+      title: '「Github一周热点133期」给Agent开家公司、让Agent剪视频、开源workbuddy、数据库链接器，还有免费的股票看板',
+      desc: '外部报道：Github 一周热点第 133 期 · 头号项目 Paperclip'
     },
     content: `
 # 一个人开一家 AI 公司：Paperclip 使用教程
