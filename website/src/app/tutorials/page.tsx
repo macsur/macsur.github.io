@@ -130,14 +130,22 @@ export default function TutorialsPage() {
   }, [activeTag]);
 
   const featuredItem = useMemo(() => {
-    return TUTORIALS_DATA.find(item => item.featured) || TUTORIALS_DATA[0];
+    // 首篇固定置顶：slug 为 paperclip 的教程永远排第一位
+    return TUTORIALS_DATA.find(item => item.slug === 'paperclip') || TUTORIALS_DATA.find(item => item.featured) || TUTORIALS_DATA[0];
   }, []);
 
   const gridItems = useMemo(() => {
-    if (activeTag === '全部') {
-      return filtered.filter(item => item.id !== featuredItem?.id);
-    }
-    return filtered;
+    // 排除置顶首篇
+    const rest = activeTag === '全部'
+      ? filtered.filter(item => item.id !== featuredItem?.id)
+      : filtered.filter(item => item.id !== featuredItem?.id);
+
+    // 按日期倒序排列（最新在前），同日保持录入先后（稳定排序）
+    return [...rest].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateB - dateA; // 倒序：新的在前
+    });
   }, [activeTag, filtered, featuredItem]);
 
   const countFor = (tag: '全部' | TutorialTag) =>
