@@ -25,7 +25,6 @@ import {
   GitFork,
   TrendingUp,
   Clock,
-  Play,
   X,
   BookOpen
 } from 'lucide-react';
@@ -868,38 +867,30 @@ export default function Home() {
             ))}
           </div>
 
-          {/* 右侧：单卡片展示（终端操作演示动画「怎么用」· 保持原位置，布局自然上提） */}
+          {/* 右侧：单卡片展示（B站内嵌视频：给自己的网站拍了条广告 BV14dJC6pEV2） */}
           <div className="lg:col-span-5 flex flex-col space-y-4">
             <div className="google-card p-3 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden group">
               <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
-                  <span className="text-[11px] text-slate-400 font-mono ml-1.5">terminal · demo</span>
-                </div>
-                <div className="flex items-center space-x-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
-                  <Play className="w-2.5 h-2.5 fill-emerald-400" />
-                  <span>操作演示</span>
+                <div className="w-3.5" />
+                <div className="flex items-center space-x-2">
+                  <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
+                    给自己的网站拍了条广告
+                  </span>
                 </div>
               </div>
-              <div className="relative rounded-lg overflow-hidden bg-[#0d1017] border border-slate-800/80 aspect-[960/560]">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                  poster="/hero-terminal-demo.gif"
-                >
-                  <source src="/hero-terminal-demo.mp4" type="video/mp4" />
-                  {/* 降级备用图片 */}
-                  <img src="/hero-terminal-demo.gif" alt="终端操作演示动画" className="w-full h-full object-cover" />
-                </video>
+              <div className="relative rounded-lg overflow-hidden bg-[#0d1017] border border-slate-800/80 aspect-video">
+                <iframe
+                  src="https://player.bilibili.com/player.html?bvid=BV14dJC6pEV2&autoplay=0"
+                  scrolling="no"
+                  frameBorder="0"
+                  allowFullScreen
+                  className="w-full h-full"
+                  title="给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声"
+                />
               </div>
               <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span>三幕流程：一键安装 → 打开 z 工作台 → 直达常用与分类</span>
-                <span className="font-mono text-cyan-400">11.4s 循环</span>
+                <span className="truncate mr-2">三条片子：AI 配音 / 纯音乐 / 站主原声克隆</span>
+                <span className="font-mono text-cyan-400 shrink-0">90s · B站</span>
               </div>
             </div>
           </div>

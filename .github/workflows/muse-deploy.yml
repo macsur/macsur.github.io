@@ -60,4 +60,4 @@ jobs:
           clean: true
           clean-exclude: |
             .github/**
-          commit-message: "AutoSync by Muse AI: Update website & Trending TOP 10 [skip ci]"
+          commit-message: "AutoSync by Muse AI: Update website & Trending TOP 10"
