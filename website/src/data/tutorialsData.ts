@@ -929,4 +929,103 @@ zttz.eu.org，欢迎来看看。
       }
     ]
   },
+  {
+    id: 'gpt-sovits-voice-clone-mac',
+    slug: 'gpt-sovits-voice-clone-mac',
+    title: 'Mac 上克隆自己的声音：GPT-SoVITS 零样本实操（免训练 · API 版）',
+    summary: '开源 GPT-SoVITS 在 Apple 芯片 Mac 上的零样本声音克隆实操：几秒钟本人录音当参考，不用训练，API 模式启动与调用全记录，含参考音频与原文对照等关键经验。',
+    category: 'AI工具',
+    date: '2026-10-15',
+    readTime: '6 分钟阅读',
+    tags: ['推荐'],
+    featured: false,
+    coverBadge: '声音克隆',
+    coverTitle: 'GPT-SoVITS 声音克隆',
+    coverSubtitle: '几秒样本，克隆自己的声音',
+    content: `
+# Mac 上克隆自己的声音：GPT-SoVITS 零样本实操（免训练 · API 版）
+
+想给自己的视频配音，又不想露嗓子反复录？现在有一条免费的路：开源项目 GPT-SoVITS，只要一段几秒钟的本人录音，就能把音色学下来，之后你写什么文字，它就用你的声音念什么。全程在本机跑，不用训练，不用上传任何音频到别人的服务器。这篇记录在 Apple 芯片 Mac 上从安装到合成第一句的完整过程，全部实测。
+
+## 一、准备工作
+
+- 一台 Apple 芯片（M 系列）Mac
+- miniforge（conda）环境管理器
+- 一段本人的录音（后面细说要求）
+
+GPT-SoVITS 官方对 Apple 芯片有实测支持，模型权重从 ModelScope 或 HF-Mirror 下载即可，不依赖网盘。
+
+## 二、安装
+
+\`\`\`bash
+git clone https://github.com/RVC-Boss/GPT-SoVITS.git
+cd GPT-SoVITS
+conda create -n GPTSoVits python=3.10
+conda activate GPTSoVits
+# 按官方 install.sh / 文档装齐依赖，并把预训练模型放进 GPT_SoVITS/pretrained_models/
+\`\`\`
+
+版本选 v2 的预训练权重即可（配置文件 \`GPT_SoVITS/configs/tts_infer.yaml\` 里的 \`custom\` 一档就是它），零样本克隆不需要任何微调训练。
+
+## 三、启动服务（API 模式）
+
+不用图形界面，直接起 API 服务，后面所有操作都走接口，反而更稳：
+
+\`\`\`bash
+python api_v2.py -a 127.0.0.1 -p 9880 -c GPT_SoVITS/configs/tts_infer.yaml
+\`\`\`
+
+启动后浏览器打开 \`http://127.0.0.1:9880/docs\`，能看到全部接口（/tts、/set_refer_audio、/set_gpt_weights 等），每个接口都能在页面上直接试调。嫌每次敲命令麻烦，可以把上面这行做成一个 \`.command\` 启动脚本，双击就起服务。
+
+注意：地址绑的是 127.0.0.1，只有本机能打开——声音是自己的，服务别往公网上放。
+
+## 四、准备参考音频（最关键的一步）
+
+克隆像不像，一半功夫在这里：
+
+- **时长 3–10 秒**，太长没必要，太短学不到位；
+- **单人、安静、无背景音乐和混响**，手机在安静房间里录的就够用；
+- 内容花样丰富一点更好（带上数字、英文、问句、笑声各一句，音色信息更全）；
+- 转成 wav 放到机器上任意目录；
+- **务必记下这段音频里说的原话，一个字都不能差**——下一步要用，它叫 prompt_text（参考音频原文）。填错或漏填，音色和断句都会打折。
+
+## 五、合成第一句
+
+在 /docs 页面展开绿色的 **POST /tts**，点 Try it out，把请求体换成：
+
+\`\`\`json
+{
+  "text": "大家好，这是我用自己的声音做的第一条克隆音频。",
+  "text_lang": "zh",
+  "ref_audio_path": "/你的路径/ref_audio.wav",
+  "prompt_text": "（参考音频里那句话的原文，一字不差）",
+  "prompt_lang": "zh",
+  "text_split_method": "cut5",
+  "batch_size": 1,
+  "media_type": "wav",
+  "streaming_mode": false
+}
+\`\`\`
+
+点 Execute，等它算完（返回 200），在 Response 旁边点 Download file 就能拿到合成的 wav。
+
+几个参数说人话版：
+
+- \`text\`：要合成的新内容，随便改；
+- \`ref_audio_path\`：参考音频在**本机**的路径——注意 API 版没有「上传」按钮，音频先放好在机器上，接口只认路径；
+- \`prompt_text\` / \`prompt_lang\`：参考音频的原文和语种；
+- 也可以先调一次 GET \`/set_refer_audio\` 把参考音频设为默认，之后每次只改 text 就行。
+
+## 六、常见问题
+
+- **/docs 页面里找不到导入/上传？** 正常，API 版就没有上传，参考音频靠路径引用（见上）。
+- **合成很慢？** 没有显卡帮忙时是纯 CPU 推理，一句话等上几分钟是常态；泡杯茶，别以为它死了。文本先切短句（cut5）会稳一些。
+- **声音不太像？** 先查参考音频：杂音大、太短、原文对不上，是前三名的原因。换一段干净的、把原文填准，比调任何参数都管用。
+- **想要图形界面？** 项目自带 webui.py（默认 9874 端口），但日常批量合成，API 版更顺手。
+
+## 七、小结
+
+整条链路：录音十几秒 → 剪出几秒当参考 → 填对原文 → 写字就能出声。自己的声音自己做主，数据一步都不出本机。给网站、给视频留一条「原声」轨道，就是这么来的。
+    `.trim()
+  }
 ];
