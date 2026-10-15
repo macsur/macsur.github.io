@@ -4,7 +4,8 @@ type InlineToken =
   | { type: 'text'; text: string }
   | { type: 'code'; text: string }
   | { type: 'bold'; children: InlineToken[] }
-  | { type: 'link'; href: string; children: InlineToken[] };
+  | { type: 'link'; href: string; children: InlineToken[] }
+  | { type: 'image'; src: string; alt: string };
 
 function renderInline(tokens: InlineToken[], keyPrefix: string): React.ReactNode[] {
   return tokens.map((token, i) => {
@@ -25,6 +26,12 @@ function renderInline(tokens: InlineToken[], keyPrefix: string): React.ReactNode
           <a key={key} href={token.href} target="_blank" rel="noreferrer" className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-800 dark:text-cyan-300 dark:hover:text-cyan-200">
             {renderInline(token.children, key)}
           </a>
+        );
+      case 'image':
+        return (
+          <span key={key} className="my-6 block overflow-hidden rounded-2xl border border-slate-200 shadow-md dark:border-white/10">
+            <img src={token.src} alt={token.alt} className="w-full" loading="lazy" />
+          </span>
         );
       default:
         return null;
@@ -60,6 +67,24 @@ function parseInline(source: string): InlineToken[] {
         source = source.slice(end + 2);
         i = 0;
         continue;
+      }
+    }
+    // 图片 ![alt](src)
+    if (source.startsWith('![', i)) {
+      const close = source.indexOf(']', i + 2);
+      if (close !== -1 && source[close + 1] === '(') {
+        const parenEnd = source.indexOf(')', close + 2);
+        if (parenEnd !== -1) {
+          pushText(source.slice(0, i));
+          tokens.push({
+            type: 'image',
+            src: source.slice(close + 2, parenEnd),
+            alt: source.slice(i + 2, close),
+          });
+          source = source.slice(parenEnd + 1);
+          i = 0;
+          continue;
+        }
       }
     }
     // 链接 [text](url)

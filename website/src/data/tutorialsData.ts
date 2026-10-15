@@ -933,7 +933,7 @@ zttz.eu.org，欢迎来看看。
     id: 'gpt-sovits-voice-clone-mac',
     slug: 'gpt-sovits-voice-clone-mac',
     title: 'Mac 上克隆自己的声音：GPT-SoVITS 零样本实操（免训练 · API 版）',
-    summary: '开源 GPT-SoVITS 在 Apple 芯片 Mac 上的零样本声音克隆实操：几秒钟本人录音当参考，不用训练，API 模式启动与调用全记录，含参考音频与原文对照等关键经验。',
+    summary: '开源 GPT-SoVITS 在 Apple 芯片 Mac 上的零样本声音克隆实操：几秒钟本人录音当参考，不用训练，API 模式启动与调用全记录，含参考音频与原文对照等关键经验。图文并茂，每步可照做。',
     category: 'AI工具',
     date: '2026-10-15',
     readTime: '6 分钟阅读',
@@ -945,7 +945,7 @@ zttz.eu.org，欢迎来看看。
     content: `
 # Mac 上克隆自己的声音：GPT-SoVITS 零样本实操（免训练 · API 版）
 
-想给自己的视频配音，又不想露嗓子反复录？现在有一条免费的路：开源项目 GPT-SoVITS，只要一段几秒钟的本人录音，就能把音色学下来，之后你写什么文字，它就用你的声音念什么。全程在本机跑，不用训练，不用上传任何音频到别人的服务器。这篇记录在 Apple 芯片 Mac 上从安装到合成第一句的完整过程，全部实测。
+想给自己的视频配音，又不想露嗓子反复录？只要一段几秒钟的本人录音，就能把音色学下来，之后你写什么文字，它就用你的声音念什么。全程在本机跑，不用训练，不用上传任何音频到别人的服务器。这篇记录在 Apple 芯片 Mac 上从安装到合成第一句的完整过程，全部实测。
 
 ## 一、准备工作
 
@@ -953,33 +953,35 @@ zttz.eu.org，欢迎来看看。
 - miniforge（conda）环境管理器
 - 一段本人的录音（后面细说要求）
 
-GPT-SoVITS 官方对 Apple 芯片有实测支持，模型权重从 ModelScope 或 HF-Mirror 下载即可，不依赖网盘。
-
-## 二、安装
+## 二、安装与启动
 
 \`\`\`bash
 git clone https://github.com/RVC-Boss/GPT-SoVITS.git
 cd GPT-SoVITS
 conda create -n GPTSoVits python=3.10
 conda activate GPTSoVits
-# 按官方 install.sh / 文档装齐依赖，并把预训练模型放进 GPT_SoVITS/pretrained_models/
+bash install.sh --device MPS --source ModelScope
 \`\`\`
 
 版本选 v2 的预训练权重即可（配置文件 \`GPT_SoVITS/configs/tts_infer.yaml\` 里的 \`custom\` 一档就是它），零样本克隆不需要任何微调训练。
 
-## 三、启动服务（API 模式）
-
-不用图形界面，直接起 API 服务，后面所有操作都走接口，反而更稳：
+装好后，双击 \`启动GPT-SoVITS.command\`（或执行下面这条命令）启动 API 服务：
 
 \`\`\`bash
 python api_v2.py -a 127.0.0.1 -p 9880 -c GPT_SoVITS/configs/tts_infer.yaml
 \`\`\`
 
-启动后浏览器打开 \`http://127.0.0.1:9880/docs\`，能看到全部接口（/tts、/set_refer_audio、/set_gpt_weights 等），每个接口都能在页面上直接试调。嫌每次敲命令麻烦，可以把上面这行做成一个 \`.command\` 启动脚本，双击就起服务。
+看到类似下面的输出就说明启动成功了：
 
-注意：地址绑的是 127.0.0.1，只有本机能打开——声音是自己的，服务别往公网上放。
+![终端启动成功](/images/gptsovits/01-terminal-startup.png)
 
-## 四、准备参考音频（最关键的一步）
+启动后浏览器打开 \`http://127.0.0.1:9880/docs\`，能看到全部接口列表：
+
+![API 接口列表](/images/gptsovits/02-docs-page.png)
+
+注意：地址绑的是 \`127.0.0.1\`，只有本机能打开——声音是自己的，服务别往公网上放。
+
+## 三、参考音频是命门
 
 克隆像不像，一半功夫在这里：
 
@@ -987,18 +989,26 @@ python api_v2.py -a 127.0.0.1 -p 9880 -c GPT_SoVITS/configs/tts_infer.yaml
 - **单人、安静、无背景音乐和混响**，手机在安静房间里录的就够用；
 - 内容花样丰富一点更好（带上数字、英文、问句、笑声各一句，音色信息更全）；
 - 转成 wav 放到机器上任意目录；
-- **务必记下这段音频里说的原话，一个字都不能差**——下一步要用，它叫 prompt_text（参考音频原文）。填错或漏填，音色和断句都会打折。
+- **务必记下这段音频里说的原话，一个字都不能差**——下一步要用，它叫 \`prompt_text\`（参考音频原文）。
 
-## 五、合成第一句
+**【今晚真实教训】**：我们第一轮就是栽在这一步。参考音频录的是一段 5 秒的游泳聊天，\`prompt_text\` 却填了一段完全无关的 47 字问候语——模型找不到对应音频，把多余的 prompt 尾巴当正文念了出来。修复方法：先用 ASR 工具把参考音频逐字转写下来，\`prompt_text\` 就填转写原文，一字不多、一字不少。
 
-在 /docs 页面展开绿色的 **POST /tts**，点 Try it out，把请求体换成：
+## 四、第一次合成
+
+在 /docs 页面找到绿色的 **POST /tts**，点击展开，再点 **Try it out** 进入编辑模式：
+
+![展开 POST /tts 接口](/images/gptsovits/03-post-tts-expanded.png)
+
+**注意：必须先点 Try it out 才能编辑**，这是今晚真实踩过的坑——不点它，JSON 输入框是锁死的。
+
+把请求体换成下面这段（路径换成你自己的）：
 
 \`\`\`json
 {
-  "text": "大家好，这是我用自己的声音做的第一条克隆音频。",
+  "text": "要合成的新内容，随便改。",
   "text_lang": "zh",
-  "ref_audio_path": "/你的路径/ref_audio.wav",
-  "prompt_text": "（参考音频里那句话的原文，一字不差）",
+  "ref_audio_path": "~/GPT-SoVITS/output/ref_audio_clean.wav",
+  "prompt_text": "参考音频里说的原话，一字不差",
   "prompt_lang": "zh",
   "text_split_method": "cut5",
   "batch_size": 1,
@@ -1007,25 +1017,75 @@ python api_v2.py -a 127.0.0.1 -p 9880 -c GPT_SoVITS/configs/tts_infer.yaml
 }
 \`\`\`
 
-点 Execute，等它算完（返回 200），在 Response 旁边点 Download file 就能拿到合成的 wav。
+![JSON 填好待执行](/images/gptsovits/04-json-filled.png)
 
 几个参数说人话版：
 
 - \`text\`：要合成的新内容，随便改；
 - \`ref_audio_path\`：参考音频在**本机**的路径——注意 API 版没有「上传」按钮，音频先放好在机器上，接口只认路径；
 - \`prompt_text\` / \`prompt_lang\`：参考音频的原文和语种；
-- 也可以先调一次 GET \`/set_refer_audio\` 把参考音频设为默认，之后每次只改 text 就行。
+- \`text_split_method\`：文本切分方式，\`cut5\` 是按标点切短句，比较稳。
 
-## 六、常见问题
+点 **Execute**，等它算完（没有显卡帮忙时是纯 CPU 推理，一句话等上几十秒到几分钟是常态）：
 
-- **/docs 页面里找不到导入/上传？** 正常，API 版就没有上传，参考音频靠路径引用（见上）。
-- **合成很慢？** 没有显卡帮忙时是纯 CPU 推理，一句话等上几分钟是常态；泡杯茶，别以为它死了。文本先切短句（cut5）会稳一些。
-- **声音不太像？** 先查参考音频：杂音大、太短、原文对不上，是前三名的原因。换一段干净的、把原文填准，比调任何参数都管用。
-- **想要图形界面？** 项目自带 webui.py（默认 9874 端口），但日常批量合成，API 版更顺手。
+![执行后返回 200](/images/gptsovits/05-execute-response.png)
 
-## 七、小结
+返回 200 后，在 Response 旁边就能试听了。
 
-整条链路：录音十几秒 → 剪出几秒当参考 → 填对原文 → 写字就能出声。自己的声音自己做主，数据一步都不出本机。给网站、给视频留一条「原声」轨道，就是这么来的。
+## 五、保存成品
+
+浏览器播放器菜单可能没有下载按钮（我们实测某浏览器只有倍速调节），这时候用终端 \`curl\` 直接落盘最靠谱：
+
+\`\`\`bash
+curl -s -X POST "http://127.0.0.1:9880/tts" \\
+  -H "Content-Type: application/json" \\
+  -d @clone_check_request.json \\
+  -o clone_check.wav
+\`\`\`
+
+![终端 curl 落盘](/images/gptsovits/06-curl-save.png)
+
+\`-d @文件名\` 表示请求体从 JSON 文件读取，\`-o 文件名\` 表示响应直接存成文件。先把 JSON 存成文件再跑 curl，比在命令行里拼 JSON 稳得多。
+
+## 六、长文合成
+
+合成一整篇文章时，命令行拼 JSON 会超出长度限制，必须用**文件法**：
+
+\`\`\`bash
+# 1. 把请求体存成 JSON 文件（正文放 "text" 字段）
+# 2. 用文件法提交
+curl -s -X POST "http://127.0.0.1:9880/tts" \\
+  -H "Content-Type: application/json" \\
+  -d @tts_long_fix_1.json \\
+  -o part1_fix.wav
+\`\`\`
+
+长文太长会超时，实操是**切成三段分别合成，再用 ffmpeg 合并**：
+
+\`\`\`bash
+# 合并（必须带 -nostdin，否则终端会挂起）
+echo "file 'part1_fix.wav'" > parts.txt
+echo "file 'part2_fix.wav'" >> parts.txt
+echo "file 'part3_fix.wav'" >> parts.txt
+
+ffmpeg -nostdin -y -f concat -safe 0 -i parts.txt -c copy 成品.wav
+\`\`\`
+
+耗时参考：纯 CPU 推理约每分钟 55 字，一篇 1500 多字的文章大约半小时（三段各 100 秒左右）。中途别关终端。
+
+合成好的成品文件都在 \`output\` 文件夹里：
+
+![输出文件夹内容](/images/gptsovits/07-output-folder.png)
+
+## 七、像不像怎么调
+
+- **先多抽几版挑最好**：同一句多合成几次，每次随机种子不同，挑最像的那版；
+- **参考音频自然聊天语气比念稿强**：说话自然、有停顿、有情绪的录音，学出来的音色更活；
+- **文案先短后长**：先用短句试通全链路，确认像了再上长文，免得白等半小时。
+
+## 八、安全一句
+
+服务只绑 \`127.0.0.1\`，只有本机能访问；参考音频和合成结果都存在本地目录，声音数据一步都不出本机。自己的声音自己做主。
     `.trim()
   }
 ];
