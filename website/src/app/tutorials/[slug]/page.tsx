@@ -116,44 +116,53 @@ export default function TutorialArticlePage({ params }: { params: { slug: string
           </div>
         )}
 
-        {/* 📺 外部报道视频（B 站官方嵌入播放器，16:9 自适应，手机端不溢出） */}
-        {item.externalVideo && (
-          <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-md dark:border-white/10 dark:bg-[#10131c]">
-            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3 dark:border-white/10">
-              <div>
-                <div className="inline-flex items-center space-x-1.5 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">
-                  <Tv className="h-3.5 w-3.5" />
-                  <span>{item.externalVideo.desc}</span>
-                </div>
-                <h3 className="mt-1.5 text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                  {item.externalVideo.title}
-                </h3>
-              </div>
-              <a
-                href={`https://www.bilibili.com/video/${item.externalVideo.bvid}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex shrink-0 items-center space-x-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-              >
-                <span>在 B 站打开 ({item.externalVideo.bvid})</span>
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src={`https://player.bilibili.com/player.html?bvid=${item.externalVideo.bvid}&autoplay=0`}
-                className="absolute top-0 left-0 h-full w-full rounded-2xl border border-slate-800"
-                scrolling="no"
-                frameBorder="no"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        )}
-
         <div className="mt-10 border-t border-slate-200 pt-10 dark:border-white/10">
           <MarkdownContent content={item.content} />
         </div>
+
+        {/* 📺 外部视频组（B 站官方嵌入播放器，16:9 自适应，手机端不溢出，置于正文末尾） */}
+        {item.externalVideos && item.externalVideos.length > 0 && (
+          <div className="mt-10 border-t border-slate-200 pt-10 dark:border-white/10">
+            <h2 className="mb-6 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              📺 相关视频
+            </h2>
+            <div className="space-y-8">
+              {item.externalVideos.map((vid, idx) => (
+                <div key={idx} className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-md dark:border-white/10 dark:bg-[#10131c]">
+                  <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3 dark:border-white/10">
+                    <div>
+                      <div className="inline-flex items-center space-x-1.5 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300">
+                        <Tv className="h-3.5 w-3.5" />
+                        <span>{vid.desc}</span>
+                      </div>
+                      <h3 className="mt-1.5 text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                        {vid.title}
+                      </h3>
+                    </div>
+                    <a
+                      href={`https://www.bilibili.com/video/${vid.bvid}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex shrink-0 items-center space-x-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    >
+                      <span>在 B 站打开 ({vid.bvid})</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    <iframe
+                      src={`https://player.bilibili.com/player.html?bvid=${vid.bvid}&autoplay=0`}
+                      className="absolute top-0 left-0 h-full w-full rounded-2xl border border-slate-800"
+                      scrolling="no"
+                      frameBorder="no"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <footer className="mt-12 border-t border-slate-200 pt-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
           <a
