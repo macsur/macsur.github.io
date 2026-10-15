@@ -51,14 +51,24 @@ export const TUTORIALS_DATA: TutorialItem[] = [
     },
     externalVideos: [
       {
+        bvid: 'BV1heDGBLECh',
+        title: 'AI时代，用Paperclip打造自己的"零人公司"',
+        desc: '视频教程：五里墩茶社 · 用 Paperclip 打造"零人公司"'
+      },
+      {
+        bvid: 'BV1KPDcBTEwc',
+        title: 'Paperclip Routines，让"零人公司"每天自动干活',
+        desc: '视频教程：五里墩茶社 · Paperclip Routines 进阶'
+      },
+      {
+        bvid: 'BV1XgDoBzEfy',
+        title: '【Paperclip进阶】Docker容器化运行与云端部署',
+        desc: '视频教程：五里墩茶社 · Docker 容器化与云端部署'
+      },
+      {
         bvid: 'BV1GbH469Erp',
         title: '「Github一周热点133期」给Agent开家公司、让Agent剪视频、开源workbuddy、数据库链接器，还有免费的股票看板',
         desc: '外部报道：Github 一周热点第 133 期 · 头号项目 Paperclip'
-      },
-      {
-        bvid: 'BV17nEK6fEWM',
-        title: '【中配】Paperclip AI教程: 如何构建零人工公司（Metics Media 频道教程翻译配音）',
-        desc: '视频教程（中配）：Paperclip AI 教程 · 如何构建零人工公司'
       }
     ],
     content: `
