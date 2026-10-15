@@ -25,6 +25,7 @@ import {
   GitFork,
   TrendingUp,
   Clock,
+  Play,
   X,
   BookOpen
 } from 'lucide-react';
@@ -64,35 +65,6 @@ export default function Home() {
   // 🌟 【今日推荐】TOP 3 数据由构建时 generate_daily_recommend.js 每日生成
   // 内容铁律：上游有新应用时优先打新上榜，无新内容时随机抽取，每日构建刷新
   const recommendedApps: RecommendedAppItem[] = DAILY_RECOMMEND;
-  const [heroAdIdx, setHeroAdIdx] = useState(0);
-
-  // 首页广告轮播配置：仅保留 2026-10-09 上线的 v2 / v3 / v4 三个逐行广告
-  const heroAds = useMemo(() => [
-    {
-      title: '代码矩阵广告 (v2)',
-      src: '/ads/linux-baibaoxiang-linebyline-v2.gif'
-    },
-    {
-      title: '代码矩阵广告 (v3)',
-      src: '/ads/linux-baibaoxiang-linebyline-v3.gif'
-    },
-    {
-      title: '代码矩阵广告 (v4)',
-      src: '/ads/linux-baibaoxiang-linebyline-v4.gif'
-    }
-  ], []);
-
-  // GIF 广告播放约 10 秒后自动切换到下一张
-  const handleHeroAdEnded = useCallback(() => {
-    setHeroAdIdx((prev) => (prev + 1) % heroAds.length);
-  }, [heroAds.length]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      handleHeroAdEnded();
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, [heroAdIdx, heroAds.length, handleHeroAdEnded]);
 
   // 主题模式状态机：'auto' | 'light' | 'dark'，默认 'auto'
   const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
@@ -731,45 +703,31 @@ export default function Home() {
             </a>
           </div>
 
-          {/* 🎬 Hero 宣传片：手机竖屏、桌面横屏 */}
+          {/* 🎬 Hero 宣传片：B 站内嵌 BV14dJC6pEV2 */}
           <div className="max-w-4xl mx-auto mt-8 mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
             <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
               <div className="w-3.5" />
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                  {heroAds[heroAdIdx].title}
+                  给自己的网站拍了条广告
                 </span>
-                {/* 小圆点指示器 */}
-                <div className="flex items-center space-x-1.5 ml-2">
-                  {heroAds.map((item, idx) => (
-                    <button
-                      key={item.title}
-                      type="button"
-                      onClick={() => setHeroAdIdx(idx)}
-                      title={`切换至第 ${idx + 1} 个广告`}
-                      aria-label={`切换至第 ${idx + 1} 个广告`}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        heroAdIdx === idx ? 'bg-cyan-400 w-4' : 'bg-slate-600 hover:bg-slate-400'
-                      }`}
-                    />
-                  ))}
-                </div>
               </div>
             </div>
 
-            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-[9/16] md:aspect-video flex items-center justify-center">
-              <img
-                src={heroAds[heroAdIdx].src}
-                alt="CODE MATRIX 代码矩阵 终端创意广告"
-                className="w-full h-full object-contain md:object-cover"
+            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-video">
+              <iframe
+                src="https://player.bilibili.com/player.html?bvid=BV14dJC6pEV2&autoplay=0"
+                scrolling="no"
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full"
+                title="给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声"
               />
-
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-slate-950/45" />
             </div>
 
             <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="truncate mr-2">复制一条命令，让终端自动搞定服务器</span>
-              <span className="font-mono text-cyan-400 shrink-0">10s 循环</span>
+              <span className="truncate mr-2">三条片子：AI 配音 / 纯音乐 / 站主原声克隆</span>
+              <span className="font-mono text-cyan-400 shrink-0">90s · B站</span>
             </div>
           </div>
 
@@ -867,30 +825,38 @@ export default function Home() {
             ))}
           </div>
 
-          {/* 右侧：单卡片展示（B站内嵌视频：给自己的网站拍了条广告 BV14dJC6pEV2） */}
+          {/* 右侧：单卡片展示（终端操作演示动画「怎么用」· 保持原位置，布局自然上提） */}
           <div className="lg:col-span-5 flex flex-col space-y-4">
             <div className="google-card p-3 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden group">
               <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
-                <div className="w-3.5" />
-                <div className="flex items-center space-x-2">
-                  <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                    给自己的网站拍了条广告
-                  </span>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+                  <span className="text-[11px] text-slate-400 font-mono ml-1.5">terminal · demo</span>
+                </div>
+                <div className="flex items-center space-x-1 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
+                  <Play className="w-2.5 h-2.5 fill-emerald-400" />
+                  <span>操作演示</span>
                 </div>
               </div>
-              <div className="relative rounded-lg overflow-hidden bg-[#0d1017] border border-slate-800/80 aspect-video">
-                <iframe
-                  src="https://player.bilibili.com/player.html?bvid=BV14dJC6pEV2&autoplay=0"
-                  scrolling="no"
-                  frameBorder="0"
-                  allowFullScreen
-                  className="w-full h-full"
-                  title="给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声"
-                />
+              <div className="relative rounded-lg overflow-hidden bg-[#0d1017] border border-slate-800/80 aspect-[960/560]">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                  poster="/hero-terminal-demo.gif"
+                >
+                  <source src="/hero-terminal-demo.mp4" type="video/mp4" />
+                  {/* 降级备用图片 */}
+                  <img src="/hero-terminal-demo.gif" alt="终端操作演示动画" className="w-full h-full object-cover" />
+                </video>
               </div>
               <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-                <span className="truncate mr-2">三条片子：AI 配音 / 纯音乐 / 站主原声克隆</span>
-                <span className="font-mono text-cyan-400 shrink-0">90s · B站</span>
+                <span>三幕流程：一键安装 → 打开 z 工作台 → 直达常用与分类</span>
+                <span className="font-mono text-cyan-400 shrink-0">11.4s 循环</span>
               </div>
             </div>
           </div>

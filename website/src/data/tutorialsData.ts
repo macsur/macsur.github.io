@@ -899,8 +899,6 @@ echo "下一步：tmux attach -t xiaoan ，在 work 窗口里启动 claude（小
     content: `
 # 把自己的声音，留给我的网站
 
-<iframe src="https://player.bilibili.com/player.html?bvid=BV14dJC6pEV2&autoplay=0" scrolling="no" frameBorder="0" allowFullScreen style="width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;" title="给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声"></iframe>
-
 今天是个高兴日子。晚上坐下来，越想越觉得这一天过得有意思，干脆写下来，放在 Muse Miracle 里。这里本来就是记我折腾这些事情的地方，只不过往常放的都是教程，一步步教人怎么做；今天这篇不教什么，只记一个心情。
 
 事情起得不大。我的小网站 CODE MATRIX 代码矩阵，做了这么久，首页有模有样，教程也攒了好几篇，可一直缺一条像样的宣传片。前些天刷到别人给自家产品做的短片，画面一闪一闪的，音乐一响，网址一亮，心里就痒痒：人家有，我也得有。三十秒，不长。可我不会剪视频，连从哪儿下手都不知道。
@@ -922,6 +920,13 @@ echo "下一步：tmux attach -t xiaoan ，在 work 窗口里启动 claude（小
 就记到这里。哪天你刷到这条片子，听到最后一段那个带着点口音的嗓子——那就是我。
 
 zttz.eu.org，欢迎来看看。
-    `.trim()
+    `.trim(),
+    externalVideos: [
+      {
+        bvid: 'BV14dJC6pEV2',
+        title: '给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声',
+        desc: '站主原声克隆 · 90 秒三幕：AI 配音 / 纯音乐 / 原声克隆'
+      }
+    ]
   },
 ];
