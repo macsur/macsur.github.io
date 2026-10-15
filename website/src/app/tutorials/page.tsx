@@ -140,11 +140,15 @@ export default function TutorialsPage() {
       ? filtered.filter(item => item.id !== featuredItem?.id)
       : filtered.filter(item => item.id !== featuredItem?.id);
 
-    // 按日期倒序排列（最新在前），同日保持录入先后（稳定排序）
+    // 按日期倒序排列（最新在前），同日以录入先后为次级（越晚录入越靠前）
     return [...rest].sort((a, b) => {
       const dateA = new Date(a.date).getTime();
       const dateB = new Date(b.date).getTime();
-      return dateB - dateA; // 倒序：新的在前
+      if (dateB !== dateA) return dateB - dateA; // 日期倒序：新的在前
+      // 同日：原始录入位置越靠后（index 越大），排序越靠前
+      const idxA = filtered.indexOf(a);
+      const idxB = filtered.indexOf(b);
+      return idxB - idxA;
     });
   }, [activeTag, filtered, featuredItem]);
 
