@@ -21,6 +21,7 @@ KPANEL_WEB_CERTIFICATE_PROTOCOL_VERSION="1"
 KPANEL_WEB_CERTIFICATE_REPLACE_PROTOCOL_VERSION="1"
 KPANEL_WEB_CERTIFICATE_FORCE_RENEW_PROTOCOL_VERSION="1"
 KPANEL_APP_CONCURRENCY_PROTOCOL_VERSION="1"
+KPANEL_LOCAL_APPS_PROTOCOL_VERSION="1"
 unset KJ_APP_LOCKS_HELD
 
 # Locks live outside PrivateTmp and app data. Only the paired KPanel worker
@@ -22027,6 +22028,44 @@ run_ai_cli_manager() (
 	ai_cli_main "$app"
 )
 
+# 本地自建应用只接受当前用户所有、不可被他人写入的普通文件
+local_app_config_trusted() {
+	local name="$1" path owner mode
+	case "$name" in
+		""|[!A-Za-z0-9]*|*[!A-Za-z0-9_.-]*) return 1 ;;
+	esac
+	path="$HOME/apps-local/${name}.conf"
+	[ -f "$path" ] && [ ! -L "$path" ] || return 1
+	read -r owner mode < <(stat -c '%u %a' -- "$path" 2>/dev/null) || return 1
+	[ "$owner" = "$(id -u)" ] || return 1
+	[ $((8#$mode & 8#022)) -eq 0 ]
+}
+
+# 官方 ~/apps 优先，其次 ~/apps-local；输出配置路径
+# local:<名称> 只查 ~/apps-local，供 KPanel 避开内置菜单别名(如 b/r/bt)
+resolve_app_config() {
+	local name="$1" local_only=0
+	case "$name" in
+		local:*) name="${name#local:}"; local_only=1 ;;
+	esac
+	if [ -f "$HOME/apps/${name}.conf" ]; then
+		if [ "$local_only" = 1 ]; then
+			echo -e "${gl_hong}错误: ${gl_bai}${name} 与官方应用同名，本地配置已忽略" >&2
+			return 1
+		fi
+		printf '%s\n' "$HOME/apps/${name}.conf"
+		return 0
+	fi
+	if local_app_config_trusted "$name"; then
+		printf '%s\n' "$HOME/apps-local/${name}.conf"
+		return 0
+	fi
+	if [ -e "$HOME/apps-local/${name}.conf" ]; then
+		echo -e "${gl_hong}错误: ${gl_bai}~/apps-local/${name}.conf 须为当前用户所有且不可被组或他人写入 (chmod 644)" >&2
+	fi
+	return 1
+}
+
 linux_panel() {
 
 local sub_choice="$1"
@@ -22144,6 +22183,28 @@ while true; do
 			  echo -e "${gl_kjlan}$base_name${gl_bai} - ${gl_lv}$app_text [已安装]${gl_bai}"
 		  else
 			  # 如果未安装：正常显示
+			  echo -e "${gl_kjlan}$base_name${gl_bai} - $app_text"
+		  fi
+	  done
+
+	  # 本地自建应用：~/apps-local/*.conf，与官方同名时以官方为准
+	  local local_header_shown=0
+	  for f in "$HOME"/apps-local/*.conf; do
+		  local base_name=$(basename "$f" .conf)
+		  local_app_config_trusted "$base_name" || continue
+		  if [ "$local_header_shown" = 0 ]; then
+			  echo -e "${gl_kjlan}-------------------------"
+			  echo -e "${gl_kjlan}本地应用列表 ${gl_bai}(~/apps-local，未经官方审核)"
+			  local_header_shown=1
+		  fi
+		  if [ -e "$HOME/apps/${base_name}.conf" ]; then
+			  echo -e "${gl_huang}$base_name${gl_bai} - 与官方应用同名，已忽略"
+			  continue
+		  fi
+		  local app_text=$(grep "app_text=" "$f" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+		  if echo "$app_numbers" | grep -q "^$base_name$"; then
+			  echo -e "${gl_kjlan}$base_name${gl_bai} - ${gl_lv}$app_text [已安装]${gl_bai}"
+		  else
 			  echo -e "${gl_kjlan}$base_name${gl_bai} - $app_text"
 		  fi
 	  done
@@ -26004,41 +26065,9 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 		  kejilion
 		  ;;
 	  *)
-		local custom_app=""
-
-		# 1. 优先使用已选取的自定义应用完整配置路径
-		if [ -n "${SELECTED_CUSTOM_CONF:-}" ] && [ -f "$SELECTED_CUSTOM_CONF" ]; then
-			custom_app="$SELECTED_CUSTOM_CONF"
-			SELECTED_CUSTOM_CONF=""
-		fi
-
-		# 2. 如果 sub_choice 是形如 J1, J2 的自定义排序序号，直接索引定位
-		if [ -z "$custom_app" ]; then
-			local upper_sub
-			upper_sub=$(echo "$sub_choice" | tr "[:lower:]" "[:upper:]")
-			if [[ "$upper_sub" =~ ^J([0-9]+)$ ]]; then
-				local jnum="${BASH_REMATCH[1]}"
-				local jidx=$((jnum - 1))
-				if [ "$jidx" -ge 0 ] && [ "$jidx" -lt "${#CUSTOM_APPS[@]}" ]; then
-					local c_entry="${CUSTOM_APPS[$jidx]}"
-					IFS="|" read -r _aid _aname _acat _astar _alias _adesc _conf <<< "$c_entry"
-					custom_app="$_conf"
-				fi
-			fi
-		fi
-
-		# 3. 兼容直接输入文件名或应用 ID
-		if [ -z "$custom_app" ] || [ ! -f "$custom_app" ]; then
-			if [ -f "$HOME/apps/${sub_choice}.conf" ]; then
-				custom_app="$HOME/apps/${sub_choice}.conf"
-			elif [ -f "./apps/${sub_choice}.conf" ]; then
-				custom_app="./apps/${sub_choice}.conf"
-			elif [ -f "${KJ_SCRIPT_DIR:-}/apps/${sub_choice}.conf" ]; then
-				custom_app="${KJ_SCRIPT_DIR:-}/apps/${sub_choice}.conf"
-			fi
-		fi
-
-		if [ -n "$custom_app" ] && [ -f "$custom_app" ]; then
+		refresh_apps_catalog || return 1
+		local custom_app
+		if custom_app=$(resolve_app_config "$sub_choice"); then
 			if [ "${KJ_APP_CONCURRENCY:-}" = "1" ]; then
 				kpanel_app_source_config "$custom_app"
 			else
