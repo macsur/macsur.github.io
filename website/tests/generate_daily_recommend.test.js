@@ -145,7 +145,7 @@ test('duplicate same-day history is normalized to one canonical record', () => {
   assert.deepEqual(readManifest(root), firstManifest);
 });
 
-test('HEAD baseline regression reproduces the original same-day drift', () => {
+test('pre-fix baseline regression reproduces the original same-day drift', () => {
   const root = scratchDir('daily-head-baseline');
   writeFixture(root, {
     ids: [...Array.from({ length: 10 }, (_, index) => 201 + index), 999],
@@ -153,7 +153,7 @@ test('HEAD baseline regression reproduces the original same-day drift', () => {
     history: [{ date: '2026-10-17', ids: [201, 202, 203] }],
   });
 
-  const baseline = spawnSync('git', ['show', 'HEAD:website/generate_daily_recommend.js'], {
+  const baseline = spawnSync('git', ['show', 'HEAD^:website/generate_daily_recommend.js'], {
     cwd: PROJECT_ROOT,
     encoding: 'utf8',
   });
