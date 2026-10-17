@@ -153,7 +153,7 @@ test('pre-fix baseline regression reproduces the original same-day drift', () =>
     history: [{ date: '2026-10-17', ids: [201, 202, 203] }],
   });
 
-  const baseline = spawnSync('git', ['show', 'HEAD^:website/generate_daily_recommend.js'], {
+  const baseline = spawnSync('git', ['show', '36cb3c65^:website/generate_daily_recommend.js'], {
     cwd: PROJECT_ROOT,
     encoding: 'utf8',
   });
