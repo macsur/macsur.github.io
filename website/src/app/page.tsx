@@ -1918,17 +1918,35 @@ export default function Home() {
 
             {/* 20 个友链名额网格：桌面 5 列 × 4 行，手机 2 列 × 10 行 */}
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[60vh] overflow-y-auto">
-              {Array.from({ length: 20 }).map((_, idx) => {
+              {[
+                { name: '文件快递柜 FileCodeBox', desc: '匿名口令分享 · 取件码取文件', url: 'https://f.136222.xyz' },
+                { name: '文件快递柜 FileCodeBox', desc: '匿名口令分享 · 取件码取文件', url: 'https://f.tomsir.cc.cd' },
+                ...Array.from({ length: 18 }, () => null),
+              ].map((item, idx) => {
                 const num = String(idx + 1).padStart(2, '0');
+                const cardCls =
+                  'flex flex-col items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.03] p-4 text-center transition-colors hover:border-cyan-400/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/10';
+                if (!item) {
+                  return (
+                    <div key={idx} className={cardCls}>
+                      <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 mb-1">#{num}</span>
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">虚位以待</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">欢迎优质项目入驻</span>
+                    </div>
+                  );
+                }
                 return (
-                  <div
+                  <a
                     key={idx}
-                    className="flex flex-col items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.03] p-4 text-center transition-colors hover:border-cyan-400/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/10"
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cardCls}
                   >
                     <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 mb-1">#{num}</span>
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">虚位以待</span>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">欢迎优质项目入驻</span>
-                  </div>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{item.name}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{item.desc}</span>
+                  </a>
                 );
               })}
             </div>
@@ -1936,7 +1954,7 @@ export default function Home() {
             {/* 底部提示 */}
             <div className="mt-5 pt-4 border-t border-slate-200 dark:border-white/10 text-center">
               <span className="text-xs text-slate-400 dark:text-slate-500">
-                共 20 个友链名额 · 站点名单由站主后续指定 · 当前为占位展示
+                共 20 个友链名额 · 已入驻 2/20 · 其余虚位以待
               </span>
             </div>
           </div>
