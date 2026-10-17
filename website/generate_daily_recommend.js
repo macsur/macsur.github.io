@@ -15,7 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = __dirname;
+const ROOT = process.env.DAILY_RECOMMEND_ROOT || __dirname;
 const MANIFEST_PATH = path.join(ROOT, 'src/data/recommendManifest.json');
 const OUTPUT_PATH = path.join(ROOT, 'src/data/dailyRecommend.ts');
 const APPS_DATA_PATH = path.join(ROOT, 'src/data/appsData.ts');
@@ -38,6 +38,21 @@ function loadAppsAndCategories() {
   return { apps, catMap };
 }
 
+function normalizeHistory(history) {
+  // One canonical record per Beijing date keeps prebuild retries idempotent.
+  const historyByDate = new Map();
+  for (const entry of history || []) {
+    if (!entry || typeof entry.date !== 'string' || !Array.isArray(entry.ids)) continue;
+    const ids = entry.ids.map(Number);
+    const invalidIds = ids.filter(id => !Number.isSafeInteger(id));
+    if (invalidIds.length > 0) {
+      throw new Error(`推荐 history 包含非法 IDs: ${invalidIds.join(', ')}`);
+    }
+    historyByDate.set(entry.date, { date: entry.date, ids });
+  }
+  return [...historyByDate.values()];
+}
+
 function main() {
   const { apps, catMap } = loadAppsAndCategories();
 
@@ -57,11 +72,14 @@ function main() {
     }
   }
 
+  // 先规范化 history：重复重试不得追加重复记录，同日记录必须作为重试锚点。
+  manifest.history = normalizeHistory(manifest.history);
+
   // 统一转为 string 进行比对，避免 number/string 类型漂移
   const seenSet = new Set((manifest.seenIds || []).map(id => String(id)));
 
-  // 北京时间日期计算
-  const now = new Date();
+  // 北京时间日期计算；测试可通过环境变量注入固定时间
+  const now = process.env.DAILY_RECOMMEND_NOW ? new Date(process.env.DAILY_RECOMMEND_NOW) : new Date();
   const bjTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
   const year = bjTime.getUTCFullYear();
   const month = String(bjTime.getUTCMonth() + 1).padStart(2, '0');
@@ -73,15 +91,28 @@ function main() {
   const currentEpoch = Date.UTC(year, bjTime.getUTCMonth(), bjTime.getUTCDate());
   const dayIndex = Math.max(0, Math.floor((currentEpoch - baseEpoch) / (24 * 60 * 60 * 1000)));
 
+  const existingTodayHistory = manifest.history.find(entry => entry.date === today);
+  const poolById = new Map(pool.map(app => [String(app.id), app]));
   const picked = [];
 
-  // 2. 打新机制：查找未在 seenSet 中的全新应用，按 id 降序最多取 3 个
-  const unseenApps = pool.filter(a => !seenSet.has(String(a.id)));
-  if (unseenApps.length > 0) {
-    const sortedUnseen = [...unseenApps].sort((a, b) => Number(b.id) - Number(a.id));
-    const newPicks = sortedUnseen.slice(0, 3);
-    picked.push(...newPicks);
-    console.log(`🔥 [打新铁律生效] 发现 ${unseenApps.length} 款新应用从未上榜，打新上榜 ${newPicks.length} 款！`);
+  if (existingTodayHistory) {
+    // 今日 canonical history 是同日重试的唯一锚点。缺失/非法候选必须显式失败，
+    // 不得回落到重新计算，否则第一次打新结果会在 seenIds 更新后漂移。
+    const missingIds = existingTodayHistory.ids.filter(id => !poolById.has(String(id)));
+    if (missingIds.length > 0) {
+      throw new Error(`今日推荐 history 引用了候选池外 IDs: ${missingIds.join(', ')}`);
+    }
+    picked.push(...existingTodayHistory.ids.map(id => poolById.get(String(id))));
+    console.log(`♻️ [同日幂等生效] 复用 ${today} 的 canonical history，输出保持不变`);
+  } else {
+    // 2. 打新机制：查找未在 seenSet 中的全新应用，按 id 降序最多取 3 个
+    const unseenApps = pool.filter(a => !seenSet.has(String(a.id)));
+    if (unseenApps.length > 0) {
+      const sortedUnseen = [...unseenApps].sort((a, b) => Number(b.id) - Number(a.id));
+      const newPicks = sortedUnseen.slice(0, 3);
+      picked.push(...newPicks);
+      console.log(`🔥 [打新铁律生效] 发现 ${unseenApps.length} 款新应用从未上榜，打新上榜 ${newPicks.length} 款！`);
+    }
   }
 
   // 3. 补位轮换：若打新不足 3 款，根据 (dayIndex * 3) % pool.length 确定性轮转取足 3 款
@@ -140,14 +171,24 @@ export const DAILY_RECOMMEND: DailyRecommendItem[] = ${JSON.stringify(formattedP
   fs.writeFileSync(OUTPUT_PATH, tsContent, 'utf8');
   console.log(`✅ 已写入 ${OUTPUT_PATH}`);
 
-  // 6. 更新 manifest 记录
-  const newSeen = [...seenSet, ...formattedPicked.map(a => String(a.id))];
-  manifest.seenIds = [...new Set(newSeen)].map(Number);
-  manifest.history = manifest.history || [];
-  manifest.history.push({ date: today, ids: formattedPicked.map(a => a.id) });
+  // 6. 更新 manifest 记录。history 先于 seenIds 读取，因此同日重试只补齐状态，
+  // 不会覆盖 canonical history，也不会改变当日输出。
+  const allSeenIds = [
+    ...seenSet,
+    ...manifest.history.flatMap(entry => entry.ids.map(String)),
+    ...formattedPicked.map(a => String(a.id)),
+  ];
+  manifest.seenIds = [...new Set(allSeenIds)].map(Number);
+  if (!existingTodayHistory) {
+    manifest.history.push({ date: today, ids: formattedPicked.map(a => a.id) });
+  }
   if (manifest.history.length > 90) manifest.history = manifest.history.slice(-90);
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2), 'utf8');
   console.log(`✅ manifest 已更新，累计记录上榜应用: ${manifest.seenIds.length} 款`);
 }
 
-main();
+module.exports = { normalizeHistory };
+
+if (require.main === module) {
+  main();
+}
