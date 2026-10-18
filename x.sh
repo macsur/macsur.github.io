@@ -180,6 +180,56 @@ yinsiyuanquan2() {
 
 
 
+zttz_deploy_entry() {
+	local src="$1"
+	local dest="$2"
+	[ -f "$src" ] || return 1
+
+	if [ -f "$dest" ] && cmp -s "$src" "$dest"; then
+		chmod +x "$dest" > /dev/null 2>&1 || true
+		return 0
+	fi
+
+	local dest_dir
+	dest_dir=$(dirname "$dest")
+	mkdir -p "$dest_dir" > /dev/null 2>&1 || true
+
+	local tmp_dest="${dest}.tmp.$"
+	if ! cp -f "$src" "$tmp_dest" > /dev/null 2>&1; then
+		rm -f "$tmp_dest" > /dev/null 2>&1
+		return 1
+	fi
+	chmod +x "$tmp_dest" > /dev/null 2>&1 || true
+
+	if ! mv -f "$tmp_dest" "$dest" > /dev/null 2>&1; then
+		rm -f "$tmp_dest" > /dev/null 2>&1
+		return 1
+	fi
+	return 0
+}
+
+zttz_verify_entries() {
+	local src="$1"
+	local failed=0
+	for target in /usr/local/bin/k /usr/local/bin/z; do
+		if [ ! -f "$target" ]; then
+			echo -e "${gl_hong}❌ 入口自检失败: $target 不存在！${gl_bai}"
+			failed=1
+		elif ! cmp -s "$src" "$target"; then
+			echo -e "${gl_hong}❌ 入口自检失败: $target 与 $src 逐字节不一致！${gl_bai}"
+			failed=1
+		elif ! bash -n "$target" > /dev/null 2>&1; then
+			echo -e "${gl_hong}❌ 入口自检失败: $target 语法检查未通过！${gl_bai}"
+			failed=1
+		fi
+	done
+	if [ "$failed" -eq 1 ]; then
+		echo -e "${gl_hong}❌ 致命错误：命令入口部署验证未通过，已中止运行！${gl_bai}"
+		return 1
+	fi
+	return 0
+}
+
 if ! kpanel_protocol_active; then
 	if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
 	# CODE MATRIX 存量迁移：旧版 kejilion.sh → codematrix.sh，保留已同意状态
@@ -235,14 +285,14 @@ if [ ! -f ~/codematrix.sh ]; then
 	sed -i '/^alias z=/d' ~/.profile > /dev/null 2>&1
 	sed -i '/^alias z=/d' ~/.bash_profile > /dev/null 2>&1
 
-	# 部署 k 与 z 命令入口并赋予可执行权限
+	# 原子部署 k 与 z 命令入口，防范正在运行的入口被原地改写导致语法解析错位崩坏
 	if [ -f ~/codematrix.sh ]; then
 		chmod +x ~/codematrix.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod ~/codematrix.sh 失败，已中止。${gl_bai}"; exit 1; }
-		cp -f ~/codematrix.sh /usr/local/bin/k > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/k 失败，已中止。${gl_bai}"; exit 1; }
-		cp -f ~/codematrix.sh /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/z 失败，已中止。${gl_bai}"; exit 1; }
-		chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod /usr/local/bin/k/z 失败，已中止。${gl_bai}"; exit 1; }
+		zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k || { echo -e "${gl_hong}❌ 自举失败：原子部署 /usr/local/bin/k 失败，已中止。${gl_bai}"; exit 1; }
+		zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z || { echo -e "${gl_hong}❌ 自举失败：原子部署 /usr/local/bin/z 失败，已中止。${gl_bai}"; exit 1; }
 		[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 		[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
+		zttz_verify_entries ~/codematrix.sh || exit 1
 	fi
 fi
 
@@ -33465,14 +33515,34 @@ while true; do
 			local country=$(curl -s --max-time 5 ipinfo.io/country)
 			local download_url="https://zttz.eu.org/z.sh"
 
-			if zttz_safe_update; then
+			# 备份当前脚本
+			cp -f ~/codematrix.sh ~/codematrix.sh.bak 2>/dev/null
+
+			# 下载到临时文件，校验后再替换
+			local tmp_file=$(mktemp ~/kejilion_tmp.XXXXXX)
+			if curl -sS --max-time 60 --fail -o "$tmp_file" "$download_url" && \
+			   [ -s "$tmp_file" ] && \
+			   head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
+				chmod +x "$tmp_file"
+				mv -f "$tmp_file" ~/codematrix.sh
 				canshu_v6
 				CheckFirstRun_true
 				yinsiyuanquan2
-				echo -e "${gl_lv}脚本已安全更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
+				chmod +x ~/codematrix.sh > /dev/null 2>&1
+				zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k > /dev/null 2>&1
+				zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z > /dev/null 2>&1
+				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
+				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
+				zttz_verify_entries ~/codematrix.sh > /dev/null 2>&1 || true
+				echo -e "${gl_lv}脚本已更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
 				send_stats "脚本已经最新$sh_v_new"
 			else
-				echo -e "${gl_hong}更新失败，旧版本已自动恢复。${gl_bai}"
+				rm -f "$tmp_file"
+				# 恢复备份
+				if [ -f ~/codematrix.sh.bak ]; then
+					mv -f ~/codematrix.sh.bak ~/codematrix.sh
+				fi
+				echo -e "${gl_hong}更新失败！下载出错或文件校验不通过，已恢复原版本${gl_bai}"
 				send_stats "脚本更新失败"
 			fi
 			break_end
@@ -33542,9 +33612,11 @@ if grep -qxF "kpanel" /home/docker/appno.txt 2>/dev/null; then
 	kpanel_menu_status="${gl_lv}[已安装]${gl_bai}"
 fi
 echo -e "${gl_kjlan}"
-echo "╔═══╗ ╔════╗ ╔════╗ ╔═══╗      ╔═══╗ ╦ ╦       ╔═══╗ ╔═╗  ╔═══╗ "
-echo "╠╦╔╝    ║     ║   ╠╦╔╝   ●   ╠══╣  ║ ║   ●   ║  ║ ╠═╣  ║ ═╣  "
-echo "╚═══╝   ╩     ╩   ╚═══╝      ╚═══╝ ╚═╝       ╚═══╝ ╩ ╩  ╚═══╝ "
+echo ' _____ _________________     ________  __  ____  ____  ______'
+echo '/__  //_  __/_  __/__  /    / ____/ / / / / __ \/ __ \/ ____/'
+echo '  / /  / /   / /    / /    / __/ / / / / / / / /_/ / / __'
+echo ' / /__/ /   / /    / /___ / /___/ /_/ /_/ /_/ / _, _/ /_/ /'
+echo '/____/_/   /_/    /____(_)_____/\____/(_)____/_/ |_|\____/'
 echo -e "CODE MATRIX 代码矩阵 v$sh_v"
 echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -33791,10 +33863,11 @@ zttz_update_rollback() {
     if [ -f ~/codematrix.sh.bak ]; then
         if mv -f ~/codematrix.sh.bak ~/codematrix.sh; then
             chmod +x ~/codematrix.sh 2>/dev/null || true
-            cp -f ~/codematrix.sh /usr/local/bin/k 2>/dev/null || true
-            cp -f ~/codematrix.sh /usr/local/bin/z 2>/dev/null || true
+            zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k 2>/dev/null || true
+            zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z 2>/dev/null || true
             [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
             [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
+            zttz_verify_entries ~/codematrix.sh 2>/dev/null || true
             echo -e "${gl_huang}已回滚到更新前备份版本。${gl_bai}"
         else
             echo -e "${gl_hong}回滚失败，请人工检查 ~/codematrix.sh 与 ~/codematrix.sh.bak。${gl_bai}"
@@ -33878,11 +33951,11 @@ zttz_safe_update() {
     tmp_file=""
 
     chmod +x ~/codematrix.sh || zttz_update_rollback "设置新版脚本可执行权限失败，已回滚"
-    cp -f ~/codematrix.sh /usr/local/bin/k || zttz_update_rollback "部署 /usr/local/bin/k 失败，已回滚"
-    cp -f ~/codematrix.sh /usr/local/bin/z || zttz_update_rollback "部署 /usr/local/bin/z 失败，已回滚"
-    chmod +x /usr/local/bin/k /usr/local/bin/z || zttz_update_rollback "设置命令执行权限失败，已回滚"
+    zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k || zttz_update_rollback "原子部署 /usr/local/bin/k 失败，已回滚"
+    zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z || zttz_update_rollback "原子部署 /usr/local/bin/z 失败，已回滚"
     [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
     [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
+    zttz_verify_entries ~/codematrix.sh || { zttz_update_rollback "入口文件自检比对或语法检查失败，已回滚"; return 1; }
 
     rm -f "$checksum_file" 2>/dev/null || true
     echo -e "${gl_lv}✅ ZTTZ 融合版脚本已安全更新到最新版本！${gl_bai}"
@@ -34229,7 +34302,19 @@ z_apps_panel() {
 }
 
 z_update() {
-    zttz_safe_update
+    if zttz_safe_update; then
+        echo ""
+        echo -e "${gl_huang}🔄 正在自动同步应用市场数据 (z-apps)...${gl_bai}"
+        if z_sync_apps; then
+            echo -e "${gl_lv}✅ 应用市场数据同步完成！${gl_bai}"
+        else
+            echo -e "${gl_hong}⚠️ 警告: 脚本本体已更新成功，但应用市场数据同步失败！${gl_bai}"
+            echo -e "${gl_huang}请检查网络连接后手动运行 'z app sync' 重新同步应用数据。${gl_bai}"
+        fi
+        return 0
+    else
+        return 1
+    fi
 }
 
 z_run_checked() {
