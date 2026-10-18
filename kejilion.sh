@@ -33000,31 +33000,7 @@ EOF
 			  ;;
 
 		  102)
-			  clear
-			  send_stats "卸载代码矩阵脚本"
-			  echo "卸载代码矩阵脚本"
-			  echo "------------------------------------------------"
-			  echo "将彻底卸载代码矩阵脚本，不影响你其他功能"
-			  read -e -p "确定继续吗？(Y/N): " choice
-
-			  case "$choice" in
-				[Yy])
-				  clear
-				  (crontab -l | grep -v "kejilion.sh") | crontab -
-				  rm -f /usr/local/bin/k
-				  rm ~/codematrix.sh
-				  echo "脚本已卸载，再见！"
-				  break_end
-				  clear
-				  exit
-				  ;;
-				[Nn])
-				  echo "已取消"
-				  ;;
-				*)
-				  echo "无效的选择，请输入 Y 或 N。"
-				  ;;
-			  esac
+			  z_uninstall
 			  ;;
 
 		  0)
@@ -34328,6 +34304,127 @@ z_run_checked() {
     return "$rc"
 }
 
+z_uninstall() {
+    clear
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+    echo -e "${gl_huang}      🗑️ 卸载 CODE MATRIX 代码矩阵脚本${gl_bai}"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+    echo "将彻底卸载代码矩阵脚本及所有关联命令入口。"
+    echo -e "${gl_lv}安全边界: 仅清理脚本本体与命令入口，绝不影响 Docker 容器、KPanel、/etc 系统配置与用户数据。${gl_bai}"
+    echo ""
+    echo -e "${gl_huang}待清理项目清单：${gl_bai}"
+
+    local targets=()
+    # 1. 核心命令入口四处
+    for bin in /usr/local/bin/z /usr/local/bin/k /usr/bin/z /usr/bin/k; do
+        if [ -f "$bin" ] || [ -L "$bin" ]; then
+            targets+=("$bin")
+            echo -e "  • 命令入口: ${gl_bai}$bin${gl_bai}"
+        fi
+    done
+
+    # 2. 快捷软链接：扫描 /usr/local/bin 与 /usr/bin 下所有指向 codematrix.sh 或 kejilion.sh 的链接
+    for dir in /usr/local/bin /usr/bin; do
+        [ -d "$dir" ] || continue
+        for link in "$dir"/*; do
+            if [ -L "$link" ]; then
+                local dest
+                dest=$(readlink "$link" 2>/dev/null || true)
+                if [[ "$dest" == *"codematrix.sh"* ]] || [[ "$dest" == *"kejilion.sh"* ]]; then
+                    if [[ ! " ${targets[*]} " =~ " ${link} " ]]; then
+                        targets+=("$link")
+                        echo -e "  • 快捷软链: ${gl_bai}$link -> $dest${gl_bai}"
+                    fi
+                fi
+            fi
+        done
+    done
+
+    # 3. 脚本本体与历史备份
+    for f in ~/codematrix.sh ~/codematrix.sh.bak ~/codematrix.sh ~/codematrix.sh.bak ~/codematrix.sh.migrated; do
+        if [ -f "$f" ]; then
+            targets+=("$f")
+            echo -e "  • 脚本文件: ${gl_bai}$f${gl_bai}"
+        fi
+    done
+
+    # 4. crontab 任务
+    echo -e "  • 定时任务: ${gl_bai}清理包含 codematrix.sh 与 kejilion.sh 的 crontab 任务${gl_bai}"
+    # 5. alias 别名
+    echo -e "  • Shell别名: ${gl_bai}清理 ~/.bashrc 等文件中的 alias k= / alias z=${gl_bai}"
+
+    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+
+    local choice_uninstall="N"
+    if [ -t 0 ]; then
+        read -e -p "是否确认卸载代码矩阵脚本？(y/N): " choice_uninstall
+    else
+        read -r choice_uninstall || choice_uninstall="N"
+    fi
+    if [ "$choice_uninstall" != "y" ] && [ "$choice_uninstall" != "Y" ]; then
+        echo -e "${gl_huang}已取消卸载，未做任何修改。${gl_bai}"
+        return 0
+    fi
+
+    # 单独确认 z-apps 自用应用目录
+    local delete_zapps=0
+    if [ -d "$HOME/z-apps" ]; then
+        echo ""
+        local choice_zapps="N"
+        if [ -t 0 ]; then
+            read -e -p "检测到自定义应用配置目录 ~/z-apps，是否同时删除？(y/N, 默认保留): " choice_zapps
+        else
+            read -r choice_zapps || choice_zapps="N"
+        fi
+        if [ "$choice_zapps" = "y" ] || [ "$choice_zapps" = "Y" ]; then
+            delete_zapps=1
+            echo -e "${gl_huang}已标记删除: ~/z-apps${gl_bai}"
+        else
+            echo -e "${gl_lv}已保留: ~/z-apps${gl_bai}"
+        fi
+    fi
+
+    echo ""
+    echo -e "${gl_huang}正在执行清理...${gl_bai}"
+
+    # 1. 清理 crontab (仅在确实存在相关任务时重写，避免盲跑影响系统)
+    if command -v crontab >/dev/null 2>&1; then
+        local current_cron
+        current_cron=$(crontab -l 2>/dev/null || true)
+        if [ -n "$current_cron" ] && echo "$current_cron" | grep -q -E "codematrix.sh|kejilion.sh"; then
+            echo "$current_cron" | grep -v -E "codematrix.sh|kejilion.sh" | crontab - 2>/dev/null || true
+        fi
+    fi
+
+    # 2. 清理 alias
+    for rc in ~/.bashrc ~/.profile ~/.bash_profile; do
+        if [ -f "$rc" ]; then
+            sed -i '/^alias k=/d' "$rc" 2>/dev/null || true
+            sed -i '/^alias z=/d' "$rc" 2>/dev/null || true
+        fi
+    done
+
+    # 3. 清理各入口与软链接（先删软链和外部入口，最后删本体）
+    for t in "${targets[@]}"; do
+        if [ "$t" != "$HOME/codematrix.sh" ]; then
+            rm -f "$t" 2>/dev/null || true
+        fi
+    done
+
+    # 4. 按需删除 ~/z-apps
+    if [ "$delete_zapps" -eq 1 ]; then
+        rm -rf "$HOME/z-apps" 2>/dev/null || true
+    fi
+
+    # 5. 最后一步安全删除本体并退出
+    rm -f "$HOME/codematrix.sh" 2>/dev/null || true
+    rm -f "$HOME/kejilion.sh" 2>/dev/null || true
+    rm -f "$HOME/kejilion.sh.migrated" 2>/dev/null || true
+
+    echo -e "${gl_lv}✅ 脚本已卸载，再见！${gl_bai}"
+    exit 0
+}
+
 z_main_menu() {
     while true; do
         clear
@@ -34347,6 +34444,7 @@ z_main_menu() {
         echo -e "${gl_kjlan}4. ${gl_bai}上游分类折叠市场 (k app+)"
         echo -e "${gl_kjlan}5. ${gl_bai}切换至上游主菜单 (k)"
         echo -e "${gl_kjlan}6. ${gl_bai}在线更新脚本 (z update)"
+        echo -e "${gl_kjlan}7. ${gl_bai}卸载代码矩阵脚本 (z uninstall)"
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
         echo -e "${gl_kjlan}0. ${gl_bai}退出"
         echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
@@ -34372,6 +34470,10 @@ z_main_menu() {
                 ;;
             6)
                 z_run_checked "z update" z_update
+                break_end
+                ;;
+            7)
+                z_uninstall
                 break_end
                 ;;
             0)
@@ -34427,6 +34529,9 @@ z_dispatch() {
         update|upgrade)
             z_run_checked "z update" z_update
             ;;
+        uninstall)
+            z_uninstall
+            ;;
         help|--help|-h)
             echo "ZTTZ 脚本用法:"
             echo "  z                    打开 ZTTZ 自用工作台"
@@ -34435,6 +34540,7 @@ z_dispatch() {
             echo "  z app sync           从 GitHub 同步自用应用配置 (macsur/z-apps)"
             echo "  z app+               打开分类手风琴应用市场"
             echo "  z update             更新融合版脚本"
+            echo "  z uninstall          卸载代码矩阵脚本 (完整清理入口与本体)"
             echo "  k ...                调用上游官方全部原生能力"
             ;;
         *)
