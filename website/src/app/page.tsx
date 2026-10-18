@@ -566,22 +566,56 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             {/* 左侧品牌区：手机端紧凑内联布局，确保 390px 下品牌字与徽标舒展同行且不挤压圆点 */}
             <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
-              {/* 点击左上角 Logo 实现白天/夜间主题切换，带有轻微点击反馈与模式指示器 */}
+              {/* 点击左上角 Logo 实现白天/夜间主题切换：3:2 比例月度轮播图，高度协调，手机 390px 完整舒展 */}
               <div
                 onClick={toggleTheme}
                 title={activeTheme === 'dark' ? '点击切换为清新白天模式 ☀️' : '点击切换为默认极客暗黑模式 🌙'}
-                className="relative group cursor-pointer shrink-0"
+                className="relative group cursor-pointer shrink-0 flex items-center"
               >
-                <img
-                  src="/logo.png"
-                  alt="CODE MATRIX 代码矩阵 zttz.eu.org"
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow-lg shadow-cyan-500/20 ring-2 ring-cyan-500/40 group-hover:scale-110 group-active:scale-95 transition-all object-cover"
-                />
-                <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[7px] sm:text-[8px] transition-all ${
+                <div className="relative aspect-[3/2] h-7 sm:h-8.5 w-auto overflow-hidden rounded-md border border-slate-300/80 dark:border-white/15 bg-slate-100/80 dark:bg-slate-950/60 shadow-md shadow-cyan-950/20 group-hover:border-cyan-400/50 group-hover:scale-105 group-active:scale-95 transition-all">
+                  <img
+                    id="nav-monthly-logo"
+                    src={monthlyLogoSrc}
+                    alt="Z.SH - CODE MATRIX 代码矩阵"
+                    className="w-full h-full object-contain select-none"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </div>
+                <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[7.5px] sm:text-[8px] transition-all shadow-sm ${
                   activeTheme === 'dark' ? 'bg-amber-400 text-slate-950 ring-2 ring-[#090a0f]' : 'bg-blue-600 text-white ring-2 ring-white'
                 }`}>
                   {activeTheme === 'dark' ? '🌙' : '☀️'}
                 </span>
+                {/* 运行时内联脚本：首屏 DOM 解析瞬间即按访客真实时间校准 src，确保次月静态缓存也无闪烁且单张请求 */}
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+(function(){
+  try {
+    var d = new Date();
+    var offset = (d.getFullYear() - 2026) * 12 + (d.getMonth() + 1 - 10);
+    var idx = ((offset % 6) + 6) % 6;
+    var logos = [
+      'logo-05-avatar-top-center.webp',
+      'logo-06-avatar-bottom-left.webp',
+      'logo-01-matrix-green.webp',
+      'logo-02-shield-blue.webp',
+      'logo-03-armor-cinematic.webp',
+      'logo-04-hud-future.webp'
+    ];
+    var el = document.getElementById('nav-monthly-logo');
+    if (el) {
+      var target = '/images/logo/' + logos[idx];
+      if (el.getAttribute('src') !== target) {
+        el.src = target;
+      }
+    }
+  } catch(e){}
+})();
+                    `,
+                  }}
+                />
               </div>
               <div onClick={toggleTheme} className="cursor-pointer select-none shrink-0 flex items-center">
                 <span className={`brand-script font-bold text-[13.5px] sm:text-lg tracking-tight sm:tracking-wider transition-colors whitespace-nowrap ${
@@ -685,48 +719,33 @@ export default function Home() {
         </header>
 
         {/* Hero 区域 */}
-        <section id="install" className="pt-16 sm:pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
-          {/* 🌟 首屏品牌主 Logo (每月自动轮播，3:2 比例整图展示) */}
-          <div className="mx-auto mb-8 w-full max-w-[280px] sm:max-w-md lg:max-w-lg">
-            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-slate-300/80 dark:border-white/10 bg-slate-100/60 dark:bg-slate-950/40 shadow-xl shadow-cyan-950/20 backdrop-blur-sm group hover:border-cyan-500/40 transition-all duration-300">
-              <img
-                id="hero-monthly-logo"
-                src={monthlyLogoSrc}
-                alt="Z.SH - CODE MATRIX 代码矩阵"
-                className="w-full h-full object-contain select-none"
-                loading="eager"
-                decoding="async"
+        <section id="install" className="pt-12 sm:pt-16 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+          {/* 🎬 Hero 宣传片：B 站内嵌 BV14dJC6pEV2 回到最高广告位 */}
+          <div className="max-w-4xl mx-auto mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
+            <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
+              <div className="w-3.5" />
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
+                  给自己的网站拍了条广告
+                </span>
+              </div>
+            </div>
+
+            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-video">
+              <iframe
+                src="https://player.bilibili.com/player.html?bvid=BV14dJC6pEV2&autoplay=0"
+                scrolling="no"
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full"
+                title="给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声"
               />
             </div>
-            {/* 运行时内联脚本：首屏解析瞬间按访客设备时间校准 src，确保静态导出在次月也无跳变且仅请求当月单张图 */}
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-(function(){
-  try {
-    var d = new Date();
-    var offset = (d.getFullYear() - 2026) * 12 + (d.getMonth() + 1 - 10);
-    var idx = ((offset % 6) + 6) % 6;
-    var logos = [
-      'logo-05-avatar-top-center.webp',
-      'logo-06-avatar-bottom-left.webp',
-      'logo-01-matrix-green.webp',
-      'logo-02-shield-blue.webp',
-      'logo-03-armor-cinematic.webp',
-      'logo-04-hud-future.webp'
-    ];
-    var el = document.getElementById('hero-monthly-logo');
-    if (el) {
-      var target = '/images/logo/' + logos[idx];
-      if (el.getAttribute('src') !== target) {
-        el.src = target;
-      }
-    }
-  } catch(e){}
-})();
-                `,
-              }}
-            />
+
+            <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="truncate mr-2">三条片子：AI 配音 / 纯音乐 / 站主原声克隆</span>
+              <span className="font-mono text-cyan-400 shrink-0">90s · B站</span>
+            </div>
           </div>
 
           {/* 首屏定位胶囊 */}
@@ -774,34 +793,6 @@ export default function Home() {
                 进入教程 →
               </span>
             </a>
-          </div>
-
-          {/* 🎬 Hero 宣传片：B 站内嵌 BV14dJC6pEV2 */}
-          <div className="max-w-4xl mx-auto mt-8 mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
-            <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
-              <div className="w-3.5" />
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                  给自己的网站拍了条广告
-                </span>
-              </div>
-            </div>
-
-            <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-video">
-              <iframe
-                src="https://player.bilibili.com/player.html?bvid=BV14dJC6pEV2&autoplay=0"
-                scrolling="no"
-                frameBorder="0"
-                allowFullScreen
-                className="w-full h-full"
-                title="给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声"
-              />
-            </div>
-
-            <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="truncate mr-2">三条片子：AI 配音 / 纯音乐 / 站主原声克隆</span>
-              <span className="font-mono text-cyan-400 shrink-0">90s · B站</span>
-            </div>
           </div>
 
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
