@@ -59,6 +59,24 @@ const fireConfetti = async (options?: ConfettiOptions, force: boolean = false) =
   }
 };
 
+// 🌟 Z.SH Logo 每月轮播序列 (定版 6 张循环，2026-10 为起点：[05,06,01,02,03,04])
+const MONTHLY_LOGOS = [
+  'logo-05-avatar-top-center.webp',
+  'logo-06-avatar-bottom-left.webp',
+  'logo-01-matrix-green.webp',
+  'logo-02-shield-blue.webp',
+  'logo-03-armor-cinematic.webp',
+  'logo-04-hud-future.webp',
+] as const;
+
+function getMonthlyLogoFilename(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // 1 ~ 12
+  const offset = (year - 2026) * 12 + (month - 10);
+  const index = ((offset % 6) + 6) % 6;
+  return MONTHLY_LOGOS[index];
+}
+
 export default function Home() {
   // 主题模式：'dark'（默认极客流光暗黑模式）或 'light'（清爽科技白昼模式）
   // 🌟 【今日推荐】精选 3 款极力推荐的一键部署应用（由 AI 原创精选 & 深度实测）
@@ -70,6 +88,18 @@ export default function Home() {
   const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
   // 实际生效的展示样式：'dark' | 'light'
   const [activeTheme, setActiveTheme] = useState<'dark' | 'light'>('dark');
+
+  // 🌟 首屏月度 Logo：运行时按当前时间计算对应轮播图
+  const [monthlyLogoSrc, setMonthlyLogoSrc] = useState<string>(() => {
+    return `/images/logo/${getMonthlyLogoFilename(new Date())}`;
+  });
+
+  useEffect(() => {
+    const actual = `/images/logo/${getMonthlyLogoFilename(new Date())}`;
+    if (actual !== monthlyLogoSrc) {
+      setMonthlyLogoSrc(actual);
+    }
+  }, [monthlyLogoSrc]);
 
   // 计算当前北京时间 (UTC+8) 应该处于白天还是黑夜 (06:00-17:59 白天，其余黑夜)
   const getBeijingAutoTheme = useCallback((): 'light' | 'dark' => {
@@ -655,7 +685,50 @@ export default function Home() {
         </header>
 
         {/* Hero 区域 */}
-        <section id="install" className="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+        <section id="install" className="pt-16 sm:pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+          {/* 🌟 首屏品牌主 Logo (每月自动轮播，3:2 比例整图展示) */}
+          <div className="mx-auto mb-8 w-full max-w-[280px] sm:max-w-md lg:max-w-lg">
+            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-slate-300/80 dark:border-white/10 bg-slate-100/60 dark:bg-slate-950/40 shadow-xl shadow-cyan-950/20 backdrop-blur-sm group hover:border-cyan-500/40 transition-all duration-300">
+              <img
+                id="hero-monthly-logo"
+                src={monthlyLogoSrc}
+                alt="Z.SH - CODE MATRIX 代码矩阵"
+                className="w-full h-full object-contain select-none"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+            {/* 运行时内联脚本：首屏解析瞬间按访客设备时间校准 src，确保静态导出在次月也无跳变且仅请求当月单张图 */}
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+(function(){
+  try {
+    var d = new Date();
+    var offset = (d.getFullYear() - 2026) * 12 + (d.getMonth() + 1 - 10);
+    var idx = ((offset % 6) + 6) % 6;
+    var logos = [
+      'logo-05-avatar-top-center.webp',
+      'logo-06-avatar-bottom-left.webp',
+      'logo-01-matrix-green.webp',
+      'logo-02-shield-blue.webp',
+      'logo-03-armor-cinematic.webp',
+      'logo-04-hud-future.webp'
+    ];
+    var el = document.getElementById('hero-monthly-logo');
+    if (el) {
+      var target = '/images/logo/' + logos[idx];
+      if (el.getAttribute('src') !== target) {
+        el.src = target;
+      }
+    }
+  } catch(e){}
+})();
+                `,
+              }}
+            />
+          </div>
+
           {/* 首屏定位胶囊 */}
           <div className="inline-flex items-center google-pill mb-8 select-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
