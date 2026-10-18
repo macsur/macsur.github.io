@@ -137,8 +137,21 @@ const protocolBlockNew = `if ! kpanel_protocol_active; then
 		elif [ -n "\${BASH_SOURCE[0]:-}" ] && [ -f "\${BASH_SOURCE[0]}" ]; then
 			cp -f "\${BASH_SOURCE[0]}" ~/kejilion.sh > /dev/null 2>&1 || { echo -e "\${gl_hong}❌ 自举失败：复制当前脚本到 ~/kejilion.sh 失败，已中止。\${gl_bai}"; exit 1; }
 		else
-			echo -e "\${gl_hong}❌ 自举失败：未找到可用脚本文件，已中止。\${gl_bai}"
-			exit 1
+			# 下载兜底：本地五路皆空时从官网拉取脚本落盘（修复进程替换管道场景 BASH_SOURCE 非 regular file 导致的自举失败）
+			echo -e "\${gl_huang}本地未找到脚本文件，正在从官网下载...\${gl_bai}"
+			_zttz_dl_ok=0
+			if command -v curl >/dev/null 2>&1; then
+				curl -fsSL https://zttz.eu.org/z.sh -o ~/kejilion.sh > /dev/null 2>&1
+			elif command -v wget > /dev/null 2>&1; then
+				wget -qO ~/kejilion.sh https://zttz.eu.org/z.sh > /dev/null 2>&1
+			fi
+			if [ -s ~/kejilion.sh ] && [ "\$(head -c 15 ~/kejilion.sh 2>/dev/null | grep -c '#!/bin/bash')" -ge 1 ] && grep -q 'sh_v=' ~/kejilion.sh 2>/dev/null; then
+				echo -e "\${gl_lv}✅ 已从官网下载脚本到 ~/kejilion.sh\${gl_bai}"
+			else
+				rm -f ~/kejilion.sh > /dev/null 2>&1
+				echo -e "\${gl_hong}❌ 自举失败：未找到可用脚本文件，且官网下载未成功，已中止。\${gl_bai}"
+				exit 1
+			fi
 		fi
 	fi
 
@@ -1345,6 +1358,253 @@ for (const [oldStr, newStr] of brandReplacements) {
     }
 }
 console.log(`✅ 品牌去痕替换完成 (${brandOk}/${brandReplacements.length})`);
+
+// 补丁 13: 主菜单横幅三行字符画整体替换 KEJILION.SH → ZTTZ.EU.ORG（站主亲定，按三行整体结构匹配，防上游单行复活）
+const bannerOld = `echo "╦╔═╔═╗ ╦╦╦  ╦╔═╗╔╗╔ ╔═╗╦ ╦"
+echo "╠╩╗║╣  ║║║  ║║ ║║║║ ╚═╗╠═╣"
+echo "╩ ╩╚═╝╚╝╩╩═╝╩╚═╝╝╚╝o╚═╝╩ ╩"`;
+const bannerNew = `echo "╔═══╗ ╔════╗ ╔════╗ ╔═══╗      ╔═══╗ ╦ ╦       ╔═══╗ ╔═╗  ╔═══╗ "
+echo "╠╦╔╝    ║     ║   ╠╦╔╝   ●   ╠══╣  ║ ║   ●   ║  ║ ╠═╣  ║ ═╣  "
+echo "╚═══╝   ╩     ╩   ╚═══╝      ╚═══╝ ╚═╝       ╚═══╝ ╩ ╩  ╚═══╝ "`;
+if (officialCode.includes(bannerOld)) {
+    officialCode = officialCode.replace(bannerOld, bannerNew);
+    console.log('✅ 主菜单横幅三行已整体替换为 ZTTZ.EU.ORG 字符画');
+} else {
+    console.log('⚠️ 去痕: 未找到上游三行字符画横幅，横幅补丁跳过');
+}
+
+// 补丁 14: 去痕 - 主菜单 17 项描述
+const menuDescReplacements = [
+    ['kejilion.sh 的现代化网页管理界面', 'CODE MATRIX 代码矩阵的现代化网页管理界面'],
+];
+for (const [oldStr, newStr] of menuDescReplacements) {
+    if (officialCode.includes(oldStr)) {
+        officialCode = officialCode.split(oldStr).join(newStr);
+        console.log('✅ 17 项描述已替换');
+    } else {
+        console.log(`⚠️ 去痕: 未找到 17 项描述 "${oldStr}"，跳过`);
+    }
+}
+
+// 补丁 15: 去痕 - 广告专栏整页替换为 CODE MATRIX 品牌页
+const adSectionOld = `kejilion_Affiliates() {
+
+clear
+send_stats "广告专栏"
+echo "广告专栏"
+echo "------------------------"
+echo "将为用户提供更简单优雅的推广与购买体验！"
+echo ""
+echo -e "服务器优惠"
+echo "------------------------"
+echo -e "\${gl_lan}莱卡云 香港CN2 GIA 韩国双ISP 美国CN2 GIA 优惠活动\${gl_bai}"
+echo -e "\${gl_bai}网址: https://www.lcayun.com/aff/ZEXUQBIM\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_lan}VMRack 美国优质原生 CN2 大带宽 每月9.9刀起\${gl_bai}"
+echo -e "\${gl_bai}网址: https://www.vmrack.net?ref_code=5bFonow83w5\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_lan}RackNerd 10.99刀每年 美国 1核心 1G内存 20G硬盘 1T流量每月\${gl_bai}"
+echo -e "\${gl_bai}网址: https://my.racknerd.com/aff.php?aff=5501&pid=879\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_zi}Hostinger 52.7刀每年 美国 1核心 4G内存 50G硬盘 4T流量每月\${gl_bai}"
+echo -e "\${gl_bai}网址: https://cart.hostinger.com/pay/d83c51e9-0c28-47a6-8414-b8ab010ef94f?_ga=GA1.3.942352702.1711283207\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_huang}搬瓦工 49刀每季 美国CN2GIA 日本软银 2核心 1G内存 20G硬盘 1T流量每月\${gl_bai}"
+echo -e "\${gl_bai}网址: https://bandwagonhost.com/aff.php?aff=69004&pid=87\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_lan}DMIT 28刀每季 美国CN2GIA 1核心 2G内存 20G硬盘 800G流量每月\${gl_bai}"
+echo -e "\${gl_bai}网址: https://www.dmit.io/aff.php?aff=4966&pid=100\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_zi}V.PS 6.9刀每月 东京软银 2核心 1G内存 20G硬盘 1T流量每月\${gl_bai}"
+echo -e "\${gl_bai}网址: https://vps.hosting/cart/tokyo-cloud-kvm-vps/?id=148&?affid=1355&?affid=1355\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_kjlan}VPS更多热门优惠\${gl_bai}"
+echo -e "\${gl_bai}网址: https://kejilion.pro/topvps/\${gl_bai}"
+echo "------------------------"
+echo ""
+echo -e "域名优惠"
+echo "------------------------"
+echo -e "\${gl_lan}GNAME 8.8刀首年COM域名 6.68刀首年CC域名\${gl_bai}"
+echo -e "\${gl_bai}网址: https://www.gname.com/register?tt=86836&ttcode=KEJILION86836&ttbj=sh\${gl_bai}"
+echo "------------------------"
+echo ""
+echo -e "科技lion周边"
+echo "------------------------"
+echo -e "\${gl_kjlan}B站: \${gl_bai}https://b23.tv/2mqnQyh              \${gl_kjlan}油管: \${gl_bai}https://www.youtube.com/@kejilion\${gl_bai}"
+echo -e "\${gl_kjlan}官网: \${gl_bai}https://kejilion.pro/              \${gl_kjlan}导航: \${gl_bai}https://dh.kejilion.pro/\${gl_bai}"
+echo -e "\${gl_kjlan}博客: \${gl_bai}https://blog.kejilion.pro/         \${gl_kjlan}软件中心: \${gl_bai}https://app.kejilion.pro/\${gl_bai}"
+echo "------------------------"
+echo -e "\${gl_kjlan}脚本官网: \${gl_bai}https://kejilion.sh            \${gl_kjlan}GitHub地址: \${gl_bai}\${gh_https_url}github.com/kejilion/sh\${gl_bai}"
+echo "------------------------"
+echo ""
+}`;
+const adSectionNew = `kejilion_Affiliates() {
+
+clear
+echo "CODE MATRIX 品牌专栏"
+echo "------------------------"
+echo "用代码 · 爱上Linux"
+echo ""
+echo -e "\${gl_kjlan}品牌名: \${gl_bai}CODE MATRIX 代码矩阵\${gl_bai}"
+echo -e "\${gl_kjlan}口号: \${gl_bai}用代码 · 爱上Linux\${gl_bai}"
+echo -e "\${gl_kjlan}官网: \${gl_bai}https://zttz.eu.org/\${gl_bai}"
+echo -e "\${gl_kjlan}安装: \${gl_bai}bash <(curl -sL https://zttz.eu.org/z)\${gl_bai}"
+echo "------------------------"
+echo ""
+}`;
+if (officialCode.includes(adSectionOld)) {
+    officialCode = officialCode.replace(adSectionOld, adSectionNew);
+    console.log('✅ 广告专栏整页已替换为 CODE MATRIX 品牌页');
+} else {
+    console.log('⚠️ 去痕: 未找到广告专栏函数体，广告专栏补丁跳过');
+}
+
+// 补丁 16: 去痕 - 应用市场页脚开发者指南行删除
+const devGuideOld = 'echo -e "${gl_kjlan}想要让你的应用出现在这里？查看开发者指南: ${gl_huang}https://dev.kejilion.sh/${gl_bai}"';
+if (officialCode.includes(devGuideOld)) {
+    officialCode = officialCode.split(devGuideOld).join('');
+    console.log('✅ 应用市场页脚开发者指南行已删除');
+} else {
+    console.log('⚠️ 去痕: 未找到开发者指南行，跳过');
+}
+
+// 补丁 17: 去痕 - 进阶玩法 ssh-key 上游链接删除（保留功能文案）
+const sshKeyOld = 'echo "进阶玩法: https://blog.kejilion.pro/ssh-key"';
+if (officialCode.includes(sshKeyOld)) {
+    officialCode = officialCode.split(sshKeyOld).join('echo "进阶玩法: 配置 SSH 密钥登录"');
+    console.log('✅ 进阶玩法 ssh-key 上游链接已替换');
+} else {
+    console.log('⚠️ 去痕: 未找到进阶玩法 ssh-key 链接，跳过');
+}
+
+// 补丁 18: 去痕 - 首次许可协议上游域名链接删除（保留协议提示文字）
+const licenseOld = 'echo "用户许可协议: https://blog.kejilion.pro/user-license-agreement/"';
+if (officialCode.includes(licenseOld)) {
+    officialCode = officialCode.split(licenseOld).join('echo "用户许可协议: 使用本脚本前请阅读并同意用户许可协议"');
+    console.log('✅ 许可协议上游链接已替换');
+} else {
+    console.log('⚠️ 去痕: 未找到许可协议链接，跳过');
+}
+
+// 补丁 19: 去痕 - KPanel 进度与日志类可见文案中的 kejilion.sh → 代码矩阵脚本
+const kpanelReplacements = [
+    ['正在执行 kejilion.sh 应用安装函数', '正在执行代码矩阵脚本应用安装函数'],
+    ['写入 kejilion.sh 兼容状态', '写入代码矩阵脚本兼容状态'],
+    ['未发现 kejilion.sh 应用安装标记', '未发现代码矩阵脚本应用安装标记'],
+    ['正在修复 kejilion.sh 应用安装标记', '正在修复代码矩阵脚本应用安装标记'],
+];
+let kpanelOk = 0;
+for (const [oldStr, newStr] of kpanelReplacements) {
+    if (officialCode.includes(oldStr)) {
+        officialCode = officialCode.split(oldStr).join(newStr);
+        kpanelOk++;
+    } else {
+        console.log(`⚠️ 去痕: 未找到 KPanel 文案 "${oldStr}"，跳过`);
+    }
+}
+console.log(`✅ KPanel 文案替换完成 (${kpanelOk}/${kpanelReplacements.length})`);
+
+// 补丁 20: 去痕 - 写入用户服务器配置文件的 Managed by kejilion.sh → Managed by CODE MATRIX
+const managedOld = 'Managed by kejilion.sh';
+const managedNew = 'Managed by CODE MATRIX';
+let managedCount = 0;
+while (officialCode.includes(managedOld)) {
+    officialCode = officialCode.replace(managedOld, managedNew);
+    managedCount++;
+}
+if (managedCount > 0) {
+    console.log(`✅ Managed by 注释已替换 (${managedCount} 处)`);
+} else {
+    console.log('⚠️ 去痕: 未找到 Managed by kejilion.sh，跳过');
+}
+
+// 补丁 21: 去痕 - board.kejilion.pro 留言板链接替换
+const boardOld = 'https://board.kejilion.pro';
+const boardNew = 'https://zttz.eu.org';
+if (officialCode.includes(boardOld)) {
+    officialCode = officialCode.split(boardOld).join(boardNew);
+    console.log('✅ board.kejilion.pro 链接已替换');
+} else {
+    console.log('⚠️ 去痕: 未找到 board.kejilion.pro，跳过');
+}
+
+// 补丁 22: 去痕 - send_stats 死代码整段删除（含 api.kejilion.pro 端点）
+// 先定位 send_stats 函数完整范围，从 "send_stats() {" 到下一个函数定义前
+const sendStatsMatch = officialCode.match(/send_stats\(\) \{[\s\S]*?\n\}\n/);
+if (sendStatsMatch) {
+    officialCode = officialCode.replace(sendStatsMatch[0], 'send_stats() {\n\treturn 0  # CODE MATRIX: 上报已永久关闭\n}\n');
+    console.log('✅ send_stats 死代码整段已删除，仅保留空壳 return 0');
+} else {
+    console.log('⚠️ 去痕: 未找到 send_stats 完整函数体，跳过整段删除');
+}
+
+// 补丁 22.1: 去痕 - 内联 Python 脚本中的 send_stat 上报函数清空（彻底消除第二处 api.kejilion.pro）
+const pySendStatOld = `def send_stat(action):
+    if not stats_enabled:
+        return
+    payload = {
+        "action": action,
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+        "country": "",
+        "os_info": platform.platform(),
+        "cpu_arch": platform.machine(),
+        "version": script_version,
+    }
+    try:
+        req = urllib.request.Request(
+            "https://api.kejilion.pro/api/log",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=3):
+            pass
+    except Exception:
+        pass`;
+const pySendStatNew = `def send_stat(action):
+    return`;
+if (officialCode.includes(pySendStatOld)) {
+    officialCode = officialCode.replace(pySendStatOld, pySendStatNew);
+    console.log('✅ Python 内联 send_stat 上报函数已清空，彻底消除第二处 api.kejilion.pro');
+} else {
+    console.log('⚠️ 去痕: 未找到 Python 内联 send_stat 定义，跳过');
+}
+
+// 补丁 23: 去痕 - 家目录脚本文件名 ~/kejilion.sh → ~/codematrix.sh（全量替换）
+// 注意：只替换用户可见/路径引用，不碰函数名 kejilion()/kejilion_sh()
+let codematrixCount = 0;
+// 先统计
+const cmMatches = officialCode.match(/~\/kejilion\.sh/g);
+if (cmMatches) codematrixCount = cmMatches.length;
+officialCode = officialCode.replace(/~\/kejilion\.sh/g, '~/codematrix.sh');
+// 同时替换 kejilion.sh.bak
+officialCode = officialCode.replace(/kejilion\.sh\.bak/g, 'codematrix.sh.bak');
+console.log(`✅ 家目录脚本文件名已替换 (~/kejilion.sh → ~/codematrix.sh, 约 ${codematrixCount} 处; .bak 同步替换)`);
+
+// 补丁 24: 去痕 - 存量迁移逻辑注入
+// 在脚本首次运行或更新时，若发现旧 ~/kejilion.sh 存在，迁移参数后处置旧文件
+const migrationOld = 'if [ ! -f ~/codematrix.sh ]; then';
+const migrationNew = `if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
+	# CODE MATRIX 存量迁移：旧版 kejilion.sh → codematrix.sh，保留已同意状态
+	cp -f ~/kejilion.sh ~/codematrix.sh
+	# 迁移关键参数（canshu / permission_granted / ENABLE_STATS）
+	_old_canshu=$(grep -E '^canshu=' ~/kejilion.sh 2>/dev/null | tail -1)
+	_old_perm=$(grep -E '^permission_granted=' ~/kejilion.sh 2>/dev/null | tail -1)
+	_old_stats=$(grep -E '^ENABLE_STATS=' ~/kejilion.sh 2>/dev/null | tail -1)
+	[ -n "$_old_canshu" ] && sed -i "s/^canshu=.*/$_old_canshu/" ~/codematrix.sh 2>/dev/null
+	[ -n "$_old_perm" ] && sed -i "s/^permission_granted=.*/$_old_perm/" ~/codematrix.sh 2>/dev/null
+	[ -n "$_old_stats" ] && sed -i "s/^ENABLE_STATS=.*/$_old_stats/" ~/codematrix.sh 2>/dev/null
+	# 处置旧文件：改名 .migrated 备份
+	mv -f ~/kejilion.sh ~/kejilion.sh.migrated
+	echo -e "\${gl_lv}✅ 存量迁移完成：参数已迁入 ~/codematrix.sh，旧文件已备份为 ~/kejilion.sh.migrated\${gl_bai}"
+fi
+if [ ! -f ~/codematrix.sh ]; then`;
+if (officialCode.includes(migrationOld)) {
+    officialCode = officialCode.replace(migrationOld, migrationNew);
+    console.log('✅ 存量迁移逻辑已注入（旧 ~/kejilion.sh → ~/codematrix.sh，参数 preserved，旧文件 .migrated 备份）');
+} else {
+    console.log('⚠️ 去痕: 未找到首次安装检测点，存量迁移补丁跳过');
+}
 
 console.log('💾 [4/5] 写入同步生成的 kejilion.sh 并验证语法...');
 fs.writeFileSync(path.join(ROOT_DIR, 'kejilion.sh'), officialCode, 'utf8');
