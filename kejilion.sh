@@ -138,21 +138,21 @@ run_command() {
 
 
 canshu_v6() {
-	[ -f ~/kejilion.sh ] || return 0
+	[ -f ~/codematrix.sh ] || return 0
 	if grep -q '^canshu="V6"' /usr/local/bin/k > /dev/null 2>&1; then
-		sed -i 's/^canshu="default"/canshu="V6"/' ~/kejilion.sh 2>/dev/null
-	elif grep -q '^canshu="V6"' ~/kejilion.sh.bak > /dev/null 2>&1; then
-		sed -i 's/^canshu="default"/canshu="V6"/' ~/kejilion.sh 2>/dev/null
+		sed -i 's/^canshu="default"/canshu="V6"/' ~/codematrix.sh 2>/dev/null
+	elif grep -q '^canshu="V6"' ~/codematrix.sh.bak > /dev/null 2>&1; then
+		sed -i 's/^canshu="default"/canshu="V6"/' ~/codematrix.sh 2>/dev/null
 	fi
 }
 
 
 CheckFirstRun_true() {
-	[ -f ~/kejilion.sh ] || return 0
+	[ -f ~/codematrix.sh ] || return 0
 	if grep -q '^permission_granted="true"' /usr/local/bin/k > /dev/null 2>&1; then
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh 2>/dev/null
-	elif grep -q '^permission_granted="true"' ~/kejilion.sh.bak > /dev/null 2>&1; then
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh 2>/dev/null
+		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/codematrix.sh 2>/dev/null
+	elif grep -q '^permission_granted="true"' ~/codematrix.sh.bak > /dev/null 2>&1; then
+		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/codematrix.sh 2>/dev/null
 	fi
 }
 
@@ -165,49 +165,61 @@ CheckFirstRun_true() {
 
 
 send_stats() {
-	return 0  # ZTTZ 去痕: 上报已关闭，不再向任何外部发送数据
-	if [ "$ENABLE_STATS" == "false" ]; then
-		return
-	fi
-
-	local country=$(curl -s ipinfo.io/country)
-	local os_info=$(grep PRETTY_NAME /etc/os-release | cut -d '=' -f2 | tr -d '"')
-	local cpu_arch=$(uname -m)
-
-	(
-		curl -s -X POST "https://api.kejilion.pro/api/log" \
-			-H "Content-Type: application/json" \
-			-d "{\"action\":\"$1\",\"timestamp\":\"$(date -u '+%Y-%m-%d %H:%M:%S')\",\"country\":\"$country\",\"os_info\":\"$os_info\",\"cpu_arch\":\"$cpu_arch\",\"version\":\"$sh_v\"}" \
-		&>/dev/null
-	) &
-
+	return 0  # CODE MATRIX: 上报已永久关闭
 }
 
 
 yinsiyuanquan2() {
-	[ -f ~/kejilion.sh ] || return 0
+	[ -f ~/codematrix.sh ] || return 0
 	if grep -q '^ENABLE_STATS="false"' /usr/local/bin/k > /dev/null 2>&1; then
-		sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/kejilion.sh 2>/dev/null
-	elif grep -q '^ENABLE_STATS="false"' ~/kejilion.sh.bak > /dev/null 2>&1; then
-		sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/kejilion.sh 2>/dev/null
+		sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/codematrix.sh 2>/dev/null
+	elif grep -q '^ENABLE_STATS="false"' ~/codematrix.sh.bak > /dev/null 2>&1; then
+		sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/codematrix.sh 2>/dev/null
 	fi
 }
 
 
 
 if ! kpanel_protocol_active; then
-	if [ ! -f ~/kejilion.sh ]; then
+	if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
+	# CODE MATRIX 存量迁移：旧版 kejilion.sh → codematrix.sh，保留已同意状态
+	cp -f ~/kejilion.sh ~/codematrix.sh
+	# 迁移关键参数（canshu / permission_granted / ENABLE_STATS）
+	_old_canshu=$(grep -E '^canshu=' ~/kejilion.sh 2>/dev/null | tail -1)
+	_old_perm=$(grep -E '^permission_granted=' ~/kejilion.sh 2>/dev/null | tail -1)
+	_old_stats=$(grep -E '^ENABLE_STATS=' ~/kejilion.sh 2>/dev/null | tail -1)
+	[ -n "$_old_canshu" ] && sed -i "s/^canshu=.*/$_old_canshu/" ~/codematrix.sh 2>/dev/null
+	[ -n "$_old_perm" ] && sed -i "s/^permission_granted=.*/$_old_perm/" ~/codematrix.sh 2>/dev/null
+	[ -n "$_old_stats" ] && sed -i "s/^ENABLE_STATS=.*/$_old_stats/" ~/codematrix.sh 2>/dev/null
+	# 处置旧文件：改名 .migrated 备份
+	mv -f ~/kejilion.sh ~/kejilion.sh.migrated
+	echo -e "${gl_lv}✅ 存量迁移完成：参数已迁入 ~/codematrix.sh，旧文件已备份为 ~/kejilion.sh.migrated${gl_bai}"
+fi
+if [ ! -f ~/codematrix.sh ]; then
 		if [ -f "./kejilion.sh" ]; then
-			cp -f ./kejilion.sh ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./kejilion.sh 到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
+			cp -f ./kejilion.sh ~/codematrix.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./kejilion.sh 到 ~/codematrix.sh 失败，已中止。${gl_bai}"; exit 1; }
 		elif [ -f "./z.sh" ]; then
-			cp -f ./z.sh ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./z.sh 到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
+			cp -f ./z.sh ~/codematrix.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./z.sh 到 ~/codematrix.sh 失败，已中止。${gl_bai}"; exit 1; }
 		elif [ -f "./x.sh" ]; then
-			cp -f ./x.sh ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./x.sh 到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
+			cp -f ./x.sh ~/codematrix.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制 ./x.sh 到 ~/codematrix.sh 失败，已中止。${gl_bai}"; exit 1; }
 		elif [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
-			cp -f "${BASH_SOURCE[0]}" ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制当前脚本到 ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
+			cp -f "${BASH_SOURCE[0]}" ~/codematrix.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：复制当前脚本到 ~/codematrix.sh 失败，已中止。${gl_bai}"; exit 1; }
 		else
-			echo -e "${gl_hong}❌ 自举失败：未找到可用脚本文件，已中止。${gl_bai}"
-			exit 1
+			# 下载兜底：本地五路皆空时从官网拉取脚本落盘（修复进程替换管道场景 BASH_SOURCE 非 regular file 导致的自举失败）
+			echo -e "${gl_huang}本地未找到脚本文件，正在从官网下载...${gl_bai}"
+			_zttz_dl_ok=0
+			if command -v curl >/dev/null 2>&1; then
+				curl -fsSL https://zttz.eu.org/z.sh -o ~/codematrix.sh > /dev/null 2>&1
+			elif command -v wget > /dev/null 2>&1; then
+				wget -qO ~/codematrix.sh https://zttz.eu.org/z.sh > /dev/null 2>&1
+			fi
+			if [ -s ~/codematrix.sh ] && [ "$(head -c 15 ~/codematrix.sh 2>/dev/null | grep -c '#!/bin/bash')" -ge 1 ] && grep -q 'sh_v=' ~/codematrix.sh 2>/dev/null; then
+				echo -e "${gl_lv}✅ 已从官网下载脚本到 ~/codematrix.sh${gl_bai}"
+			else
+				rm -f ~/codematrix.sh > /dev/null 2>&1
+				echo -e "${gl_hong}❌ 自举失败：未找到可用脚本文件，且官网下载未成功，已中止。${gl_bai}"
+				exit 1
+			fi
 		fi
 	fi
 
@@ -224,10 +236,10 @@ if ! kpanel_protocol_active; then
 	sed -i '/^alias z=/d' ~/.bash_profile > /dev/null 2>&1
 
 	# 部署 k 与 z 命令入口并赋予可执行权限
-	if [ -f ~/kejilion.sh ]; then
-		chmod +x ~/kejilion.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod ~/kejilion.sh 失败，已中止。${gl_bai}"; exit 1; }
-		cp -f ~/kejilion.sh /usr/local/bin/k > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/k 失败，已中止。${gl_bai}"; exit 1; }
-		cp -f ~/kejilion.sh /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/z 失败，已中止。${gl_bai}"; exit 1; }
+	if [ -f ~/codematrix.sh ]; then
+		chmod +x ~/codematrix.sh > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod ~/codematrix.sh 失败，已中止。${gl_bai}"; exit 1; }
+		cp -f ~/codematrix.sh /usr/local/bin/k > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/k 失败，已中止。${gl_bai}"; exit 1; }
+		cp -f ~/codematrix.sh /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：部署 /usr/local/bin/z 失败，已中止。${gl_bai}"; exit 1; }
 		chmod +x /usr/local/bin/k /usr/local/bin/z > /dev/null 2>&1 || { echo -e "${gl_hong}❌ 自举失败：chmod /usr/local/bin/k/z 失败，已中止。${gl_bai}"; exit 1; }
 		[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
 		[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
@@ -247,14 +259,14 @@ UserLicenseAgreement() {
 	clear
 	echo -e "${gl_kjlan}欢迎使用 CODE MATRIX 代码矩阵${gl_bai}"
 	echo "首次使用脚本，请先阅读并同意用户许可协议。"
-	echo "用户许可协议: https://blog.kejilion.pro/user-license-agreement/"
+	echo "用户许可协议: 使用本脚本前请阅读并同意用户许可协议"
 	echo -e "----------------------"
 	read -e -p "是否同意以上条款？(y/n): " user_input
 
 
 	if [ "$user_input" = "y" ] || [ "$user_input" = "Y" ]; then
 		send_stats "许可同意"
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/kejilion.sh
+		sed -i 's/^permission_granted="false"/permission_granted="true"/' ~/codematrix.sh
 		sed -i 's/^permission_granted="false"/permission_granted="true"/' /usr/local/bin/k
 	else
 		send_stats "许可拒绝"
@@ -3964,7 +3976,7 @@ kpanel_run_docker_app_install() {
 	kpanel_app_progress 15 "正在准备 Docker 运行环境"
 	install jq || return 1
 	install_docker || return 1
-	kpanel_app_progress 30 "正在执行 kejilion.sh 应用安装函数"
+	kpanel_app_progress 30 "正在执行代码矩阵脚本应用安装函数"
 
 	if [ "$adapter" = "plus" ]; then
 		if ! docker_app_install; then
@@ -3978,7 +3990,7 @@ kpanel_run_docker_app_install() {
 		fi
 	fi
 
-	kpanel_app_progress 90 "正在写入 kejilion.sh 兼容状态"
+	kpanel_app_progress 90 "正在写入代码矩阵脚本兼容状态"
 	echo "$docker_port" > "/home/docker/${docker_name}_port.conf"
 	add_app_id || return 1
 	if [ "${KJ_APP_ACCESS_MODE:-direct}" = "domain_only" ]; then
@@ -4018,10 +4030,10 @@ kpanel_run_docker_app_action() {
 	service_name="$(kpanel_app_verified_service true)" || return 1
 	if ! grep -qxF "${app_id}" /home/docker/appno.txt 2>/dev/null; then
 		if [ "${KJ_APP_RECONCILE_MARKER:-0}" != "1" ]; then
-			echo "错误: 未发现 kejilion.sh 应用安装标记"
+			echo "错误: 未发现代码矩阵脚本应用安装标记"
 			return 1
 		fi
-		kpanel_app_progress 10 "正在修复 kejilion.sh 应用安装标记"
+		kpanel_app_progress 10 "正在修复代码矩阵脚本应用安装标记"
 		add_app_id || return 1
 	fi
 
@@ -4826,7 +4838,7 @@ kpanel_f2b_manager_write_config() {
 	temporary="$(mktemp "$config_dir/.99-kejilion-sshd.local.XXXXXX")" || return 1
 	{
 		printf '[%s]\n' "$jail"
-		printf '%s\n' '# Managed by kejilion.sh for SSH defense'
+		printf '%s\n' '# Managed by CODE MATRIX for SSH defense'
 		printf 'enabled = true\nbantime = %s\nfindtime = %s\nmaxretry = %s\n' "$bantime" "$findtime" "$maxretry"
 		if [ "$#" -gt 0 ]; then
 			printf 'ignoreip ='
@@ -5419,7 +5431,7 @@ f2b_basic_config() {
 	mkdir -p /etc/fail2ban/jail.d
 	cat > /etc/fail2ban/jail.d/sshd.local <<EOF
 [$jail_name]
-# Managed by kejilion.sh
+# Managed by CODE MATRIX
 # Note: enable the jail so these parameters take effect
 enabled = true
 bantime = $bantime
@@ -8128,7 +8140,7 @@ sshkey_panel() {
 	  	  IS_KEY_ENABLED="${gl_hui}未启用${gl_bai}"
 	  fi
   	  echo -e "用户密钥登录模式 ${IS_KEY_ENABLED}"
-  	  echo "进阶玩法: https://blog.kejilion.pro/ssh-key"
+  	  echo "进阶玩法: 配置 SSH 密钥登录"
   	  echo "------------------------------------------------"
   	  echo "将会生成密钥对，更安全的方式SSH登录"
 	  echo "------------------------"
@@ -16536,27 +16548,7 @@ stats_enabled = (sys.argv[2].lower() == "true") if len(sys.argv) > 2 else True
 script_version = sys.argv[3] if len(sys.argv) > 3 else ""
 
 def send_stat(action):
-    if not stats_enabled:
-        return
-    payload = {
-        "action": action,
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
-        "country": "",
-        "os_info": platform.platform(),
-        "cpu_arch": platform.machine(),
-        "version": script_version,
-    }
-    try:
-        req = urllib.request.Request(
-            "https://api.kejilion.pro/api/log",
-            data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=3):
-            pass
-    except Exception:
-        pass
+    return
 
 with open(path, 'r', encoding='utf-8') as f:
     obj = json.load(f)
@@ -22168,7 +22160,7 @@ while true; do
 	  echo -e "${gl_kjlan}123. ${color123}Cursor CLI编程助手${gl_huang}★${gl_bai}"
 	  echo -e "${gl_kjlan}-------------------------"
 	  echo -e "${gl_kjlan}第三方应用列表"
-  	  echo -e "${gl_kjlan}想要让你的应用出现在这里？查看开发者指南: ${gl_huang}https://dev.kejilion.sh/${gl_bai}"
+  	  
 
 	  for f in "$HOME"/apps/*.conf; do
 		  [ -e "$f" ] || continue
@@ -31326,7 +31318,7 @@ kpanel_account_apply_ssh_policy() {
 	mkdir -p -- "$(dirname -- "$fragment")" || return 1
 	fragment_temp="$(mktemp "$(dirname -- "$fragment")/.00-kejilion-account-management.conf.XXXXXX")" || return 1
 	{
-		printf '%s\n' '# Managed by kejilion.sh account-management protocol v1'
+		printf '%s\n' '# Managed by CODE MATRIX account-management protocol v1'
 		printf 'PubkeyAuthentication yes\n'
 		[ "$password_auth" = enabled ] && printf 'PasswordAuthentication yes\n' || printf 'PasswordAuthentication no\n'
 		printf 'KbdInteractiveAuthentication no\nChallengeResponseAuthentication no\nUsePAM yes\n'
@@ -32843,7 +32835,7 @@ EOF
 			clear
 			send_stats "留言板"
 			echo "访问官方留言板，您对脚本有任何想法欢迎留言交流！"
-			echo "https://board.kejilion.pro"
+			echo "https://zttz.eu.org"
 			echo "公共密码: kejilion.sh"
 			  ;;
 
@@ -32934,14 +32926,14 @@ EOF
 				  1)
 					  cd ~
 					  sed -i 's/^ENABLE_STATS="false"/ENABLE_STATS="true"/' /usr/local/bin/k
-					  sed -i 's/^ENABLE_STATS="false"/ENABLE_STATS="true"/' ~/kejilion.sh
+					  sed -i 's/^ENABLE_STATS="false"/ENABLE_STATS="true"/' ~/codematrix.sh
 					  echo "已开启采集"
 					  send_stats "隐私与安全已开启采集"
 					  ;;
 				  2)
 					  cd ~
 					  sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' /usr/local/bin/k
-					  sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/kejilion.sh
+					  sed -i 's/^ENABLE_STATS="true"/ENABLE_STATS="false"/' ~/codematrix.sh
 					  echo "已关闭采集"
 					  send_stats "隐私与安全已关闭采集"
 					  ;;
@@ -32970,7 +32962,7 @@ EOF
 				  clear
 				  (crontab -l | grep -v "kejilion.sh") | crontab -
 				  rm -f /usr/local/bin/k
-				  rm ~/kejilion.sh
+				  rm ~/codematrix.sh
 				  echo "脚本已卸载，再见！"
 				  break_end
 				  clear
@@ -33352,51 +33344,14 @@ done
 kejilion_Affiliates() {
 
 clear
-send_stats "广告专栏"
-echo "广告专栏"
+echo "CODE MATRIX 品牌专栏"
 echo "------------------------"
-echo "将为用户提供更简单优雅的推广与购买体验！"
+echo "用代码 · 爱上Linux"
 echo ""
-echo -e "服务器优惠"
-echo "------------------------"
-echo -e "${gl_lan}莱卡云 香港CN2 GIA 韩国双ISP 美国CN2 GIA 优惠活动${gl_bai}"
-echo -e "${gl_bai}网址: https://www.lcayun.com/aff/ZEXUQBIM${gl_bai}"
-echo "------------------------"
-echo -e "${gl_lan}VMRack 美国优质原生 CN2 大带宽 每月9.9刀起${gl_bai}"
-echo -e "${gl_bai}网址: https://www.vmrack.net?ref_code=5bFonow83w5${gl_bai}"
-echo "------------------------"
-echo -e "${gl_lan}RackNerd 10.99刀每年 美国 1核心 1G内存 20G硬盘 1T流量每月${gl_bai}"
-echo -e "${gl_bai}网址: https://my.racknerd.com/aff.php?aff=5501&pid=879${gl_bai}"
-echo "------------------------"
-echo -e "${gl_zi}Hostinger 52.7刀每年 美国 1核心 4G内存 50G硬盘 4T流量每月${gl_bai}"
-echo -e "${gl_bai}网址: https://cart.hostinger.com/pay/d83c51e9-0c28-47a6-8414-b8ab010ef94f?_ga=GA1.3.942352702.1711283207${gl_bai}"
-echo "------------------------"
-echo -e "${gl_huang}搬瓦工 49刀每季 美国CN2GIA 日本软银 2核心 1G内存 20G硬盘 1T流量每月${gl_bai}"
-echo -e "${gl_bai}网址: https://bandwagonhost.com/aff.php?aff=69004&pid=87${gl_bai}"
-echo "------------------------"
-echo -e "${gl_lan}DMIT 28刀每季 美国CN2GIA 1核心 2G内存 20G硬盘 800G流量每月${gl_bai}"
-echo -e "${gl_bai}网址: https://www.dmit.io/aff.php?aff=4966&pid=100${gl_bai}"
-echo "------------------------"
-echo -e "${gl_zi}V.PS 6.9刀每月 东京软银 2核心 1G内存 20G硬盘 1T流量每月${gl_bai}"
-echo -e "${gl_bai}网址: https://vps.hosting/cart/tokyo-cloud-kvm-vps/?id=148&?affid=1355&?affid=1355${gl_bai}"
-echo "------------------------"
-echo -e "${gl_kjlan}VPS更多热门优惠${gl_bai}"
-echo -e "${gl_bai}网址: https://kejilion.pro/topvps/${gl_bai}"
-echo "------------------------"
-echo ""
-echo -e "域名优惠"
-echo "------------------------"
-echo -e "${gl_lan}GNAME 8.8刀首年COM域名 6.68刀首年CC域名${gl_bai}"
-echo -e "${gl_bai}网址: https://www.gname.com/register?tt=86836&ttcode=KEJILION86836&ttbj=sh${gl_bai}"
-echo "------------------------"
-echo ""
-echo -e "科技lion周边"
-echo "------------------------"
-echo -e "${gl_kjlan}B站: ${gl_bai}https://b23.tv/2mqnQyh              ${gl_kjlan}油管: ${gl_bai}https://www.youtube.com/@kejilion${gl_bai}"
-echo -e "${gl_kjlan}官网: ${gl_bai}https://kejilion.pro/              ${gl_kjlan}导航: ${gl_bai}https://dh.kejilion.pro/${gl_bai}"
-echo -e "${gl_kjlan}博客: ${gl_bai}https://blog.kejilion.pro/         ${gl_kjlan}软件中心: ${gl_bai}https://app.kejilion.pro/${gl_bai}"
-echo "------------------------"
-echo -e "${gl_kjlan}脚本官网: ${gl_bai}https://kejilion.sh            ${gl_kjlan}GitHub地址: ${gl_bai}${gh_https_url}github.com/kejilion/sh${gl_bai}"
+echo -e "${gl_kjlan}品牌名: ${gl_bai}CODE MATRIX 代码矩阵${gl_bai}"
+echo -e "${gl_kjlan}口号: ${gl_bai}用代码 · 爱上Linux${gl_bai}"
+echo -e "${gl_kjlan}官网: ${gl_bai}https://zttz.eu.org/${gl_bai}"
+echo -e "${gl_kjlan}安装: ${gl_bai}bash <(curl -sL https://zttz.eu.org/z)${gl_bai}"
 echo "------------------------"
 echo ""
 }
@@ -33521,7 +33476,7 @@ while true; do
 				send_stats "脚本更新失败"
 			fi
 			break_end
-			~/kejilion.sh
+			~/codematrix.sh
 			exit
 			;;
 		2)
@@ -33531,23 +33486,23 @@ while true; do
 			local cron_proxy cron_sed_cmd
 			if [ "$country" = "CN" ]; then
 				cron_proxy="https://gh.kejilion.pro/"
-				cron_sed_cmd="sed -i 's/canshu=\"default\"/canshu=\"CN\"/g' ~/kejilion.sh"
+				cron_sed_cmd="sed -i 's/canshu=\"default\"/canshu=\"CN\"/g' ~/codematrix.sh"
 			elif [ -n "$ipv6_address" ]; then
 				cron_proxy="https://gh.kejilion.pro/"
-				cron_sed_cmd="sed -i 's/canshu=\"default\"/canshu=\"V6\"/g' ~/kejilion.sh"
+				cron_sed_cmd="sed -i 's/canshu=\"default\"/canshu=\"V6\"/g' ~/codematrix.sh"
 			else
 				cron_proxy="https://"
 				cron_sed_cmd=""
 			fi
 
 			# 构建健壮的自动更新命令：下载到临时文件 → 校验 → 备份 → 替换 → 恢复本地设置 → 部署
-			SH_Update_task="cd ~ && bash ~/kejilion.sh zttz-safe-update"
+			SH_Update_task="cd ~ && bash ~/codematrix.sh zttz-safe-update"
 			# 追加设置恢复
 			if [ -n "$cron_sed_cmd" ]; then
 				SH_Update_task="$SH_Update_task && $cron_sed_cmd"
 			fi
 			# 从旧脚本恢复 permission_granted 和 ENABLE_STATS 设置
-			SH_Update_task="$SH_Update_task && grep -q 'permission_granted=\"true\"' ~/kejilion.sh.bak 2>/dev/null && sed -i 's/permission_granted=\"false\"/permission_granted=\"true\"/' ~/kejilion.sh; grep -q 'ENABLE_STATS=\"false\"' ~/kejilion.sh.bak 2>/dev/null && sed -i 's/ENABLE_STATS=\"true\"/ENABLE_STATS=\"false\"/' ~/kejilion.sh"
+			SH_Update_task="$SH_Update_task && grep -q 'permission_granted=\"true\"' ~/codematrix.sh.bak 2>/dev/null && sed -i 's/permission_granted=\"false\"/permission_granted=\"true\"/' ~/codematrix.sh; grep -q 'ENABLE_STATS=\"false\"' ~/codematrix.sh.bak 2>/dev/null && sed -i 's/ENABLE_STATS=\"true\"/ENABLE_STATS=\"false\"/' ~/codematrix.sh"
 			# 部署到 /usr/local/bin/k 和 /usr/bin/k
 			SH_Update_task="$SH_Update_task"
 			# 下载失败时清理临时文件
@@ -33587,9 +33542,9 @@ if grep -qxF "kpanel" /home/docker/appno.txt 2>/dev/null; then
 	kpanel_menu_status="${gl_lv}[已安装]${gl_bai}"
 fi
 echo -e "${gl_kjlan}"
-echo "╦╔═╔═╗ ╦╦╦  ╦╔═╗╔╗╔ ╔═╗╦ ╦"
-echo "╠╩╗║╣  ║║║  ║║ ║║║║ ╚═╗╠═╣"
-echo "╩ ╩╚═╝╚╝╩╩═╝╩╚═╝╝╚╝o╚═╝╩ ╩"
+echo "╔═══╗ ╔════╗ ╔════╗ ╔═══╗      ╔═══╗ ╦ ╦       ╔═══╗ ╔═╗  ╔═══╗ "
+echo "╠╦╔╝    ║     ║   ╠╦╔╝   ●   ╠══╣  ║ ║   ●   ║  ║ ╠═╣  ║ ═╣  "
+echo "╚═══╝   ╩     ╩   ╚═══╝      ╚═══╝ ╚═╝       ╚═══╝ ╩ ╩  ╚═══╝ "
 echo -e "CODE MATRIX 代码矩阵 v$sh_v"
 echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -33613,7 +33568,7 @@ echo -e "${gl_kjlan}15.  ${gl_bai}广告专栏"
 echo -e "${gl_kjlan}16.  ${gl_bai}游戏开服脚本合集"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
 echo -e "${gl_huang}17.  ${gl_bai}KPanel Web管理面板 ${kpanel_menu_status}"
-echo -e "${gl_hui}     kejilion.sh 的现代化网页管理界面${gl_bai}"
+echo -e "${gl_hui}     CODE MATRIX 代码矩阵的现代化网页管理界面${gl_bai}"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
 echo -e "${gl_kjlan}00.  ${gl_bai}脚本更新"
 echo -e "${gl_kjlan}------------------------${gl_bai}"
@@ -33833,16 +33788,16 @@ zttz_update_rollback() {
     local msg="${1:-更新失败}"
     echo -e "${gl_hong}❌ ${msg}${gl_bai}"
     rm -f "${tmp_file:-}" "${checksum_file:-}" 2>/dev/null || true
-    if [ -f ~/kejilion.sh.bak ]; then
-        if mv -f ~/kejilion.sh.bak ~/kejilion.sh; then
-            chmod +x ~/kejilion.sh 2>/dev/null || true
-            cp -f ~/kejilion.sh /usr/local/bin/k 2>/dev/null || true
-            cp -f ~/kejilion.sh /usr/local/bin/z 2>/dev/null || true
+    if [ -f ~/codematrix.sh.bak ]; then
+        if mv -f ~/codematrix.sh.bak ~/codematrix.sh; then
+            chmod +x ~/codematrix.sh 2>/dev/null || true
+            cp -f ~/codematrix.sh /usr/local/bin/k 2>/dev/null || true
+            cp -f ~/codematrix.sh /usr/local/bin/z 2>/dev/null || true
             [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
             [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
             echo -e "${gl_huang}已回滚到更新前备份版本。${gl_bai}"
         else
-            echo -e "${gl_hong}回滚失败，请人工检查 ~/kejilion.sh 与 ~/kejilion.sh.bak。${gl_bai}"
+            echo -e "${gl_hong}回滚失败，请人工检查 ~/codematrix.sh 与 ~/codematrix.sh.bak。${gl_bai}"
         fi
     fi
     return 1
@@ -33870,7 +33825,7 @@ zttz_safe_update() {
 
     echo -e "${gl_kjlan}🚀 正在从 ${download_url} 安全更新脚本...${gl_bai}"
 
-    if ! cp -f ~/kejilion.sh ~/kejilion.sh.bak; then
+    if ! cp -f ~/codematrix.sh ~/codematrix.sh.bak; then
         echo -e "${gl_hong}❌ 更新前备份失败，已中止更新。${gl_bai}"
         return 1
     fi
@@ -33916,15 +33871,15 @@ zttz_safe_update() {
         fi
     fi
 
-    if ! mv -f "$tmp_file" ~/kejilion.sh; then
+    if ! mv -f "$tmp_file" ~/codematrix.sh; then
         zttz_update_rollback "替换新版脚本失败，已恢复原版本"
         return 1
     fi
     tmp_file=""
 
-    chmod +x ~/kejilion.sh || zttz_update_rollback "设置新版脚本可执行权限失败，已回滚"
-    cp -f ~/kejilion.sh /usr/local/bin/k || zttz_update_rollback "部署 /usr/local/bin/k 失败，已回滚"
-    cp -f ~/kejilion.sh /usr/local/bin/z || zttz_update_rollback "部署 /usr/local/bin/z 失败，已回滚"
+    chmod +x ~/codematrix.sh || zttz_update_rollback "设置新版脚本可执行权限失败，已回滚"
+    cp -f ~/codematrix.sh /usr/local/bin/k || zttz_update_rollback "部署 /usr/local/bin/k 失败，已回滚"
+    cp -f ~/codematrix.sh /usr/local/bin/z || zttz_update_rollback "部署 /usr/local/bin/z 失败，已回滚"
     chmod +x /usr/local/bin/k /usr/local/bin/z || zttz_update_rollback "设置命令执行权限失败，已回滚"
     [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
     [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
