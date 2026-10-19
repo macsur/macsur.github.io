@@ -1,0 +1,20 @@
+model_provider = "sub2api"
+model = "gemini-3.8-flash-high"
+
+[model_providers.sub2api]
+name = "Sub2API Gemini"
+base_url = "https://sub2api.136222.xyz/v1"
+wire_api = "responses"
+env_key = "SUB2API_API_KEY"
+requires_openai_auth = true
+
+# BEGIN PAPERCLIP MANAGED MCP
+# Written by Paperclip for governed MCP gateway access. Do not edit this block by hand.
+
+[mcp_servers."paperclip-connections"]
+url = "http://127.0.0.1:3100/mcp/runtime-tools"
+http_headers = { Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3OGE2YjlmNC00NTJiLTQ1OGUtOWNmYi1mOTM1NWI0Y2QwY2IiLCJjb21wYW55X2lkIjoiNGMxY2RiNGQtZmRkNy00NDFmLTgxMTEtMzYzODQxOTk0YjUwIiwicnVuX2lkIjoiYjRjODJiM2QtYTMyOC00OWNkLWE2NTktYTFjMGEyNzBlZDA3IiwicmVzcG9uc2libGVfdXNlcl9pZCI6ImxvY2FsLWJvYXJkIiwic2NvcGUiOiJjb25uZWN0aW9uX2ludGVudHMiLCJpYXQiOjE3OTIyNTIwNTAsImV4cCI6MTc5MjI1NTY1MCwiaW5zdGFuY2VfaWQiOiJkZWZhdWx0In0.16WF11tBoOq2Qd8KdS-4jfj3bxJsfck9-g_Mj6TKdTY" }
+
+[projects."/Users/ttnk/Desktop/Kejilion"]
+trust_level = "trusted"
+# END PAPERCLIP MANAGED MCP

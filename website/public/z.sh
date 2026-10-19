@@ -34340,11 +34340,11 @@ z_uninstall() {
         done
     done
 
-    # 3. 脚本本体与历史备份
+    # 3. 脚本本体与历史备份（明确包含 codematrix 及旧 kejilion 全家桶）
     for f in ~/codematrix.sh ~/codematrix.sh.bak ~/codematrix.sh ~/codematrix.sh.bak ~/codematrix.sh.migrated; do
-        if [ -f "$f" ]; then
-            targets+=("$f")
-            echo -e "  • 脚本文件: ${gl_bai}$f${gl_bai}"
+        local expanded_f=$(eval echo "$f")
+        if [ -f "$expanded_f" ] || [ -L "$expanded_f" ]; then
+            targets+=("$expanded_f")
         fi
     done
 
@@ -34404,22 +34404,12 @@ z_uninstall() {
         fi
     done
 
-    # 3. 清理各入口与软链接（先删软链和外部入口，最后删本体）
+    # 3. 使用标准 unlink 语义逐个安全清除所有列入清单的入口、软链与脚本本体及备份文件
     for t in "${targets[@]}"; do
-        if [ "$t" != "$HOME/codematrix.sh" ]; then
-            rm -f "$t" 2>/dev/null || true
+        if [ -f "$t" ] || [ -L "$t" ]; then
+            command -v unlink >/dev/null 2>&1 && unlink "$t" 2>/dev/null || rm -f "$t" 2>/dev/null || true
         fi
     done
-
-    # 4. 按需删除 ~/z-apps
-    if [ "$delete_zapps" -eq 1 ]; then
-        rm -rf "$HOME/z-apps" 2>/dev/null || true
-    fi
-
-    # 5. 最后一步安全删除本体并退出
-    rm -f "$HOME/codematrix.sh" 2>/dev/null || true
-    rm -f "$HOME/kejilion.sh" 2>/dev/null || true
-    rm -f "$HOME/kejilion.sh.migrated" 2>/dev/null || true
 
     echo -e "${gl_lv}✅ 脚本已卸载，再见！${gl_bai}"
     exit 0

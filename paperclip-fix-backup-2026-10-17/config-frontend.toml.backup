@@ -1,0 +1,20 @@
+model_provider = "agent2api"
+model = "deepseek-v4-pro"
+
+[model_providers.agent2api]
+name = "Agent2API DeepSeek"
+base_url = "https://test002.zttz.eu.org/v1"
+wire_api = "responses"
+env_key = "AGENT2API_API_KEY"
+requires_openai_auth = true
+
+# BEGIN PAPERCLIP MANAGED MCP
+# Written by Paperclip for governed MCP gateway access. Do not edit this block by hand.
+
+[mcp_servers."paperclip-connections"]
+url = "http://127.0.0.1:3100/mcp/runtime-tools"
+http_headers = { Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MGIyNDFlZi1hYWNlLTQxYzAtOTQwNS04MjI5OWNjOWU3ZjciLCJjb21wYW55X2lkIjoiNGMxY2RiNGQtZmRkNy00NDFmLTgxMTEtMzYzODQxOTk0YjUwIiwicnVuX2lkIjoiZWI1MzUwM2ItZThhMi00MDE4LWEwZDYtNzBkNWU2NjM2NjVjIiwicmVzcG9uc2libGVfdXNlcl9pZCI6ImxvY2FsLWJvYXJkIiwic2NvcGUiOiJjb25uZWN0aW9uX2ludGVudHMiLCJpYXQiOjE3OTIyNTIxMTAsImV4cCI6MTc5MjI1NTcxMCwiaW5zdGFuY2VfaWQiOiJkZWZhdWx0In0.DBeGuZTi03eAxJU2SB1kqvuKqA2aZdUv83KMJzU5fjQ" }
+
+[projects."/Users/ttnk/Desktop/Kejilion"]
+trust_level = "trusted"
+# END PAPERCLIP MANAGED MCP

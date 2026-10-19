@@ -1,0 +1,139 @@
+app_id="3"
+app_name="FileCodeBox 文件快递柜"
+app_category="storage"
+app_text="匿名口令分享文件与文本：上传得 5 位取件码，像取快递一样取文件"
+app_size="1"
+docker_name="filecodebox"
+docker_port="12345"
+docker_describe="FileCodeBox 文件快递柜（端口 12345，存储后端可在后台切换为 S3 / Cloudflare R2）"
+docker_url="https://github.com/vastsa/FileCodeBox"
+
+FCB_IMG="lanol/filecodebox:latest"
+FCB_BASE_DIR="/home/docker/filecodebox"
+
+docker_app_install() {
+    clear
+    echo -e "\033[96m==================================================\033[0m"
+    echo -e "\033[32m  🚀 [z app 3] FileCodeBox 文件快递柜 正在安装...\033[0m"
+    echo -e "\033[96m==================================================\033[0m"
+
+    if ! command -v docker >/dev/null 2>&1; then
+        echo -e "\033[31m❌ 未检测到 docker，请先安装 Docker 后重试\033[0m"
+        return 1
+    fi
+
+    # 已安装则提示
+    if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "filecodebox"; then
+        echo -e "\033[33m⚠️ 检测到 filecodebox 容器已存在\033[0m"
+        if docker ps --format '{{.Names}}' 2>/dev/null | grep -qx "filecodebox"; then
+            echo -e "\033[32m✅ 容器正在运行中，无需重复安装\033[0m"
+        else
+            echo -e "\033[33m正在启动已存在的容器...\033[0m"
+            docker start filecodebox >/dev/null 2>&1
+            echo -e "\033[32m✅ 容器已启动\033[0m"
+        fi
+        echo -e "\033[96m==================================================\033[0m"
+        return 0
+    fi
+
+    echo -e "\033[33m正在拉取镜像 $FCB_IMG ...\033[0m"
+    if ! docker pull "$FCB_IMG"; then
+        echo -e "\033[31m❌ 镜像拉取失败，请检查网络后重试\033[0m"
+        return 1
+    fi
+
+    mkdir -p "$FCB_BASE_DIR/data"
+
+    echo -e "\033[33m正在启动容器...\033[0m"
+    if ! docker run -d --name filecodebox \
+        --restart unless-stopped \
+        -p 12345:12345 \
+        -v "$FCB_BASE_DIR/data:/app/data" \
+        -e APP_ENV=production \
+        -e LOG_LEVEL=warning \
+        -e ACCESS_LOG=false \
+        -e WORKERS=1 \
+        --log-opt max-size=10m \
+        --log-opt max-file=3 \
+        "$FCB_IMG" >/dev/null 2>&1; then
+        echo -e "\033[31m❌ 容器启动失败\033[0m"
+        return 1
+    fi
+
+    # 等待服务就绪
+    echo -e "\033[33m等待服务就绪...\033[0m"
+    local ok=0
+    for i in $(seq 1 20); do
+        if curl -fsS --max-time 3 "http://127.0.0.1:12345/" >/dev/null 2>&1; then
+            ok=1
+            break
+        fi
+        sleep 2
+    done
+
+    echo ""
+    if [ "$ok" = "1" ]; then
+        echo -e "\033[32m✅ FileCodeBox 安装完成！\033[0m"
+    else
+        echo -e "\033[33m⚠️ 容器已启动，但 Web 页面暂未响应，请稍后手动检查\033[0m"
+    fi
+    echo -e "访问地址: \033[33mhttp://服务器IP:12345\033[0m（首次打开完成初始化，设置管理员账号）"
+    echo -e "使用方式: 上传文件/文本后得到 5 位取件码，对方在首页输入取件码即可提取"
+    echo -e "对象存储: 后台「系统设置 → 存储配置」可切换为 S3（Cloudflare R2 / AWS S3）"
+    echo -e "数据目录: \033[33m$FCB_BASE_DIR/data\033[0m"
+    echo -e "\033[96m==================================================\033[0m"
+}
+
+docker_app_update() {
+    echo "正在更新 FileCodeBox ..."
+    if ! docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx "filecodebox"; then
+        echo -e "\033[31m❌ 未检测到 filecodebox 容器，请先安装\033[0m"
+        return 1
+    fi
+    echo -e "\033[33m拉取最新镜像...\033[0m"
+    docker pull "$FCB_IMG" || {
+        echo -e "\033[31m❌ 镜像拉取失败\033[0m"
+        return 1
+    }
+    echo -e "\033[33m重建容器（数据卷保留）...\033[0m"
+    docker rm -f filecodebox >/dev/null 2>&1
+    docker run -d --name filecodebox \
+        --restart unless-stopped \
+        -p 12345:12345 \
+        -v "$FCB_BASE_DIR/data:/app/data" \
+        -e APP_ENV=production \
+        -e LOG_LEVEL=warning \
+        -e ACCESS_LOG=false \
+        -e WORKERS=1 \
+        --log-opt max-size=10m \
+        --log-opt max-file=3 \
+        "$FCB_IMG" >/dev/null 2>&1
+    echo -e "\033[32m✅ 更新完成\033[0m"
+}
+
+docker_app_uninstall() {
+    echo "正在卸载 FileCodeBox ..."
+    docker rm -f filecodebox 2>/dev/null || true
+    # 可选删除镜像
+    echo -e "\033[33m是否同时删除镜像 $FCB_IMG？(y/N)\033[0m"
+    local ans_img
+    read -r ans_img
+    if [ "$ans_img" = "y" ] || [ "$ans_img" = "Y" ]; then
+        docker rmi "$FCB_IMG" 2>/dev/null || true
+        echo "镜像已删除"
+    fi
+    if [ -d "$FCB_BASE_DIR" ]; then
+        echo -e "\033[33m是否同时删除数据目录 $FCB_BASE_DIR（含分享记录与数据库）？(y/N)\033[0m"
+        local ans
+        read -r ans
+        if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
+            rm -rf "$FCB_BASE_DIR"
+            echo "数据目录已删除"
+        else
+            echo "数据目录保留：$FCB_BASE_DIR"
+        fi
+    fi
+    echo -e "\033[32m✅ 卸载完成\033[0m"
+}
+
+docker_app_plus

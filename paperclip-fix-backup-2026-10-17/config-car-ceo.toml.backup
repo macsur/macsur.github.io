@@ -1,0 +1,17 @@
+model_provider = "sub2api"
+model = "gemini-3.8-flash-high"
+
+[model_providers.sub2api]
+name = "Sub2API Gemini"
+base_url = "https://sub2api.136222.xyz/v1"
+wire_api = "responses"
+env_key = "SUB2API_API_KEY"
+requires_openai_auth = true
+
+# BEGIN PAPERCLIP MANAGED MCP
+# Written by Paperclip for governed MCP gateway access. Do not edit this block by hand.
+
+[mcp_servers."paperclip-connections"]
+url = "http://127.0.0.1:3100/mcp/runtime-tools"
+http_headers = { Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3OTk2YWQwNC01NWU0LTQxYmEtYjE4NC1lYWRiOWIxNGRmMzciLCJjb21wYW55X2lkIjoiMjQ1ZjA2NzEtZDk2OS00ZDMzLTkwNGUtYzkyOTc1MmI5ODNmIiwicnVuX2lkIjoiOTI4NWRhODYtYmMxMi00NWQ0LWI2OTItMTgwYzhiMjA1MjEzIiwicmVzcG9uc2libGVfdXNlcl9pZCI6ImxvY2FsLWJvYXJkIiwic2NvcGUiOiJjb25uZWN0aW9uX2ludGVudHMiLCJpYXQiOjE3OTIyNTIxNzAsImV4cCI6MTc5MjI1NTc3MCwiaW5zdGFuY2VfaWQiOiJkZWZhdWx0In0.LBZSWyGTmAUkxqV2FAE4dByuB-xCBmodaz5ypOI344k" }
+# END PAPERCLIP MANAGED MCP
