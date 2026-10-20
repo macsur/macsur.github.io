@@ -1,3 +1,5 @@
+// 🌟 GitHub 一周热点第 135 期 · 5 篇实测教程（专栏页：/github-trending/）
+import { TRENDING_EPISODE_135_TUTORIALS } from './trendingTutorialsData';
 export type TutorialTag = '我喜欢的' | '测试中' | '正在用' | '推荐';
 
 export interface TutorialItem {
@@ -1266,3 +1268,6 @@ VDO.Ninja 是个免费的网页工具，基于浏览器的实时传输（WebRTC�
     `.trim()
   }
 ];
+
+// 合并 GitHub 一周热点第 135 期专栏教程
+TUTORIALS_DATA.push(...TRENDING_EPISODE_135_TUTORIALS);
