@@ -134,11 +134,17 @@ export default function TutorialsPage() {
     return TUTORIALS_DATA.find(item => item.slug === 'paperclip') || TUTORIALS_DATA.find(item => item.featured) || TUTORIALS_DATA[0];
   }, []);
 
+  // 置顶首篇是否参与展示：「全部」时永远展示；按标签筛选时，
+  // 只有当首篇本身命中该标签才展示——否则顶部徽标写着 N 篇、点进去却只有 N-1 张卡。
+  const showFeatured = useMemo(() => {
+    if (!featuredItem) return false;
+    if (activeTag === '全部') return true;
+    return featuredItem.tags.includes(activeTag);
+  }, [activeTag, featuredItem]);
+
   const gridItems = useMemo(() => {
-    // 排除置顶首篇
-    const rest = activeTag === '全部'
-      ? filtered.filter(item => item.id !== featuredItem?.id)
-      : filtered.filter(item => item.id !== featuredItem?.id);
+    // 网格区剔除置顶首篇（它由上方置顶大卡单独承载）
+    const rest = filtered.filter(item => item.id !== featuredItem?.id);
 
     // 按日期倒序排列（最新在前），同日以录入先后为次级（越晚录入越靠前）
     return [...rest].sort((a, b) => {
@@ -150,7 +156,7 @@ export default function TutorialsPage() {
       const idxB = filtered.indexOf(b);
       return idxB - idxA;
     });
-  }, [activeTag, filtered, featuredItem]);
+  }, [filtered, featuredItem]);
 
   const countFor = (tag: '全部' | TutorialTag) =>
     tag === '全部' ? TUTORIALS_DATA.length : TUTORIALS_DATA.filter(item => item.tags.includes(tag)).length;
@@ -194,8 +200,8 @@ export default function TutorialsPage() {
           })}
         </div>
 
-        {/* 置顶 Featured 大卡片 (全部标签时展示) */}
-        {activeTag === '全部' && featuredItem && (
+        {/* 置顶 Featured 大卡片（全部标签时展示；按标签筛选时，首篇命中该标签才展示） */}
+        {showFeatured && featuredItem && (
           <div className="mt-8">
             <FeaturedCard item={featuredItem} />
           </div>
