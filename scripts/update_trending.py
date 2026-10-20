@@ -140,7 +140,9 @@ TAG_DEFAULT_STYLE = (
 # ---- 用户指定的大模型翻译 API 端点信息 ----
 DEFAULT_API_URL = "https://cli.136222.xyz/v1"
 DEFAULT_MODEL = "gemini-2.5-flash"
-DEFAULT_API_KEY = "sk-f6ba10cfedb11ef9213fe3f0eae6fc81727b08d12bd4cc211ab015a978cb1f0f"
+# 不再内置任何硬编码 Key：仓库是公开的，明文 Key 会被 GitHub 自动化扫描
+# 抓取并可能被外部滥用。未注入 TRANSLATE_API_KEY 时直接走内置词库兜底。
+DEFAULT_API_KEY = ""
 
 TRANSLATE_API_URL = (
     os.environ.get("TRANSLATE_API_URL") or DEFAULT_API_URL
@@ -225,6 +227,9 @@ def create_insecure_ssl_context():
 def translate_via_api(text):
     """调用用户指定的大模型 API 翻译接口 (https://cli.136222.xyz/v1, cli-api)."""
     if not text or not text.strip():
+        return None
+    # 没有可用 Key 时不发起请求，直接交给调用方的内置词库/规则兜底。
+    if not TRANSLATE_API_KEY:
         return None
     try:
         payload = json.dumps({

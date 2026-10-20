@@ -70,7 +70,9 @@ const BUILTIN_ZH_DICTIONARY = {
  * 尝试通过用户指定的服务器 API 执行翻译
  */
 const API_URL = process.env.TRANSLATE_API_URL || 'https://cli.136222.xyz/v1';
-const API_KEY = process.env.TRANSLATE_API_KEY || 'sk-f6ba10cfedb11ef9213fe3f0eae6fc81727b08d12bd4cc211ab015a978cb1f0f';
+// 不再内置任何硬编码 Key：仓库是公开的，明文 Key 会被 GitHub 自动化扫描
+// 抓取并可能被外部滥用。未注入 TRANSLATE_API_KEY 时直接走内置词库兜底。
+const API_KEY = process.env.TRANSLATE_API_KEY || '';
 const API_MODEL = process.env.TRANSLATE_MODEL || 'gemini-2.5-flash';
 
 function fetchReadmeSnippet(repoPath) {
@@ -92,6 +94,8 @@ function fetchReadmeSnippet(repoPath) {
 
 async function translateViaUserApi(text, type = 'desc', context = '') {
   if (!text || !text.trim()) return null;
+  // 没有可用 Key 时不发起请求，直接交给调用方的内置词库/规则兜底。
+  if (!API_KEY) return null;
   return new Promise((resolve) => {
     try {
       let systemPrompt = '';
