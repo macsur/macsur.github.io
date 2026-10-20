@@ -41,7 +41,7 @@ for (const url of UPSTREAM_URLS) {
 
 if (!officialCode.includes('kejilion_sh()') || !officialCode.includes('linux_panel()')) {
     console.log('⚠️ 远程拉取超时，正在使用本地已有源码进行打补丁与同步...');
-    officialCode = fs.readFileSync(path.join(ROOT_DIR, 'kejilion.sh'), 'utf8');
+    officialCode = fs.readFileSync(path.join(ROOT_DIR, 'official-upstream.sh'), 'utf8');
 }
 
 console.log('🔧 [2/5] 正在执行智能守护与健壮性补丁...');
