@@ -6709,3 +6709,54 @@ tokens used 6,197
 3. 22:00 换回令的正式线选择与回滚时点确认
 
 —— 电脑小安（2026-10-20 23:41）
+
+---
+
+## 小安补充自查（2026-10-20 23:44）：回应 23:41 回执「待 Muse 核验」三项
+
+Muse 核验前，小安先把能自己查的三项查了，结论如下：
+
+### 一、8 岗 errorReason 是否清空 —— 尚未清空，但属切换前历史残留
+
+| 岗位 | status | errorReason |
+|---|---|---|
+| 车机-CEO | running | （空）✅ |
+| 车机-CTO | running | 残留 `exceeded retry limit, last status: 429 Too Many Requests` |
+| 车机-应用工程师 | running | 残留 `403 GLM-5.3 免费额度已用完…` |
+| 车机-智能体工程师 | running | 残留 `403 GLM-5.3 免费额度已用完…` |
+| 车机-QA验收 | running | 残留 `403 GLM-5.3 免费额度已用完…` |
+| 车机-逆向工程师（静态剖析） | running | 残留 `403 GLM-5.3 免费额度已用完…` |
+| 小安-CEO | running | 残留 `exceeded retry limit, last status: 429 Too Many Requests` |
+| 小安-前端工程师 | running | 残留 `403 GLM-5.3 免费额度已用完…` |
+
+**定性**：8 岗 `status` **全部为 running**（新 run 正在跑），`errorReason` 字段里挂的是**切换前**的旧错误文本（GLM-5.3 额度用尽、429 retry limit），与当前 OpenRouter 线路无关。23:41 回执的实测已证本次调用零认证失败、零 429。该字段要等新 run 正常收尾后由 Paperclip 自行覆盖。
+
+**小安不擅自清此字段**（属各岗运行状态，不在「只改线路配置」授权内），请 Muse 知悉。
+
+### 二、组织健康度 —— 已恢复 healthy ✅
+
+- **网站公司**：12 岗 = 9 idle + 2 running + 1 error，`orgChainHealth.status = healthy`
+- **车机公司**：11 岗 = 5 idle + 6 running，`orgChainHealth.status = healthy`
+- 两家 `firstInvalidAncestor = null`、`invalidAncestors = []`，汇报链无断点
+
+### 三、顺带定位到网站公司唯一 1 个 error 岗（不在本次 8 岗范围内）
+
+**小安-后端工程师**（`e52aec5f`，沙箱 `backend`）：
+
+```
+errorReason: 404 Not Found: 模型不存在: deepseek-v4-pro
+  （目录里相近的模型: deepseek-v4-pro-0813、DeepSeek-V4-Pro-Official-solo）
+  url: https://test002.zttz.eu.org/v1/responses
+```
+
+该岗走 **Agent2API + `deepseek-v4-pro`**（旧名，10-13 已被网关改名为 `deepseek-v4-pro-0813`），**不属本次切换的 8 岗**（8 岗是 base_url 指向 `127.0.0.1:9` 的断电态集合），故未在本次改动范围内。
+
+**小安不擅自改**（超出本单授权，且 22:00 换回令会覆盖该岗线路）。在此仅作定点上报，请 Muse 裁定是否在 22:00 换回时一并把该岗 `model` 改成 `deepseek-v4-pro-0813`。
+
+### 四、22:00 换回预备（无需现在动手，仅报备）
+
+- 8 份 `.bak-openrouter-20261020` 已在各沙箱目录就位
+- 各岗 `AGENT2API_API_KEY` / `SUB2API_API_KEY` 槽位与旧 Key 均**保留未动**，换回时把 `env_key` 指回、删掉 `OPENROUTER_API_KEY`、改回 `base_url` 与 `model` 即可完全复原
+- **只待 Muse 下换回令**（正式线候选：glm-5-3、deepseek-v4-pro-0813、gemini-3.8-flash-high 任一已验活线）
+
+—— 电脑小安（2026-10-20 23:44）
