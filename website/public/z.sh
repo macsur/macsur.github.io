@@ -2,6 +2,8 @@
 sh_v="4.5.13"
 zttz_edition="true"
 zttz_v="1.0.0"
+zttz_edition="true"
+zttz_v="1.0.0"
 
 
 gl_hui='\e[37m'
@@ -231,7 +233,21 @@ zttz_verify_entries() {
 }
 
 if ! kpanel_protocol_active; then
-	if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
+	if [ -f ~/codematrix.sh ] && [ ! -f ~/codematrix.sh ]; then
+	# CODE MATRIX 存量迁移：旧版 kejilion.sh → codematrix.sh，保留已同意状态
+	cp -f ~/codematrix.sh ~/codematrix.sh
+	# 迁移关键参数（canshu / permission_granted / ENABLE_STATS）
+	_old_canshu=$(grep -E '^canshu=' ~/codematrix.sh 2>/dev/null | tail -1)
+	_old_perm=$(grep -E '^permission_granted=' ~/codematrix.sh 2>/dev/null | tail -1)
+	_old_stats=$(grep -E '^ENABLE_STATS=' ~/codematrix.sh 2>/dev/null | tail -1)
+	[ -n "$_old_canshu" ] && sed -i "s/^canshu=.*/$_old_canshu/" ~/codematrix.sh 2>/dev/null
+	[ -n "$_old_perm" ] && sed -i "s/^permission_granted=.*/$_old_perm/" ~/codematrix.sh 2>/dev/null
+	[ -n "$_old_stats" ] && sed -i "s/^ENABLE_STATS=.*/$_old_stats/" ~/codematrix.sh 2>/dev/null
+	# 处置旧文件：改名 .migrated 备份
+	mv -f ~/codematrix.sh ~/codematrix.sh.migrated
+	echo -e "${gl_lv}✅ 存量迁移完成：参数已迁入 ~/codematrix.sh，旧文件已备份为 ~/codematrix.sh.migrated${gl_bai}"
+fi
+if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
 	# CODE MATRIX 存量迁移：旧版 kejilion.sh → codematrix.sh，保留已同意状态
 	cp -f ~/kejilion.sh ~/codematrix.sh
 	# 迁移关键参数（canshu / permission_granted / ENABLE_STATS）
@@ -26925,6 +26941,793 @@ linux_panel_accordion() {
 
 
 
+
+# ==============================================================================
+# 11+ 应用市场 [分类折叠] 模块 (智能手风琴视图)
+# 采用纯样式 0 开销折叠、A1~J* 分类专属代号与一键极速安装
+# ==============================================================================
+CATEGORY_LIST=(
+  "github:A:⭐ 热门开源 TOP10:10"
+  "ops:B:🖥️  服务器运维与探针监控:29"
+  "ai:C:🤖 人工智能与前沿大模型:14"
+  "network:D:🌐 网络代理与穿透组网:15"
+  "storage:E:🗄️  私有网盘与数据存储:14"
+  "media:F:🎬 影音媒体与离线下载:14"
+  "office:G:📝 协作办公与实用工具:32"
+  "custom:H:📦 第三方与社区扩展应用:0"
+)
+
+# 展开状态记录字符串 (空格分隔的已展开分类ID，初始为空代表全折叠)
+EXPANDED_CATEGORIES=""
+
+is_cat_expanded() {
+    local target="$1"
+    [[ " $EXPANDED_CATEGORIES " == *" $target "* ]]
+}
+
+toggle_cat_expanded() {
+    local target="$1"
+    if is_cat_expanded "$target"; then
+        # 再次选中当前已展开的分类，执行折叠收起
+        EXPANDED_CATEGORIES=""
+    else
+        # 独占式手风琴：只展开当前选中的分类，其他分类自动折叠
+        EXPANDED_CATEGORIES=" $target "
+    fi
+}
+
+expand_all_cats() {
+    EXPANDED_CATEGORIES="github ops ai network storage media office custom"
+}
+
+collapse_all_cats() {
+    EXPANDED_CATEGORIES=""
+}
+
+get_cat_name() {
+    local target="$1"
+    for item in "${CATEGORY_LIST[@]}"; do
+        local cid="" ckey="" cname="" ccount=""
+        IFS=':' read -r cid ckey cname ccount <<< "$item"
+        if [ "$cid" = "$target" ]; then
+            echo "$cname"
+            return 0
+        fi
+    done
+    echo "$target"
+}
+
+get_cid_by_key() {
+    local upper_k="$1"
+    for item in "${CATEGORY_LIST[@]}"; do
+        local cid="" ckey="" cname="" ccount=""
+        IFS=':' read -r cid ckey cname ccount <<< "$item"
+        if [ "$ckey" = "$upper_k" ]; then
+            echo "$cid"
+            return 0
+        fi
+    done
+    echo ""
+}
+
+# 内置 118 个软件的标准数据库 (id|name|category|star|aliases|desc)
+BUILTIN_APPS=(
+  "201|DeepSeek-V3/R1 顶尖开源大模型|github|★|deepseek|全球瞩目的划时代开源大语言模型与超强推理架构。" \
+  "202|Ollama 本地大模型极速运行引擎|github|★|ollama|一键在本地或 VPS 运行 DeepSeek、Llama3 等大模型。" \
+  "203|Open WebUI 全能私有化 AI 交互平台|github|★|open-webui|媲美 ChatGPT 的自托管多模型 Web 界面。" \
+  "204|Dokploy 轻量开源自托管 PaaS 运维平台|github|★|dokploy|下一代轻量级 PaaS 应用平台，一键管理容器应用与数据库。" \
+  "205|Uptime Kuma 高颜值自托管探针监控|github|★|uptime-kuma|高颜值探针监控，支持 90+ 告警通知与公开状态页。" \
+  "206|RustDesk 开源全平台远程桌面中继|github|★|rustdesk|开源远程桌面客户端与自建中继服务，端到端高强度加密安全可控。" \
+  "207|Immich 高性能私有云相册与视频备份|github|★|immich|自主可控的极速相册备份方案，内置隐私 AI 识别与人脸聚合。" \
+  "208|n8n 智能自动化与 AI Agent 流程编排|github|★|n8n|可视化拖拽自动化工作流，原生构建私有 AI Agent 智能体。" \
+  "209|Lobe Chat 现代多模态开源大模型聊天框架|github|★|lobe-chat|极致现代化设计，支持语音、视觉多模态与丰富插件市场。" \
+  "210|Code-Server 浏览器云端全功能 VS Code|github|★|code-server|在远程服务器运行 VS Code，浏览器即开即写。" \
+  "1|宝塔面板官方版|ops||bt|baota|" \
+  "2|aaPanel宝塔国际版|ops||aapanel|" \
+  "3|1Panel新一代管理面板|ops||1p|1panel|" \
+  "4|NginxProxyManager可视化面板|network||npm|一个Nginx反向代理工具面板，不支持添加域名访问。" \
+  "5|OpenList多存储文件列表程序|storage||openlist|一个支持多种存储，支持网页浏览和 WebDAV 的文件列表程序，由 gi..." \
+  "6|Ubuntu远程桌面网页版|ops||webtop-ubuntu|webtop基于Ubuntu的容器。若IP无法访问，请添加域名访问。" \
+  "7|哪吒探针VPS监控面板|ops||nezha|" \
+  "8|QB离线BT磁力下载面板|media||qb|QB|qbittorrent离线BT磁力下载服务" \
+  "9|Poste.io邮件服务器程序|office||mail|" \
+  "10|RocketChat多人在线聊天系统|office||rocketchat|Rocket.Chat 是一个开源的团队通讯平台，支持实时聊天、音视频通..." \
+  "11|禅道项目管理软件|office||zentao|禅道是通用的项目管理软件" \
+  "12|青龙面板定时任务管理平台|ops||qinglong|青龙面板是一个定时任务管理平台" \
+  "13|Cloudreve网盘|storage||cloudreve|cloudreve是一个支持多家云存储的网盘系统" \
+  "14|简单图床图片管理程序|storage||easyimage|简单图床是一个简单的图床程序" \
+  "15|emby多媒体管理系统|media||emby|emby是一个主从式架构的媒体服务器软件，可以用来整理服务器上的视频和音..." \
+  "16|Speedtest测速面板|ops||looking|Speedtest测速面板是一个VPS网速测试工具，多项测试功能，还可以..." \
+  "17|AdGuardHome去广告软件|network||adguardhome|AdGuardHome是一款全网广告拦截与反跟踪软件，未来将不止是一个D..." \
+  "18|onlyoffice在线办公OFFICE|office||onlyoffice|onlyoffice是一款开源的在线office工具，太强大了！" \
+  "19|雷池WAF防火墙面板|network||safeline|" \
+  "20|portainer容器管理面板|ops||portainer|portainer是一个轻量级的docker容器管理面板" \
+  "21|VScode网页版|office||vscode|VScode是一款强大的在线代码编写工具" \
+  "22|UptimeKuma监控工具|ops||uptime-kuma|Uptime Kuma 易于使用的自托管监控工具" \
+  "23|Memos网页备忘录|office||memos|Memos是一款轻量级、自托管的备忘录中心" \
+  "24|Webtop远程桌面网页版|ops||webtop|webtop基于Alpine的中文版容器。若IP无法访问，请添加域名访问..." \
+  "25|Nextcloud网盘|storage||nextcloud|Nextcloud拥有超过 400,000 个部署，是您可以下载的最受欢..." \
+  "26|QD-Today定时任务管理框架|office||qd|QD-Today是一个HTTP请求定时任务自动执行框架" \
+  "27|Dockge容器堆栈管理面板|ops||dockge|dockge是一个可视化的docker-compose容器管理面板" \
+  "28|LibreSpeed测速工具|ops||speedtest|librespeed是用Javascript实现的轻量级速度测试工具，即..." \
+  "29|searxng聚合搜索站|office||searxng|searxng是一个私有且隐私的搜索引擎站点" \
+  "30|PhotoPrism私有相册系统|storage||photoprism|photoprism非常强大的私有相册系统" \
+  "31|StirlingPDF工具大全|office||s-pdf|这是一个强大的本地托管基于 Web 的 PDF 操作工具，使用 dock..." \
+  "32|drawio免费的在线图表软件|office||drawio|这是一个强大图表绘制软件。思维导图，拓扑图，流程图，都能画" \
+  "33|Sun-Panel导航面板|office||sun-panel|Sun-Panel服务器、NAS导航面板、Homepage、浏览器首页" \
+  "34|Pingvin-Share文件分享平台|storage||pingvin-share|Pingvin Share 是一个可自建的文件分享平台，是 WeTran..." \
+  "35|极简朋友圈|office||moments|极简朋友圈，高仿微信朋友圈，记录你的美好生活" \
+  "36|LobeChatAI聊天聚合网站|ai||lobe-chat|LobeChat聚合市面上主流的AI大模型，ChatGPT/Claude..." \
+  "37|MyIP工具箱|office||myip|是一个多功能IP工具箱，可以查看自己IP信息及连通性，用网页面板呈现" \
+  "38|小雅alist全家桶|storage||xiaoya|" \
+  "39|Bililive直播录制工具|media||bililive|Bililive-go是一个支持多种直播平台的直播录制工具" \
+  "40|webssh网页版SSH连接工具|ops||webssh|简易在线ssh连接工具和sftp工具" \
+  "41|耗子管理面板|ops||haozi|acepanel|" \
+  "42|Nexterm远程连接工具|ops||nexterm|nexterm是一款强大的在线SSH/VNC/RDP连接工具。" \
+  "43|RustDesk远程桌面(服务端)|ops||hbbs|rustdesk开源的远程桌面(服务端)，类似自己的向日葵私服。" \
+  "44|RustDesk远程桌面(中继端)|ops||hbbr|rustdesk开源的远程桌面(中继端)，类似自己的向日葵私服。" \
+  "45|Docker加速站|network||registry|Docker Registry 是一个用于存储和分发 Docker 镜像..." \
+  "46|GitHub加速站|network||ghproxy|使用Go实现的GHProxy，用于加速部分地区Github仓库的拉取。" \
+  "47|普罗米修斯监控|ops||prometheus|grafana|Prometheus+Grafana企业级监控系统" \
+  "48|普罗米修斯(主机监控)|ops||node-exporter|这是一个普罗米修斯的主机数据采集组件，请部署在被监控主机上。" \
+  "49|普罗米修斯(容器监控)|ops||cadvisor|这是一个普罗米修斯的容器数据采集组件，请部署在被监控主机上。" \
+  "50|补货监控工具|ops||changedetection|这是一款网站变化检测、补货监控和通知的小工具" \
+  "51|PVE开小鸡面板|ops||pve|" \
+  "52|DPanel容器管理面板|ops||dpanel|Docker可视化面板系统，提供完善的docker管理功能。" \
+  "53|llama3聊天AI大模型|ai||llama3|OpenWebUI一款大语言模型网页框架，接入全新的llama3大语言模..." \
+  "54|AMH主机建站管理面板|ops||amh|" \
+  "55|FRP内网穿透(服务端)|network||frps|" \
+  "56|FRP内网穿透(客户端)|network||frpc|" \
+  "57|Deepseek聊天AI大模型|ai||deepseek|OpenWebUI一款大语言模型网页框架，接入全新的DeepSeek R..." \
+  "58|Dify大模型知识库|ai||dify|是一款开源的大语言模型(LLM) 应用开发平台。自托管训练数据用于AI生..." \
+  "59|NewAPI大模型资产管理|ai||new-api|新一代大模型网关与AI资产管理系统" \
+  "60|JumpServer开源堡垒机|ops||jms|是一个开源的特权访问管理 (PAM) 工具，该程序占用80端口不支持添加..." \
+  "61|在线翻译服务器|office||libretranslate|免费开源机器翻译 API，完全自托管，它的翻译引擎由开源Argos Tr..." \
+  "62|RAGFlow大模型知识库|ai||ragflow|基于深度文档理解的开源 RAG（检索增强生成）引擎" \
+  "63|OpenWebUI自托管AI平台|ai||open-webui|OpenWebUI一款大语言模型网页框架，官方精简版本，支持各大模型AP..." \
+  "64|it-tools工具箱|office||it-tools|对开发人员和 IT 工作者来说非常有用的工具" \
+  "65|n8n自动化工作流平台|office||n8n|是一款功能强大的自动化工作流平台" \
+  "66|yt-dlp视频下载工具|media||yt|" \
+  "67|ddns-go动态DNS管理工具|network||ddns|自动将你的公网 IP（IPv4/IPv6）实时更新到各大 DNS 服务商..." \
+  "68|AllinSSL证书管理平台|network||allinssl|开源免费的 SSL 证书自动化管理平台" \
+  "69|SFTPGo文件传输工具|storage||sftpgo|开源免费随时随地SFTP FTP WebDAV 文件传输工具" \
+  "70|AstrBot聊天机器人框架|ai||astrbot|开源AI聊天机器人框架，支持微信，QQ，TG接入AI大模型" \
+  "71|Navidrome私有音乐服务器|media||navidrome|是一个轻量、高性能的音乐流媒体服务器" \
+  "72|bitwarden密码管理器|office||bitwarden|一个你可以控制数据的密码管理器" \
+  "73|LibreTV私有影视|media||libretv|免费在线视频搜索与观看平台" \
+  "74|MoonTV私有影视|media||moontv|免费在线视频搜索与观看平台" \
+  "75|Melody音乐精灵|media||melody|你的音乐精灵，旨在帮助你更好地管理音乐。" \
+  "76|在线DOS老游戏|media||dosgame|是一个中文DOS游戏合集网站" \
+  "77|迅雷离线下载工具|media||xunlei|迅雷你的离线高速BT磁力下载工具" \
+  "78|PandaWiki智能文档管理系统|office||PandaWiki|PandaWiki是一款AI大模型驱动的开源智能文档管理系统，强烈建议不..." \
+  "79|Beszel服务器监控|ops||beszel|Beszel轻量易用的服务器监控" \
+  "80|linkwarden书签管理|office||linkwarden|一个开源的自托管书签管理平台，支持标签、搜索和团队协作。" \
+  "81|JitsiMeet视频会议|office||jitsi|一个开源的安全视频会议解决方案，支持多人在线会议、屏幕共享与加密通信。" \
+  "82|gpt-load高性能AI透明代理|ai||gpt-load|高性能AI接口透明代理服务" \
+  "83|komari服务器监控工具|ops||komari|轻量级的自托管服务器监控工具" \
+  "84|Wallos个人财务管理工具|office||wallos|开源个人订阅追踪器，可用于财务管理" \
+  "85|immich图片视频管理器|storage||immich|高性能自托管照片和视频管理解决方案。" \
+  "86|jellyfin媒体管理系统|media||jellyfin|是一款开源媒体服务器软件" \
+  "87|SyncTV一起看片神器|media||synctv|远程一起观看电影和直播的程序。它提供了同步观影、直播、聊天等功能" \
+  "88|Owncast自托管直播平台|media||owncast|开源、免费的自建直播平台" \
+  "89|FileCodeBox文件快递|storage||file-code-box|匿名口令分享文本和文件，像拿快递一样取文件" \
+  "90|matrix去中心化聊天协议|office||matrix|Matrix是一个去中心化的聊天协议" \
+  "91|gitea私有代码仓库|office||gitea|免费新一代的代码托管平台，提供接近 GitHub 的使用体验。" \
+  "92|FileBrowser文件管理器|storage||filebrowser|是一个基于Web的文件管理器" \
+  "93|Dufs极简静态文件服务器|storage||dufs|极简静态文件服务器，支持上传下载" \
+  "94|Gopeed高速下载工具|media||gopeed|分布式高速下载工具，支持多种协议" \
+  "95|paperless文档管理平台|office||paperless|开源的电子文档管理系统，它的主要用途是把你的纸质文件数字化并管理起来。" \
+  "96|2FAuth自托管二步验证器|office||2fauth|自托管的双重身份验证 (2FA) 账户管理和验证码生成工具。" \
+  "97|WireGuard组网(服务端)|network||wgs|现代化、高性能的虚拟专用网络工具" \
+  "98|WireGuard组网(客户端)|network||wgc|现代化、高性能的虚拟专用网络工具" \
+  "99|DSM群晖虚拟机|ops||dsm|Docker容器中的虚拟DSM" \
+  "100|Syncthing点对点文件同步工具|storage||syncthing|开源的点对点文件同步工具，类似于 Dropbox、Resilio Syn..." \
+  "101|AI视频生成工具|ai||moneyprinterturbo|MoneyPrinterTurbo是一款使用AI大模型合成高清短视频的工..." \
+  "102|VoceChat多人在线聊天系统|office||vocechat|是一款支持独立部署的个人云社交媒体聊天服务" \
+  "103|Umami网站统计工具|ops||umami|开源、轻量、隐私友好的网站分析工具，类似于GoogleAnalytics..." \
+  "104|Stream四层代理转发工具|network||nginx-stream|" \
+  "105|思源笔记|office||siyuan|思源笔记是一款隐私优先的知识管理系统" \
+  "106|Drawnix开源白板工具|office||drawnix|是一款强大的开源白板工具，集成思维导图、流程图等。" \
+  "107|PanSou网盘搜索|office||pansou|PanSou是一个高性能的网盘资源搜索API服务。" \
+  "108|LangBot聊天机器人|ai||langbot|是一个开源的大语言模型原生即时通信机器人开发平台" \
+  "109|ZFile在线网盘|storage||zfile|是一个适用于个人或小团队的在线网盘程序。" \
+  "110|Karakeep书签管理|office||karakeep|是一款可自行托管的书签应用，带有人工智能功能，专为数据囤积者而设计。" \
+  "111|多格式文件转换工具|office||convertx|是一个功能强大的多格式文件转换工具（支持文档、图像、音频视频等）强烈建议..." \
+  "112|Lucky大内网穿透工具|network||lucky|Lucky 是一个大内网穿透及端口转发管理工具，支持 DDNS、反向代理..." \
+  "113|Firefox浏览器|office||firefox|是一个运行在 Docker 中的 Firefox 浏览器，支持通过网页直..." \
+  "114|OpenClaw机器人管理工具|ai||Moltbot|ClawdBot|moltbot|clawdbot|openclaw|OpenClaw|" \
+  "115|Hermes机器人管理工具|ai||hermes|" \
+  "116|DeepSeek Harness管理工具|ai||deepseek-harness|DeepSeek-Harness|dsh|" \
+  "117|99CDN自建CDN管理平台|network||99cdn|" \
+  "118|99DNS智能调度服务|network||99dns|"
+)
+
+# 动态加载第三方应用
+load_custom_apps() {
+    CUSTOM_APPS=()
+    local scanned_files=()
+
+    local dirs=("$HOME/apps" "${KJ_SCRIPT_DIR:-}/apps" "$(dirname "$0")/apps" "./apps")
+
+    # 搜集所有存在的 .conf 文件
+    local found_confs=()
+    for d in "${dirs[@]}"; do
+        [ -d "$d" ] || continue
+        for conf in "$d"/*.conf; do
+            [ -f "$conf" ] || continue
+            local bname
+            bname=$(basename "$conf" .conf)
+            if [[ " ${scanned_files[*]} " == *" ${bname} "* ]]; then
+                continue
+            fi
+            scanned_files+=("$bname")
+            found_confs+=("$conf")
+        done
+    done
+
+    # 按照文件名升序排序，使 J1, J2... 顺序稳定固定
+    local sorted_confs=()
+    if [ "${#found_confs[@]}" -gt 0 ]; then
+        while IFS= read -r line; do
+            [ -n "$line" ] && sorted_confs+=("$line")
+        done < <(printf '%s\n' "${found_confs[@]}" | sort -f)
+    fi
+
+    for conf in "${sorted_confs[@]}"; do
+        local bname
+        bname=$(basename "$conf" .conf)
+        local app_id="$bname"
+        local app_name=""
+        local app_category="custom"
+        local app_text=""
+        local app_star=""
+
+        app_id=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_id=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
+        [ -z "$app_id" ] && app_id="$bname"
+
+        app_name=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | sed -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*$//')
+        [ -z "$app_name" ] && app_name="$app_id"
+
+        local cat_temp
+        cat_temp=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+        if [ -n "$cat_temp" ]; then
+            case "$cat_temp" in
+                panel|ai|monitor|storage|network|media|office|social|tools|custom|github)
+                    app_category="$cat_temp"
+                    ;;
+            esac
+        fi
+
+        app_text=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | sed -e 's/^[[:space:]]*["'\'']//' -e 's/["'\''][[:space:]]*$//')
+        [ -n "$app_text" ] && [ ${#app_text} -gt 36 ] && app_text="${app_text:0:36}..."
+
+        CUSTOM_APPS+=("$app_id|$app_name|$app_category|$app_star|$bname|$app_text|$conf")
+    done
+}
+
+# 渲染手风琴式可折叠菜单
+render_accordion_apps_menu() {
+    load_custom_apps
+
+    local app_installed=""
+    if [ -f /home/docker/appno.txt ]; then
+        app_installed=$(cat /home/docker/appno.txt 2>/dev/null || echo "")
+    fi
+
+    while true; do
+        clear
+        echo -e "${gl_kjlan}========================================================================${gl_bai}"
+        echo -e "${gl_huang}  🚀 CODE MATRIX 代码矩阵 · 8 大分类${gl_bai}"
+        echo -e "${gl_kjlan}========================================================================${gl_bai}"
+
+        for item in "${CATEGORY_LIST[@]}"; do
+            local cid="" ckey="" cname="" ccount=""
+            IFS=':' read -r cid ckey cname ccount <<< "$item"
+
+            # 动态获取自定义应用款数与标签展示
+            local cat_badge=""
+            if [ "$cid" = "custom" ]; then
+                ccount="${#CUSTOM_APPS[@]}"
+                cat_badge="${gl_huang}[本地]${gl_bai} "
+            fi
+
+            local count_str="[${ccount} 款]"
+            if [ "$cid" = "custom" ] && [ "$ccount" -eq 0 ]; then
+                count_str="[暂无本地配置]"
+            fi
+
+            if is_cat_expanded "$cid"; then
+                echo -e "${gl_kjlan}▼ [${gl_huang}$ckey${gl_kjlan}] ${cat_badge}${gl_bai}$cname ${gl_hui}${count_str}${gl_bai}"
+                echo -e "${gl_hui}  ┌───────────────────────────────────────────────────────────────────${gl_bai}"
+
+                # 展开内置分类 (A~G)：输出专属代号 [A1]、[B1]... 并附带原应用编号
+                if [ "$cid" != "custom" ]; then
+                    local item_idx=1
+                    for entry in "${BUILTIN_APPS[@]}"; do
+                        local aid="" aname="" acat="" astar="" aalias="" adesc=""
+                        IFS='|' read -r aid aname acat astar aalias adesc <<< "$entry"
+
+                        if [ "$acat" = "$cid" ]; then
+                            local is_inst=0
+                            if [ -n "$app_installed" ] && [[ " $app_installed " == *" $aid "* ]]; then
+                                is_inst=1
+                            fi
+
+                            local star_badge=""
+                            [ -n "$astar" ] && star_badge="${gl_huang}★${gl_bai}"
+
+                            local tag="${ckey}${item_idx}"
+                            local num_prefix=""
+                            num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$tag")
+                            local status_badge=""
+                            if [ "$is_inst" -eq 1 ]; then
+                                status_badge="${gl_lv}[已安装]${gl_bai}"
+                            fi
+
+                            local orig_id_str
+                            orig_id_str=$(printf "${gl_hui}#%-3s${gl_bai}" "$aid")
+
+                            printf "%b%-30s %b %b %b\n" "$num_prefix" "$aname$star_badge" "$orig_id_str" "$status_badge" "${gl_hui}$adesc${gl_bai}"
+                            item_idx=$((item_idx + 1))
+                        fi
+                    done
+                else
+                    # 展开 [H] 独立的第三方与扩展应用列表
+                    if [ "${#CUSTOM_APPS[@]}" -gt 0 ]; then
+                        local custom_idx=1
+                        for entry in "${CUSTOM_APPS[@]}"; do
+                            local aid="" aname="" acat="" astar="" aalias="" adesc="" aconf=""
+                            IFS='|' read -r aid aname acat astar aalias adesc aconf <<< "$entry"
+                            local h_tag="H${custom_idx}"
+                            local num_prefix=""
+                            num_prefix=$(printf "${gl_kjlan}  │ ${gl_huang}[%-4s]${gl_bai} " "$h_tag")
+                            local orig_id_str
+                            orig_id_str=$(printf "${gl_lv}#%-3s${gl_bai}" "DIY")
+                            printf "%b%-30s %b %b\n" "$num_prefix" "$aname" "$orig_id_str" "${gl_hui}$adesc${gl_bai}"
+                            custom_idx=$((custom_idx + 1))
+                        done
+                    else
+                        echo -e "${gl_hui}  │ 暂无本地第三方应用，输入 [${gl_huang}+${gl_hui}] 可快速添加，或访问开发者生态获取${gl_bai}"
+                    fi
+                fi
+
+                echo -e "${gl_hui}  └───────────────────────────────────────────────────────────────────${gl_bai}"
+            else
+                # 未展开分类瞬间输出纯折叠样式行，0 延迟秒开
+                echo -e "${gl_hui}▶ [${gl_huang}$ckey${gl_hui}] ${cat_badge}${gl_bai}$cname ${gl_hui}${count_str}${gl_bai}"
+            fi
+        done
+
+        echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
+        echo -e "${gl_bai}分类控制: [${gl_huang}A~H${gl_bai}] 折叠/展开对应分类  [${gl_huang}ALL${gl_bai}] 全部展开  [${gl_huang}COL${gl_bai}] 全部折叠"
+        echo -e "${gl_bai}快捷操作: [${gl_huang}S${gl_bai}] 搜索应用  [${gl_huang}+${gl_bai}] 自定义软件  [${gl_huang}11${gl_bai}] 经典平铺  [${gl_huang}BAK${gl_bai}] 备份  [${gl_huang}R${gl_bai}] 还原  [${gl_huang}0${gl_bai}] 退出"
+        echo -e "${gl_kjlan}------------------------------------------------------------------------${gl_bai}"
+        echo -e "${gl_huang}提示: 输入 A~H 查看分类；输入专属代号(如 A1, B1, H1)或原编号(如 1, 57)直接安装！${gl_bai}"
+
+        read -e -p "请输入你的选择: " user_input
+        [ -z "$user_input" ] && continue
+
+        local upper_input
+        upper_input=$(echo "$user_input" | tr '[:lower:]' '[:upper:]')
+        local lower_input
+        lower_input=$(echo "$user_input" | tr '[:upper:]' '[:lower:]')
+
+        # 1. 匹配分类专属代号 (A1~A*, B1~B*, ..., H1~H*，兼顾历史 J1 自定义兼容)
+        if [[ "$upper_input" =~ ^([A-H]|J)([0-9]+)$ ]]; then
+            local cat_key="${BASH_REMATCH[1]}"
+            local item_num="${BASH_REMATCH[2]}"
+            local item_idx=$((item_num - 1))
+
+            if [ "$cat_key" = "A" ]; then
+                # 🌟 [Github乐园] TOP 10 专属快捷安装映射 (A1 ~ A10)
+                case "$item_num" in
+                    1)  SELECTED_APP_ACTION="57" ; return 0 ;; # DeepSeek
+                    2)  SELECTED_APP_ACTION="56" ; return 0 ;; # Ollama
+                    3)  SELECTED_APP_ACTION="58" ; return 0 ;; # OpenWebUI
+                    4)
+                        echo -e "\n${gl_huang}正在启动 Dokploy 轻量 PaaS 官方安装向导...\n${gl_bai}"
+                        curl -sSL https://dokploy.com/setup.sh | sh
+                        read -e -p "按回车键返回手风琴应用市场..." _dummy
+                        continue
+                        ;;
+                    5)  SELECTED_APP_ACTION="18" ; return 0 ;; # Uptime Kuma
+                    6)  SELECTED_APP_ACTION="35" ; return 0 ;; # RustDesk
+                    7)  SELECTED_APP_ACTION="30" ; return 0 ;; # Immich
+                    8)  SELECTED_APP_ACTION="88" ; return 0 ;; # n8n
+                    9)  SELECTED_APP_ACTION="59" ; return 0 ;; # Lobe Chat
+                    10) SELECTED_APP_ACTION="63" ; return 0 ;; # Code-Server
+                    *)
+                        echo -e "${gl_hong}错误: Github乐园序号 A${item_num} 无效 (当前可用范围: A1 ~ A10)${gl_bai}"
+                        sleep 1.5
+                        continue
+                        ;;
+                esac
+            elif [ "$cat_key" = "H" ] || [ "$cat_key" = "J" ]; then
+                # 独立 H1~H* 第三方与社区扩展应用（兼容历史 J1~J*）
+                if [ "$item_idx" -ge 0 ] && [ "$item_idx" -lt "${#CUSTOM_APPS[@]}" ]; then
+                    local t_entry="${CUSTOM_APPS[$item_idx]}"
+                    local t_aid="" t_aname="" t_acat="" t_astar="" t_alias="" t_adesc="" t_conf=""
+                    IFS='|' read -r t_aid t_aname t_acat t_astar t_alias t_adesc t_conf <<< "$t_entry"
+                    SELECTED_APP_ACTION="$t_alias"
+                    SELECTED_CUSTOM_CONF="$t_conf"
+                    return 0
+                else
+                    echo -e "${gl_hong}错误: 第三方应用编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${#CUSTOM_APPS[@]})${gl_bai}"
+                    sleep 1.5
+                    continue
+                fi
+            else
+                # 内置分类 (B ~ G)
+                local target_cid
+                target_cid=$(get_cid_by_key "$cat_key")
+                local cur_idx=0
+                local matched_aid=""
+                for entry in "${BUILTIN_APPS[@]}"; do
+                    local b_aid="" b_name="" b_cat="" rest=""
+                    IFS='|' read -r b_aid b_name b_cat rest <<< "$entry"
+                    if [ "$b_cat" = "$target_cid" ]; then
+                        cur_idx=$((cur_idx + 1))
+                        if [ "$cur_idx" -eq "$item_num" ]; then
+                            matched_aid="$b_aid"
+                            break
+                        fi
+                    fi
+                done
+
+                if [ -n "$matched_aid" ]; then
+                    SELECTED_APP_ACTION="$matched_aid"
+                    return 0
+                else
+                    echo -e "${gl_hong}错误: 分类 [${cat_key}] 编号 ${cat_key}${item_num} 无效 (当前可用范围: ${cat_key}1 ~ ${cat_key}${cur_idx})${gl_bai}"
+                    sleep 1.5
+                    continue
+                fi
+            fi
+        fi
+
+        # 2. 匹配原数字编号直接安装 (如 1, 36, 57 等，自由取舍，二者同时有效)
+        if [[ "$user_input" =~ ^[0-9]+$ ]]; then
+            SELECTED_APP_ACTION="$user_input"
+            return 0
+        fi
+
+        # 3. 匹配单字母分类快捷键 (A~H / a~h) 展开/折叠分类
+        local matched_cid
+        matched_cid=$(get_cid_by_key "$upper_input")
+        if [ -n "$matched_cid" ]; then
+            toggle_cat_expanded "$matched_cid"
+            continue
+        fi
+
+        # 4. 匹配分类英文全称直接展开 (如 github, ops, ai, network, storage, media, office, custom 等)
+        case "$lower_input" in
+            github|ops|ai|network|storage|media|office|custom|panel|monitor|tools|social)
+                local mapped_cat="$lower_input"
+                [ "$mapped_cat" = "panel" ] || [ "$mapped_cat" = "monitor" ] && mapped_cat="ops"
+                [ "$mapped_cat" = "tools" ] || [ "$mapped_cat" = "social" ] && mapped_cat="office"
+                toggle_cat_expanded "$mapped_cat"
+                continue
+                ;;
+        esac
+
+        # 5. 全局快捷操作
+        case "$lower_input" in
+            0)
+                SELECTED_APP_ACTION="0"
+                return 0
+                ;;
+            11|orig|classic)
+                SELECTED_APP_ACTION="11"
+                return 0
+                ;;
+            all|\*)
+                expand_all_cats
+                continue
+                ;;
+            col|collapse|_|-)
+                collapse_all_cats
+                continue
+                ;;
+            s|/|search|find)
+                search_apps_wizard
+                if [ -n "$SELECTED_APP_ACTION" ]; then
+                    return 0
+                fi
+                continue
+                ;;
+            \+|add|new)
+                new_custom_app_wizard
+                load_custom_apps
+                continue
+                ;;
+            bak|backup)
+                SELECTED_APP_ACTION="b"
+                return 0
+                ;;
+            r|rst|restore)
+                SELECTED_APP_ACTION="r"
+                return 0
+                ;;
+            *)
+                # 6. Fallback：匹配本地第三方应用文件名 (如 kpanel, kpanel.conf 等直接输入/粘贴)
+                local clean_name
+                clean_name=$(echo "$user_input" | sed -e 's/\.conf$//I' | tr '[:upper:]' '[:lower:]')
+                for c_entry in "${CUSTOM_APPS[@]}"; do
+                    local ca_id="" ca_name="" ca_cat="" ca_star="" ca_alias="" ca_desc="" ca_conf=""
+                    IFS='|' read -r ca_id ca_name ca_cat ca_star ca_alias ca_desc ca_conf <<< "$c_entry"
+                    local ca_alias_lower
+                    ca_alias_lower=$(echo "$ca_alias" | tr '[:upper:]' '[:lower:]')
+                    local ca_id_lower
+                    ca_id_lower=$(echo "$ca_id" | tr '[:upper:]' '[:lower:]')
+                    if [ "$clean_name" = "$ca_alias_lower" ] || [ "$clean_name" = "$ca_id_lower" ]; then
+                        SELECTED_APP_ACTION="$ca_alias"
+                        SELECTED_CUSTOM_CONF="$ca_conf"
+                        return 0
+                    fi
+                done
+
+                # 其它按键传给应用管理器处理
+                SELECTED_APP_ACTION="$user_input"
+                return 0
+                ;;
+        esac
+    done
+}
+
+# 交互式搜索应用向导
+search_apps_wizard() {
+    clear
+    echo -e "${gl_kjlan}========================================================================${gl_bai}"
+    echo -e "${gl_huang}  🔍 CODE MATRIX 代码矩阵 · 快速搜索${gl_bai}"
+    echo -e "${gl_kjlan}========================================================================${gl_bai}"
+    read -e -p "请输入应用关键词或拼音 (直接回车取消): " kw
+    [ -z "$kw" ] && return 0
+
+    local kw_lower
+    kw_lower=$(echo "$kw" | tr '[:upper:]' '[:lower:]')
+
+    local matches=()
+    for entry in "${BUILTIN_APPS[@]}"; do
+        local aid="" aname="" acat="" astar="" aalias="" adesc=""
+        aid=$(echo "$entry" | cut -d'|' -f1)
+        aname=$(echo "$entry" | cut -d'|' -f2)
+        acat=$(echo "$entry" | cut -d'|' -f3)
+        astar=$(echo "$entry" | cut -d'|' -f4)
+        aalias=$(echo "$entry" | cut -d'|' -f5)
+        adesc=$(echo "$entry" | cut -d'|' -f6)
+
+        local search_str="$aid $aname $aalias $adesc $acat"
+        search_str=$(echo "$search_str" | tr '[:upper:]' '[:lower:]')
+        if [[ "$search_str" == *"$kw_lower"* ]]; then
+            matches+=("$aid|$aname|$acat|$astar|$adesc")
+        fi
+    done
+
+    for entry in "${CUSTOM_APPS[@]}"; do
+        local aid="" aname="" acat="" astar="" aalias="" adesc=""
+        aid=$(echo "$entry" | cut -d'|' -f1)
+        aname=$(echo "$entry" | cut -d'|' -f2)
+        acat=$(echo "$entry" | cut -d'|' -f3)
+        astar=$(echo "$entry" | cut -d'|' -f4)
+        aalias=$(echo "$entry" | cut -d'|' -f5)
+        adesc=$(echo "$entry" | cut -d'|' -f6)
+
+        local search_str="$aid $aname $aalias $adesc $acat"
+        search_str=$(echo "$search_str" | tr '[:upper:]' '[:lower:]')
+        if [[ "$search_str" == *"$kw_lower"* ]]; then
+            matches+=("$aid|$aname|$acat|$astar|$adesc")
+        fi
+    done
+
+    echo ""
+    if [ ${#matches[@]} -eq 0 ]; then
+        echo -e "${gl_hong}未找到与 "$kw" 相关的软件。${gl_bai}"
+        read -e -p "按回车键返回菜单..." _dummy
+        return 0
+    fi
+
+    echo -e "共找到 ${gl_huang}${#matches[@]}${gl_bai} 款匹配的应用："
+    echo -e "${gl_hui}------------------------------------------------------------------------${gl_bai}"
+    for m in "${matches[@]}"; do
+        local maid="" maname="" macat="" mastar="" mdesc=""
+        maid=$(echo "$m" | cut -d'|' -f1)
+        maname=$(echo "$m" | cut -d'|' -f2)
+        macat=$(echo "$m" | cut -d'|' -f3)
+        mastar=$(echo "$m" | cut -d'|' -f4)
+        mdesc=$(echo "$m" | cut -d'|' -f5)
+        local cat_title
+        cat_title=$(get_cat_name "$macat")
+        printf "  ${gl_kjlan}[%-5s]${gl_bai} %-30s ${gl_hui}%-22s %s${gl_bai}\n" "$maid" "$maname" "($cat_title)" "$mdesc"
+    done
+    echo -e "${gl_hui}------------------------------------------------------------------------${gl_bai}"
+    read -e -p "请输入要操作的应用编号 (输入0取消): " chosen_id
+    if [ -n "$chosen_id" ] && [ "$chosen_id" != "0" ]; then
+        SELECTED_APP_ACTION="$chosen_id"
+    fi
+}
+
+# 一键创建自定义软件向导
+new_custom_app_wizard() {
+    clear
+    echo -e "${gl_kjlan}========================================================================${gl_bai}"
+    echo -e "${gl_huang}  ➕ CODE MATRIX 代码矩阵新增自定义软件向导 (自动生成 apps/*.conf 模板)${gl_bai}"
+    echo -e "${gl_kjlan}========================================================================${gl_bai}"
+    echo -e "本向导将帮助您根据应用配置规范快速注册一个新应用。"
+    echo ""
+
+    local app_dir="$HOME/apps"
+    [ ! -d "$app_dir" ] && mkdir -p "$app_dir"
+
+    read -e -p "1. 应用唯一英文ID (例: my-blog, 仅小写字母和连字符): " wiz_id
+    wiz_id=$(echo "$wiz_id" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-_')
+    if [ -z "$wiz_id" ]; then
+        echo -e "${gl_hong}ID 不能为空，已取消。${gl_bai}"
+        sleep 1.5
+        return 0
+    fi
+
+    if [ -f "$app_dir/$wiz_id.conf" ]; then
+        echo -e "${gl_hong}应用配置文件 $app_dir/$wiz_id.conf 已存在！${gl_bai}"
+        read -e -p "是否覆盖创建？(y/N): " wiz_overwrite
+        [[ "$wiz_overwrite" =~ ^[Yy]$ ]] || return 0
+    fi
+
+    read -e -p "2. 应用显示名称 (例: 我的个人博客): " wiz_name
+    [ -z "$wiz_name" ] && wiz_name="$wiz_id"
+
+    echo ""
+    echo "请选择所属分类："
+    echo "  1) ops     - 🖥️  服务器运维与探针监控"
+    echo "  2) ai      - 🤖 人工智能与前沿大模型"
+    echo "  3) network - 🌐 网络代理与穿透组网"
+    echo "  4) storage - 🗄️  私有网盘与数据存储"
+    echo "  5) media   - 🎬 影音媒体与离线下载"
+    echo "  6) office  - 📝 协作办公与实用工具"
+    read -e -p "3. 请输入分类序号 [默认6]: " wiz_cat_idx
+    local wiz_cat="office"
+    if [ "$wiz_cat_idx" = "1" ]; then
+        wiz_cat="ops"
+    elif [ "$wiz_cat_idx" = "2" ]; then
+        wiz_cat="ai"
+    elif [ "$wiz_cat_idx" = "3" ]; then
+        wiz_cat="network"
+    elif [ "$wiz_cat_idx" = "4" ]; then
+        wiz_cat="storage"
+    elif [ "$wiz_cat_idx" = "5" ]; then
+        wiz_cat="media"
+    else
+        wiz_cat="office"
+    fi
+
+    read -e -p "4. 一句话简介 (说明用途): " wiz_text
+    read -e -p "5. 项目官网/GitHub链接: " wiz_url
+    read -e -p "6. Docker容器名 [默认 ${wiz_id}_app]: " wiz_dname
+    [ -z "$wiz_dname" ] && wiz_dname="${wiz_id}_app"
+
+    read -e -p "7. 默认访问端口 [默认 8080]: " wiz_dport
+    [ -z "$wiz_dport" ] && wiz_dport="8080"
+
+    read -e -p "8. 占用空间估算(GB) [默认 1]: " wiz_size
+    [ -z "$wiz_size" ] && wiz_size="1"
+
+    cat << WIZARD_EOF > "$app_dir/$wiz_id.conf"
+# --- 基础信息 / Basic Information ---
+local app_id="$wiz_id"
+local app_name="$wiz_name"
+local app_category="$wiz_cat"
+local app_text="$wiz_text"
+local app_url="$wiz_url"
+local docker_name="$wiz_dname"
+local docker_port="$wiz_dport"
+local app_size="$wiz_size"
+
+# --- 核心逻辑 / Core Logic ---
+docker_app_install() {
+    mkdir -p /home/docker/$wiz_id && cd /home/docker/$wiz_id
+    cat << DOCKER_COMPOSE_EOF > docker-compose.yml
+services:
+  $wiz_dname:
+    image: nginx:alpine
+    container_name: $wiz_dname
+    restart: always
+    ports:
+      - "\${docker_port}:80"
+DOCKER_COMPOSE_EOF
+
+    docker compose up -d
+    echo "$wiz_name 安装完成！"
+    check_docker_app_ip
+}
+
+docker_app_update() {
+    cd /home/docker/$wiz_id
+    docker compose pull
+    docker compose up -d
+    echo "$wiz_name 更新完成！"
+}
+
+docker_app_uninstall() {
+    cd /home/docker/$wiz_id
+    docker compose down --rmi all
+    rm -rf /home/docker/$wiz_id
+    echo "$wiz_name 卸载完成！"
+}
+
+# --- 注册 (必须包含) ---
+docker_app_plus
+WIZARD_EOF
+
+    chmod +x "$app_dir/$wiz_id.conf"
+    local cat_display
+    cat_display=$(get_cat_name "$wiz_cat")
+    echo ""
+    echo -e "${gl_lv}✅ 成功创建自定义应用配置文件: $app_dir/$wiz_id.conf${gl_bai}"
+    echo -e "您可以在该分类（$cat_display）下直接看到并管理它！"
+    read -e -p "按回车键继续..." _dummy
+}
+
+linux_panel_accordion() {
+    local target_app=""
+    while true; do
+        render_accordion_apps_menu
+        target_app="$SELECTED_APP_ACTION"
+        [ -z "$target_app" ] && break
+
+        case "$target_app" in
+            0)
+                break
+                ;;
+            11|orig|classic)
+                CALL_FROM_ACCORDION=1 linux_panel
+                ;;
+            b|bak|backup)
+                CALL_FROM_ACCORDION=1 linux_panel "b"
+                ;;
+            r|rst|restore)
+                CALL_FROM_ACCORDION=1 linux_panel "r"
+                ;;
+            *)
+                # 带着用户选择的应用ID直接调用原生安装管理引擎，执行完毕或退出后精准返回本手风琴菜单
+                CALL_FROM_ACCORDION=1 linux_panel "$target_app"
+                ;;
+        esac
+    done
+}
+
+linux_panel_accordion() {
+    local init_mode="${1:-}"
+    if [ "$init_mode" = "custom" ] || [ "$init_mode" = "H" ] || [ "$init_mode" = "h" ]; then
+        EXPANDED_CATEGORIES=" custom "
+    fi
+    local target_app=""
+    while true; do
+        render_accordion_apps_menu
+        target_app="$SELECTED_APP_ACTION"
+        [ -z "$target_app" ] && break
+
+        case "$target_app" in
+            0)
+                break
+                ;;
+            11|orig|classic)
+                CALL_FROM_ACCORDION=1 linux_panel
+                ;;
+            b|bak|backup)
+                CALL_FROM_ACCORDION=1 linux_panel "b"
+                ;;
+            r|rst|restore)
+                CALL_FROM_ACCORDION=1 linux_panel "r"
+                ;;
+            *)
+                # 带着用户选择的应用ID直接调用原生安装管理引擎，执行完毕或退出后精准返回本手风琴菜单
+                CALL_FROM_ACCORDION=1 linux_panel "$target_app"
+                ;;
+        esac
+    done
+}
+
+
+
 linux_work() {
 
 	while true; do
@@ -33003,1862 +33806,6 @@ EOF
 			  z_uninstall
 			  ;;
 
-		  0)
-			  kejilion
-
-			  ;;
-		  *)
-			  echo "无效的输入!"
-			  ;;
-	  esac
-	  break_end
-
-	done
-
-
-
-}
-
-
-
-
-
-
-linux_file() {
-	root_use
-	send_stats "文件管理器"
-	while true; do
-		clear
-		echo "文件管理器"
-		echo "------------------------"
-		echo "当前路径"
-		pwd
-		echo "------------------------"
-		ls --color=auto -x
-		echo "------------------------"
-		echo "1.  进入目录           2.  创建目录             3.  修改目录权限         4.  重命名目录"
-		echo "5.  删除目录           6.  返回上一级选单目录"
-		echo "------------------------"
-		echo "11. 创建文件           12. 编辑文件             13. 修改文件权限         14. 重命名文件"
-		echo "15. 删除文件"
-		echo "------------------------"
-		echo "21. 压缩文件目录       22. 解压文件目录         23. 移动文件目录         24. 复制文件目录"
-		echo "25. 传文件至其他服务器"
-		echo "------------------------"
-		echo "0.  返回上一级选单"
-		echo "------------------------"
-		read -e -p "请输入你的选择: " Limiting
-
-		case "$Limiting" in
-			1)  # 进入目录
-				read -e -p "请输入目录名: " dirname
-				cd "$dirname" 2>/dev/null || echo "无法进入目录"
-				send_stats "进入目录"
-				;;
-			2)  # 创建目录
-				read -e -p "请输入要创建的目录名: " dirname
-				mkdir -p "$dirname" && echo "目录已创建" || echo "创建失败"
-				send_stats "创建目录"
-				;;
-			3)  # 修改目录权限
-				read -e -p "请输入目录名: " dirname
-				read -e -p "请输入权限 (如 755): " perm
-				chmod "$perm" "$dirname" && echo "权限已修改" || echo "修改失败"
-				send_stats "修改目录权限"
-				;;
-			4)  # 重命名目录
-				read -e -p "请输入当前目录名: " current_name
-				read -e -p "请输入新目录名: " new_name
-				mv "$current_name" "$new_name" && echo "目录已重命名" || echo "重命名失败"
-				send_stats "重命名目录"
-				;;
-			5)  # 删除目录
-				read -e -p "请输入要删除的目录名: " dirname
-				rm -rf "$dirname" && echo "目录已删除" || echo "删除失败"
-				send_stats "删除目录"
-				;;
-			6)  # 返回上一级选单目录
-				cd ..
-				send_stats "返回上一级选单目录"
-				;;
-			11) # 创建文件
-				read -e -p "请输入要创建的文件名: " filename
-				touch "$filename" && echo "文件已创建" || echo "创建失败"
-				send_stats "创建文件"
-				;;
-			12) # 编辑文件
-				read -e -p "请输入要编辑的文件名: " filename
-				install nano
-				nano "$filename"
-				send_stats "编辑文件"
-				;;
-			13) # 修改文件权限
-				read -e -p "请输入文件名: " filename
-				read -e -p "请输入权限 (如 755): " perm
-				chmod "$perm" "$filename" && echo "权限已修改" || echo "修改失败"
-				send_stats "修改文件权限"
-				;;
-			14) # 重命名文件
-				read -e -p "请输入当前文件名: " current_name
-				read -e -p "请输入新文件名: " new_name
-				mv "$current_name" "$new_name" && echo "文件已重命名" || echo "重命名失败"
-				send_stats "重命名文件"
-				;;
-			15) # 删除文件
-				read -e -p "请输入要删除的文件名: " filename
-				rm -f "$filename" && echo "文件已删除" || echo "删除失败"
-				send_stats "删除文件"
-				;;
-			21) # 压缩文件/目录
-				read -e -p "请输入要压缩的文件/目录名: " name
-				install tar
-				tar -czvf "$name.tar.gz" "$name" && echo "已压缩为 $name.tar.gz" || echo "压缩失败"
-				send_stats "压缩文件/目录"
-				;;
-			22) # 解压文件/目录
-				read -e -p "请输入要解压的文件名 (.tar.gz): " filename
-				install tar
-				tar -xzvf "$filename" && echo "已解压 $filename" || echo "解压失败"
-				send_stats "解压文件/目录"
-				;;
-
-			23) # 移动文件或目录
-				read -e -p "请输入要移动的文件或目录路径: " src_path
-				if [ ! -e "$src_path" ]; then
-					echo "错误: 文件或目录不存在。"
-					send_stats "移动文件或目录失败: 文件或目录不存在"
-					continue
-				fi
-
-				read -e -p "请输入目标路径 (包括新文件名或目录名): " dest_path
-				if [ -z "$dest_path" ]; then
-					echo "错误: 请输入目标路径。"
-					send_stats "移动文件或目录失败: 目标路径未指定"
-					continue
-				fi
-
-				mv "$src_path" "$dest_path" && echo "文件或目录已移动到 $dest_path" || echo "移动文件或目录失败"
-				send_stats "移动文件或目录"
-				;;
-
-
-		   24) # 复制文件目录
-				read -e -p "请输入要复制的文件或目录路径: " src_path
-				if [ ! -e "$src_path" ]; then
-					echo "错误: 文件或目录不存在。"
-					send_stats "复制文件或目录失败: 文件或目录不存在"
-					continue
-				fi
-
-				read -e -p "请输入目标路径 (包括新文件名或目录名): " dest_path
-				if [ -z "$dest_path" ]; then
-					echo "错误: 请输入目标路径。"
-					send_stats "复制文件或目录失败: 目标路径未指定"
-					continue
-				fi
-
-				# 使用 -r 选项以递归方式复制目录
-				cp -r "$src_path" "$dest_path" && echo "文件或目录已复制到 $dest_path" || echo "复制文件或目录失败"
-				send_stats "复制文件或目录"
-				;;
-
-
-			 25) # 传送文件至远端服务器
-				read -e -p "请输入要传送的文件路径: " file_to_transfer
-				if [ ! -f "$file_to_transfer" ]; then
-					echo "错误: 文件不存在。"
-					send_stats "传送文件失败: 文件不存在"
-					continue
-				fi
-
-				kj_ssh_read_host_user_port "请输入远端服务器IP: " "请输入远端服务器用户名 (默认root): " "请输入登录端口 (默认22): " "root" "22"
-				local remote_ip="$KJ_SSH_HOST"
-				local remote_user="$KJ_SSH_USER"
-				local remote_port="$KJ_SSH_PORT"
-
-				kj_ssh_read_password "请输入远端服务器密码: "
-				local remote_password="$KJ_SSH_PASSWORD"
-
-				# 清除已知主机的旧条目
-				ssh-keygen -f "/root/.ssh/known_hosts" -R "$remote_ip"
-				sleep 2  # 等待时间
-
-				# 使用scp传输文件
-				scp -P "$remote_port" -o StrictHostKeyChecking=no "$file_to_transfer" "$remote_user@$remote_ip:/home/" <<EOF
-$remote_password
-EOF
-
-				if [ $? -eq 0 ]; then
-					echo "文件已传送至远程服务器home目录。"
-					send_stats "文件传送成功"
-				else
-					echo "文件传送失败。"
-					send_stats "文件传送失败"
-				fi
-
-				break_end
-				;;
-
-
-
-			0)  # 返回上一级选单
-				send_stats "返回上一级选单菜单"
-				break
-				;;
-			*)  # 处理无效输入
-				echo "无效的选择，请重新输入"
-				send_stats "无效选择"
-				;;
-		esac
-	done
-}
-
-
-
-
-
-
-cluster_python3() {
-	install python3 python3-paramiko
-	cd ~/cluster/
-	curl -sS -O ${gh_proxy}raw.githubusercontent.com/kejilion/python-for-vps/main/cluster/$py_task
-	python3 ~/cluster/$py_task
-}
-
-
-run_commands_on_servers() {
-
-	install sshpass
-
-	local SERVERS_FILE="$HOME/cluster/servers.py"
-	local SERVERS=$(grep -oP '{"name": "\K[^"]+|"hostname": "\K[^"]+|"port": \K[^,]+|"username": "\K[^"]+|"password": "\K[^"]+' "$SERVERS_FILE")
-
-	# 将提取的信息转换为数组
-	IFS=$'\n' read -r -d '' -a SERVER_ARRAY <<< "$SERVERS"
-
-	# 遍历服务器并执行命令
-	for ((i=0; i<${#SERVER_ARRAY[@]}; i+=5)); do
-		local name=${SERVER_ARRAY[i]}
-		local hostname=${SERVER_ARRAY[i+1]}
-		local port=${SERVER_ARRAY[i+2]}
-		local username=${SERVER_ARRAY[i+3]}
-		local password=${SERVER_ARRAY[i+4]}
-		echo
-		echo -e "${gl_huang}连接到 $name ($hostname)...${gl_bai}"
-		# sshpass -p "$password" ssh -o StrictHostKeyChecking=no "$username@$hostname" -p "$port" "$1"
-		sshpass -p "$password" ssh -t -o StrictHostKeyChecking=no "$username@$hostname" -p "$port" "$1"
-	done
-	echo
-	break_end
-
-}
-
-
-linux_cluster() {
-mkdir cluster
-if [ ! -f ~/cluster/servers.py ]; then
-	cat > ~/cluster/servers.py << EOF
-servers = [
-
-]
-EOF
-fi
-
-while true; do
-	  clear
-	  send_stats "集群控制中心"
-	  echo "服务器集群控制"
-	  cat ~/cluster/servers.py
-	  echo
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}服务器列表管理${gl_bai}"
-	  echo -e "${gl_kjlan}1.  ${gl_bai}添加服务器               ${gl_kjlan}2.  ${gl_bai}删除服务器            ${gl_kjlan}3.  ${gl_bai}编辑服务器"
-	  echo -e "${gl_kjlan}4.  ${gl_bai}备份集群                 ${gl_kjlan}5.  ${gl_bai}还原集群"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}批量执行任务${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}安装代码矩阵脚本         ${gl_kjlan}12. ${gl_bai}更新系统              ${gl_kjlan}13. ${gl_bai}清理系统"
-	  echo -e "${gl_kjlan}14. ${gl_bai}安装docker               ${gl_kjlan}15. ${gl_bai}安装BBR3              ${gl_kjlan}16. ${gl_bai}设置1G虚拟内存"
-	  echo -e "${gl_kjlan}17. ${gl_bai}设置时区到上海           ${gl_kjlan}18. ${gl_bai}开放所有端口	       ${gl_kjlan}51. ${gl_bai}自定义指令"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}0.  ${gl_bai}返回主菜单"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  read -e -p "请输入你的选择: " sub_choice
-
-	  case $sub_choice in
-		  1)
-			  send_stats "添加集群服务器"
-			  read -e -p "服务器名称: " server_name
-			  read -e -p "服务器IP: " server_ip
-			  read -e -p "服务器端口（22）: " server_port
-			  local server_port=${server_port:-22}
-			  read -e -p "服务器用户名（root）: " server_username
-			  local server_username=${server_username:-root}
-			  read -e -p "服务器用户密码: " server_password
-
-			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"$server_password\", \"remote_path\": \"/home/\"}," ~/cluster/servers.py
-
-			  ;;
-		  2)
-			  send_stats "删除集群服务器"
-			  read -e -p "请输入需要删除的关键字: " rmserver
-			  sed -i "/$rmserver/d" ~/cluster/servers.py
-			  ;;
-		  3)
-			  send_stats "编辑集群服务器"
-			  install nano
-			  nano ~/cluster/servers.py
-			  ;;
-
-		  4)
-			  clear
-			  send_stats "备份集群"
-			  echo -e "请将 ${gl_huang}/root/cluster/servers.py${gl_bai} 文件下载，完成备份！"
-			  break_end
-			  ;;
-
-		  5)
-			  clear
-			  send_stats "还原集群"
-			  echo "请上传您的servers.py，按任意键开始上传！"
-			  echo -e "请上传您的 ${gl_huang}servers.py${gl_bai} 文件到 ${gl_huang}/root/cluster/${gl_bai} 完成还原！"
-			  break_end
-			  ;;
-
-		  11)
-			  local py_task="install_kejilion.py"
-			  cluster_python3
-			  ;;
-		  12)
-			  run_commands_on_servers "k update"
-			  ;;
-		  13)
-			  run_commands_on_servers "k clean"
-			  ;;
-		  14)
-			  run_commands_on_servers "k docker install"
-			  ;;
-		  15)
-			  run_commands_on_servers "k bbr3"
-			  ;;
-		  16)
-			  run_commands_on_servers "k swap 1024"
-			  ;;
-		  17)
-			  run_commands_on_servers "k time Asia/Shanghai"
-			  ;;
-		  18)
-			  run_commands_on_servers "k iptables_open"
-			  ;;
-
-		  51)
-			  send_stats "自定义执行命令"
-			  read -e -p "请输入批量执行的命令: " mingling
-			  run_commands_on_servers "${mingling}"
-			  ;;
-
-		  *)
-			  kejilion
-			  ;;
-	  esac
-done
-
-}
-
-
-
-
-kejilion_Affiliates() {
-
-clear
-echo "CODE MATRIX 品牌专栏"
-echo "------------------------"
-echo "用代码 · 爱上Linux"
-echo ""
-echo -e "${gl_kjlan}品牌名: ${gl_bai}CODE MATRIX 代码矩阵${gl_bai}"
-echo -e "${gl_kjlan}口号: ${gl_bai}用代码 · 爱上Linux${gl_bai}"
-echo -e "${gl_kjlan}官网: ${gl_bai}https://zttz.eu.org/${gl_bai}"
-echo -e "${gl_kjlan}安装: ${gl_bai}bash <(curl -sL https://zttz.eu.org/z)${gl_bai}"
-echo "------------------------"
-echo ""
-}
-
-
-
-
-games_server_tools() {
-
-	while true; do
-	  clear
-	  echo -e "游戏开服脚本合集"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1. ${gl_bai}幻兽帕鲁开服脚本"
-	  echo -e "${gl_kjlan}2. ${gl_bai}我的世界开服脚本"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0. ${gl_bai}返回主菜单"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  read -e -p "请输入你的选择: " sub_choice
-
-	  case $sub_choice in
-
-		  1) send_stats "幻兽帕鲁开服脚本" ; cd ~
-			 curl -sS -O ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/palworld.sh ; chmod +x palworld.sh ; ./palworld.sh
-			 exit
-			 ;;
-		  2) send_stats "我的世界开服脚本" ; cd ~
-			 curl -sS -O ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/mc.sh ; chmod +x mc.sh ; ./mc.sh
-			 exit
-			 ;;
-
-		  0)
-			kejilion
-			;;
-
-		  *)
-			echo "无效的输入!"
-			;;
-	  esac
-	  break_end
-
-	done
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-kejilion_update() {
-
-send_stats "脚本更新"
-cd ~
-while true; do
-	clear
-	echo "更新日志"
-	echo "------------------------"
-	echo "全部日志: ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion_sh_log.txt"
-	echo "------------------------"
-
-	curl -s --max-time 15 ${gh_proxy}raw.githubusercontent.com/kejilion/sh/main/kejilion_sh_log.txt | tail -n 30
-	# 只下载前5行获取版本号，避免下载整个脚本
-	local sh_v_new=$(curl -s --max-time 15 -r 0-300 https://zttz.eu.org/z.sh | grep -o 'zttz_v="[0-9.]*"' | head -1 | cut -d '"' -f 2)
-	local cur_display_v="${zttz_v:-$sh_v}"
-
-	if [ -z "$sh_v_new" ]; then
-		echo -e "${gl_hong}无法获取最新版本信息，请检查网络连接${gl_bai}"
-	elif [ "${zttz_v:-}" = "$sh_v_new" ]; then
-		echo -e "${gl_lv}你已经是 ZTTZ 融合版最新版本！${gl_huang}v$cur_display_v${gl_bai}"
-		send_stats "脚本已经最新了，无需更新"
-	else
-		echo "发现新版本！"
-		echo -e "当前版本 v$cur_display_v        最新版本 ${gl_huang}v$sh_v_new${gl_bai}"
-	fi
-
-
-	local cron_job="kejilion.sh"
-	local existing_cron=$(crontab -l 2>/dev/null | grep -F "$cron_job")
-
-	if [ -n "$existing_cron" ]; then
-		echo "------------------------"
-		echo -e "${gl_lv}自动更新已开启，每天凌晨2点脚本会自动更新！${gl_bai}"
-	fi
-
-	echo "------------------------"
-	echo "1. 现在更新            2. 开启自动更新            3. 关闭自动更新"
-	echo "------------------------"
-	echo "0. 返回主菜单"
-	echo "------------------------"
-	read -e -p "请输入你的选择: " choice
-	case "$choice" in
-		1)
-			clear
-			local country=$(curl -s --max-time 5 ipinfo.io/country)
-			local download_url="https://zttz.eu.org/z.sh"
-
-			# 备份当前脚本
-			cp -f ~/codematrix.sh ~/codematrix.sh.bak 2>/dev/null
-
-			# 下载到临时文件，校验后再替换
-			local tmp_file=$(mktemp ~/kejilion_tmp.XXXXXX)
-			if curl -sS --max-time 60 --fail -o "$tmp_file" "$download_url" && \
-			   [ -s "$tmp_file" ] && \
-			   head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
-				chmod +x "$tmp_file"
-				mv -f "$tmp_file" ~/codematrix.sh
-				canshu_v6
-				CheckFirstRun_true
-				yinsiyuanquan2
-				chmod +x ~/codematrix.sh > /dev/null 2>&1
-				zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k > /dev/null 2>&1
-				zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z > /dev/null 2>&1
-				[ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k > /dev/null 2>&1
-				[ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z > /dev/null 2>&1
-				zttz_verify_entries ~/codematrix.sh > /dev/null 2>&1 || true
-				echo -e "${gl_lv}脚本已更新到最新版本！${gl_huang}v$sh_v_new${gl_bai}"
-				send_stats "脚本已经最新$sh_v_new"
-			else
-				rm -f "$tmp_file"
-				# 恢复备份
-				if [ -f ~/codematrix.sh.bak ]; then
-					mv -f ~/codematrix.sh.bak ~/codematrix.sh
-				fi
-				echo -e "${gl_hong}更新失败！下载出错或文件校验不通过，已恢复原版本${gl_bai}"
-				send_stats "脚本更新失败"
-			fi
-			break_end
-			~/codematrix.sh
-			exit
-			;;
-		2)
-			clear
-			local country=$(curl -s --max-time 5 ipinfo.io/country)
-			local ipv6_address=$(curl -s --max-time 1 ipv6.ip.sb)
-			local cron_proxy cron_sed_cmd
-			if [ "$country" = "CN" ]; then
-				cron_proxy="https://gh.kejilion.pro/"
-				cron_sed_cmd="sed -i 's/canshu=\"default\"/canshu=\"CN\"/g' ~/codematrix.sh"
-			elif [ -n "$ipv6_address" ]; then
-				cron_proxy="https://gh.kejilion.pro/"
-				cron_sed_cmd="sed -i 's/canshu=\"default\"/canshu=\"V6\"/g' ~/codematrix.sh"
-			else
-				cron_proxy="https://"
-				cron_sed_cmd=""
-			fi
-
-			# 构建健壮的自动更新命令：下载到临时文件 → 校验 → 备份 → 替换 → 恢复本地设置 → 部署
-			SH_Update_task="cd ~ && bash ~/codematrix.sh zttz-safe-update"
-			# 追加设置恢复
-			if [ -n "$cron_sed_cmd" ]; then
-				SH_Update_task="$SH_Update_task && $cron_sed_cmd"
-			fi
-			# 从旧脚本恢复 permission_granted 和 ENABLE_STATS 设置
-			SH_Update_task="$SH_Update_task && grep -q 'permission_granted=\"true\"' ~/codematrix.sh.bak 2>/dev/null && sed -i 's/permission_granted=\"false\"/permission_granted=\"true\"/' ~/codematrix.sh; grep -q 'ENABLE_STATS=\"false\"' ~/codematrix.sh.bak 2>/dev/null && sed -i 's/ENABLE_STATS=\"true\"/ENABLE_STATS=\"false\"/' ~/codematrix.sh"
-			# 部署到 /usr/local/bin/k 和 /usr/bin/k
-			SH_Update_task="$SH_Update_task"
-			# 下载失败时清理临时文件
-			SH_Update_task="$SH_Update_task || rm -f \"\$tmp\" 2>/dev/null"
-
-			check_crontab_installed
-			(crontab -l | grep -v "kejilion.sh") | crontab -
-			(crontab -l 2>/dev/null; echo "$(shuf -i 0-59 -n 1) 2 * * * bash -c '$SH_Update_task'") | crontab -
-			echo -e "${gl_lv}自动更新已开启，每天凌晨2点脚本会自动更新！${gl_bai}"
-			send_stats "开启脚本自动更新"
-			break_end
-			;;
-		3)
-			clear
-			(crontab -l | grep -v "kejilion.sh") | crontab -
-			echo -e "${gl_lv}自动更新已关闭${gl_bai}"
-			send_stats "关闭脚本自动更新"
-			break_end
-			;;
-		*)
-			kejilion_sh
-			;;
-	esac
-done
-
-}
-
-
-
-
-
-kejilion_sh() {
-while true; do
-clear
-local kpanel_menu_status="${gl_huang}★ 推荐${gl_bai}"
-if grep -qxF "kpanel" /home/docker/appno.txt 2>/dev/null; then
-	kpanel_menu_status="${gl_lv}[已安装]${gl_bai}"
-fi
-echo -e "${gl_kjlan}"
-echo ' _____ _________________     ________  __  ____  ____  ______'
-echo '/__  //_  __/_  __/__  /    / ____/ / / / / __ \/ __ \/ ____/'
-echo '  / /  / /   / /    / /    / __/ / / / / / / / /_/ / / __'
-echo ' / /__/ /   / /    / /___ / /___/ /_/ /_/ /_/ / _, _/ /_/ /'
-echo '/____/_/   /_/    /____(_)_____/\____/(_)____/_/ |_|\____/'
-echo -e "CODE MATRIX 代码矩阵 v$sh_v"
-echo -e "命令行输入${gl_huang}k${gl_kjlan}可快速启动脚本${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_huang}11+. ${gl_bai}应用市场 [分类折叠]${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}1.   ${gl_bai}系统信息查询"
-echo -e "${gl_kjlan}2.   ${gl_bai}系统更新"
-echo -e "${gl_kjlan}3.   ${gl_bai}系统清理"
-echo -e "${gl_kjlan}4.   ${gl_bai}基础工具"
-echo -e "${gl_kjlan}5.   ${gl_bai}BBR管理"
-echo -e "${gl_kjlan}6.   ${gl_bai}Docker管理"
-echo -e "${gl_kjlan}7.   ${gl_bai}WARP管理"
-echo -e "${gl_kjlan}8.   ${gl_bai}测试脚本合集"
-echo -e "${gl_kjlan}9.   ${gl_bai}甲骨文云脚本合集"
-echo -e "${gl_huang}10.  ${gl_bai}LDNMP建站"
-echo -e "${gl_kjlan}11.  ${gl_bai}应用市场"
-echo -e "${gl_kjlan}12.  ${gl_bai}后台工作区"
-echo -e "${gl_kjlan}13.  ${gl_bai}系统工具"
-echo -e "${gl_kjlan}14.  ${gl_bai}服务器集群控制"
-echo -e "${gl_kjlan}15.  ${gl_bai}广告专栏"
-echo -e "${gl_kjlan}16.  ${gl_bai}游戏开服脚本合集"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_huang}17.  ${gl_bai}KPanel Web管理面板 ${kpanel_menu_status}"
-echo -e "${gl_hui}     CODE MATRIX 代码矩阵的现代化网页管理界面${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}00.  ${gl_bai}脚本更新"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}0.   ${gl_bai}退出脚本"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-read -e -p "请输入你的选择: " choice
-
-if ! z_platform_guard_menu_choice "$choice"; then
-    break_end
-    continue
-fi
-
-case $choice in
-  1) linux_info ;;
-  2) clear ; send_stats "系统更新" ; linux_update ;;
-  3) clear ; send_stats "系统清理" ; linux_clean ;;
-  4) linux_tools ;;
-  5) linux_bbr ;;
-  6) linux_docker ;;
-  7) clear ; send_stats "warp管理" ; install wget
-	wget -N https://gitlab.com/fscarmen/warp/-/raw/main/menu.sh ; bash menu.sh [option] [lisence/url/token]
-	;;
-  8) linux_test ;;
-  9) linux_Oracle ;;
-  10) linux_ldnmp ;;
-  11) linux_panel ;;
-  11+|11\+|11p) linux_panel_accordion ;;
-  12) linux_work ;;
-  13) linux_Settings ;;
-  14) linux_cluster ;;
-  15) kejilion_Affiliates ;;
-  16) games_server_tools ;;
-  17) linux_panel kpanel ;;
-  00) kejilion_update ;;
-  0) clear ; exit ;;
-  *) echo "无效的输入!" ;;
-esac
-	break_end
-done
-}
-
-
-k_info() {
-send_stats "k命令参考用例"
-echo "-------------------"
-echo "视频介绍: https://www.bilibili.com/video/BV1ib421E7it?t=0.1"
-echo "以下是k命令参考用例："
-echo "启动脚本            k"
-echo "安装软件包          k install nano wget | k add nano wget | k 安装 nano wget"
-echo "卸载软件包          k remove nano wget | k del nano wget | k uninstall nano wget | k 卸载 nano wget"
-echo "更新系统            k update | k 更新"
-echo "清理系统垃圾        k clean | k 清理"
-echo "重装系统面板        k dd | k 重装"
-echo "bbr3控制面板        k bbr3 | k bbrv3"
-echo "内核调优面板        k nhyh | k 内核优化"
-echo "设置虚拟内存        k swap 2048"
-echo "设置虚拟时区        k time Asia/Shanghai | k 时区 Asia/Shanghai"
-echo "系统回收站          k trash | k hsz | k 回收站"
-echo "系统备份功能        k backup | k bf | k 备份"
-echo "ssh远程连接工具     k ssh | k 远程连接"
-echo "rsync远程同步工具   k rsync | k 远程同步"
-echo "硬盘管理工具        k disk | k 硬盘管理"
-echo "内网穿透（服务端）  k frps"
-echo "内网穿透（客户端）  k frpc"
-echo "软件启动            k start sshd | k 启动 sshd "
-echo "软件停止            k stop sshd | k 停止 sshd "
-echo "软件重启            k restart sshd | k 重启 sshd "
-echo "软件状态查看        k status sshd | k 状态 sshd "
-echo "软件开机启动        k enable docker | k autostart docke | k 开机启动 docker "
-echo "域名证书申请        k ssl"
-echo "域名证书到期查询    k ssl ps"
-echo "docker管理平面      k docker"
-echo "docker环境安装      k docker install |k docker 安装"
-echo "docker容器管理      k docker ps |k docker 容器"
-echo "docker镜像管理      k docker img |k docker 镜像"
-echo "LDNMP站点管理       k web"
-echo "LDNMP缓存清理       k web cache"
-echo "安装WordPress       k wp |k wordpress |k wp xxx.com"
-echo "安装反向代理        k fd |k rp |k 反代 |k fd xxx.com"
-echo "安装负载均衡        k loadbalance |k 负载均衡"
-echo "安装L4负载均衡      k stream |k L4负载均衡"
-echo "防火墙面板          k fhq |k 防火墙"
-echo "开放端口            k dkdk 8080 |k 打开端口 8080"
-echo "关闭端口            k gbdk 7800 |k 关闭端口 7800"
-echo "放行IP              k fxip 127.0.0.0/8 |k 放行IP 127.0.0.0/8"
-echo "阻止IP              k zzip 177.5.25.36 |k 阻止IP 177.5.25.36"
-echo "命令收藏夹          k fav | k 命令收藏夹"
-echo "应用市场管理        k app"
-echo "应用市场 [分类折叠]  k app+"
-echo "ZTTZ 自用应用市场    z app"
-echo "ZTTZ 自定义应用安装  z app <数字/代号>"
-echo "应用编号快捷管理    k app 26 | k app 1panel | k app npm"
-echo "KPanel管理          k app kpanel"
-echo "fail2ban管理        k fail2ban | k f2b [status|enable|disable]"
-echo "显示系统信息        k info"
-echo "ROOT密钥管理        k sshkey"
-echo "SSH公钥导入(URL)    k sshkey <url>"
-echo "SSH公钥导入(GitHub) k sshkey github <user> "
-
-}
-
-
-
-# Versioned shared backup adapter. No downloaded helper or caller-supplied path.
-kpanel_backup_center_dispatch() {
-    local binary="/usr/local/libexec/kejilion-agent" metadata owner mode protocol
-    [ "$(id -u)" = "0" ] || { echo "备份适配器需要 root" >&2; return 1; }
-    [ -f "$binary" ] && [ -x "$binary" ] && [ ! -L "$binary" ] || { echo "缺少 KPanel 备份适配器，请安装匹配版本的 Agent" >&2; return 1; }
-    metadata=$(stat -c '%u %a' "$binary") || return 1
-    read -r owner mode <<< "$metadata"
-    [[ "$owner" = "0" && "$mode" =~ ^[0-7]{3,4}$ ]] || return 1
-    (( (8#$mode & 0022) == 0 )) || { echo "备份适配器权限无效" >&2; return 1; }
-    protocol=$("$binary" backup-center protocol) || return 1
-    [ "$protocol" = '{"protocol":1,"format":1}' ] || { echo "备份适配器协议不兼容" >&2; return 1; }
-    "$binary" backup-center "$@"
-}
-
-
-# ==============================================================================
-# ZTTZ 专属自用应用生态与 Z 命令调度引擎
-# 100% 兼容上游，独立管理 ~/z-apps 目录与 GitHub (macsur/z-apps) 远端同步
-# ==============================================================================
-Z_APPS_DIR="${Z_APPS_DIR:-$HOME/z-apps}"
-Z_APPS_REPO="https://github.com/macsur/z-apps.git"
-
-z_platform_detect() {
-    if [ -n "${Z_FORCE_PLATFORM:-}" ]; then
-        Z_OS="$(echo "$Z_FORCE_PLATFORM" | tr '[:upper:]' '[:lower:]')"
-    elif [ "$(uname -s 2>/dev/null || true)" = "Darwin" ]; then
-        Z_OS="macos"
-    elif [ "$(uname -s 2>/dev/null || true)" = "Linux" ]; then
-        if grep -Eiq 'microsoft|wsl' /proc/sys/kernel/osrelease /proc/version 2>/dev/null; then
-            Z_OS="wsl"
-        else
-            Z_OS="linux"
-        fi
-    else
-        local uname_out
-        uname_out="$(uname -s 2>/dev/null || true)"
-        case "$uname_out" in
-            MINGW*|MSYS*|CYGWIN*) Z_OS="windows" ;;
-            *) Z_OS="unknown" ;;
-        esac
-    fi
-
-    case "$Z_OS" in
-        linux|wsl)
-            if [ "$Z_OS" = "linux" ] && [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
-                Z_HAS_SYSTEMD="yes"
-            elif [ "$Z_OS" = "wsl" ] && systemctl is-system-running >/dev/null 2>&1; then
-                Z_HAS_SYSTEMD="yes"
-            else
-                Z_HAS_SYSTEMD="no"
-            fi
-            ;;
-        *)
-            Z_HAS_SYSTEMD="no"
-            ;;
-    esac
-}
-
-z_platform_notice() {
-    case "$Z_OS" in
-        macos)
-            echo -e "${gl_huang}检测到 macOS：系统级功能仅支持 Linux，本机仅提供有限支持${gl_bai}"
-            ;;
-        windows)
-            echo -e "${gl_hong}请在 WSL 里运行本脚本，原生 Windows 暂不提供完整支持。${gl_bai}"
-            ;;
-        wsl)
-            if [ "$Z_HAS_SYSTEMD" = "no" ]; then
-                echo -e "${gl_huang}当前 WSL 未启用 systemd；可在 .wslconfig 中启用 systemd 后重试服务类功能。${gl_bai}"
-            fi
-            ;;
-        *)
-            ;;
-    esac
-}
-
-z_require_linux() {
-    if [ "$Z_OS" != "linux" ] && [ "$Z_OS" != "wsl" ]; then
-        echo -e "${gl_hong}此功能仅支持 Linux${gl_bai}"
-        return 1
-    fi
-    return 0
-}
-
-z_require_systemd() {
-    if [ "$Z_OS" = "wsl" ] && [ "$Z_HAS_SYSTEMD" = "no" ]; then
-        echo -e "${gl_huang}当前 WSL 未启用 systemd，此功能不可用；可在 .wslconfig 启用 systemd 后重试${gl_bai}"
-        return 1
-    fi
-    return 0
-}
-
-z_platform_guard_menu_choice() {
-    local choice="${1:-}"
-    case "$choice" in
-        1|15|00|0)
-            return 0
-            ;;
-    esac
-    if ! z_require_linux; then
-        return 1
-    fi
-    if [ "$Z_OS" = "wsl" ] && [ "$Z_HAS_SYSTEMD" = "no" ]; then
-        case "$choice" in
-            2|3|4|5|6|7|9|10|11|11+|11p|12|13|14|16|17)
-                z_require_systemd || return 1
-                ;;
-        esac
-    fi
-    return 0
-}
-
-zttz_update_rollback() {
-    local msg="${1:-更新失败}"
-    echo -e "${gl_hong}❌ ${msg}${gl_bai}"
-    rm -f "${tmp_file:-}" "${checksum_file:-}" 2>/dev/null || true
-    if [ -f ~/codematrix.sh.bak ]; then
-        if mv -f ~/codematrix.sh.bak ~/codematrix.sh; then
-            chmod +x ~/codematrix.sh 2>/dev/null || true
-            zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k 2>/dev/null || true
-            zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z 2>/dev/null || true
-            [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
-            [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
-            zttz_verify_entries ~/codematrix.sh 2>/dev/null || true
-            echo -e "${gl_huang}已回滚到更新前备份版本。${gl_bai}"
-        else
-            echo -e "${gl_hong}回滚失败，请人工检查 ~/codematrix.sh 与 ~/codematrix.sh.bak。${gl_bai}"
-        fi
-    fi
-    return 1
-}
-
-zttz_download_with_retry() {
-    local url="$1" output="$2" max_time="${3:-30}" attempts="${4:-3}"
-    local n=0
-    while [ "$n" -lt "$attempts" ]; do
-        n=$((n + 1))
-        if curl -fsSL --connect-timeout 10 --max-time "$max_time" --retry 2 -o "$output" "$url"; then
-            return 0
-        fi
-        echo -e "${gl_huang}⚠️ 下载失败，正在重试 ($n/$attempts): ${url}${gl_bai}"
-        sleep 2
-    done
-    return 1
-}
-
-zttz_safe_update() {
-    local download_url="https://zttz.eu.org/z.sh"
-    local checksum_url="${download_url}.sha256"
-    local tmp_file="" checksum_file=""
-    local got_checksum=0 expected actual
-
-    echo -e "${gl_kjlan}🚀 正在从 ${download_url} 安全更新脚本...${gl_bai}"
-
-    if ! cp -f ~/codematrix.sh ~/codematrix.sh.bak; then
-        echo -e "${gl_hong}❌ 更新前备份失败，已中止更新。${gl_bai}"
-        return 1
-    fi
-
-    tmp_file=$(mktemp ~/zttz_update.XXXXXX) || zttz_update_rollback "创建临时脚本文件失败"
-    checksum_file=$(mktemp ~/zttz_sha.XXXXXX) || zttz_update_rollback "创建临时校验文件失败"
-
-    if ! zttz_download_with_retry "$download_url" "$tmp_file" 30 3; then
-        zttz_update_rollback "脚本下载失败，已恢复原版本"
-        return 1
-    fi
-
-    if zttz_download_with_retry "$checksum_url" "$checksum_file" 20 3; then
-        got_checksum=1
-    else
-        echo -e "${gl_huang}⚠️ 未获取到 sha256 校验文件，降级为警告模式：备份后继续更新。${gl_bai}"
-    fi
-
-    if [ ! -s "$tmp_file" ] || ! head -1 "$tmp_file" | grep -q '^#!/bin/bash'; then
-        zttz_update_rollback "下载内容不是有效 shell 脚本，已恢复原版本"
-        return 1
-    fi
-
-    if ! bash -n "$tmp_file"; then
-        zttz_update_rollback "新版脚本 bash -n 语法检查失败，已恢复原版本"
-        return 1
-    fi
-
-    if [ "$got_checksum" -eq 1 ] && [ -s "$checksum_file" ]; then
-        expected=$(awk '{print $1}' "$checksum_file" | head -1 | tr -d '')
-        if [ -n "$expected" ]; then
-            if command -v sha256sum >/dev/null 2>&1; then
-                actual=$(sha256sum "$tmp_file" | awk '{print $1}')
-            else
-                actual=""
-            fi
-            if [ -z "$actual" ] || [ "$actual" != "$expected" ]; then
-                zttz_update_rollback "sha256 校验失败，坏文件已拒绝替换，旧版已恢复"
-                return 1
-            fi
-        else
-            echo -e "${gl_huang}⚠️ sha256 校验文件内容为空，降级为警告模式继续更新。${gl_bai}"
-        fi
-    fi
-
-    if ! mv -f "$tmp_file" ~/codematrix.sh; then
-        zttz_update_rollback "替换新版脚本失败，已恢复原版本"
-        return 1
-    fi
-    tmp_file=""
-
-    chmod +x ~/codematrix.sh || zttz_update_rollback "设置新版脚本可执行权限失败，已回滚"
-    zttz_deploy_entry ~/codematrix.sh /usr/local/bin/k || zttz_update_rollback "原子部署 /usr/local/bin/k 失败，已回滚"
-    zttz_deploy_entry ~/codematrix.sh /usr/local/bin/z || zttz_update_rollback "原子部署 /usr/local/bin/z 失败，已回滚"
-    [ -f /usr/local/bin/k ] && ln -sf /usr/local/bin/k /usr/bin/k 2>/dev/null || true
-    [ -f /usr/local/bin/z ] && ln -sf /usr/local/bin/z /usr/bin/z 2>/dev/null || true
-    zttz_verify_entries ~/codematrix.sh || { zttz_update_rollback "入口文件自检比对或语法检查失败，已回滚"; return 1; }
-
-    rm -f "$checksum_file" 2>/dev/null || true
-    echo -e "${gl_lv}✅ ZTTZ 融合版脚本已安全更新到最新版本！${gl_bai}"
-    return 0
-}
-
-z_check_git() {
-    if ! command -v git >/dev/null 2>&1; then
-        echo -e "${gl_hong}❌ 错误: 未检测到 git 命令！${gl_bai}"
-        echo -e "${gl_huang}请先安装 git 后重试：${gl_bai}"
-        echo "  Debian / Ubuntu:  apt update && apt install -y git"
-        echo "  CentOS / RHEL:    yum install -y git"
-        echo "  Alpine:           apk add git"
-        return 1
-    fi
-    return 0
-}
-
-z_sync_apps() {
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
-    echo -e "${gl_huang}  🔄 正在同步 ZTTZ 自用应用仓库 (macsur/z-apps)...${gl_bai}"
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
-
-    if ! z_check_git; then
-        return 0
-    fi
-
-    local before_files=()
-    if [ -d "$Z_APPS_DIR" ]; then
-        for conf in "$Z_APPS_DIR"/*.conf; do
-            [ -f "$conf" ] && before_files+=("$(basename "$conf")")
-        done
-    fi
-
-    local sync_ok=0
-    # 1. 目录不存在或非 git 目录
-    if [ ! -d "$Z_APPS_DIR/.git" ]; then
-        echo -e "${gl_hui}正在从 GitHub 克隆自用应用配置库...${gl_bai}"
-        local tmp_sync
-        tmp_sync=$(mktemp -d /tmp/z_apps_clone.XXXXXX)
-        if git clone --depth=1 "$Z_APPS_REPO" "$tmp_sync"; then
-            mkdir -p "$Z_APPS_DIR"
-            cp -r "$tmp_sync"/.git "$Z_APPS_DIR/" 2>/dev/null || true
-            cp -f "$tmp_sync"/*.conf "$Z_APPS_DIR/" 2>/dev/null || true
-            cp -f "$tmp_sync"/README.md "$Z_APPS_DIR/" 2>/dev/null || true
-            chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
-            rm -rf "$tmp_sync"
-            echo -e "${gl_lv}✅ 首次同步成功！自用配置已拉取至: $Z_APPS_DIR${gl_bai}"
-            sync_ok=1
-        else
-            rm -rf "$tmp_sync"
-            echo -e "${gl_hong}❌ 克隆失败，请检查网络连接或 GitHub 访问！${gl_bai}"
-            return 1
-        fi
-    else
-        # 2. 目录已存在且为 git 目录，首先恢复本地工作区被删改的配置文件，杜绝假成功
-        echo -e "${gl_hui}正在核对本地文件状态并拉取远端更新...${gl_bai}"
-        if ! git -C "$Z_APPS_DIR" checkout -f HEAD 2>/dev/null; then
-            if ! git -C "$Z_APPS_DIR" restore . 2>/dev/null; then
-                echo -e "${gl_hong}❌ 同步失败：恢复本地被删改的 .conf 失败，已中止。${gl_bai}"
-                return 1
-            fi
-        fi
-        git -C "$Z_APPS_DIR" clean -fd >/dev/null 2>&1 || { echo -e "${gl_hong}❌ 同步失败：清理未跟踪文件失败，已中止。${gl_bai}"; return 1; }
-
-        local pull_err=""
-        if pull_err=$(git -C "$Z_APPS_DIR" pull --ff-only "$Z_APPS_REPO" main 2>&1); then
-            chmod +x "$Z_APPS_DIR"/*.conf 2>/dev/null || true
-            echo -e "${gl_lv}✅ 同步成功！自用应用配置已更新至最新。${gl_bai}"
-            sync_ok=1
-        else
-            echo -e "${gl_hong}❌ 同步失败：git pull --ff-only 拉取失败，已中止。${gl_bai}"
-            echo -e "${gl_hui}详情: ${pull_err}${gl_bai}"
-            return 1
-        fi
-    fi
-
-    # 完整性校验：同步完成后必须确保有 .conf 配置文件，否则决不允许假报成功
-    local local_conf_count remote_conf_count
-    local_conf_count=$(find "$Z_APPS_DIR" -maxdepth 1 -name '*.conf' -type f 2>/dev/null | wc -l | tr -d ' ')
-    remote_conf_count=$(git -C "$Z_APPS_DIR" ls-tree -r --name-only HEAD 2>/dev/null | grep -c '.conf$' || true)
-    remote_conf_count=$(echo "$remote_conf_count" | tr -d ' ')
-    local check_confs=("$Z_APPS_DIR"/*.conf)
-    if [ ! -e "${check_confs[0]}" ]; then
-        echo -e "${gl_hong}❌ 错误: 同步完成但未在 $Z_APPS_DIR 检测到任何 .conf 应用配置！${gl_bai}"
-        return 1
-    fi
-    if [ -n "$remote_conf_count" ] && [ "$local_conf_count" != "$remote_conf_count" ]; then
-        echo -e "${gl_hong}❌ 错误: 本地 .conf 数量($local_conf_count)与远端($remote_conf_count)不一致，拒绝视为同步成功。${gl_bai}"
-        return 1
-    fi
-
-    # 新应用发现播报 (非空目录且同步成功时对比)
-    if [ "$sync_ok" -eq 1 ] && [ "${#before_files[@]}" -gt 0 ]; then
-        local added_names=()
-        for conf in "$Z_APPS_DIR"/*.conf; do
-            [ -f "$conf" ] || continue
-            local fn
-            fn=$(basename "$conf")
-            local is_new=1
-            for bf in "${before_files[@]}"; do
-                if [ "$bf" = "$fn" ]; then
-                    is_new=0
-                    break
-                fi
-            done
-            if [ "$is_new" -eq 1 ]; then
-                local aname
-                aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-                [ -z "$aname" ] && aname=$(basename "$conf" .conf)
-                added_names+=("$aname")
-            fi
-        done
-        if [ "${#added_names[@]}" -gt 0 ]; then
-            local names_str
-            names_str=$(IFS="、"; echo "${added_names[*]}")
-            echo -e "${gl_huang}🎉 发现 ${#added_names[@]} 个新应用：${names_str}${gl_bai}"
-        fi
-    fi
-
-    return 0
-}
-
-Z_CATEGORY_LIST=(
-    "ai:🤖 人工智能"
-    "ops:🖥️  服务器运维"
-    "network:🌐 网络代理"
-    "storage:🗄️  数据存储"
-    "media:🎬 影音媒体"
-    "office:📝 办公工具"
-    "tools:🔧 实用工具"
-    "other:📦 其他"
-)
-
-z_get_cat_name() {
-    local cid="${1:-other}"
-    for item in "${Z_CATEGORY_LIST[@]}"; do
-        local key="${item%%:*}"
-        local name="${item#*:}"
-        if [ "$key" = "$cid" ]; then
-            echo "$name"
-            return 0
-        fi
-    done
-    echo "📦 其他"
-}
-
-z_norm_category() {
-    local raw_cat
-    raw_cat=$(echo "${1:-other}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-    for item in "${Z_CATEGORY_LIST[@]}"; do
-        local key="${item%%:*}"
-        if [ "$key" = "$raw_cat" ]; then
-            echo "$key"
-            return 0
-        fi
-    done
-    echo "other"
-}
-
-z_is_recent_file() {
-    local f="$1"
-    [ -f "$f" ] || return 1
-    local now mtime diff_sec
-    now=$(date +%s 2>/dev/null || echo 0)
-    mtime=0
-    if stat -c %Y "$f" >/dev/null 2>&1; then
-        mtime=$(stat -c %Y "$f" 2>/dev/null)
-    elif stat -f %m "$f" >/dev/null 2>&1; then
-        mtime=$(stat -f %m "$f" 2>/dev/null)
-    fi
-    [ "$now" -gt 0 ] && [ "$mtime" -gt 0 ] || return 1
-    diff_sec=$((now - mtime))
-    [ "$diff_sec" -ge 0 ] && [ "$diff_sec" -le 604800 ]
-}
-
-z_init_env() {
-    [ -d "$Z_APPS_DIR" ] || mkdir -p "$Z_APPS_DIR"
-}
-
-z_list_apps() {
-    local p1="${1:-}"
-    local p2="${2:-}"
-    local is_interactive=0
-    local filter_cat=""
-
-    if [ "$p1" = "interactive" ]; then
-        is_interactive=1
-        filter_cat=$(z_norm_category "$p2")
-        [ -z "$p2" ] && filter_cat=""
-    else
-        filter_cat=$(z_norm_category "$p1")
-        if [ "$p1" = "other" ] || [ "$filter_cat" != "other" ]; then
-            [ "$p2" = "interactive" ] && is_interactive=1
-        else
-            filter_cat=""
-        fi
-    fi
-
-    z_init_env
-
-    while true; do
-        clear
-        echo -e "${gl_kjlan}==================================================${gl_bai}"
-        if [ -n "$filter_cat" ]; then
-            local filter_cat_name
-            filter_cat_name=$(z_get_cat_name "$filter_cat")
-            echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 [分类: ${filter_cat_name}]${gl_bai}"
-        else
-            echo -e "${gl_huang}  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)${gl_bai}"
-        fi
-        echo -e "${gl_kjlan}==================================================${gl_bai}"
-
-        local conf_files=("$Z_APPS_DIR"/*.conf)
-        if [ ! -e "${conf_files[0]}" ]; then
-            echo -e "${gl_huang}💡 提示: ~/z-apps 目录为空或未初始化。${gl_bai}"
-            echo -e "${gl_lv}请先运行同步命令从 GitHub 拉取自用应用配置：${gl_bai}"
-            echo -e "  ${gl_huang}z app sync${gl_bai}"
-            echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-            echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
-            echo -e "${gl_kjlan}==================================================${gl_bai}"
-            return 0
-        fi
-
-        # 清空动态序号映射持久化缓存
-        rm -f /tmp/.z_app_disp_map 2>/dev/null || true
-
-        local rendered_count=0
-        local disp_idx=0
-        for item in "${Z_CATEGORY_LIST[@]}"; do
-            local cat_key="${item%%:*}"
-            local cat_name="${item#*:}"
-
-            if [ -n "$filter_cat" ] && [ "$cat_key" != "$filter_cat" ]; then
-                continue
-            fi
-
-            local cat_has_item=0
-            for conf in "$Z_APPS_DIR"/*.conf; do
-                [ -f "$conf" ] || continue
-                local acat
-                acat=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_category=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-                acat=$(z_norm_category "$acat")
-
-                if [ "$acat" = "$cat_key" ]; then
-                    if [ "$cat_has_item" -eq 0 ]; then
-                        echo -e "${gl_kjlan}▼ [${gl_huang}${cat_name}${gl_kjlan}]${gl_bai}"
-                        cat_has_item=1
-                    fi
-
-                    disp_idx=$((disp_idx + 1))
-                    echo "${disp_idx}=${conf}" >> /tmp/.z_app_disp_map
-
-                    local bname
-                    bname=$(basename "$conf" .conf)
-                    local aname
-                    aname=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'" | tr -d ' ')
-                    [ -z "$aname" ] && aname="$bname"
-
-                    if z_is_recent_file "$conf"; then
-                        aname="🆕 ${aname}"
-                    fi
-
-                    local atext
-                    atext=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_text=' "$conf" 2>/dev/null | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'")
-                    printf "  ${gl_huang}%-10s${gl_bai} | ${gl_lv}%-24s${gl_bai} | %s\n" "$disp_idx" "$aname" "$atext"
-                    rendered_count=$((rendered_count + 1))
-                fi
-            done
-        done
-
-        if [ "$rendered_count" -eq 0 ]; then
-            echo -e "${gl_huang}未找到指定分类下的自用应用。${gl_bai}"
-        fi
-
-        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-        if [ "$is_interactive" -ne 1 ]; then
-            echo -e "安装或管理应用：${gl_huang}z app <数字/名称>${gl_bai} (例如: z app 1)"
-            echo -e "分类过滤浏览：${gl_huang}z app ai / z app ops / z app tools${gl_bai}"
-            echo -e "从 GitHub 同步配置：${gl_huang}z app sync${gl_bai}"
-            echo -e "返回上游官方应用市场请使用：${gl_huang}k app <数字>${gl_bai}"
-            echo -e "${gl_kjlan}==================================================${gl_bai}"
-            return 0
-        fi
-
-        echo -e "${gl_kjlan}0. ${gl_bai}返回上级菜单"
-        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-        read -e -p "请输入要安装/管理的软件编号 (0 返回): " app_choice
-        if [ -z "$app_choice" ] || [ "$app_choice" = "0" ]; then
-            break
-        fi
-
-        z_apps_panel "$app_choice"
-        break_end
-    done
-}
-
-z_apps_panel() {
-    local target="${1:-}"
-    z_init_env
-    if [ -z "$target" ]; then
-        if [ -t 0 ]; then
-            z_list_apps interactive
-        else
-            z_list_apps
-        fi
-        return 0
-    fi
-
-    if [ "$target" = "sync" ]; then
-        z_sync_apps
-        return 0
-    fi
-
-    local conf_path=""
-    # 1. 优先在动态显示映射关系集中按渲染序号匹配
-    if [ -f /tmp/.z_app_disp_map ]; then
-        local mapped
-        mapped=$(grep -E "^${target}=" /tmp/.z_app_disp_map 2>/dev/null | cut -d'=' -f2-)
-        if [ -n "$mapped" ] && [ -f "$mapped" ]; then
-            conf_path="$mapped"
-        fi
-    fi
-
-    # 2. 回退匹配配置文件名/别名
-    if [ -z "$conf_path" ]; then
-        if [ -f "$Z_APPS_DIR/${target}.conf" ]; then
-            conf_path="$Z_APPS_DIR/${target}.conf"
-        elif [ -f "./z-apps/${target}.conf" ]; then
-            conf_path="./z-apps/${target}.conf"
-        fi
-    fi
-
-    if [ -n "$conf_path" ] && [ -f "$conf_path" ]; then
-        echo -e "${gl_lv}🚀 正在加载 ZTTZ 自定义应用配置: ${conf_path}${gl_bai}"
-        . "$conf_path"
-    else
-        echo -e "${gl_hong}❌ 错误: 未在 ~/z-apps 中找到自定义应用 '${target}' 的配置！${gl_bai}"
-        echo -e "${gl_hui}提示: 自定义配置文件路径应为: ~/z-apps/${target}.conf${gl_bai}"
-        echo -e "${gl_lv}可通过 ${gl_huang}z app sync${gl_lv} 从远端拉取最新配置库${gl_bai}"
-        echo -e "${gl_huang}如为官方应用编号，请直接使用: z app ${target}${gl_bai}"
-        return 1
-    fi
-}
-
-z_update() {
-    if zttz_safe_update; then
-        echo ""
-        echo -e "${gl_huang}🔄 正在自动同步应用市场数据 (z-apps)...${gl_bai}"
-        if z_sync_apps; then
-            echo -e "${gl_lv}✅ 应用市场数据同步完成！${gl_bai}"
-        else
-            echo -e "${gl_hong}⚠️ 警告: 脚本本体已更新成功，但应用市场数据同步失败！${gl_bai}"
-            echo -e "${gl_huang}请检查网络连接后手动运行 'z app sync' 重新同步应用数据。${gl_bai}"
-        fi
-        return 0
-    else
-        return 1
-    fi
-}
-
-z_run_checked() {
-    local label="${1:-命令}"
-    shift
-    "$@"
-    local rc=$?
-    if [ "$rc" -ne 0 ]; then
-        echo -e "${gl_hong}❌ 命令失败: ${label} (退出码 $rc)${gl_bai}"
-    fi
-    return "$rc"
-}
-
-z_uninstall() {
-    clear
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
-    echo -e "${gl_huang}      🗑️ 卸载 CODE MATRIX 代码矩阵脚本${gl_bai}"
-    echo -e "${gl_kjlan}==================================================${gl_bai}"
-    echo "将彻底卸载代码矩阵脚本及所有关联命令入口。"
-    echo -e "${gl_lv}安全边界: 仅清理脚本本体与命令入口，绝不影响 Docker 容器、KPanel、/etc 系统配置与用户数据。${gl_bai}"
-    echo ""
-    echo -e "${gl_huang}待清理项目清单：${gl_bai}"
-
-    local targets=()
-    # 1. 核心命令入口四处
-    for bin in /usr/local/bin/z /usr/local/bin/k /usr/bin/z /usr/bin/k; do
-        if [ -f "$bin" ] || [ -L "$bin" ]; then
-            targets+=("$bin")
-            echo -e "  • 命令入口: ${gl_bai}$bin${gl_bai}"
-        fi
-    done
-
-    # 2. 快捷软链接：扫描 /usr/local/bin 与 /usr/bin 下所有指向 codematrix.sh 或 kejilion.sh 的链接
-    for dir in /usr/local/bin /usr/bin; do
-        [ -d "$dir" ] || continue
-        for link in "$dir"/*; do
-            if [ -L "$link" ]; then
-                local dest
-                dest=$(readlink "$link" 2>/dev/null || true)
-                if [[ "$dest" == *"codematrix.sh"* ]] || [[ "$dest" == *"kejilion.sh"* ]]; then
-                    if [[ ! " ${targets[*]} " =~ " ${link} " ]]; then
-                        targets+=("$link")
-                        echo -e "  • 快捷软链: ${gl_bai}$link -> $dest${gl_bai}"
-                    fi
-                fi
-            fi
-        done
-    done
-
-    # 3. 脚本本体与历史备份（明确包含 codematrix 及旧 kejilion 全家桶）
-    for f in ~/codematrix.sh ~/codematrix.sh.bak ~/codematrix.sh ~/codematrix.sh.bak ~/codematrix.sh.migrated; do
-        local expanded_f=$(eval echo "$f")
-        if [ -f "$expanded_f" ] || [ -L "$expanded_f" ]; then
-            targets+=("$expanded_f")
-        fi
-    done
-
-    # 4. crontab 任务
-    echo -e "  • 定时任务: ${gl_bai}清理包含 codematrix.sh 与 kejilion.sh 的 crontab 任务${gl_bai}"
-    # 5. alias 别名
-    echo -e "  • Shell别名: ${gl_bai}清理 ~/.bashrc 等文件中的 alias k= / alias z=${gl_bai}"
-
-    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-
-    local choice_uninstall="N"
-    if [ -t 0 ]; then
-        read -e -p "是否确认卸载代码矩阵脚本？(y/N): " choice_uninstall
-    else
-        read -r choice_uninstall || choice_uninstall="N"
-    fi
-    if [ "$choice_uninstall" != "y" ] && [ "$choice_uninstall" != "Y" ]; then
-        echo -e "${gl_huang}已取消卸载，未做任何修改。${gl_bai}"
-        return 0
-    fi
-
-    # 单独确认 z-apps 自用应用目录
-    local delete_zapps=0
-    if [ -d "$HOME/z-apps" ]; then
-        echo ""
-        local choice_zapps="N"
-        if [ -t 0 ]; then
-            read -e -p "检测到自定义应用配置目录 ~/z-apps，是否同时删除？(y/N, 默认保留): " choice_zapps
-        else
-            read -r choice_zapps || choice_zapps="N"
-        fi
-        if [ "$choice_zapps" = "y" ] || [ "$choice_zapps" = "Y" ]; then
-            delete_zapps=1
-            echo -e "${gl_huang}已标记删除: ~/z-apps${gl_bai}"
-        else
-            echo -e "${gl_lv}已保留: ~/z-apps${gl_bai}"
-        fi
-    fi
-
-    echo ""
-    echo -e "${gl_huang}正在执行清理...${gl_bai}"
-
-    # 1. 清理 crontab (仅在确实存在相关任务时重写，避免盲跑影响系统)
-    if command -v crontab >/dev/null 2>&1; then
-        local current_cron
-        current_cron=$(crontab -l 2>/dev/null || true)
-        if [ -n "$current_cron" ] && echo "$current_cron" | grep -q -E "codematrix.sh|kejilion.sh"; then
-            echo "$current_cron" | grep -v -E "codematrix.sh|kejilion.sh" | crontab - 2>/dev/null || true
-        fi
-    fi
-
-    # 2. 清理 alias
-    for rc in ~/.bashrc ~/.profile ~/.bash_profile; do
-        if [ -f "$rc" ]; then
-            sed -i '/^alias k=/d' "$rc" 2>/dev/null || true
-            sed -i '/^alias z=/d' "$rc" 2>/dev/null || true
-        fi
-    done
-
-    # 3. 使用标准 unlink 语义逐个安全清除所有列入清单的入口、软链与脚本本体及备份文件
-    for t in "${targets[@]}"; do
-        if [ -f "$t" ] || [ -L "$t" ]; then
-            command -v unlink >/dev/null 2>&1 && unlink "$t" 2>/dev/null || rm -f "$t" 2>/dev/null || true
-        fi
-    done
-
-    echo -e "${gl_lv}✅ 脚本已卸载，再见！${gl_bai}"
-    exit 0
-}
-
-z_main_menu() {
-    while true; do
-        clear
-        local custom_cnt=48
-        if declare -f load_custom_apps >/dev/null 2>&1; then
-            load_custom_apps 2>/dev/null || true
-            [ "${#CUSTOM_APPS[@]}" -gt 0 ] && custom_cnt="${#CUSTOM_APPS[@]}"
-        fi
-        echo -e "${gl_kjlan}==================================================${gl_bai}"
-        echo -e "${gl_huang}      🚀 CODE MATRIX 代码矩阵工作台${gl_bai}"
-        echo -e "${gl_kjlan}==================================================${gl_bai}"
-        echo -e "${gl_lv}CODE MATRIX REVOLUTION${gl_bai}"
-        echo -e "${gl_bai}欢迎来到代码矩阵，矩阵已就位，只等你敲下回车${gl_bai}"
-        echo -e "${gl_kjlan}1. ${gl_bai}自用应用市场列表 (z app)"
-        echo -e "${gl_kjlan}2. ${gl_bai}从 GitHub 同步自用配置 (z app sync)"
-        echo -e "${gl_kjlan}3. ${gl_bai}第三方与社区扩展应用 [${custom_cnt} 款]"
-        echo -e "${gl_kjlan}4. ${gl_bai}上游分类折叠市场 (k app+)"
-        echo -e "${gl_kjlan}5. ${gl_bai}切换至上游主菜单 (k)"
-        echo -e "${gl_kjlan}6. ${gl_bai}在线更新脚本 (z update)"
-        echo -e "${gl_kjlan}7. ${gl_bai}卸载代码矩阵脚本 (z uninstall)"
-        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-        echo -e "${gl_kjlan}0. ${gl_bai}退出"
-        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
-        read -e -p "请输入你的选择: " z_choice
-        case "$z_choice" in
-            1)
-                z_run_checked "z app 列表" z_list_apps interactive
-                break_end
-                ;;
-            2)
-                z_run_checked "z app sync" z_sync_apps
-                break_end
-                ;;
-            3)
-                z_run_checked "第三方应用市场" linux_panel_accordion "custom"
-                ;;
-            4)
-                z_run_checked "上游分类市场" linux_panel_accordion
-                ;;
-            5)
-                kejilion_sh
-                break
-                ;;
-            6)
-                z_run_checked "z update" z_update
-                break_end
-                ;;
-            7)
-                z_uninstall
-                break_end
-                ;;
-            0)
-                break
-                ;;
-            *)
-                echo "无效的选择"
-                sleep 1
-                ;;
-        esac
-    done
-}
-
-z_dispatch() {
-    local cmd="${1:-}"
-    shift 2>/dev/null || true
-    case "$cmd" in
-        "")
-            z_main_menu
-            ;;
-        app)
-            if [ "$1" = "sync" ]; then
-                z_run_checked "z app sync" z_sync_apps
-            elif [ -n "$1" ]; then
-                local check_cat
-                check_cat=$(z_norm_category "$1")
-                if [ "$1" = "other" ] || [ "$check_cat" != "other" ]; then
-                    if [ -t 0 ]; then
-                        z_list_apps "$1" interactive
-                    else
-                        z_list_apps "$1"
-                    fi
-                else
-                    if z_apps_panel "$@"; then
-                        :
-                    elif [[ "$1" =~ ^[0-9]+$ ]]; then
-                        echo -e "${gl_huang}未命中自用配置，转由官方应用编号直达安装。${gl_bai}"
-                        z_require_linux || return 0
-                        linux_panel "$@"
-                    fi
-                fi
-            else
-                z_apps_panel "$@"
-            fi
-            ;;
-        app+|app-cat|app-category)
-            z_require_linux || return 0
-            linux_panel_accordion "$@"
-            ;;
-        sync)
-            z_run_checked "z app sync" z_sync_apps
-            ;;
-        update|upgrade)
-            z_run_checked "z update" z_update
-            ;;
-        uninstall)
-            z_uninstall
-            ;;
-        help|--help|-h)
-            echo "ZTTZ 脚本用法:"
-            echo "  z                    打开 ZTTZ 自用工作台"
-            echo "  z app                查看自定义应用列表 (为空时引导 sync)"
-            echo "  z app <数字/代号>    优先安装自用指定应用；未命中时按官方编号直达"
-            echo "  z app sync           从 GitHub 同步自用应用配置 (macsur/z-apps)"
-            echo "  z app+               打开分类手风琴应用市场"
-            echo "  z update             更新融合版脚本"
-            echo "  z uninstall          卸载代码矩阵脚本 (完整清理入口与本体)"
-            echo "  k ...                调用上游官方全部原生能力"
-            ;;
-        *)
-            echo -e "${gl_hong}未知的 z 子命令: ${cmd}${gl_bai}"
-            echo "输入 'z help' 查看帮助，或使用 'k ${cmd}' 尝试上游命令"
-            ;;
-    esac
-}
-
-
-# 平台识别与入口级降级提示
-z_platform_detect
-z_platform_notice
-if [ "$Z_OS" = "windows" ]; then
-    exit 1
-fi
-
-# 判别当前调用是否来自 'z' 命令 (软链、二进制名或环境变量强制)
-CURRENT_INVOCATION="$(basename "$0" 2>/dev/null || echo "")"
-if [ "$CURRENT_INVOCATION" = "z" ] || [ "${Z_INVOKE_MODE:-}" = "1" ]; then
-    z_dispatch "$@"
-    exit $?
-fi
-
-case "${1:-}" in
-    zttz-safe-update)
-        zttz_safe_update
-        exit $?
-        ;;
-esac
-
-if [ "$#" -eq 0 ]; then
-	# 如果没有参数，运行交互式逻辑
-	kejilion_sh
-else
-	# 如果有参数，执行相应函数
-	case $1 in
-		backup-center)
-			shift
-			kpanel_backup_center_dispatch "$@"
-			;;
-		install|add|安装)
-			shift
-			send_stats "安装软件"
-			install "$@"
-			;;
-		remove|del|uninstall|卸载)
-			shift
-			send_stats "卸载软件"
-			remove "$@"
-			;;
-		update|更新)
-			linux_update
-			;;
-		clean|清理)
-			linux_clean
-			;;
-		dd|重装)
-			dd_xitong
-			;;
-		bbr3|bbrv3)
-			if [ "${KJ_BBRV3_NONINTERACTIVE:-}" = "1" ]; then
-				shift
-				bbrv3 "$@"
-			else
-				bbrv3
-			fi
-			;;
-		nhyh|内核优化)
-			Kernel_optimize
-			;;
-		trash|hsz|回收站)
-			linux_trash
-			;;
-		backup|bf|备份)
-			linux_backup
-			;;
-		ssh|远程连接)
-			ssh_manager
-			;;
-
-		rsync|远程同步)
-			rsync_manager
-			;;
-
-		rsync_run)
-			shift
-			send_stats "定时rsync同步"
-			run_task "$@"
-			;;
-
-		disk|硬盘管理)
-			disk_manager
-			;;
-
-		http-site)
-			shift
-			kpanel_run_http_site "$@"
-			;;
-		wp|wordpress)
-			shift
-			ldnmp_wp "$@"
-
-			;;
-		discuz)
-			shift
-			kpanel_run_web_recipe_cli 3 "$@"
-			;;
-		kodbox)
-			shift
-			kpanel_run_web_recipe_cli 4 "$@"
-			;;
-		maccms)
-			shift
-			kpanel_run_web_recipe_cli 5 "$@"
-			;;
-		dujiaoka)
-			shift
-			kpanel_run_web_recipe_cli 6 "$@"
-			;;
-		flarum)
-			shift
-			kpanel_run_web_recipe_cli 7 "$@"
-			;;
-		typecho)
-			shift
-			kpanel_run_web_recipe_cli 8 "$@"
-			;;
-		linkstack)
-			shift
-			kpanel_run_web_recipe_cli 9 "$@"
-			;;
-		ai-prompt)
-			shift
-			kpanel_run_web_recipe_cli 27 "$@"
-			;;
-		php-site)
-			shift
-			kpanel_run_web_recipe_cli 20 "$@"
-			;;
-		redirect-site)
-			shift
-			kpanel_run_web_recipe_cli 22 "$@"
-			;;
-		domain-proxy)
-			shift
-			kpanel_run_web_recipe_cli 24 "$@"
-			;;
-		bitwarden-site)
-			shift
-			kpanel_run_web_recipe_cli 25 "$@"
-			;;
-		halo-site)
-			shift
-			kpanel_run_web_recipe_cli 26 "$@"
-			;;
-		loadbalance-site)
-			shift
-			kpanel_run_web_recipe_cli 28 "$@"
-			;;
-		static-site)
-			shift
-			kpanel_run_web_recipe_cli 30 "$@"
-			;;
-		fd|rp|反代)
-			shift
-			ldnmp_Proxy "$@"
-	  		find_container_by_host_port "$port"
-	  		if [ -z "$docker_name" ]; then
-	  		  close_port "$port"
-			  echo "已阻止IP+端口访问该服务"
-	  		else
-			  ip_address
-			  close_port "$port"
-			block_container_port "$docker_name" "$ipv4_address" || return 1
-	  		fi
-			;;
-
-		loadbalance|负载均衡)
-			ldnmp_Proxy_backend
-			;;
-
-
-		stream|L4负载均衡)
-			ldnmp_Proxy_backend_stream
-			;;
-
-		swap)
-			shift
-			send_stats "快速设置虚拟内存"
-			add_swap "$@"
-			;;
-
-		time|时区)
-			shift
-			send_stats "快速设置时区"
-			set_timedate "$@"
-			;;
-
-		dns)
-			shift
-			kpanel_set_dns_noninteractive "$@"
-			;;
-
-		ssh-port)
-			shift
-			kpanel_ssh_port_noninteractive "$@"
-			;;
-
-		test|check|体检|测试)
-			shift
-			if [ "${KJ_TEST_NONINTERACTIVE:-}" = "1" ]; then
-				kpanel_run_test_noninteractive "$@"
-			else
-				linux_test
-			fi
-			;;
-
-
-		iptables_open)
-			iptables_open
-			;;
-
-		frps)
-			frps_panel
-			;;
-
-		frpc)
-			frpc_panel
-			;;
-
-
-		打开端口|dkdk)
-			shift
-			open_port "$@"
-			;;
-
-		关闭端口|gbdk)
-			shift
-			close_port "$@"
-			;;
-
-		放行IP|fxip)
-			shift
-			allow_ip "$@"
-			;;
-
-		阻止IP|zzip)
-			shift
-			block_ip "$@"
-			;;
-
-		防火墙|fhq)
-			iptables_panel
-			;;
-
-		命令收藏夹|fav)
-			linux_fav
-			;;
-
-		status|状态)
-			shift
-			send_stats "软件状态查看"
-			status "$@"
-			;;
-		start|启动)
-			shift
-			send_stats "软件启动"
-			start "$@"
-			;;
-		stop|停止)
-			shift
-			send_stats "软件暂停"
-			stop "$@"
-			;;
-		restart|重启)
-			shift
-			send_stats "软件重启"
-			restart "$@"
-			;;
-
-		enable|autostart|开机启动)
-			shift
-			send_stats "软件开机自启"
-			enable "$@"
-			;;
-
-		ssl)
-			shift
-			if [ "${KJ_WEB_FORCE_RENEW:-0}" = "1" ]; then
-				add_ssl "${1:-}"
-				exit $?
-			fi
-			if [ "$1" = "ps" ]; then
-				send_stats "查看证书状态"
-				ssl_ps
-			elif [ -z "$1" ]; then
-				add_ssl
-				send_stats "快速申请证书"
-			elif [ -n "$1" ]; then
-				add_ssl "$1"
-				send_stats "快速申请证书"
-			else
-				k_info
-			fi
-			;;
-
-		docker)
-			shift
-			case $1 in
-				install|安装)
-					send_stats "快捷安装docker"
-					install_docker
-					;;
-				ps|容器)
-					send_stats "快捷容器管理"
-					docker_ps
-					;;
-				img|镜像)
-					send_stats "快捷镜像管理"
-					docker_image
-					;;
-				*)
-					linux_docker
-					;;
-			esac
-			;;
-
 		web)
 		   shift
 			if [ "$1" = "env" ] || [ "$1" = "environment" ] || [ "$1" = "环境" ]; then
@@ -34918,6 +33865,12 @@ else
 			shift
 			send_stats "应用$@"
 			linux_panel "$@"
+			;;
+
+		app+|app-cat|app-category)
+			shift
+			send_stats "分类折叠应用$@"
+			linux_panel_accordion "$@"
 			;;
 
 		app+|app-cat|app-category)
