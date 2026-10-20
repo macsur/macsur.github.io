@@ -41,17 +41,38 @@ for (const url of UPSTREAM_URLS) {
 
 if (!officialCode.includes('kejilion_sh()') || !officialCode.includes('linux_panel()')) {
     console.log('⚠️ 远程拉取超时，正在使用本地已有源码进行打补丁与同步...');
-    officialCode = fs.readFileSync(path.join(ROOT_DIR, 'official-upstream.sh'), 'utf8');
+    const localCandidates = [
+        path.join(ROOT_DIR, 'official-upstream.sh'),
+        path.join(ROOT_DIR, 'kejilion.sh')
+    ];
+    let loaded = false;
+    for (const cand of localCandidates) {
+        if (fs.existsSync(cand)) {
+            const candidateContent = fs.readFileSync(cand, 'utf8');
+            if (candidateContent.includes('kejilion_sh()') && candidateContent.includes('linux_panel()')) {
+                officialCode = candidateContent;
+                console.log(`✅ 成功从本地 ${path.basename(cand)} 读取源码`);
+                loaded = true;
+                break;
+            }
+        }
+    }
+    if (!loaded) {
+        console.error('❌ 未能获取到有效的官方源码，已中止。');
+        process.exit(1);
+    }
 }
 
 console.log('🔧 [2/5] 正在执行智能守护与健壮性补丁...');
 
 // 补丁 1.1: 增加 ZTTZ 增强版标识
-const versionOld = `sh_v="4.5.10"`;
-if (officialCode.includes(versionOld)) {
-    officialCode = officialCode.replace(versionOld, `${versionOld}\nzttz_edition="true"\nzttz_v="1.0.0"`);
-} else {
-    officialCode = officialCode.replace(/(sh_v="[^"]*")/, `$1\nzttz_edition="true"\nzttz_v="1.0.0"`);
+if (!officialCode.includes('zttz_edition="true"')) {
+    const versionOld = `sh_v="4.5.10"`;
+    if (officialCode.includes(versionOld)) {
+        officialCode = officialCode.replace(versionOld, `${versionOld}\nzttz_edition="true"\nzttz_v="1.0.0"`);
+    } else {
+        officialCode = officialCode.replace(/(sh_v="[^"]*")/, `$1\nzttz_edition="true"\nzttz_v="1.0.0"`);
+    }
 }
 const canshuOld = `canshu_v6() {
 	if grep -q '^canshu="V6"' /usr/local/bin/k > /dev/null 2>&1; then
@@ -1714,10 +1735,10 @@ if (officialCode.includes(boardOld)) {
 }
 
 // 补丁 22: 去痕 - send_stats 死代码整段删除（含 api.kejilion.pro 端点）
-// 先定位 send_stats 函数完整范围，从 "send_stats() {" 到下一个函数定义前
-const sendStatsMatch = officialCode.match(/send_stats\(\) \{[\s\S]*?\n\}\n/);
+// 定位 send_stats 函数完整范围，从 "send_stats() {" 到下一个顶层函数定义前，避免非贪婪正则因内部大括号截断代码
+const sendStatsMatch = officialCode.match(/send_stats\(\) \{[\s\S]*?(?=\n[a-zA-Z0-9_]+\(\) \{)/);
 if (sendStatsMatch) {
-    officialCode = officialCode.replace(sendStatsMatch[0], 'send_stats() {\n\treturn 0  # CODE MATRIX: 上报已永久关闭\n}\n');
+    officialCode = officialCode.replace(sendStatsMatch[0], 'send_stats() {\n\treturn 0  # CODE MATRIX: 上报已永久关闭\n}\n\n');
     console.log('✅ send_stats 死代码整段已删除，仅保留空壳 return 0');
 } else {
     console.log('⚠️ 去痕: 未找到 send_stats 完整函数体，跳过整段删除');
@@ -1757,19 +1778,34 @@ if (officialCode.includes(pySendStatOld)) {
 
 // 补丁 23: 去痕 - 家目录脚本文件名 ~/kejilion.sh → ~/codematrix.sh（全量替换）
 // 注意：只替换用户可见/路径引用，不碰函数名 kejilion()/kejilion_sh()
+// 保护已有的存量迁移块，防止将迁移源 ~/kejilion.sh 破坏成 ~/codematrix.sh（根因修复）
+const migrationBlockRegex = /if \[ -f ~\/kejilion\.sh \] && \[ ! -f ~\/codematrix\.sh \]; then[\s\S]*?fi\nif \[ ! -f ~\/codematrix\.sh \]; then/;
+let savedMigrationBlock = null;
+const existingMigrationMatch = officialCode.match(migrationBlockRegex);
+if (existingMigrationMatch) {
+    savedMigrationBlock = existingMigrationMatch[0];
+    officialCode = officialCode.replace(savedMigrationBlock, '__CODE_MATRIX_MIGRATION_PLACEHOLDER__');
+}
+
 let codematrixCount = 0;
-// 先统计
 const cmMatches = officialCode.match(/~\/kejilion\.sh/g);
 if (cmMatches) codematrixCount = cmMatches.length;
 officialCode = officialCode.replace(/~\/kejilion\.sh/g, '~/codematrix.sh');
 // 同时替换 kejilion.sh.bak
 officialCode = officialCode.replace(/kejilion\.sh\.bak/g, 'codematrix.sh.bak');
-console.log(`✅ 家目录脚本文件名已替换 (~/kejilion.sh → ~/codematrix.sh, 约 ${codematrixCount} 处; .bak 同步替换)`);
+
+if (savedMigrationBlock) {
+    officialCode = officialCode.replace('__CODE_MATRIX_MIGRATION_PLACEHOLDER__', savedMigrationBlock);
+}
+console.log(`✅ 家目录脚本文件名已替换 (~/kejilion.sh → ~/codematrix.sh, 约 ${codematrixCount} 处; .bak 同步替换; 迁移块受保护)`);
 
 // 补丁 24: 去痕 - 存量迁移逻辑注入
 // 在脚本首次运行或更新时，若发现旧 ~/kejilion.sh 存在，迁移参数后处置旧文件
-const migrationOld = 'if [ ! -f ~/codematrix.sh ]; then';
-const migrationNew = `if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
+if (officialCode.includes('# CODE MATRIX 存量迁移')) {
+    console.log('✅ 存量迁移逻辑已存在，跳过重复注入（幂等保证）');
+} else {
+    const migrationOld = 'if [ ! -f ~/codematrix.sh ]; then';
+    const migrationNew = `if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
 	# CODE MATRIX 存量迁移：旧版 kejilion.sh → codematrix.sh，保留已同意状态
 	cp -f ~/kejilion.sh ~/codematrix.sh
 	# 迁移关键参数（canshu / permission_granted / ENABLE_STATS）
@@ -1784,11 +1820,27 @@ const migrationNew = `if [ -f ~/kejilion.sh ] && [ ! -f ~/codematrix.sh ]; then
 	echo -e "\${gl_lv}✅ 存量迁移完成：参数已迁入 ~/codematrix.sh，旧文件已备份为 ~/kejilion.sh.migrated\${gl_bai}"
 fi
 if [ ! -f ~/codematrix.sh ]; then`;
-if (officialCode.includes(migrationOld)) {
-    officialCode = officialCode.replace(migrationOld, migrationNew);
-    console.log('✅ 存量迁移逻辑已注入（旧 ~/kejilion.sh → ~/codematrix.sh，参数 preserved，旧文件 .migrated 备份）');
-} else {
-    console.log('⚠️ 去痕: 未找到首次安装检测点，存量迁移补丁跳过');
+    if (officialCode.includes(migrationOld)) {
+        officialCode = officialCode.replace(migrationOld, migrationNew);
+        console.log('✅ 存量迁移逻辑已注入（旧 ~/kejilion.sh → ~/codematrix.sh，参数 preserved，旧文件 .migrated 备份）');
+    } else {
+        console.log('⚠️ 去痕: 未找到首次安装检测点，存量迁移补丁跳过');
+    }
+}
+
+// 结构断言：绝对禁止出现恒假迁移块与自毁/自复制逻辑
+if (officialCode.includes('[ -f ~/codematrix.sh ] && [ ! -f ~/codematrix.sh ]')) {
+    throw new Error('❌ 致命结构错误: 检测到恒假迁移块 [ -f ~/codematrix.sh ] && [ ! -f ~/codematrix.sh ]');
+}
+if (officialCode.includes('mv -f ~/codematrix.sh ~/codematrix.sh.migrated')) {
+    throw new Error('❌ 致命结构错误: 检测到错误移动 ~/codematrix.sh 的破坏逻辑');
+}
+if (/\bcp\s+-f\s+~\/codematrix\.sh\s+~\/codematrix\.sh(?:\s|$)/.test(officialCode)) {
+    throw new Error('❌ 致命结构错误: 检测到同名自复制逻辑 cp -f ~/codematrix.sh ~/codematrix.sh');
+}
+const migrationMatches = officialCode.match(/# CODE MATRIX 存量迁移/g);
+if (!migrationMatches || migrationMatches.length !== 1) {
+    throw new Error(`❌ 致命结构错误: 存量迁移块数量异常 (预期 1 处，实际 ${migrationMatches ? migrationMatches.length : 0} 处)`);
 }
 
 // 补丁 25: 统一卸载入口 - 将 k 菜单第 102 项替换为调用统一的 z_uninstall 并清除旧逻辑与上报
@@ -1800,31 +1852,64 @@ if (uninstall102Re.test(officialCode)) {
     console.log('⚠️ 未找到 k 菜单 102 项定义，卸载入口接入跳过');
 }
 
-console.log('💾 [4/5] 写入同步生成的 kejilion.sh 并验证语法...');
-fs.writeFileSync(path.join(ROOT_DIR, 'kejilion.sh'), officialCode, 'utf8');
-fs.writeFileSync(path.join(ROOT_DIR, 'z.sh'), officialCode, 'utf8');
-fs.writeFileSync(path.join(ROOT_DIR, 'x.sh'), officialCode, 'utf8');
+console.log('🔍 [4/5] 验证生成代码结构与语法（写盘前双门禁校验）...');
+
+// 写临时文件执行写盘前 bash -n + zsh -n 双校验
+const os = require('os');
+const tmpCheckFile = path.join(os.tmpdir(), `codematrix_syntax_gate_${Date.now()}_${process.pid}.sh`);
+try {
+    fs.writeFileSync(tmpCheckFile, officialCode, 'utf8');
+    cp.execSync(`bash -n "${tmpCheckFile}"`);
+    console.log('  ✅ 写盘前门禁: bash -n 语法检验通过');
+    cp.execSync(`zsh -n "${tmpCheckFile}"`);
+    console.log('  ✅ 写盘前门禁: zsh -n 语法检验通过');
+} catch (err) {
+    try { fs.unlinkSync(tmpCheckFile); } catch (_) {}
+    console.error('❌ 写盘前语法门禁拦截：生成的脚本存在语法错误，已中止写盘，工作区未受污染！', err.message);
+    process.exit(1);
+} finally {
+    try { fs.unlinkSync(tmpCheckFile); } catch (_) {}
+}
+
+console.log('💾 语法门禁全部通过，开始原子写入 6 份 shell 镜像及校验和文件...');
 
 const websitePublicDir = path.join(ROOT_DIR, 'website', 'public');
-if (fs.existsSync(websitePublicDir)) {
-    fs.writeFileSync(path.join(websitePublicDir, 'kejilion.sh'), officialCode, 'utf8');
-    fs.writeFileSync(path.join(websitePublicDir, 'x.sh'), officialCode, 'utf8');
-    fs.writeFileSync(path.join(websitePublicDir, 'z.sh'), officialCode, 'utf8');
+const targetMirrors = [
+    path.join(ROOT_DIR, 'kejilion.sh'),
+    path.join(ROOT_DIR, 'z.sh'),
+    path.join(ROOT_DIR, 'x.sh'),
+    path.join(websitePublicDir, 'kejilion.sh'),
+    path.join(websitePublicDir, 'x.sh'),
+    path.join(websitePublicDir, 'z.sh')
+];
+
+for (const targetFile of targetMirrors) {
+    const dir = path.dirname(targetFile);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(targetFile, officialCode, 'utf8');
 }
 
 const crypto = require('crypto');
 const zshSha256 = crypto.createHash('sha256').update(officialCode).digest('hex');
-fs.writeFileSync(path.join(ROOT_DIR, 'z.sh.sha256'), `${zshSha256}  z.sh\n`, 'utf8');
+const sha256Content = `${zshSha256}  z.sh\n`;
+fs.writeFileSync(path.join(ROOT_DIR, 'z.sh.sha256'), sha256Content, 'utf8');
 if (fs.existsSync(websitePublicDir)) {
-    fs.writeFileSync(path.join(websitePublicDir, 'z.sh.sha256'), `${zshSha256}  z.sh\n`, 'utf8');
+    fs.writeFileSync(path.join(websitePublicDir, 'z.sh.sha256'), sha256Content, 'utf8');
 }
 
-try {
-    cp.execSync('bash -n kejilion.sh', { cwd: ROOT_DIR });
-    console.log('✅ 语法检验通过 (bash -n kejilion.sh 成功)！');
-} catch (err) {
-    console.error('❌ 生成的 kejilion.sh 存在语法错误：', err.message);
-    process.exit(1);
+console.log('🔍 正在执行写盘后一致性与完整性校验（6 份镜像 cmp 逐字节一致性 + sha256 校验）...');
+const baseFile = path.join(ROOT_DIR, 'kejilion.sh');
+for (const mirror of targetMirrors) {
+    cp.execSync(`bash -n "${mirror}"`);
+    cp.execSync(`zsh -n "${mirror}"`);
+    if (mirror !== baseFile) {
+        cp.execSync(`cmp "${baseFile}" "${mirror}"`);
+    }
 }
+const currentZshSha = cp.execSync(`shasum -a 256 "${path.join(ROOT_DIR, 'z.sh')}" | awk '{print $1}'`).toString().trim();
+if (currentZshSha !== zshSha256) {
+    throw new Error(`SHA-256 不匹配: 预期 ${zshSha256}, 实际 ${currentZshSha}`);
+}
+console.log(`✅ 6 份镜像字节完全一致，bash/zsh 语法全通过，SHA-256 匹配 (${zshSha256})！`);
 
 console.log('🎉 [5/5] 同步完成！最新官方特性已完整融入 11+ 分类折叠架构！');
