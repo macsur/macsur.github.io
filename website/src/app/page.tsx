@@ -34,6 +34,7 @@ import { GITHUB_TRENDING_APPS, LAST_UPDATED_AT, GithubTrendingRepo } from '@/dat
 import { DAILY_RECOMMEND } from '@/data/dailyRecommend';
 import { EASTER_EGG_ITEMS, EasterEggItem } from '@/data/easterEggData';
 import { isHolidayToday, isSpringFestivalToday } from '@/data/holidays';
+import { copyTextToClipboard } from '@/lib/clipboard';
 
 interface RecommendedAppItem {
   id: number;
@@ -299,9 +300,15 @@ export default function Home() {
   };
 
   // 复制彩蛋条目并给予即时反馈
+  // 只有剪贴板写入真正成功才切换成「已复制」，避免权限被拒时给用户假成功提示
   const handleCopyEasterEggItem = (text: string, id: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedEasterId(id);
+    void copyTextToClipboard(text).then((result) => {
+      if (!result.ok) return;
+      setCopiedEasterId(id);
+      setTimeout(() => {
+        setCopiedEasterId((current) => (current === id ? null : current));
+      }, 2200);
+    });
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
@@ -318,9 +325,6 @@ export default function Home() {
         osc.stop(ctx.currentTime + 0.2);
       }
     } catch {}
-    setTimeout(() => {
-      setCopiedEasterId(null);
-    }, 2200);
   };
 
   // 触发彩蛋 (站主特别口径：彩蛋正式放开，全年每天可点触发，呈现量子数据礼花弹窗，与友链完全独立)
@@ -518,12 +522,15 @@ export default function Home() {
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
 
   // 复制文本辅助函数
+  // 只有剪贴板写入真正成功才切换成「已复制」，避免权限被拒 / 非安全上下文时给用户假成功提示
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(text);
-    setTimeout(() => {
-      setCopiedText(null);
-    }, 2000);
+    void copyTextToClipboard(text).then((result) => {
+      if (!result.ok) return;
+      setCopiedText(text);
+      setTimeout(() => {
+        setCopiedText((current) => (current === text ? null : current));
+      }, 2000);
+    });
   };
 
   // 安装命令
@@ -535,7 +542,7 @@ export default function Home() {
   const quickCommands = [
     { cmd: 'z', desc: '打开 CODE MATRIX 代码矩阵工作台' },
     { cmd: 'z app+', desc: '打开分类手风琴应用市场' },
-    { cmd: 'z app+', desc: '进入应用市场后选择 DeepSeek AI 应用' },
+    { cmd: 'z app 57', desc: '直达安装 DeepSeek 聊天 AI 大模型' },
     { cmd: 'z bbr3', desc: 'BBRv3 内核与网络调优' },
     { cmd: 'z clean', desc: '一键深度清理系统冗余缓存' },
     { cmd: 'z dd', desc: '纯净版 Linux 系统一键重装' },
