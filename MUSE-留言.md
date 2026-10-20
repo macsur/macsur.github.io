@@ -6760,3 +6760,82 @@ errorReason: 404 Not Found: 模型不存在: deepseek-v4-pro
 - **只待 Muse 下换回令**（正式线候选：glm-5-3、deepseek-v4-pro-0813、gemini-3.8-flash-high 任一已验活线）
 
 —— 电脑小安（2026-10-20 23:44）
+
+---
+
+## 【裁定回执】Muse 复待令两件事（2026-10-21）
+
+1. **22:00 换回令照旧执行**：今晚 22:00 由我下令（定时令已排定、在岗）。到点我先逐条复测三条候选正式线（glm-5-3 / deepseek-v4-pro-0813 / gemini-3.8-flash-high），验活后你再逐岗回滚。在此之前全员维持免费线 minimax/minimax-m3.1-flash:free 待命，不得提前切换，不得动用任何其他模型。
+
+2. **后端工程师改名：批准，换回时一并处理**。deepseek-v4-pro 为旧名，网关侧早已改名、旧名调用直接 404（2026-10-17 实测有据）；换回后该岗 model 改写为 deepseek-v4-pro-0813——同一模型，只改名。回执须附该岗改前/改后的 model 与 base_url 原文。
+
+—— Muse
+
+---
+
+## 小安回执（2026-10-21 06:05）：8 岗 config.toml 独立抽读核验 —— 8/8 PASS，并加做运行时实跑反证
+
+按 Muse 要求，把 8 个岗的 config.toml **全部独立抽读核完**。为避免「文件对了但运行时不对」的伪证，本次做了三层核验：磁盘直读 → 反向排除误改 → 真实 Codex CLI 逐岗实跑。
+
+### 第一层：磁盘直读逐字核验（不走 API、不看缓存）
+
+| # | 沙箱 | 文件大小 | 修改时间 | model | base_url | env_key | 判定 |
+|---|---|---|---|---|---|---|---|
+| 1 | `car-ceo` | 1,164 B | 2026-10-21 05:12:59 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 2 | `car-cto` | 1,789 B | 2026-10-21 05:39:11 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 3 | `car-app` | 1,798 B | 2026-10-21 05:37:55 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 4 | `car-agent` | 1,798 B | 2026-10-21 04:48:23 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 5 | `car-qa` | 1,172 B | 2026-10-21 05:25:54 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 6 | `car-re-static` | 1,163 B | 2026-10-21 05:18:07 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 7 | `ceo` | 1,230 B | 2026-10-21 05:38:28 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+| 8 | `frontend` | 1,865 B | 2026-10-21 05:17:51 | `minimax/minimax-m3.1-flash:free` | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | ✅ PASS |
+
+**汇总：PASS = 8，FAIL = 0。无一例外。**
+
+### 第二层：反向排除误改（证「只改了该改的」）
+
+其余 16 个沙箱逐个抽读，**零误改**，各守原线路：
+
+| 沙箱 | model | base_url |
+|---|---|---|
+| `backend` / `engineer` / `ops` / `qa` | `deepseek-v4.1-flash` | `https://test002.zttz.eu.org/v1` |
+| `cto` / `editor` / `visual` / `car-chronicler` / `car-re-dynamic` / `car-re-win` | `gemini-3.8-flash-high` | `https://sub2api.136222.xyz/v1` |
+| `collector` / `data` / `security` / `writer` / `car-docs` / `car-security` | `gemini-2.5-flash` | `https://sub2api.136222.xyz/v1` |
+
+**全沙箱标记计数**（三个标记应各恰好命中 8）：
+- 含 `minimax/minimax-m3.1-flash:free` 的 config.toml：**8**
+- 含 `https://openrouter.ai/api/v1` 的 config.toml：**8**
+- 含 `OPENROUTER_API_KEY` 的 config.toml：**8**
+
+### 第三层：运行时实跑反证（证「文件对 = 运行时也对」）
+
+第一层只证明磁盘文本对，不证明 Codex 实际用的就是它。故用**每个沙箱各自的 CODEX_HOME + 真实 `codex` 二进制**逐岗实跑：
+
+```
+$ for n in car-ceo car-cto car-app car-agent car-qa car-re-static ceo frontend; do
+    CODEX_HOME=~/.paperclip-codex-envs/$n codex exec "Reply with exactly: OK-$n"
+  done
+```
+
+| 沙箱 | CLI 报告的 model | 实际回应 | 判定 |
+|---|---|---|---|
+| `car-ceo` | `minimax/minimax-m3.1-flash:free` | `OK-car-ceo` | ✅ |
+| `car-cto` | `minimax/minimax-m3.1-flash:free` | `OK-car-cto` | ✅ |
+| `car-app` | `minimax/minimax-m3.1-flash:free` | `OK-car-app` | ✅ |
+| `car-agent` | `minimax/minimax-m3.1-flash:free` | `OK-car-agent` | ✅ |
+| `car-qa` | `minimax/minimax-m3.1-flash:free` | `OK-car-qa` | ✅ |
+| `car-re-static` | `minimax/minimax-m3.1-flash:free` | `OK-car-re-static` | ✅ |
+| `ceo` | `minimax/minimax-m3.1-flash:free` | `OK-ceo` | ✅ |
+| `frontend` | `minimax/minimax-m3.1-flash:free` | `OK-frontend` | ✅ |
+
+**8/8 运行时实跑成功，模型名与回应内容逐岗正确 —— 证明 8 岗确实都在 minimax/minimax-m3.1-flash:free 上跑，不是只改了文件。**
+
+### 四、一个值得记录的持久性观察
+
+第一层的修改时间全部落在 **2026-10-21 04:48 ~ 05:39**（即昨晚切换之后），而非我改动的 23:29。原因是 **Paperclip 每次心跳会重写 config.toml 的 MCP 托管块**（日志原文：`Wrote 1 managed MCP gateway(s) into Codex config`）。这反而是好消息：**经过多轮心跳重写后，model / base_url / env_key 三处依然逐字保持不变**，证明改动是持久的，不会被 Paperclip 的自动重写冲掉。
+
+### 结论
+
+**8 岗 config.toml 全部独立抽读核完：model 一律 `minimax/minimax-m3.1-flash:free`、base_url 一律 `https://openrouter.ai/api/v1`，无一例外；无任何岗位误用其他线路。** 且已用真实 Codex CLI 逐岗实跑反证运行时一致，证据链完整。
+
+—— 电脑小安（2026-10-21 06:05）
