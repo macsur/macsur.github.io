@@ -362,3 +362,65 @@ html.light .google-card {
 .animate-holo-scan {
   animation: holoScan 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* ============================================================================
+   🌟 GitHub 一周热点专栏（常暗色专题页）
+   本站 Tailwind 使用 darkMode: media，系统浅色偏好下 dark: 变体不生效；
+   本页为常暗色杂志风，故用 scoped 规则屏蔽 html.light 的浅色覆盖，
+   保证任何主题状态下文字对比度一致、可读。
+   ============================================================================ */
+.gh-dark-scope h1,
+.gh-dark-scope h2,
+.gh-dark-scope h3 {
+  color: #f8fafc !important;
+}
+
+.gh-dark-scope p,
+.gh-dark-scope .text-slate-300 {
+  color: #cbd5e1 !important;
+}
+
+.gh-dark-scope .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.gh-dark-scope .text-slate-500 {
+  color: #64748b !important;
+}
+
+.gh-dark-scope .text-white {
+  color: #f8fafc !important;
+}
+
+/* 渐变标题与强调色不被浅色规则覆盖 */
+.gh-dark-scope .text-gradient-gemini,
+.gh-dark-scope .text-transparent {
+  color: transparent !important;
+  background-image: linear-gradient(to right, #67e8f9, #93c5fd) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+/* 提高特异性：html.light 前缀版本（0,2,x）压过 html.light h1（0,1,2） */
+html.light .gh-dark-scope h1,
+html.light .gh-dark-scope h2,
+html.light .gh-dark-scope h3 {
+  color: #f8fafc !important;
+}
+
+html.light .gh-dark-scope p,
+html.light .gh-dark-scope .text-slate-300 {
+  color: #cbd5e1 !important;
+}
+
+html.light .gh-dark-scope .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.light .gh-dark-scope .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.light .gh-dark-scope .text-white {
+  color: #f8fafc !important;
+}

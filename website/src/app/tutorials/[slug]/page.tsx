@@ -69,6 +69,45 @@ export default function TutorialArticlePage({ params }: { params: { slug: string
           </div>
         </header>
 
+        {/* 🎬 GitHub 一周热点专栏：本文所属期的原视频（16:9 B 站官方播放器，正文上方） */}
+        {item.episodeVideo && (
+          <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-md sm:p-5 dark:border-white/10 dark:bg-[#10131c]">
+            <div className="mb-4 flex flex-col gap-2 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 px-2.5 py-0.5 text-xs font-bold text-cyan-700 dark:bg-cyan-500/15 dark:text-cyan-300">
+                  <Tv className="h-3.5 w-3.5" />
+                  <span>第 {item.episodeVideo.episode} 期原视频</span>
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  UP 主：<span className="font-semibold text-slate-700 dark:text-slate-200">{item.episodeVideo.author}</span>
+                </span>
+              </div>
+              <a
+                href={item.episodeVideo.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+              >
+                <span>在 B 站打开 ({item.episodeVideo.bvid})</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={`https://player.bilibili.com/player.html?bvid=${item.episodeVideo.bvid}&autoplay=0`}
+                className="absolute top-0 left-0 h-full w-full rounded-2xl border border-slate-800"
+                scrolling="no"
+                frameBorder="no"
+                allowFullScreen
+                title={item.episodeVideo.title}
+              />
+            </div>
+            <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+              {item.episodeVideo.title}
+            </p>
+          </div>
+        )}
+
         {/* 🎬 官方 B 站同步视频（9:16 竖屏短片，桌面居中限宽，手机 390px 完整适配） */}
         {item.video && (
           <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-md dark:border-white/10 dark:bg-[#10131c]">
