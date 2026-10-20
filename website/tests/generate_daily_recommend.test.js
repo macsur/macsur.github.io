@@ -158,8 +158,16 @@ test('pre-fix baseline regression reproduces the original same-day drift', () =>
     encoding: 'utf8',
   });
   assert.equal(baseline.status, 0, baseline.stderr);
+  // The pre-fix baseline reads the wall clock instead of DAILY_RECOMMEND_NOW, so
+  // pin its clock to the injected fixture time. Without this the expected
+  // rotation depends on the calendar day the test happens to run.
+  const baselineSource = baseline.stdout.replace(
+    'const now = new Date();',
+    'const now = new Date(process.env.DAILY_RECOMMEND_NOW);',
+  );
+  assert.notEqual(baselineSource, baseline.stdout, 'baseline clock line not found');
   const baselineScript = path.join(root, 'generate_daily_recommend.js');
-  fs.writeFileSync(baselineScript, baseline.stdout, 'utf8');
+  fs.writeFileSync(baselineScript, baselineSource, 'utf8');
 
   runGenerator(root, baselineScript);
   assert.deepEqual(outputIds(root), [999, 202, 203]);
