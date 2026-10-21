@@ -55,6 +55,15 @@ jobs:
           npm test
           cd ..
 
+      - name: 3.5 安装 zsh (sync_upstream.js 写盘前双门禁需要 zsh -n 校验)
+        run: |
+          if ! command -v zsh > /dev/null 2>&1; then
+            echo "未检测到 zsh，开始安装..."
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq zsh
+          fi
+          echo "zsh 版本: $(zsh --version)"
+
       - name: 4. 编译 Next.js 生产级静态站点 (包含自动打新与彩蛋节点更新)
         run: |
           cd website

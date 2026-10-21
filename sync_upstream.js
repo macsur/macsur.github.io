@@ -1854,6 +1854,23 @@ if (uninstall102Re.test(officialCode)) {
 
 console.log('🔍 [4/5] 验证生成代码结构与语法（写盘前双门禁校验）...');
 
+// 环境能力探测：zsh 非必需。CI runner 未装 zsh 时降级为只跑 bash -n 并打印警告，
+// 绝不把「命令不存在」误判成「生成的脚本有语法错误」而中止发布。
+const zshAvailable = (() => {
+    // 允许在 CI 或本地强制走「无 zsh」降级路径（用于验证降级逻辑确实不拦截发布）
+    if (process.env.ZTTZ_FORCE_NO_ZSH === '1') return false;
+    try {
+        cp.execSync('command -v zsh', { stdio: 'ignore' });
+        return true;
+    } catch (_) {
+        return false;
+    }
+})();
+
+if (!zshAvailable) {
+    console.warn('  ⚠️ 未检测到 zsh，将跳过 zsh -n 语法检验（仅执行 bash -n 门禁，不拦截发布）');
+}
+
 // 写临时文件执行写盘前 bash -n + zsh -n 双校验
 const os = require('os');
 const tmpCheckFile = path.join(os.tmpdir(), `codematrix_syntax_gate_${Date.now()}_${process.pid}.sh`);
@@ -1861,8 +1878,10 @@ try {
     fs.writeFileSync(tmpCheckFile, officialCode, 'utf8');
     cp.execSync(`bash -n "${tmpCheckFile}"`);
     console.log('  ✅ 写盘前门禁: bash -n 语法检验通过');
-    cp.execSync(`zsh -n "${tmpCheckFile}"`);
-    console.log('  ✅ 写盘前门禁: zsh -n 语法检验通过');
+    if (zshAvailable) {
+        cp.execSync(`zsh -n "${tmpCheckFile}"`);
+        console.log('  ✅ 写盘前门禁: zsh -n 语法检验通过');
+    }
 } catch (err) {
     try { fs.unlinkSync(tmpCheckFile); } catch (_) {}
     console.error('❌ 写盘前语法门禁拦截：生成的脚本存在语法错误，已中止写盘，工作区未受污染！', err.message);
@@ -1901,7 +1920,9 @@ console.log('🔍 正在执行写盘后一致性与完整性校验（6 份镜像
 const baseFile = path.join(ROOT_DIR, 'kejilion.sh');
 for (const mirror of targetMirrors) {
     cp.execSync(`bash -n "${mirror}"`);
-    cp.execSync(`zsh -n "${mirror}"`);
+    if (zshAvailable) {
+        cp.execSync(`zsh -n "${mirror}"`);
+    }
     if (mirror !== baseFile) {
         cp.execSync(`cmp "${baseFile}" "${mirror}"`);
     }
@@ -1910,6 +1931,6 @@ const currentZshSha = cp.execSync(`shasum -a 256 "${path.join(ROOT_DIR, 'z.sh')}
 if (currentZshSha !== zshSha256) {
     throw new Error(`SHA-256 不匹配: 预期 ${zshSha256}, 实际 ${currentZshSha}`);
 }
-console.log(`✅ 6 份镜像字节完全一致，bash/zsh 语法全通过，SHA-256 匹配 (${zshSha256})！`);
+console.log(`✅ 6 份镜像字节完全一致，bash${zshAvailable ? '/zsh' : ''} 语法全通过，SHA-256 匹配 (${zshSha256})！`);
 
 console.log('🎉 [5/5] 同步完成！最新官方特性已完整融入 11+ 分类折叠架构！');
