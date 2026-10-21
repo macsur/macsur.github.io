@@ -35,12 +35,23 @@ export default function TutorialArticlePage({ params }: { params: { slug: string
   return (
     <div className="min-h-screen bg-[#f6f8fb] text-slate-900 dark:bg-[#090a0f] dark:text-slate-100">
       <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-        <a
-          href="/tutorials/"
-          className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-cyan-300 dark:hover:text-cyan-200"
-        >
-          ← 返回教程列表
-        </a>
+        <div className="flex flex-wrap items-center gap-4">
+          <a
+            href="/tutorials/"
+            className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-cyan-300 dark:hover:text-cyan-200"
+          >
+            ← 返回教程列表
+          </a>
+          {/* 🌐 Paperclip 英文版互链（仅首篇有英文版） */}
+          {item.slug === 'paperclip' && (
+            <a
+              href="/tutorials/paperclip-en/"
+              className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 transition-colors hover:border-blue-400 hover:bg-blue-100 dark:border-cyan-400/30 dark:bg-cyan-500/10 dark:text-cyan-300"
+            >
+              English version
+            </a>
+          )}
+        </div>
 
         <header className="mt-6">
           <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
