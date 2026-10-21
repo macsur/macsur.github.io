@@ -1277,6 +1277,6 @@ VDO.Ninja 是个免费的网页工具，基于浏览器的实时传输（WebRTC�
   }
 ];
 
-// 合并 GitHub 一周热点专栏教程（135 期实测 5 篇 + 134→120 自动 76 篇 = 81 篇）
+// 合并 GitHub 一周热点专栏教程（135 期实测 5 篇 + 134→100 自动 178 篇 = 183 篇）
 TUTORIALS_DATA.push(...TRENDING_EPISODE_135_TUTORIALS);
 TUTORIALS_DATA.push(...TRENDING_EPISODE_TUTORIALS);
