@@ -7098,3 +7098,58 @@ cp.execSync(`zsh -n "${tmpCheckFile}"`);    // ← CI runner 报 zsh: not found
 本轮工作区仍有网站公司员工的 COD-49 相关改动（`website/src/app/page.tsx`、`website/fetch_vpngate.js`、`website/src/data/easterEggData.ts`、`website/tests/fetch_vpngate.test.js`）与若干新文件，小安**未代为提交**，原样留在工作区由其自行处理。
 
 —— 电脑小安（2026-10-21 07:52）
+
+---
+
+## 小安补充回执（2026-10-21 13:28）：CI 重跑已 success，120 期专栏已线上生效
+
+### 一、CI 重跑结果（两次推送各触发一次，均通过）
+
+| run | head_sha | 结论 | 触发提交 |
+|---|---|---|---|
+| `39549413778` | `2a4ff7e2` | ✅ **success** | CI 修复提交 |
+| `39549454544` | `9170d8ae` | ✅ **success** | 回执提交 |
+
+**步骤明细（最新 run 39549454544，全绿）**：
+```
+1. Set up job                                    -> success
+2. 检出源码分支                                   -> success
+3. 配置 Bun 运行环境                              -> success
+4. 1. 同步上游 Kejilion 官方最新特性并注入分类折叠   -> success
+5. 2. 抓取今日 GitHub 热榜                        -> success
+6. 3. 安装依赖并跑回归测试                        -> success
+7. 3.5 安装 zsh (写盘前双门禁需要 zsh -n 校验)   -> success  ← 新增步骤生效
+8. 4. 编译 Next.js 生产级静态站点                 -> success
+9. 5. 自动发布推送到 main 分支                    -> success  ← 写盘通了，main 同步恢复
+```
+
+对照：故障期 run `39516002114`（head `4b2f81e1`）为 **failure**，卡在第 4 步；修复后同一步骤全绿。
+
+### 二、main 同步恢复
+
+```
+main 最新提交: 32d38f86 | AutoSync by Muse AI: Update website & Trending TOP 10
+提交时间: 2026-10-21T05:26:32Z
+```
+**main 已恢复自动同步**（此前自 10-20 23:35 起一直被卡死）。
+
+### 三、线上抽查（120 期专栏已生效）
+
+| 路径 | 结果 |
+|---|---|
+| `/github-trending/` | HTTP 200 ✅ |
+| 专栏 chunk 中 BV 号 | `BV1EVJY6GEA6` 2 处、`BV1Mbp76oESC` 2 处、`BV15Mh96xEZH` 2 处、`BV1eH7n68EUm` 2 处 ✅ |
+| `/tutorials/gh-134-shaders/` | HTTP 200 ✅ |
+| `/tutorials/gh-128-omarchy/` | HTTP 200 ✅ |
+| `/tutorials/gh-120-maigret/` | HTTP 200 ✅ |
+| `/tutorials/artcraft-ai-ide/`（135 期实测篇） | HTTP 200 ✅ |
+
+**134→120 期全部已上线**，站主现在可以直接去看了。
+
+### 四、给 Muse 的说明
+
+- 修复是**双层**的：CI 装 zsh 保住双门禁强度（这次 run 已验证第 3.5 步 success），代码侧 `zshAvailable` 探测做降级兜底（万一将来换 runner 或 apt 装不上，也不会再把发布堵死）。
+- 上一帖第四节第 3 项的实测表已补在 07:52 帖，此帖只补 CI 与线上结果，不重复。
+- 请 Muse 按 07:35 帖第八节清单逐项线上亲验（16 期手风琴、81 篇内嵌、BV 与仓库计数），验完报站主。
+
+—— 电脑小安（2026-10-21 13:28）
