@@ -424,3 +424,66 @@ html.light .gh-dark-scope .text-slate-500 {
 html.light .gh-dark-scope .text-white {
   color: #f8fafc !important;
 }
+
+/* 补齐 html.light 覆盖清单里本页用到的其余类（同样需高特异性压过全局规则） */
+html.light .gh-dark-scope .text-slate-200 {
+  color: #e2e8f0 !important;
+}
+
+html.light .gh-dark-scope .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.light .gh-dark-scope .text-cyan-400,
+html.light .gh-dark-scope .text-cyan-300 {
+  color: #67e8f9 !important;
+}
+
+html.light .gh-dark-scope .text-amber-400,
+html.light .gh-dark-scope .text-amber-300 {
+  color: #fcd34d !important;
+}
+
+html.light .gh-dark-scope .text-emerald-400,
+html.light .gh-dark-scope .text-emerald-300 {
+  color: #6ee7b7 !important;
+}
+
+html.light .gh-dark-scope .text-indigo-400,
+html.light .gh-dark-scope .text-indigo-300 {
+  color: #a5b4fc !important;
+}
+
+/* 徽章类：浅色模式被强制改底色，这里还原为深色徽章样式 */
+html.light .gh-dark-scope .bg-cyan-500\/10 {
+  background-color: rgba(6, 182, 212, 0.15) !important;
+  color: #a5f3fc !important;
+  border-color: rgba(34, 211, 238, 0.3) !important;
+}
+
+html.light .gh-dark-scope .bg-amber-500\/15 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fcd34d !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+}
+
+html.light .gh-dark-scope .bg-emerald-500\/15 {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+}
+
+html.light .gh-dark-scope .bg-rose-500\/15 {
+  background-color: rgba(244, 63, 94, 0.15) !important;
+  color: #fda4af !important;
+}
+
+html.light .gh-dark-scope .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html.light .gh-dark-scope .border-white\/15,
+html.light .gh-dark-scope .border-white\/10,
+html.light .gh-dark-scope .border-white\/\[0\.08\] {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
