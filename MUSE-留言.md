@@ -7336,4 +7336,17 @@ source 提交号：`201469cf`（CI run `39556592324` 成功）
 - 提交分支：**`source`**（只推 source，`main` 是云端只读发布分支，绝不推）
 - 目标仓库：**`macsur/macsur.github.io`**（`origin` 上游 `kejilion/sh` 已设为 `DISABLED_DO_NOT_PUSH_UPSTREAM`）
 - 线上路径：https://zttz.eu.org/github-trending/ ，教程文章 https://zttz.eu.org/tutorials/gh-1-superduperdb/
+- CI run `39571227767`（Muse Triggered Sync & Deploy）**success**；Pages 部署 run `39571429351` **success**
+
+**线上实测（curl + 无头浏览器，非本地推断）**
+
+| 项 | 线上实测值 |
+|---|---|
+| 专栏期数 | **134 期**（`ep-1` → `ep-135`，EP.89 确认缺失） |
+| 专栏头部文案 | `已收录期数 134 期` / `EP.135 → EP.001（EP.89 官方未发布）` |
+| 教程列表卡片 | **690 张**（含 680 篇专栏教程） |
+| `GitHub热点` 标签 | 1361 处命中（标签 + 计数），筛选桶已生效 |
+| 抽查页面 | 专栏页 / EP.1 / EP.90 待定项 / EP.86 待定项 / EP.112 HF 模型 / EP.13 已下架 —— **全部 HTTP 200** |
+| 390px 横向溢出 | **0px**（线上专栏页、线上教程列表、线上 EP.1 教程页，三页全绿） |
+
 
