@@ -205,7 +205,7 @@ export default function GithubTrendingColumnPage() {
             {/* 统计三连 */}
             <div className="mt-6 flex flex-wrap gap-3">
               {[
-                { k: '已收录期数', v: `${episodes.length} 期`, s: 'EP.135 → EP.120' },
+                { k: '已收录期数', v: `${episodes.length} 期`, s: 'EP.135 → EP.001（EP.89 官方未发布）' },
                 { k: '项目卡片', v: `${totalProjects} 篇`, s: '每项目一页可读档案' },
                 { k: '累计星标', v: totalStars.toLocaleString('en-US'), s: `数据日期 ${TRENDING_STARS_DATE}` },
               ].map((x) => (
