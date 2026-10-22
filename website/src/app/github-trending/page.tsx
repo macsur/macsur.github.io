@@ -113,6 +113,9 @@ function EpisodeCard({ episode, defaultOpen }: { episode: TrendingEpisode; defau
                 <Tv className="h-3 w-3" />
                 <span>第 {episode.episode} 期原视频</span>
               </span>
+              {episode.episode === 135 && (
+                <span className="text-[10px] text-slate-400">候选来源：IT咖啡馆《Github一周热点》第135期</span>
+              )}
               <a
                 href={episode.videoUrl}
                 target="_blank"
@@ -191,15 +194,14 @@ export default function GithubTrendingColumnPage() {
             </div>
 
             <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-              GitHub 一周热点
+              GitHub 龙虎榜
               <span className="ml-2 bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
-                逐期盘点
+                逐周精选
               </span>
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
-              跟踪 B 站 UP 主「{TRENDING_AUTHOR}」的《Github一周热点》系列。每一期视频挑几个当周爆火的开源项目，本站就着
-              视频做成一页可读的档案 —— 附原视频内嵌、真实星标、语言与协议，一期一期往下补。
+              GitHub 龙虎榜（原《GitHub 一周热点》）：每周按本周新增星标，只选真热前三。本站对每期项目真装真跑一遍 —— 跑通的出实操教程，装不动的如实降级为解读评估篇。
             </p>
 
             {/* 统计三连 */}
@@ -221,6 +223,102 @@ export default function GithubTrendingColumnPage() {
             </div>
           </div>
         </header>
+
+        {/* 🌟 第 135 期置顶精选区块：龙虎榜本周真热前三 */}
+        <div className="mt-8 overflow-hidden rounded-3xl border border-cyan-400/40 bg-gradient-to-br from-cyan-950/70 via-slate-950/90 to-blue-950/70 p-6 shadow-xl sm:p-8">
+          <div className="mb-4 flex flex-col gap-2 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-500/20 px-3 py-1 text-xs font-bold text-cyan-200 ring-1 ring-cyan-400/40">
+                <Tv className="h-4 w-4" />
+                <span>GitHub龙虎榜 · 第 135 期</span>
+              </span>
+              <span className="text-xs text-slate-400">
+                出品方：<span className="font-semibold text-slate-200">代码咖啡馆 Code Cafe</span>
+              </span>
+            </div>
+            <a
+              href="https://www.bilibili.com/video/BV1omn26EEir"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300"
+            >
+              <span>在 B 站打开 (BV1omn26EEir)</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-center">
+            {/* 左侧竖屏播放器容器（9:16 自适应居中） */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="relative w-full max-w-[280px] sm:max-w-[300px]">
+                <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl border border-cyan-500/30 bg-black shadow-2xl">
+                  <iframe
+                    src="https://player.bilibili.com/player.html?bvid=BV1omn26EEir&autoplay=0"
+                    className="absolute top-0 left-0 h-full w-full"
+                    scrolling="no"
+                    frameBorder="no"
+                    allowFullScreen
+                    title="GitHub龙虎榜第135期：本周真热前三"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 右侧导读与三强项目卡链接 */}
+            <div className="lg:col-span-7 flex flex-col justify-center space-y-4">
+              <div>
+                <h2 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+                  本周真热前三 —— 第 135 期
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                  按本周新增星标（而非总星标），从第 135 期的 5 个开源项目里严格筛选出真热前三：
+                  <strong className="text-cyan-200">ArtCraft</strong> 两日新增 1,873 星夺冠；
+                  <strong className="text-cyan-200">Anatomy</strong> 新增 1,618 星增速最快；
+                  <strong className="text-cyan-200">PPT Master</strong> 总星标全场最高却因本周增速排在第三。逐个实测核查，全部免费开源。
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <a
+                  href="/tutorials/artcraft-ai-ide/"
+                  className="group flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-all hover:border-cyan-400 hover:bg-white/[0.08]"
+                >
+                  <div>
+                    <div className="text-[10px] font-mono font-bold text-cyan-300">冠军 · 新增 1,873 星</div>
+                    <div className="mt-1 text-xs font-bold text-white group-hover:text-cyan-200">ArtCraft AI IDE</div>
+                  </div>
+                  <span className="mt-2 text-[10px] text-slate-400 group-hover:text-cyan-300">读实操教程 →</span>
+                </a>
+
+                <a
+                  href="/tutorials/anatomy-isometric-skill/"
+                  className="group flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-all hover:border-cyan-400 hover:bg-white/[0.08]"
+                >
+                  <div>
+                    <div className="text-[10px] font-mono font-bold text-cyan-300">亚军 · 新增 1,618 星</div>
+                    <div className="mt-1 text-xs font-bold text-white group-hover:text-cyan-200">Anatomy 等距图解</div>
+                  </div>
+                  <span className="mt-2 text-[10px] text-slate-400 group-hover:text-cyan-300">读实操教程 →</span>
+                </a>
+
+                <a
+                  href="/tutorials/ppt-master-native-deck/"
+                  className="group flex flex-col justify-between rounded-xl border border-white/10 bg-white/[0.04] p-3 transition-all hover:border-cyan-400 hover:bg-white/[0.08]"
+                >
+                  <div>
+                    <div className="text-[10px] font-mono font-bold text-cyan-300">季军 · 总星全场第一</div>
+                    <div className="mt-1 text-xs font-bold text-white group-hover:text-cyan-200">PPT Master 原生PPT</div>
+                  </div>
+                  <span className="mt-2 text-[10px] text-slate-400 group-hover:text-cyan-300">读实操教程 →</span>
+                </a>
+              </div>
+
+              <p className="text-xs text-slate-400">
+                提示：下方可继续展开往期（第 135 期至第 1 期）全量归档及历史原视频。
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* 期数快选：移动端用 8 列网格，彻底避免横向溢出 */}
         <div className="mt-8 grid grid-cols-8 gap-2 sm:flex sm:flex-wrap">

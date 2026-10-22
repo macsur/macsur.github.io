@@ -35,6 +35,9 @@ import { DAILY_RECOMMEND } from '@/data/dailyRecommend';
 import { EASTER_EGG_ITEMS, EasterEggItem } from '@/data/easterEggData';
 import { isHolidayToday, isSpringFestivalToday } from '@/data/holidays';
 import { copyTextToClipboard } from '@/lib/clipboard';
+import { COPY_KEYS } from '@/lib/copyKeys';
+import { BUILD_TIME } from '@/lib/buildTime';
+import { formatUpdateBadge } from '@/lib/updateBadge';
 
 interface RecommendedAppItem {
   id: number;
@@ -116,9 +119,10 @@ export default function Home() {
   // 实际生效的展示样式：'dark' | 'light'
   const [activeTheme, setActiveTheme] = useState<'dark' | 'light'>('dark');
 
-  // 🌟 首屏月度 Logo：运行时按当前时间计算对应轮播图
+  // 🌟 首屏月度 Logo：首帧用**构建期常量**（BUILD_TIME）而非 new Date()，
+  // 否则构建机与访客不在同一个月时会触发 React 水合不一致。
   const [monthlyLogoSrc, setMonthlyLogoSrc] = useState<string>(() => {
-    return `/images/logo/${getMonthlyLogoFilename(new Date())}`;
+    return `/images/logo/${getMonthlyLogoFilename(BUILD_TIME)}`;
   });
 
   // 🎬 Hero 顶部最高广告位：三支 B 站宣传片轮播索引
@@ -195,30 +199,28 @@ export default function Home() {
   };
 
   // 换算北京时间展示友好更新标签（如 "今日 03:00 已更新"）；法定节假日期间提示为假日更新
-  const updateBadgeText = useMemo(() => {
-    const holidayPrefix = isHolidayToday() ? '假日' : '今日';
-    if (!LAST_UPDATED_AT) return `${holidayPrefix}已更新`;
-
-    const match = LAST_UPDATED_AT.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
-    if (!match) return `${holidayPrefix}已更新`;
-
-    const [, year, month, day, hour, minute] = match;
-    const now = new Date();
-    const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
-    const bjNow = new Date(utcNow + 8 * 3600000);
-    const bjYear = bjNow.getFullYear();
-    const bjMonth = String(bjNow.getMonth() + 1).padStart(2, '0');
-    const bjDay = String(bjNow.getDate()).padStart(2, '0');
-
-    if (parseInt(year, 10) === bjYear && month === bjMonth && day === bjDay) {
-      return `${holidayPrefix} ${hour}:${minute} 已更新`;
-    }
-    return `${month}-${day} ${hour}:${minute} 已更新`;
+  // 访客当前时间：首帧必须是 null（确定性模式），水合完成后才在 useEffect 里取真实时间。
+  // 本站是 output:'export' 纯静态站，HTML 在构建那一刻烤死；若首帧就读 new Date()，
+  // 访客在别的日期打开会与 SSR 不一致 → React 水合报错。
+  const [viewerDate, setViewerDate] = useState<Date | null>(null);
+  useEffect(() => {
+    setViewerDate(new Date());
   }, []);
+
+  // 「今日更新」徽标文案：首帧只输出与当前时间无关的绝对时间（确定性），
+  // 水合后再升级为「今日/假日 HH:MM」，跨天则回落为绝对时间，绝不谎报「今日」。
+  const updateBadgeText = useMemo(
+    () =>
+      formatUpdateBadge(LAST_UPDATED_AT, {
+        viewerDate,
+        isHoliday: viewerDate ? isHolidayToday(viewerDate) : false,
+      }),
+    [viewerDate],
+  );
 
   // 安装命令源切换 (默认推荐 zttz.eu.org 专属增强版)
   const [installSource] = useState<'enhanced'>('enhanced');
-  const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // 搜索关键字与星标过滤
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -237,14 +239,14 @@ export default function Home() {
   const [isShockwaveActive, setIsShockwaveActive] = useState(false);
   const [burstParticles, setBurstParticles] = useState<Array<{ id: number; x: number; y: number; color: string; size: number }>>([]);
 
-  // 🎆 隐蔽彩蛋状态 (✦ 量子礼花 · 猜你喜欢 ✦：6个固定精选友情链接 + 3个来自 VPNGate L2TP/IPsec 优质节点)
+  // 🎆 隐蔽彩蛋状态 (✦ 量子礼花 · 猜你喜欢 ✦：6个固定精选友情链接 + 3个来自 VPNGate 的 OpenVPN 节点)
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [copiedEasterId, setCopiedEasterId] = useState<number | null>(null);
 
   // 🔗 友情链接弹窗状态 (最右下角独立文字入口，20 个名额网格布局，与彩蛋完全独立)
   const [showFriendLinks, setShowFriendLinks] = useState(false);
 
-  // 彩蛋数据：6个固定精选链接 + 3个来自 VPNGate 的 L2TP/IPsec 节点
+  // 彩蛋数据：6个固定精选链接 + 3个来自 VPNGate 的 OpenVPN 节点
   const easterEggItems: EasterEggItem[] = useMemo(() => EASTER_EGG_ITEMS, []);
 
   // 键盘 ESC 监听
@@ -523,12 +525,12 @@ export default function Home() {
 
   // 复制文本辅助函数
   // 只有剪贴板写入真正成功才切换成「已复制」，避免权限被拒 / 非安全上下文时给用户假成功提示
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, copyKey: string) => {
     void copyTextToClipboard(text).then((result) => {
       if (!result.ok) return;
-      setCopiedText(text);
+      setCopiedKey(copyKey);
       setTimeout(() => {
-        setCopiedText((current) => (current === text ? null : current));
+        setCopiedKey((current) => (current === copyKey ? null : current));
       }, 2000);
     });
   };
@@ -624,6 +626,7 @@ export default function Home() {
                     className="w-full h-full object-contain select-none"
                     loading="eager"
                     decoding="async"
+                    suppressHydrationWarning
                   />
                 </div>
                 <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-transparent flex items-center justify-center text-[7.5px] sm:text-[8px] transition-all shadow-sm ${
@@ -687,7 +690,7 @@ export default function Home() {
             {/* 桌面端标准导航链接 */}
             <nav className="hidden md:flex items-center space-x-7 text-sm font-medium">
               <a href="/tutorials/" className="text-slate-300 hover:text-cyan-400 transition-colors">Muse Miracle</a>
-              <a href="/github-trending/" className="text-slate-300 hover:text-cyan-400 transition-colors">GitHub 热点</a>
+              <a href="/github-trending/" className="text-slate-300 hover:text-cyan-400 transition-colors">GitHub 龙虎榜</a>
               <a href="/windows/" className="text-slate-300 hover:text-cyan-400 transition-colors">Windows 桌面专区</a>
               <a href="#apps" onClick={handleOpenMarketFromNav} className="text-slate-300 hover:text-cyan-400 transition-colors">应用市场 (160+)</a>
               <a href="#github-park" onClick={handleOpenGithubParkFromNav} className="text-slate-300 hover:text-amber-400 transition-colors flex items-center space-x-1.5">
@@ -861,7 +864,7 @@ export default function Home() {
             </a>
           </div>
 
-          {/* 🌟 [GitHub 一周热点] 专栏入口：第 135 期已上，5 篇逐个实测 */}
+          {/* 🌟 [GitHub 龙虎榜] 专栏入口：第 135 期真热前三已上，本周真热前三 */}
           <div className="max-w-3xl mx-auto text-left mb-8">
             <a
               href="/github-trending/"
@@ -872,15 +875,15 @@ export default function Home() {
               </div>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">GitHub 一周热点</h2>
-                  <span className="rounded-full bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[11px] font-medium text-cyan-700 dark:text-cyan-300">第 135 期已上</span>
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">GitHub 龙虎榜</h2>
+                  <span className="rounded-full bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 text-[11px] font-medium text-cyan-700 dark:text-cyan-300">第 135 期真热前三已上</span>
                 </div>
                 <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                  跟踪 IT咖啡馆的《Github一周热点》，每期项目在本站真装真跑一遍——跑通的出实操教程，装不动的如实降级为解读篇，不写假实测。
+                  GitHub 龙虎榜（原《GitHub 一周热点》）：每周按本周新增星标，只选真热前三。本站对每期项目真装真跑一遍，不写假实测。
                 </p>
               </div>
               <span className="shrink-0 text-sm font-semibold text-cyan-600 group-hover:text-cyan-700 dark:text-cyan-300 dark:group-hover:text-cyan-200">
-                进入专栏 →
+                进入龙虎榜 →
               </span>
             </a>
           </div>
@@ -920,10 +923,10 @@ export default function Home() {
                   <span className="select-all font-semibold">{installCommands[installSource]}</span>
                 </div>
                 <button
-                  onClick={() => handleCopy(installCommands[installSource])}
+                  onClick={() => handleCopy(installCommands[installSource], COPY_KEYS.install)}
                   className="ml-4 shrink-0 flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-all shadow-sm active:scale-95"
                 >
-                  {copiedText === installCommands[installSource] ? (
+                  {copiedKey === COPY_KEYS.install ? (
                     <>
                       <Check className="w-3.5 h-3.5 text-white" />
                       <span>已复制</span>
@@ -963,7 +966,7 @@ export default function Home() {
             {quickCommands.map((item, idx) => (
               <div
                 key={idx}
-                onClick={() => handleCopy(item.cmd)}
+                onClick={() => handleCopy(item.cmd, COPY_KEYS.quickCommand(item.cmd))}
                 className="google-card p-4 border border-white/[0.08] cursor-pointer group relative"
               >
                 <div className="flex items-center justify-between mb-1.5">
@@ -971,7 +974,7 @@ export default function Home() {
                     {item.cmd}
                   </span>
                   <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-700 rounded text-slate-300">
-                    {copiedText === item.cmd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedKey === COPY_KEYS.quickCommand(item.cmd) ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
                 <p className={`text-xs leading-relaxed transition-colors ${activeTheme === "dark" ? "text-slate-400" : "text-slate-800 font-medium"}`}>{item.desc}</p>
@@ -1098,10 +1101,10 @@ export default function Home() {
                     <span className="truncate text-blue-300">{app.cmd}</span>
                   </div>
                   <button
-                    onClick={() => handleCopy(app.cmd)}
+                    onClick={() => handleCopy(app.cmd, COPY_KEYS.dailyRecommend(app.cmd))}
                     className="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs transition-all shadow-sm active:scale-95 flex items-center space-x-1"
                   >
-                    {copiedText === app.cmd ? (
+                    {copiedKey === COPY_KEYS.dailyRecommend(app.cmd) ? (
                       <>
                         <Check className="w-3.5 h-3.5" />
                         <span>已复制</span>
@@ -1387,10 +1390,10 @@ export default function Home() {
                                   </span>
                                   {cat.id === 'custom' ? (
                                     <button
-                                      onClick={() => handleCopy(`z app`)}
+                                      onClick={() => handleCopy(`z app`, COPY_KEYS.appMarket(app.id))}
                                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                                     >
-                                      {copiedText === `z app` ? (
+                                      {copiedKey === COPY_KEYS.appMarket(app.id) ? (
                                         <>
                                           <Check className="w-3 h-3 text-emerald-400" />
                                           <span>已复制</span>
@@ -1404,10 +1407,10 @@ export default function Home() {
                                     </button>
                                   ) : (
                                     <button
-                                      onClick={() => handleCopy(`z app ${app.id}`)}
+                                      onClick={() => handleCopy(`z app ${app.id}`, COPY_KEYS.appMarket(app.id))}
                                       className="px-2.5 py-1 rounded bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                                     >
-                                      {copiedText === `z app ${app.id}` ? (
+                                      {copiedKey === COPY_KEYS.appMarket(app.id) ? (
                                         <>
                                           <Check className="w-3 h-3 text-emerald-400" />
                                           <span>已复制</span>
@@ -1726,10 +1729,10 @@ export default function Home() {
 
                           <div className="flex items-center space-x-2 shrink-0">
                             <button
-                              onClick={() => handleCopy(item.deployCmd)}
+                              onClick={() => handleCopy(item.deployCmd, COPY_KEYS.trendingRepo(item.rank))}
                               className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-400 hover:text-slate-950 text-amber-300 text-xs font-semibold transition-all border border-amber-500/40 flex items-center space-x-1.5 shadow-sm active:scale-95"
                             >
-                              {copiedText === item.deployCmd ? (
+                              {copiedKey === COPY_KEYS.trendingRepo(item.rank) ? (
                                 <>
                                   <Check className="w-3.5 h-3.5 text-emerald-400" />
                                   <span>已复制指令</span>
@@ -1929,7 +1932,7 @@ export default function Home() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    绽放 9 枚全息数据碎片 · 包含 6 个精选导航与 3 个实时精选的 L2TP/IPsec [US] 节点（点击即复制）
+                    绽放 9 枚全息数据碎片 · 包含 6 个精选导航与 3 个来自 VPNGate 的 OpenVPN 节点（点击即复制）
                   </p>
                 </div>
               </div>
@@ -2022,7 +2025,7 @@ export default function Home() {
             <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>真实 IP 提取自 VPNGate 全球实时节点（会话最少 0 sessions）</span>
+                <span>真实 IP 提取自 VPNGate 全球节点，标签会话数为抓取时快照</span>
               </div>
               <div className="flex items-center space-x-3">
                 <button
