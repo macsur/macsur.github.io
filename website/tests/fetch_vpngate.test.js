@@ -20,6 +20,7 @@ const test = require('node:test');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const GENERATOR_PATH = path.join(PROJECT_ROOT, 'fetch_vpngate.js');
+const HOMEPAGE_PATH = path.join(PROJECT_ROOT, 'src/app/page.tsx');
 const {
   FIXED_LINKS,
   FALLBACK_NODES,
@@ -28,6 +29,7 @@ const {
   pickVpnNodes,
   applyFallbackNodes,
   buildVpnItems,
+  formatNodeLabel,
   validateEasterEggItems,
   buildEasterEggFile,
   isValidIpv4,
@@ -145,7 +147,28 @@ test('buildVpnItems 生成的条目 id 从 7 开始且带国别标签', () => {
   assert.equal(items[0].isReal, true);
   assert.equal(items[0].url, null);
   assert.match(items[0].label, /^\[US\]/);
-  assert.match(items[0].label, /\(\d+ Sessions\)$/);
+  assert.match(items[0].label, /OpenVPN/);
+  assert.match(items[0].label, /抓取时 \d+ 会话）/);
+});
+
+test('formatNodeLabel 只标 OpenVPN，且不出现 L2TP/IPsec 伪断言', () => {
+  const label = formatNodeLabel({ countryShort: 'US', sessions: 12 });
+  assert.ok(!label.includes('L2TP'), '标签不得声称 L2TP');
+  assert.ok(!label.includes('IPsec'), '标签不得声称 IPsec');
+  assert.match(label, /OpenVPN/);
+});
+
+test('formatNodeLabel 用「抓取时」表述会话数，不声称实时', () => {
+  const label = formatNodeLabel({ countryShort: 'TH', sessions: 0 });
+  assert.ok(!label.includes('实时'), '会话数是抓取时刻快照，标签不得声称实时');
+  assert.match(label, /抓取时 0 会话/);
+});
+
+test('formatNodeLabel 国别取自 CountryShort，无国别时不编造', () => {
+  assert.match(formatNodeLabel({ countryShort: 'JP', sessions: 3 }), /^\[JP\]/);
+  const noCountry = formatNodeLabel({ countryShort: '', sessions: 3 });
+  assert.ok(!noCountry.startsWith('[]'), '空国别不得渲染成空括号');
+  assert.match(noCountry, /OpenVPN/);
 });
 
 test('validateEasterEggItems 通过 9 项、ID 连续、无重复', () => {
@@ -179,6 +202,47 @@ test('buildEasterEggFile 产出可被 TypeScript 解析的完整文件', () => {
   const jsonEnd = content.lastIndexOf('];') + 1;
   const parsed = JSON.parse(content.slice(jsonStart, jsonEnd));
   assert.equal(parsed.length, 9);
+});
+
+/**
+ * 取出首页「彩蛋弹窗」区块的源码。
+ * 彩蛋弹窗由 {showEasterEgg && ( 开头、以好友链接弹窗 {showFriendLinks && ( 结尾，
+ * 只在这个区间里做文案断言，避免把无关区块的「实时精选」误伤进来。
+ */
+function getEasterEggModalSource() {
+  const homepage = fs.readFileSync(HOMEPAGE_PATH, 'utf8');
+  const start = homepage.indexOf('{showEasterEgg && (');
+  const end = homepage.indexOf('{showFriendLinks && (');
+  assert.ok(start !== -1, '首页应存在彩蛋弹窗区块');
+  assert.ok(end !== -1 && end > start, '首页应存在好友链接弹窗区块且位于彩蛋弹窗之后');
+  return homepage.slice(start, end);
+}
+
+test('彩蛋文案不含 L2TP/IPsec 伪断言（生成器 + 首页 + 数据文件三处）', () => {
+  // 验收标准 1/2/3：L2TP/IPsec 断言在整个彩蛋链路上都必须消失。
+  // 生成器与数据文件是构建期产物，首页是唯一手写文案出口，三处一起守住。
+  const generator = fs.readFileSync(GENERATOR_PATH, 'utf8');
+  const homepage = fs.readFileSync(HOMEPAGE_PATH, 'utf8');
+  const dataFile = fs.readFileSync(path.join(PROJECT_ROOT, 'src/data/easterEggData.ts'), 'utf8');
+
+  for (const [name, content] of [['fetch_vpngate.js', generator], ['page.tsx', homepage], ['easterEggData.ts', dataFile]]) {
+    assert.ok(!content.includes('L2TP/IPsec'), `${name} 仍含 L2TP/IPsec 伪断言`);
+    assert.ok(!content.includes('L2TP'), `${name} 仍含 L2TP 伪断言`);
+  }
+});
+
+test('首页彩蛋文案不写死 [US]，也不声称节点是「实时」', () => {
+  // 验收标准 2/3：实际节点国别可能是 US/TH/JP/...，写死单一国别会与数据矛盾；
+  // 会话数是抓取快照，称「实时」同样是事实错误。
+  const easterEggBlock = getEasterEggModalSource();
+  assert.ok(!easterEggBlock.includes('[US]'), '首页彩蛋弹窗文案不得写死 [US]');
+  assert.ok(!easterEggBlock.includes('实时精选'), '首页彩蛋弹窗文案不得称「实时精选」');
+  assert.ok(!easterEggBlock.includes('L2TP'), '首页彩蛋弹窗文案不得出现 L2TP');
+});
+
+test('首页彩蛋文案改为按实际数据描述，不承诺具体国别', () => {
+  const easterEggBlock = getEasterEggModalSource();
+  assert.match(easterEggBlock, /3 个来自 VPNGate 的 OpenVPN 节点/);
 });
 
 test('生成器源码声明了「构建期会覆写 easterEggData.ts」这一坑位', () => {

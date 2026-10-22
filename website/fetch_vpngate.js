@@ -4,10 +4,17 @@
  * 自动抓取 VPNGate 节点并更新彩蛋数据 (fetch_vpngate.js)
  *
  * 规则：
- * 1. 抓取 https://www.vpngate.net/api/iphone/ (VPNGate 官方实时节点列表)
- * 2. 优先 [United States] (US) 节点，其余按当前会话数 (sessions) 升序取最少
+ * 1. 抓取 https://www.vpngate.net/api/iphone/ (VPNGate 官方节点列表)
+ * 2. 优先 [United States] (US) 节点，其余按抓取时刻的会话数 (sessions) 升序取最少
  * 3. 严格提取 3 个节点
  * 4. 与 6 个固定友情链接融合生成彩蛋数据，写入 website/src/data/easterEggData.ts
+ *
+ * 事实性约束（不要越过，详见 COD-49）：
+ *   - VPNGate API 的 15 列表头里没有任何隧道协议字段，唯一的协议列是
+ *     OpenVPN_ConfigData_Base64。所以节点协议只能标为 OpenVPN；历史上那个
+ *     「双协议」标签是未经证实的断言，已废弃。
+ *   - NumVpnSessions 是「抓取那一刻」的快照，构建后即冻结。因此标签与首页文案
+ *     都不得称其为「实时」。
  *
  * 重要：本文件在 CI 构建期（prebuild）会被执行并覆写 src/data/easterEggData.ts。
  * 任何展示口径的改动必须同时改这里，否则会被构建期重新刷回。
@@ -143,6 +150,23 @@ function applyFallbackNodes(vpnNodes, pickCount = VPN_PICK_COUNT) {
   return picked;
 }
 
+/**
+ * 生成节点标签。
+ *
+ * 口径依据（COD-49 事实性纠错）：
+ *   - 协议只能标 OpenVPN。VPNGate API 表头 15 列中没有任何隧道协议字段，唯一与
+ *     协议相关的列是 OpenVPN_ConfigData_Base64；历史上那个「双协议」标签属于
+ *     未经证实的断言，已废弃。
+ *   - 会话数是抓取时刻的快照（NumVpnSessions），构建后不再变化，因此措辞用
+ *     「快照」而不是「实时」。
+ *   - 国别只写 API 实际给出的 CountryShort，不额外承诺任何国别。
+ */
+function formatNodeLabel(node) {
+  const country = (node.countryShort || '').trim();
+  const prefix = country ? `[${country}] ` : '';
+  return `${prefix}VPNGate OpenVPN 节点（抓取时 ${node.sessions} 会话）`;
+}
+
 /** 把节点组装成彩蛋条目（id 从 7 开始，接在 6 个固定友链之后）。 */
 function buildVpnItems(vpnNodes) {
   return vpnNodes.map((node, idx) => ({
@@ -150,7 +174,7 @@ function buildVpnItems(vpnNodes) {
     text: node.ip,
     url: null,
     isReal: true,
-    label: `[${node.countryShort}] L2TP/IPsec 节点 (${node.sessions} Sessions)`,
+    label: formatNodeLabel(node),
     delay: VPN_DELAYS[idx],
     floatDelay: VPN_FLOAT_DELAYS[idx],
     color: VPN_COLORS[idx],
@@ -177,7 +201,8 @@ function validateEasterEggItems(items) {
 function buildEasterEggFile(items) {
   return `/**
  * 🌟 ✦ 量子礼花 · 猜你喜欢 ✦ 彩蛋专属数据
- * 包含：6 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 L2TP/IPsec 优质节点
+ * 包含：6 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 OpenVPN 节点
+ * 节点标签与会话数均为抓取时刻的快照，构建后不再变化。
  */
 
 export interface EasterEggItem {
@@ -211,20 +236,20 @@ function fetchVpnGate() {
 }
 
 async function main() {
-  console.log('🌐 正在从 VPNGate 官方获取实时节点列表...');
+  console.log('🌐 正在从 VPNGate 官方获取节点列表（抓取时刻快照）...');
   const raw = await fetchVpnGate();
 
   const allNodes = parseVpnGateCsv(raw);
   let vpnNodes = pickVpnNodes(allNodes);
 
   if (vpnNodes.length < VPN_PICK_COUNT) {
-    console.warn('⚠️ 实时拉取节点较少，使用精选稳定节点兜底补足...');
+    console.warn('⚠️ 本次抓取节点较少，使用精选稳定节点兜底补足...');
     vpnNodes = applyFallbackNodes(vpnNodes);
   }
 
   console.log(`✅ 成功锁定 ${vpnNodes.length} 款节点：`);
   vpnNodes.forEach((n, idx) => {
-    console.log(`   [${idx + 1}] IP: ${n.ip} | 地区: [${n.countryShort}] ${n.countryLong} | 当前会话数: ${n.sessions}`);
+    console.log(`   [${idx + 1}] IP: ${n.ip} | 地区: [${n.countryShort}] ${n.countryLong} | 抓取时会话数: ${n.sessions}`);
   });
 
   const fullItems = validateEasterEggItems([...FIXED_LINKS, ...buildVpnItems(vpnNodes)]);
@@ -241,6 +266,7 @@ module.exports = {
   pickVpnNodes,
   applyFallbackNodes,
   buildVpnItems,
+  formatNodeLabel,
   validateEasterEggItems,
   buildEasterEggFile,
 };
