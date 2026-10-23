@@ -224,6 +224,75 @@ export default function GithubTrendingColumnPage() {
           </div>
         </header>
 
+        {/* 🏆 龙虎榜正式版第 1 期：自主选品，本周新王（站主 2026-10-23 18:40 令） */}
+        <div className="relative mt-8 overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-cyan-50 p-6 shadow-xl sm:p-8 dark:border-amber-400/40 dark:bg-gradient-to-br dark:from-amber-950/50 dark:via-slate-950/90 dark:to-cyan-950/60">
+          {/* 背景光斑：金冠配色，区分于第 135 期 */}
+          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-cyan-500/12 blur-3xl" />
+
+          <div className="relative">
+            <div className="mb-4 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800 ring-1 ring-amber-300 dark:bg-amber-500/20 dark:text-amber-200 dark:ring-amber-400/40">
+                  <Star className="h-4 w-4" />
+                  <span>GitHub周冠军 · 龙虎榜 · 正式版第1期</span>
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  出品方：<span className="font-semibold text-slate-800 dark:text-slate-200">代码咖啡馆 Code Cafe</span>
+                </span>
+              </div>
+              <a
+                href="https://www.bilibili.com/video/BV1asnt6pEsm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-cyan-300 dark:text-cyan-600 dark:hover:text-cyan-500"
+              >
+                <span>在 B 站打开 (BV1asnt6pEsm)</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-center">
+              {/* 左侧竖屏播放器（9:16 居中限宽，与第 135 期同款口径） */}
+              <div className="flex justify-center lg:col-span-5">
+                <div className="relative w-full max-w-[280px] sm:max-w-[300px]">
+                  <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl border border-amber-500/30 bg-black shadow-2xl">
+                    <iframe
+                      src="https://player.bilibili.com/player.html?bvid=BV1asnt6pEsm&autoplay=0"
+                      className="absolute top-0 left-0 h-full w-full"
+                      scrolling="no"
+                      frameBorder="no"
+                      allowFullScreen
+                      title="GitHub周冠军 · 龙虎榜 第1期：新王一周涨12.9万星，还把老王收编成小弟？"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 右侧导读（口径照抄站主定稿） */}
+              <div className="flex flex-col justify-center space-y-4 lg:col-span-7">
+                <div>
+                  <h2 className="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl dark:text-white">
+                    正式版第 1 期：新王一周涨 12.9 万星，还把老王收编成小弟？
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    自主选品第一期：冠军 <strong className="text-amber-700 dark:text-amber-200">rea</strong> 本周
+                    <strong className="text-amber-700 dark:text-amber-200"> +129,417 星</strong>（是亚军的 8.6 倍），
+                    亚军 <strong className="text-cyan-700 dark:text-cyan-200">VoiceStudio</strong> +15,125，
+                    季军 <strong className="text-slate-800 dark:text-slate-200">ghidra</strong> +5,769——靠当天发布的
+                    12.2 版本守位。另有 opencode 今早冲进前三，正片季军名次不改，作为候补番外单独加演。
+                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    本期为<strong className="text-slate-900 dark:text-white">双声连播</strong>：开场番外 ＋
+                    男声版 ＋ 女声版 ＋ 候补番外，四段连播一次看全。
+                    —— 代码咖啡馆 Code Cafe 出品
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 🌟 第 135 期置顶精选区块：龙虎榜本周真热前三 */}
         <div className="mt-8 overflow-hidden rounded-3xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-6 shadow-xl sm:p-8 dark:border-cyan-400/40 dark:bg-gradient-to-br dark:from-cyan-950/70 dark:via-slate-950/90 dark:to-blue-950/70">
           <div className="mb-4 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
