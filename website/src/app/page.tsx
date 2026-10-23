@@ -73,31 +73,15 @@ const MONTHLY_LOGOS = [
   'logo-04-hud-future.webp',
 ] as const;
 
-// 🎬 Hero 顶部最高广告位：三支 B 站宣传片轮播（站主 2026-10-19 21:46 令）
-// 顺序固定：矩阵版 → 日报版 → 旧片；同一时刻仅挂一支 iframe
-const HERO_VIDEO_ADS = [
-  {
-    bvid: 'BV1bDJR6xEXX',
-    badge: '代码矩阵 · 一行命令',
-    title: '给我的网站拍了支广告｜CODE MATRIX 代码矩阵：一行命令，装遍 Linux',
-    desc: '矩阵版：CODE MATRIX 代码矩阵 · 一行命令装遍 Linux',
-    duration: '30s · B站',
-  },
-  {
-    bvid: 'BV19CJR6cEbE',
-    badge: '代码矩阵日报 · 创刊号',
-    title: '我的网站上"报纸"了｜代码矩阵日报创刊号：一行命令，装遍 Linux',
-    desc: '日报版：代码矩阵日报创刊号 · 一行命令装遍 Linux',
-    duration: '30s · B站',
-  },
-  {
-    bvid: 'BV14dJC6pEV2',
-    badge: '给自己的网站拍了条广告',
-    title: '给自己的网站拍了条广告，第三段配音是我用 AI 克隆的原声',
-    desc: '三条片子：AI 配音 / 纯音乐 / 站主原声克隆',
-    duration: '90s · B站',
-  },
-] as const;
+// 🎬 Hero 顶部最高广告位：单支 30 秒宣传片（站主 2026-10-23 18:40 令）
+// 撤下旧三支轮播，只挂一支静态展示，无轮播指示点
+const HERO_VIDEO_AD = {
+  bvid: 'BV1Dxnt6DEH4',
+  badge: '30秒认识代码矩阵',
+  title: '30秒认识代码矩阵：一条命令装齐160+应用，还有每周五的GitHub龙虎榜',
+  desc: '30秒认识代码矩阵：一条命令装齐160+应用',
+  duration: '30s · B站',
+} as const;
 
 function getMonthlyLogoFilename(date: Date = new Date()): string {
   const year = date.getFullYear();
@@ -125,8 +109,6 @@ export default function Home() {
     return `/images/logo/${getMonthlyLogoFilename(BUILD_TIME)}`;
   });
 
-  // 🎬 Hero 顶部最高广告位：三支 B 站宣传片轮播索引
-  const [heroVideoIdx, setHeroVideoIdx] = useState(0);
 
   useEffect(() => {
     const actual = `/images/logo/${getMonthlyLogoFilename(new Date())}`;
@@ -134,14 +116,6 @@ export default function Home() {
       setMonthlyLogoSrc(actual);
     }
   }, [monthlyLogoSrc]);
-
-  // 🎬 Hero 视频轮播自动切换（12 秒一轮，指示点可手动切换）
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHeroVideoIdx((prev) => (prev + 1) % HERO_VIDEO_ADS.length);
-    }, 12000);
-    return () => clearInterval(interval);
-  }, []);
 
   // 计算当前北京时间 (UTC+8) 应该处于白天还是黑夜 (06:00-17:59 白天，其余黑夜)
   const getBeijingAutoTheme = useCallback((): 'light' | 'dark' => {
@@ -768,52 +742,33 @@ export default function Home() {
 
         {/* Hero 区域 */}
         <section id="install" className="pt-12 sm:pt-16 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
-          {/* 🎬 Hero 宣传片：三支 B 站视频轮播（站主 2026-10-19 21:46 令）
-              顺序固定：矩阵版 → 日报版 → 旧片；同一时刻仅挂一支 iframe，轮到哪支加载哪支 */}
+          {/* 🎬 Hero 宣传片：单支 30 秒新片（站主 2026-10-23 18:40 令）
+              撤下旧三支轮播，单一静态展示，无轮播指示点 */}
           <div className="max-w-4xl mx-auto mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
             <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
               <div className="w-3.5" />
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-mono">
-                  {HERO_VIDEO_ADS[heroVideoIdx].badge}
+                  {HERO_VIDEO_AD.badge}
                 </span>
               </div>
             </div>
 
             <div className="relative rounded-lg overflow-hidden bg-[#0A0F1E] border border-slate-800/80 aspect-video">
-              {/* 同一时刻只渲染一支 iframe，避免三支播放器同时加载拖慢首屏 */}
               <iframe
-                key={HERO_VIDEO_ADS[heroVideoIdx].bvid}
-                src={`https://player.bilibili.com/player.html?bvid=${HERO_VIDEO_ADS[heroVideoIdx].bvid}&autoplay=0`}
+                key={HERO_VIDEO_AD.bvid}
+                src={`https://player.bilibili.com/player.html?bvid=${HERO_VIDEO_AD.bvid}&autoplay=0`}
                 scrolling="no"
                 frameBorder="0"
                 allowFullScreen
                 className="w-full h-full"
-                title={HERO_VIDEO_ADS[heroVideoIdx].title}
+                title={HERO_VIDEO_AD.title}
               />
             </div>
 
             <div className="mt-2 px-2 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="truncate mr-2">{HERO_VIDEO_ADS[heroVideoIdx].desc}</span>
-              <span className="font-mono text-cyan-400 shrink-0">{HERO_VIDEO_ADS[heroVideoIdx].duration}</span>
-            </div>
-
-            {/* 轮播指示点 + 手动切换 */}
-            <div className="mt-3 flex items-center justify-center gap-2">
-              {HERO_VIDEO_ADS.map((ad, idx) => (
-                <button
-                  key={ad.bvid}
-                  type="button"
-                  onClick={() => setHeroVideoIdx(idx)}
-                  aria-label={`切换到第 ${idx + 1} 支：${ad.badge}`}
-                  title={ad.title}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    idx === heroVideoIdx
-                      ? 'w-7 bg-cyan-400 shadow-sm shadow-cyan-500/40'
-                      : 'w-1.5 bg-slate-600/60 hover:bg-cyan-500/60'
-                  }`}
-                />
-              ))}
+              <span className="truncate mr-2">{HERO_VIDEO_AD.desc}</span>
+              <span className="font-mono text-cyan-400 shrink-0">{HERO_VIDEO_AD.duration}</span>
             </div>
           </div>
 
