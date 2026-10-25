@@ -15,7 +15,7 @@ function renderInline(tokens: InlineToken[], keyPrefix: string): React.ReactNode
         return <span key={key}>{token.text}</span>;
       case 'code':
         return (
-          <code key={key} className="rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 font-mono text-[0.9em] font-semibold text-blue-700 dark:border-white/10 dark:bg-slate-800/80 dark:text-cyan-200">
+          <code key={key} className="rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 font-mono text-[0.9em] font-semibold break-all text-blue-700 dark:border-white/10 dark:bg-slate-800/80 dark:text-cyan-200">
             {token.text}
           </code>
         );
@@ -186,11 +186,56 @@ export default function MarkdownContent({ content }: { content: string }) {
       continue;
     }
 
-    // 无序列表 / 有序列表（聚合相邻行）
+    // 表格（| 分隔行，第二行为 |---| 分隔线）
+    if (line.trim().startsWith('|')) {
+      const rows: string[][] = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        rows.push(
+          lines[i].trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim()),
+        );
+        i += 1;
+      }
+      const [header, , ...body] = rows;
+      const tableKey = key++;
+      blocks.push(
+        <div key={`b-${tableKey}`} className="my-5 overflow-x-auto rounded-xl border border-slate-200 dark:border-white/10">
+          <table className="w-full border-collapse text-[13px]">
+            <thead>
+              <tr className="bg-slate-100 dark:bg-white/[0.06]">
+                {header?.map((cell, j) => (
+                  <th key={j} className="border-b border-slate-200 px-3 py-2 text-left font-bold text-slate-900 dark:border-white/10 dark:text-white [&_code]:break-all">
+                    {renderInline(parseInline(cell), `th-${tableKey}-${j}`)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {body.map((row, j) => (
+                <tr key={j} className="border-b border-slate-100 last:border-b-0 dark:border-white/[0.06]">
+                  {row.map((cell, k) => (
+                    <td key={k} className="px-3 py-2 align-top text-slate-700 dark:text-slate-300 [&_code]:break-all">
+                      {renderInline(parseInline(cell), `td-${tableKey}-${j}-${k}`)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>,
+      );
+      continue;
+    }
+
+    // 无序列表 / 有序列表（聚合相邻行；有序列表按首行序号续号，中插代码块不归零）
     const isUl = /^[-*]\s+/.test(line.trim());
     const isOl = /^\d+[.)]\s+/.test(line.trim());
     if (isUl || isOl) {
       const items: string[] = [];
+      let olStart = 1;
+      if (isOl) {
+        const startMatch = /^(\d+)[.)]\s+/.exec(line.trim());
+        if (startMatch) olStart = parseInt(startMatch[1], 10);
+      }
       while (i < lines.length) {
         const current = lines[i];
         if (isUl && /^[-*]\s+/.test(current.trim())) {
@@ -210,7 +255,7 @@ export default function MarkdownContent({ content }: { content: string }) {
       ));
       blocks.push(
         isOl ? (
-          <ol key={`b-${key++}`} className="my-4 list-decimal space-y-1 pl-6">{listItems}</ol>
+          <ol key={`b-${key++}`} start={olStart} className="my-4 list-decimal space-y-1 pl-6">{listItems}</ol>
         ) : (
           <ul key={`b-${key++}`} className="my-4 list-disc space-y-1 pl-6">{listItems}</ul>
         ),
