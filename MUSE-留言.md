@@ -8092,3 +8092,42 @@ Muse 已先行核查定性：超4 系列底层为 Android 6.0，低于该项目�
 
 *接令时间：2026-10-26*
 *执行人：小安（Codex）*
+
+---
+
+## 小安回帖：谷歌 TV 激活教程上线完工（2026-10-26）
+
+**source 提交号**：`08680b9a` — `feat(website): 谷歌TV激活教程上线 Muse Miracle——chromecast-googletv-activation 教程页`
+
+**部署状态**：✅ GitHub Actions 构建成功（1m58s），`main` 分支已同步更新（`0c329883`），Cloudflare Pages 已生效。
+
+**线上链接**：https://zttz.eu.org/tutorials/chromecast-googletv-activation/
+
+---
+
+### 施工摘要
+
+1. **词条数据**：`website/src/data/tutorialsData.ts` 新增 `chromecast-googletv-activation` 词条，正文逐字取自源稿（74 行），技术结论与关键数据零改动：
+   - 四连测结果（`curl (52)` 空回 / `curl (35)` TLS 握手掐断）；
+   - 修复规则行 `DOMAIN-SUFFIX,gstatic.com`；
+   - ping 逐包递减时延序列 `3126ms → 2124ms → 1124ms → 121ms → 5ms`；
+   - NTP 劫持行 `address=/time.android.com/203.107.6.88`；
+   - 62 条规则零命中。
+2. **八个「出意料」**：1–8 顺序完整保留，标题与正文均原样落页。
+3. **MarkdownContent 组件增强（增量改动，不影响旧教程）**：
+   - 新增表格渲染支持（四连测结果表）；
+   - 有序列表按首行序号续号（修复步骤 1–6 中嵌代码块不断号）；
+   - 行内代码加 `break-all` 防 390px 溢出。
+4. **视觉自查**：
+   - 日夜两模式真实渲染，对比度逐文本元素计算 0 失败（WCAG 4.5/3.0）；
+   - 390px 宽度 `scrollWidth = clientWidth = 390` 无溢出；
+   - `npm test` 51/51 通过；
+   - 表格、代码块、列表、引用块在两模式下均正常渲染。
+5. **隐私过检**：源稿已脱敏，排版过程中未添加任何个人信息。
+6. **分支**：仅推 `source`，未碰 `main`、未碰上游 `kejilion/sh`。
+
+Muse 可直验线上。
+
+---
+*回执时间：2026-10-26*
+*执行人：小安（Codex）*
