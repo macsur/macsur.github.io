@@ -1852,6 +1852,209 @@ if (uninstall102Re.test(officialCode)) {
     console.log('⚠️ 未找到 k 菜单 102 项定义，卸载入口接入跳过');
 }
 
+// 补丁 26: php2shell (CVE-2026-109618 / CVE-2026-109619) 官方缓解落地
+// 1) 注入 ini 模板与写入函数 (php 与 php74 两容器都要)
+// 2) install_ldnmp: 新建环境默认写入缓解 ini
+// 3) LDNMP 更新php组件流程: 容器重建后补写该 ini
+// 4) web_security 防护流程: 新增「加固PHP缓解php2shell」一键入口 (应用后重启 php-fpm 清 worker 残留状态)
+const phpUploadProgressFuncs = `
+# php2shell 缓解 (CVE-2026-109618 / CVE-2026-109619 降险措施):
+# 关闭 session.upload_progress 上传进度跟踪可消除该攻击面 (官方缓解措施);
+# 完整修复仍需将 PHP 升级至 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 或更高。
+php_upload_progress_ini_policy() {
+	# 缓解 ini 模板 (zz 前缀保证 conf.d 目录中最后加载、优先生效)
+	cat <<'EOF'
+; php2shell 缓解 (CVE-2026-109618 / CVE-2026-109619)
+; 关闭 session.upload_progress 上传进度跟踪 (官方缓解措施)
+session.upload_progress.enabled = 0
+EOF
+}
+
+php_upload_progress_install_default() {
+	# LDNMP 新建/重建环境默认写入缓解 ini (php 与 php74), 不重启, 由调用方统一重启
+	local _pod
+	for _pod in php php74; do
+		docker inspect "\$_pod" >/dev/null 2>&1 || continue
+		php_upload_progress_ini_policy | docker exec -i "\$_pod" sh -c 'cat > /usr/local/etc/php/conf.d/zz-php-upload-progress.ini' >/dev/null 2>&1
+	done
+}
+
+php_upload_progress_off() {
+	# 防护流程一键应用: 写入存量 php / php74 容器并重启 php-fpm (清 worker 残留的上传进度会话状态)
+	local _pod _failed=""
+	for _pod in php php74; do
+		docker inspect "\$_pod" >/dev/null 2>&1 || continue
+		if ! php_upload_progress_ini_policy | docker exec -i "\$_pod" sh -c 'cat > /usr/local/etc/php/conf.d/zz-php-upload-progress.ini'; then
+			_failed="\$_failed \$_pod"
+		fi
+	done
+	if [ -n "\$_failed" ]; then
+		echo -e "\${gl_hong}警告: 写入 upload_progress 缓解配置失败:$_failed\${gl_bai}" >&2
+		return 1
+	fi
+	for _pod in php php74; do
+		docker inspect "\$_pod" >/dev/null 2>&1 || continue
+		docker restart "\$_pod" >/dev/null 2>&1
+		if ! docker exec "\$_pod" php -r 'exit((int) (ini_get("session.upload_progress.enabled") === "0"));' >/dev/null 2>&1; then
+			echo -e "\${gl_huang}提示: \${gl_bai}容器 \$_pod 的 session.upload_progress 未确认为关闭, 可能被更高优先级 ini 覆盖, 请检查。" >&2
+		fi
+	done
+	echo "已应用 php2shell 官方缓解并重启 php-fpm"
+	return 0
+}
+`;
+if (officialCode.includes('php_upload_progress_ini_policy() {')) {
+    console.log('✅ php2shell 缓解函数已存在，跳过重复注入（幂等保证）');
+} else if (officialCode.includes('install_ldnmp_conf() {')) {
+    officialCode = officialCode.replace('install_ldnmp_conf() {', () => `${phpUploadProgressFuncs}\ninstall_ldnmp_conf() {`);
+    console.log('✅ php2shell 缓解函数已注入 (php_upload_progress_ini_policy / _install_default / _off)');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到 install_ldnmp_conf() 定义锚点');
+}
+
+const installDefaultAnchor = '\t  fix_phpfpm_conf php\n\t  fix_phpfpm_conf php74';
+const installDefaultReplacement = `\t  fix_phpfpm_conf php
+\t  fix_phpfpm_conf php74
+
+\t  # php2shell 缓解: 新建环境默认写入 session.upload_progress.enabled=0 (php 与 php74)
+\t  php_upload_progress_install_default`;
+if (officialCode.includes('# php2shell 缓解: 新建环境默认写入')) {
+    console.log('✅ php2shell: install_ldnmp 默认写入钩子已存在（幂等保证）');
+} else if (officialCode.includes(installDefaultAnchor)) {
+    officialCode = officialCode.replace(installDefaultAnchor, () => installDefaultReplacement);
+    console.log('✅ php2shell: install_ldnmp 已挂接新建环境默认写入钩子');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到 install_ldnmp 的 fix_phpfpm_conf 锚点');
+}
+
+const updatePhpIniAnchor = `\t\t\t  docker exec php sh -c 'echo "max_input_vars=5000" > /usr/local/etc/php/conf.d/max_input_vars.ini' > /dev/null 2>&1`;
+const updatePhpIniReplacement = `${updatePhpIniAnchor}
+
+\t\t\t  # php2shell 缓解: 更新php容器重建后补写 session.upload_progress 缓解 ini
+\t\t\t  php_upload_progress_install_default`;
+if (officialCode.includes('# php2shell 缓解: 更新php容器重建后补写')) {
+    console.log('✅ php2shell: 更新php流程补写钩子已存在（幂等保证）');
+} else if (officialCode.includes(updatePhpIniAnchor)) {
+    officialCode = officialCode.replace(updatePhpIniAnchor, () => updatePhpIniReplacement);
+    console.log('✅ php2shell: LDNMP 更新php流程已挂接缓解 ini 补写钩子');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到更新php流程的 max_input_vars 锚点');
+}
+
+const securityMenuAnchor = '\t\t\t  echo "1. 安装防御程序"';
+const securityMenuReplacement = `${securityMenuAnchor}
+\t\t\t  echo "2. 加固PHP缓解php2shell"`;
+if (officialCode.includes('echo "2. 加固PHP缓解php2shell"')) {
+    console.log('✅ php2shell: 防护流程菜单项已存在（幂等保证）');
+} else if (officialCode.includes(securityMenuAnchor)) {
+    officialCode = officialCode.replace(securityMenuAnchor, () => securityMenuReplacement);
+    console.log('✅ php2shell: web_security 防护菜单已新增「2. 加固PHP缓解php2shell」入口');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到 web_security 菜单「1. 安装防御程序」锚点');
+}
+
+const securityCaseAnchor = '\t\t\t  case $sub_choice in\n\t\t\t\t  1)\n\t\t\t\t\t  f2b_install_sshd';
+const securityCaseReplacement = `\t\t\t  case $sub_choice in
+\t\t\t\t  2)
+\t\t\t\t\t  php_upload_progress_off
+\t\t\t\t\t  ;;
+\t\t\t\t  1)
+\t\t\t\t\t  f2b_install_sshd`;
+if (officialCode.includes('\t\t\t\t  2)\n\t\t\t\t\t  php_upload_progress_off')) {
+    console.log('✅ php2shell: 防护流程 2) 分支已存在（幂等保证）');
+} else if (officialCode.includes(securityCaseAnchor)) {
+    officialCode = officialCode.replace(securityCaseAnchor, () => securityCaseReplacement);
+    console.log('✅ php2shell: web_security case 已新增 2) 分支调用 php_upload_progress_off (含 php-fpm 重启)');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到 web_security case 1) f2b_install_sshd 锚点');
+}
+
+// 补丁 27: php2shell (CVE-2026-109618 / CVE-2026-109619) PHP 版本选择告警
+// 建站选 PHP 版本与 LDNMP 更新php流程: 低于修复版 (8.2<8.2.35 / 8.3<8.3.36 / 8.4<8.4.27 / 8.5<8.5.12) 显式告警;
+// 8.1 及以下与 php74 标注「官方无补丁、不会再有修复版」; 用户确认后才继续, 不硬阻断。
+// 分支浮动标签 (php 最新版/latest) 无法在建站时钉死版本, 按浮动标签处理并提示实测核对。
+const php2shellWarnFunc = `
+php2shell_version_warn() {
+	# php2shell (CVE-2026-109618 / CVE-2026-109619) 受影响版本告警: 提示后须用户确认, 不硬阻断
+	# 用法: php2shell_version_warn <输入版本号|latest> <容器名 php/php74, 仅用于文案>
+	local _input="\${1:-latest}" _pod="\${2:-php}" _fixed=""
+	if [ -n "\$_input" ] && [ "\$_input" != "latest" ]; then
+		case "\$_input" in
+			8.2) _fixed="8.2.35" ;;
+			8.3) _fixed="8.3.36" ;;
+			8.4) _fixed="8.4.27" ;;
+			8.5) _fixed="8.5.12" ;;
+			8.1|8.0|7.4|7.3|7.2|7.1|7.0|5.*) _fixed="none" ;;
+		esac
+	fi
+	if [ -z "\$_input" ] || [ "\$_input" = "latest" ]; then
+		echo -e "\${gl_huang}安全提示: \${gl_bai}\${_pod} 采用分支浮动标签, 实际运行版本随镜像更新浮动, 当前无法钉死具体版本。"
+		echo -e "php2shell (CVE-2026-109618 / CVE-2026-109619) 影响低于官方修复版的 PHP: 8.2 < 8.2.35 / 8.3 < 8.3.36 / 8.4 < 8.4.27 / 8.5 < 8.5.12"
+		echo -e "部署后请用 docker exec \${_pod} php -v 实测版本, 低于修复版时更新镜像至修复版, 并在「网站防御」执行「加固PHP缓解php2shell」。"
+	elif [ "\$_fixed" = "none" ]; then
+		echo -e "\${gl_hong}安全警告: PHP \${_input} 该版本受 php2shell (CVE-2026-109618 / CVE-2026-109619) 影响, 官方无补丁、不会再有修复版。\${gl_bai}"
+		[ "\$_input" = "7.4" ] && echo -e "\${gl_hong}php74 官方已停止维护, 无法通过升级消除该漏洞。\${gl_bai}"
+	elif [ -n "\$_fixed" ]; then
+		echo -e "\${gl_hong}安全警告: PHP \${_input} 低于修复版 \${_fixed}, 该版本受 php2shell (CVE-2026-109618 / CVE-2026-109619) 影响。\${gl_bai}"
+		echo -e "建议升级到 \${_fixed} 或更高版本以获得完整修复。"
+	else
+		echo -e "\${gl_huang}安全提示: \${gl_bai}未识别版本 \${_input}, 若属 8.2/8.3/8.4/8.5 分支请对照修复版 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12 判断。"
+	fi
+	read -e -p "已了解风险, 是否继续使用该 PHP 版本? (y 确认继续, 其他输入取消): " _confirm
+	case "\$_confirm" in
+		[Yy]) return 0 ;;
+		*) echo "已取消当前操作。" ; return 1 ;;
+	esac
+}
+`;
+if (officialCode.includes('php2shell_version_warn() {')) {
+    console.log('✅ php2shell 版本告警函数已存在（幂等保证）');
+} else if (officialCode.includes('install_ldnmp_conf() {')) {
+    officialCode = officialCode.replace('install_ldnmp_conf() {', () => `${php2shellWarnFunc}\ninstall_ldnmp_conf() {`);
+    console.log('✅ php2shell 版本告警函数已注入 (php2shell_version_warn)');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到 install_ldnmp_conf() 定义锚点');
+}
+
+const sitePhpAnchor = `\t\t1)
+\t\t  sed -i "s#php:9000#php:9000#g" /home/web/conf.d/\$yuming.conf
+\t\t  local PHP_Version="php"
+\t\t  ;;
+\t\t2)
+\t\t  sed -i "s#php:9000#php74:9000#g" /home/web/conf.d/\$yuming.conf
+\t\t  local PHP_Version="php74"
+\t\t  ;;`;
+const sitePhpReplacement = `\t\t1)
+\t\t  sed -i "s#php:9000#php:9000#g" /home/web/conf.d/\$yuming.conf
+\t\t  local PHP_Version="php"
+\t\t  php2shell_version_warn latest "\$PHP_Version" || return 1
+\t\t  ;;
+\t\t2)
+\t\t  sed -i "s#php:9000#php74:9000#g" /home/web/conf.d/\$yuming.conf
+\t\t  local PHP_Version="php74"
+\t\t  php2shell_version_warn 7.4 "\$PHP_Version" || return 1
+\t\t  ;;`;
+if (officialCode.includes('php2shell_version_warn latest')) {
+    console.log('✅ php2shell: 建站选PHP版本告警钩子已存在（幂等保证）');
+} else if (officialCode.includes(sitePhpAnchor)) {
+    officialCode = officialCode.replace(sitePhpAnchor, () => sitePhpReplacement);
+    console.log('✅ php2shell: 建站「3/6 选择PHP版本」已挂接版本告警 (php最新版=浮动标签提示 / php7.4=官方无补丁告警)');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到建站流程 PHP 版本选择锚点');
+}
+
+const updatePhpVersionAnchor = `\t\t\t  local version=\${version:-8.3}`;
+const updatePhpVersionReplacement = `${updatePhpVersionAnchor}
+\t\t\t  php2shell_version_warn "\$version" php || break`;
+if (officialCode.includes('php2shell_version_warn "$version" php')) {
+    console.log('✅ php2shell: 更新php版本告警钩子已存在（幂等保证）');
+} else if (officialCode.includes(updatePhpVersionAnchor)) {
+    officialCode = officialCode.replace(updatePhpVersionAnchor, () => updatePhpVersionReplacement);
+    console.log('✅ php2shell: LDNMP「更新php」已挂接版本告警 (低于修复版告警 / 8.1及以下与7.4标注无补丁)');
+} else {
+    throw new Error('❌ php2shell 补丁中止: 未找到更新php流程 version 锚点');
+}
+
 console.log('🔍 [4/5] 验证生成代码结构与语法（写盘前双门禁校验）...');
 
 // 环境能力探测：zsh 非必需。CI runner 未装 zsh 时降级为只跑 bash -n 并打印警告，
