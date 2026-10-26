@@ -1,5 +1,5 @@
 #!/bin/bash
-sh_v="4.5.14"
+sh_v="4.5.15"
 zttz_edition="true"
 zttz_v="1.0.0"
 
@@ -3920,14 +3920,14 @@ kpanel_app_delete_sites() {
 
 
 shared_waf_revision() {
-	printf '%s\n' '16620161a319443747ac0fc89242cbf510e89716'
+	printf '%s\n' '993ab1d89c2b19abbb89205ddc936c5962ad6828'
 }
 
 shared_waf_manifest() {
 	cat <<'WAF_MANIFEST'
-3c425c2214370e2ef68eab7ab629ebf7c0841c77c0c35716790a9fb329590360  configure.py
-7c1f19aad330622eca3c7d3ae3b735d2875113375f7318327cb1f44fa1bbeec6  policy.py
-954e6f6a590a5bafee495b708b8f0876bc612020ba50704d3c41020a53319d31  nginx_edit.py
+cf02c5babd0b72baacbd639d9e39f6559a86839c77b05af15deb04a668c82af9  configure.py
+b3bcfa229709259bb2568960c4fefd6df5304f7ab87aacd2df7e02039f87df33  policy.py
+99071ba780da3c7a843fda8aa348dba87fc9ebd022bb7cbbca2b8fa33f69a0a9  nginx_edit.py
 aee6fd651ceb6441acce6dc6b510e504d7127b2bba1ce84ca361655590c615b0  example-policy.json
 e6be6df199bc4ad607b6bcd7273a62a4884e5aa841786db1d8d5a2284f573179  cloudflare-ips.json
 6fd82147b99201beebe7b1a983f146e5c23ade7f9454ac883830848b7f753e30  legacy-jails.local
@@ -16255,7 +16255,7 @@ kpanel_ldnmp_result() {
 		"$1" "$2" "$(kpanel_ldnmp_escape "$3")" "$(date -u '+%Y-%m-%dT%H:%M:%SZ')")
 	printf 'KPANEL_LDNMP_RESULT %s\n' "$payload"
 	case "${KJ_LDNMP_RECEIPT:-}" in
-		/var/lib/kejilion-panel/environment-jobs/*.receipt)
+		/var/lib/kejilion-panel/environment-jobs/*.receipt|/home/docker/kpanel/data/agent/environment-jobs/*.receipt)
 			umask 077
 			printf '%s\n' "$payload" > "${KJ_LDNMP_RECEIPT}.tmp.$$" &&
 				mv -f "${KJ_LDNMP_RECEIPT}.tmp.$$" "$KJ_LDNMP_RECEIPT"
@@ -16364,18 +16364,19 @@ ldnmp_environment_install() {
 	local profile="${1:-full}" states
 	kpanel_ldnmp_event preflight 5 "正在检查安装条件"
 	case "$profile" in
-		full) kpanel_ldnmp_event install 15 "正在安装完整 LDNMP"; ldnmp_install_all ;;
-		nginx) kpanel_ldnmp_event install 15 "正在安装 Nginx"; nginx_install_all ;;
+		full) kpanel_ldnmp_event install 15 "正在安装完整 LDNMP"; ldnmp_install_all || return $? ;;
+		nginx) kpanel_ldnmp_event install 15 "正在安装 Nginx"; nginx_install_all || return $? ;;
 		*) echo "不支持的安装形态" >&2; return 2 ;;
 	esac
 	kpanel_ldnmp_event verify 90 "正在验证环境"
 	docker exec nginx nginx -t >/dev/null 2>&1 || return 1
 	docker compose -f /home/web/docker-compose.yml config -q || return 1
 	if [ "$profile" = full ]; then
-		states=$(docker inspect -f '{{.State.Running}}' nginx mysql php redis 2>/dev/null)
+		states=$(docker inspect -f '{{.State.Running}}' nginx mysql php redis 2>/dev/null) || return 1
 		[ "$(printf '%s\n' "$states" | sed '/^$/d' | wc -l)" -eq 4 ] || return 1
-		printf '%s\n' "$states" | grep -qv true && return 1
+		printf '%s\n' "$states" | grep -qxv true && return 1
 	fi
+	return 0
 }
 
 ldnmp_protection_action_apply() {
