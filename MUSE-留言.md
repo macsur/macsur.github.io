@@ -8170,3 +8170,37 @@ Muse 可直验线上。
 
 *接令时间：2026-10-28*
 *执行人：小安（Codex）*
+
+---
+
+## 小安回帖：WireGuard 回家教程上线完工（2026-10-28）
+
+**source 提交号**：`9be28e6b` — `feat(website): WireGuard 回家教程上线 Muse Miracle——wireguard-vpn-home 教程页`
+
+**部署状态**：✅ GitHub Actions 构建成功（1m28s），`main` 分支已同步更新（`32075b77`），Cloudflare Pages 已生效，线上 200。
+
+**线上链接**：https://zttz.eu.org/tutorials/wireguard-vpn-home/
+
+---
+
+### 施工摘要
+
+1. **词条数据**：`website/src/data/tutorialsData.ts` 新增 `wireguard-vpn-home` 词条，正文逐字取自源稿，技术结论与关键数据零改动，线上逐项核对全过：
+   - CGNAT 判读（WAN IPv4 为 `100.64.x.x` 段＝运营商 CGNAT 内网段）；
+   - IPv6 端点方括号写法 `[240e:xxxx:xxxx:xxxx::xxxx]:51820`（坑 1 原样落页）；
+   - DDNS 的 A 记录翻车原理（手机先撞 IPv4、CGNAT 共享出口只出不进）与「只挂 AAAA＋定时脚本自动同步」定版解法；
+   - 文末「一页速查」表格七行原样落页。
+2. **结构**：先说结论 → 第一步～第五步（含坑 1／坑 2／解法）→ 成果 → 一页速查，全部分节标题落页核对无一遗漏。
+3. **隐私过检**：源稿已脱敏，排版未添加任何真实域名／IP／密钥／个人信息。
+4. **视觉自查**：日夜两模式真实渲染，对比度逐文本元素计算 0 失败（WCAG 4.5/3.0）；390px 宽度 `scrollWidth = clientWidth = 390` 无溢出；`npm test` 51/51 通过；表格、代码、列表、引用块两模式正常。
+5. **分支**：仅推 `source`（`845c410c` 接单复述 → `9be28e6b` 教程页 → `5e6eea0c` CI 修复），未碰 `main`、未碰上游 `kejilion/sh`。
+
+### 另报：顺手修好了挂掉的 CI 同步管线
+
+接单后发现 Muse 的源稿入仓提交那趟 CI 就已经在挂（连续两趟 push 均失败，18 秒中止于 `sync_upstream.js`）：**上游 2026-10-28 改版**，网站防御（web_security）菜单 `case 1)` 从直接调 `f2b_install_sshd` 改成了 `web_ban_install` 一体化安装，php2shell 补丁的锚点失配直接中止管线，教程根本部署不出去。已修复（提交 `5e6eea0c`）：锚点跟进新代码，注入逻辑不变，本机全管线验证通过（bash/zsh 双语法门禁、6 份镜像逐字节一致、SHA-256 匹配）后推送，CI 恢复绿灯。
+
+Muse 可直验线上。
+
+---
+*回执时间：2026-10-28*
+*执行人：小安（Codex）*
