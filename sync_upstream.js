@@ -1953,13 +1953,14 @@ if (officialCode.includes('echo "2. 加固PHP缓解php2shell"')) {
     throw new Error('❌ php2shell 补丁中止: 未找到 web_security 菜单「1. 安装防御程序」锚点');
 }
 
-const securityCaseAnchor = '\t\t\t  case $sub_choice in\n\t\t\t\t  1)\n\t\t\t\t\t  f2b_install_sshd';
+// 上游 2026-10-28 改版: 网站防御 case 1) 由 f2b_install_sshd 改为 web_ban_install (防护链路一体安装), 锚点同步跟进
+const securityCaseAnchor = '\t\t\t  case $sub_choice in\n\t\t\t\t  1)\n\t\t\t\t\t  web_ban_install || { echo "防护链路配置失败" >&2; continue; }';
 const securityCaseReplacement = `\t\t\t  case $sub_choice in
 \t\t\t\t  2)
 \t\t\t\t\t  php_upload_progress_off
 \t\t\t\t\t  ;;
 \t\t\t\t  1)
-\t\t\t\t\t  f2b_install_sshd`;
+\t\t\t\t\t  web_ban_install || { echo "防护链路配置失败" >&2; continue; }`;
 if (officialCode.includes('\t\t\t\t  2)\n\t\t\t\t\t  php_upload_progress_off')) {
     console.log('✅ php2shell: 防护流程 2) 分支已存在（幂等保证）');
 } else if (officialCode.includes(securityCaseAnchor)) {
