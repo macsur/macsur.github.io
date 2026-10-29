@@ -110,6 +110,25 @@ kpanel_protocol_active() {
 }
 
 
+# Armbian can identify as Debian or Ubuntu; preserve its configured mirrors.
+is_armbian_system() {
+	local armbian_release="${1:-/etc/armbian-release}" os_release="${2:-/etc/os-release}"
+	[ -f "$armbian_release" ] || grep -Eiq '^(ID|NAME|PRETTY_NAME)="?armbian([" ]|$)' "$os_release" 2>/dev/null
+}
+
+preserve_armbian_mirrors() {
+	if is_armbian_system; then
+		echo "Armbian detected; keeping existing system package sources."
+		return 0
+	fi
+	return 1
+}
+
+run_linuxmirrors_manual() {
+	preserve_armbian_mirrors && return 0
+	bash <(curl -sSL https://linuxmirrors.cn/main.sh) "$@"
+}
+
 quanju_canshu() {
 if [ "$canshu" = "CN" ]; then
 	zhushi=0
@@ -3956,7 +3975,7 @@ kpanel_app_delete_sites() {
 
 
 shared_waf_revision() {
-	printf '%s\n' '4269829b5be389aa08c22a0c19915a5a451a7e2f'
+	printf '%s\n' 'd8c178df8c851419087194178314473ec6a6a478'
 }
 
 shared_waf_manifest() {
@@ -3964,7 +3983,7 @@ shared_waf_manifest() {
 832eef6992bd92cbe090ecb13f32b361b5a4e49b023d39417a5a9bc46ed7a4a7  configure.py
 f00fa5846217315b9f0905ddab9c7104959e77f0b1653fb4ffbf5ff48121df9a  policy.py
 99071ba780da3c7a843fda8aa348dba87fc9ebd022bb7cbbca2b8fa33f69a0a9  nginx_edit.py
-5537bbf5aeb44865562484ea7ef403d809d68a6dbd5c7972d6dbc5b58775b1f1  ban.py
+0025f9596e234c9f64b0c799318e44e00f3271f313335d0ddb152e11834185ee  ban.py
 aee6fd651ceb6441acce6dc6b510e504d7127b2bba1ce84ca361655590c615b0  example-policy.json
 e6be6df199bc4ad607b6bcd7273a62a4884e5aa841786db1d8d5a2284f573179  cloudflare-ips.json
 6fd82147b99201beebe7b1a983f146e5c23ade7f9454ac883830848b7f753e30  legacy-jails.local
@@ -4664,10 +4683,13 @@ web_security() {
 
 				  11)
 					  install nano
-					  echo "调整 waf-attack / waf-rate 的 maxretry、findtime、bantime（60~3600秒）；不修改过滤器和动作。"
+					  echo "调整 waf-attack / waf-rate 的 maxretry、findtime、bantime（首次封禁秒数）；不修改过滤器和动作。"
+					  echo "默认递进：10分钟、1小时、6小时、24小时；实际时间以各规则配置为准。"
+					  echo "bantime.increment=false 可关闭该规则递进；历史保留时间由 Fail2Ban 数据库配置决定。"
 					  nano /etc/fail2ban/jail.d/zz-waf-managed.local
 					  fail2ban-client -t || { echo "配置检查失败" >&2; continue; }
-					  f2b_status
+					  shared_waf ban-install || { echo "防护参数未完整应用，请检查上方错误并修正配置。" >&2; continue; }
+					  fail2ban-client status
 					  break
 					  ;;
 
@@ -6743,6 +6765,7 @@ kpanel_system_tuning_download_verified() {
 }
 
 kpanel_system_tuning_switch_mirror() {
+	preserve_armbian_mirrors && return 0
 	local script country url
 	script="$(mktemp /tmp/kejilion-system-tuning-mirror.XXXXXX)" || return 1
 	url="${gh_proxy}raw.githubusercontent.com/SuperManito/LinuxMirrors/${KPANEL_SYSTEM_TUNING_MIRROR_COMMIT}/ChangeMirrors.sh"
@@ -6970,7 +6993,19 @@ kpanel_system_tuning_run_item() {
 		timezone-shanghai) set_timedate Asia/Shanghai ;;
 		dns-auto) kpanel_system_tuning_dns_auto ;;
 		ipv4-preferred) prefer_ipv4 ;;
-		basic-tools) install_docker && install wget sudo tar unzip socat btop nano vim ;;
+		basic-tools)
+			local tool missing_tools=()
+			install_docker || true
+			for tool in wget sudo tar unzip socat btop nano vim; do
+				install "$tool" || true
+			done
+			for tool in docker wget sudo tar unzip socat btop nano vim; do
+				command -v "$tool" >/dev/null 2>&1 || missing_tools+=("$tool")
+			done
+			if [ "${#missing_tools[@]}" -gt 0 ]; then
+				echo "提示: 以下基础工具未安装成功: ${missing_tools[*]}。" >&2
+			fi
+			;;
 		kernel-auto) kpanel_system_tuning_kernel_auto ;;
 		*) return 2 ;;
 	esac
@@ -6982,6 +7017,10 @@ kpanel_system_tuning_menu_item() {
 	if ! kpanel_system_tuning_run_item "$item"; then
 		echo -e "[${gl_hong}FAIL${gl_bai}] ${index}/12. ${label}，一条龙调优已停止"
 		return 1
+	fi
+	if [ "$item" = basic-tools ] && ! kpanel_system_tuning_item_ready "$item"; then
+		echo -e "[${gl_huang}WARN${gl_bai}] ${index}/12. ${label}，部分工具未安装，继续调优"
+		return 0
 	fi
 	case "$item" in system-update|system-cleanup|dns-auto) ;; *)
 		if ! kpanel_system_tuning_item_ready "$item"; then
@@ -7000,7 +7039,7 @@ kpanel_system_tuning_apply_item() {
 		kpanel_system_tuning_emit needs-attention "$item"
 		return 1
 	fi
-	case "$item" in system-update|system-cleanup|dns-auto) ;; *)
+	case "$item" in system-update|system-cleanup|dns-auto|basic-tools) ;; *)
 		kpanel_system_tuning_item_ready "$item" || { kpanel_system_tuning_emit needs-attention "$item"; return 1; }
 	;; esac
 	kpanel_system_tuning_emit "$status" "$item"
@@ -28972,6 +29011,7 @@ linux_work() {
 
 # 智能切换镜像源函数
 switch_mirror() {
+	preserve_armbian_mirrors && return 0
 	# 可选参数，默认为 false
 	local upgrade_software=${1:-false}
 	local clean_cache=${2:-false}
@@ -34391,15 +34431,15 @@ EOF
 		  case $choice in
 			  1)
 				  send_stats "中国大陆默认源"
-				  bash <(curl -sSL https://linuxmirrors.cn/main.sh)
+				  run_linuxmirrors_manual
 				  ;;
 			  2)
 				  send_stats "中国大陆教育源"
-				  bash <(curl -sSL https://linuxmirrors.cn/main.sh) --edu
+				  run_linuxmirrors_manual --edu
 				  ;;
 			  3)
 				  send_stats "海外源"
-				  bash <(curl -sSL https://linuxmirrors.cn/main.sh) --abroad
+				  run_linuxmirrors_manual --abroad
 				  ;;
 			  4)
 				  send_stats "智能切换更新源"
