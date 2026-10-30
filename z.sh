@@ -1756,6 +1756,17 @@ php2shell_version_warn() {
 }
 
 install_ldnmp_conf() {
+  # Re-entry must preserve the installed stack, database credentials and WAF hooks.
+  if [ -e /home/web/docker-compose.yml ] || [ -L /home/web/docker-compose.yml ]; then
+    [ -f /home/web/docker-compose.yml ] && [ ! -L /home/web/docker-compose.yml ] || return 1
+    if [ -s /home/web/docker-compose.yml ]; then
+      [ -f /home/web/nginx.conf ] && [ ! -L /home/web/nginx.conf ] && [ -s /home/web/nginx.conf ] || {
+        echo "Existing stack has no usable nginx.conf; restore its configuration before retrying." >&2
+        return 1
+      }
+      return 0
+    fi
+  fi
 
   # 创建必要的目录和文件
   cd /home && mkdir -p web/html web/mysql web/certs web/conf.d web/stream.d web/redis web/log/nginx web/letsencrypt && touch web/docker-compose.yml
@@ -3975,14 +3986,14 @@ kpanel_app_delete_sites() {
 
 
 shared_waf_revision() {
-	printf '%s\n' 'd8c178df8c851419087194178314473ec6a6a478'
+	printf '%s\n' '1e185a050b7c6d5670a82dd70a8e85bbd49de3f6'
 }
 
 shared_waf_manifest() {
 	cat <<'WAF_MANIFEST'
-832eef6992bd92cbe090ecb13f32b361b5a4e49b023d39417a5a9bc46ed7a4a7  configure.py
-f00fa5846217315b9f0905ddab9c7104959e77f0b1653fb4ffbf5ff48121df9a  policy.py
-99071ba780da3c7a843fda8aa348dba87fc9ebd022bb7cbbca2b8fa33f69a0a9  nginx_edit.py
+7be23f9abbeb83427b1a138a97e9fd1fdbb0c0ad357d4d02f604699a2a24dffe  configure.py
+94ebfe41ee644a8747cdba8e78fc163431a1706133bd7d5a99d4b5c6b14477d7  policy.py
+93adcf667d3bab494dea93681524c6828dab9d5c36b0c9147229e02e7433360e  nginx_edit.py
 0025f9596e234c9f64b0c799318e44e00f3271f313335d0ddb152e11834185ee  ban.py
 aee6fd651ceb6441acce6dc6b510e504d7127b2bba1ce84ca361655590c615b0  example-policy.json
 e6be6df199bc4ad607b6bcd7273a62a4884e5aa841786db1d8d5a2284f573179  cloudflare-ips.json
@@ -4440,6 +4451,8 @@ nginx_template_install() {
 	[ -d /home/web ] && [ ! -L /home/web ] || { echo "Nginx 配置目录无效" >&2; exit 1; }
 	if [ -e "$target" ] || [ -L "$target" ]; then
 		[ -f "$target" ] && [ ! -L "$target" ] || { echo "Nginx 配置文件类型无效" >&2; exit 1; }
+		# Existing WAF/custom configuration is migrated by the updater, never reset here.
+        [ ! -s "$target" ] || exit 0
 	fi
 	download=$(mktemp /home/web/.nginx10.conf.download.XXXXXX) || exit 1
 	trap 'rm -f -- "$download" ${backup:+"$backup"}' EXIT
@@ -4459,7 +4472,7 @@ nginx_template_install() {
 			echo "Nginx 配置写入失败，已恢复原文件" >&2; exit 1
 		fi
 	else
-		install -m 0644 -- "$download" "$target" || exit 1
+		command install -m 0644 -- "$download" "$target" || exit 1
 	fi
 	)
 }
@@ -7221,7 +7234,7 @@ check_disk_space 3 /home
 install_dependency
 install_docker
 install_certbot
-install_ldnmp_conf
+install_ldnmp_conf || return $?
 install_ldnmp
 
 }
@@ -7236,7 +7249,7 @@ echo -e "${gl_huang}nginx未安装，开始安装nginx环境...${gl_bai}"
 install_dependency
 install_docker
 install_certbot
-install_ldnmp_conf
+install_ldnmp_conf || return $?
 nginx_upgrade || return $?
 # First-install housekeeping stays here; routine updates preserve existing jobs
 # and website ownership instead of reapplying installation defaults.
