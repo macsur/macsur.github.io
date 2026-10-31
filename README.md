@@ -7,6 +7,7 @@
 
 [![Website](https://img.shields.io/badge/官网主页-zttz.eu.org-cyan?style=for-the-badge&logo=google-chrome&logoColor=white)](https://zttz.eu.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Online-emerald?style=for-the-badge&logo=github&logoColor=white)](https://github.com/macsur/macsur.github.io)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](./LICENSE)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
 [![Bun](https://img.shields.io/badge/Bun-1.3.14-f7d7b6?style=for-the-badge&logo=bun&logoColor=111827)](https://bun.sh)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
@@ -163,3 +164,13 @@ z update        # 在线更新融合版最新脚本
 - **GitHub 源码仓库**：[https://github.com/macsur/macsur.github.io](https://github.com/macsur/macsur.github.io)
 - **自用应用库**：[https://github.com/macsur/z-apps](https://github.com/macsur/z-apps)
 - **上游官方项目**：[kejilion/sh](https://github.com/kejilion/sh)
+
+---
+
+## 📜 许可证
+
+本项目以 [GNU General Public License v3.0 (GPL-3.0)](./LICENSE) 协议公开发布。  
+Copyright © 2026 CODE MATRIX 代码矩阵（macsur）。
+
+本项目 z 脚本部分源自 Kejilion（[kejilion.sh](https://github.com/kejilion/sh)）上游项目，在此致谢；上游内容如有其自身授权声明，以上游为准。
+

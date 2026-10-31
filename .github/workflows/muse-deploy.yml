@@ -70,6 +70,13 @@ jobs:
           bun run build
           cd ..
 
+      - name: 4.5 准备 main 分支根目录同步文件 (README.md 与 LICENSE)
+        run: |
+          # 1. 复制官方 GPL-3.0 LICENSE 全文进发布目录
+          cp -f LICENSE website/out/LICENSE
+          # 2. 同步 README.md 并将头图路径从 ./website/public/og-image.png 改写为 ./og-image.png (main 根目录适配)
+          sed 's|\./website/public/og-image\.png|\./og-image.png|g' README.md > website/out/README.md
+
       - name: 5. 自动发布推送到 main 分支 (GitHub Pages)
         uses: JamesIves/github-pages-deploy-action@v4
         with:
