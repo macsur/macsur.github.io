@@ -794,16 +794,26 @@ export default function Home() {
           </h1>
 
           <div className="mb-4">
-            <p className="brand-script text-xs sm:text-sm font-semibold tracking-[0.28em] text-emerald-300/90 uppercase">
+            <p className={`text-xs sm:text-sm font-semibold tracking-[0.28em] uppercase transition-colors ${
+              activeTheme === 'dark' ? 'text-green-400' : 'text-green-700'
+            }`}>
               FOR GENERATION X: THE MATRIX REOPENS
             </p>
-            <p className="brand-script mt-1 text-sm sm:text-base font-medium text-white/90">
+            <p className={`mt-1 text-sm sm:text-base font-medium transition-colors ${
+              activeTheme === 'dark' ? 'text-green-400' : 'text-green-700'
+            }`}>
               献给 X 世代：矩阵为你重开
             </p>
           </div>
 
-          <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
-            爱上 Linux，只需要一行命令。粘贴、回车，剩下的全自动：系统重装、BBR 加速、Docker 部署、160 多个应用一键装齐。曾经高不可攀的服务器，从此任你差遣——这种掌控一切的快感，试过一次，就上头。
+          <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 mb-4 leading-relaxed font-normal">
+            爱上 Linux，只需要一行命令。粘贴、回车，剩下的全自动：系统重装、BBR 加速、Docker 部署、160 多个应用一键装齐。曾经高不可攀的服务器，从此任你差遣——这种掌控一切的快感，
+          </p>
+          {/* 12:47 点睛句：独立成行，智芒星书法＋绿色，居中收尾 */}
+          <p className={`brand-script text-center text-xl sm:text-2xl mb-10 font-normal transition-colors ${
+            activeTheme === 'dark' ? 'text-green-400' : 'text-green-700'
+          }`}>
+            试过一次，就上头。
           </p>
           </div>
 
