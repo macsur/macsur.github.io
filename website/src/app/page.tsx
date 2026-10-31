@@ -795,12 +795,12 @@ export default function Home() {
 
           <div className="mb-4">
             <p className={`text-xs sm:text-sm font-semibold tracking-[0.28em] uppercase transition-colors ${
-              activeTheme === 'dark' ? 'text-green-400' : 'text-green-700'
+              activeTheme === 'dark' ? 'text-green-400' : 'text-green-600'
             }`}>
               FOR GENERATION X: THE MATRIX REOPENS
             </p>
             <p className={`mt-1 text-sm sm:text-base font-medium transition-colors ${
-              activeTheme === 'dark' ? 'text-green-400' : 'text-green-700'
+              activeTheme === 'dark' ? 'text-green-400' : 'text-green-600'
             }`}>
               献给 X 世代：矩阵为你重开
             </p>
@@ -811,9 +811,9 @@ export default function Home() {
           </p>
           {/* 12:47 点睛句：独立成行，智芒星书法＋绿色，居中收尾 */}
           <p className={`brand-script text-center text-xl sm:text-2xl mb-10 font-normal transition-colors ${
-            activeTheme === 'dark' ? 'text-green-400' : 'text-green-700'
+            activeTheme === 'dark' ? 'text-green-400' : 'text-green-600'
           }`}>
-            试过一次，就上头。
+            试过一次，就上头...
           </p>
           </div>
 
