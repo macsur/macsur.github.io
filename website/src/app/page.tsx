@@ -743,8 +743,11 @@ export default function Home() {
         {/* Hero 区域 */}
         <section id="install" className="pt-12 sm:pt-16 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
           {/* 🎬 Hero 宣传片：单支 30 秒新片（站主 2026-10-23 18:40 令）
-              撤下旧三支轮播，单一静态展示，无轮播指示点 */}
-          <div className="max-w-4xl mx-auto mb-8 google-card p-3 border border-cyan-500/25 shadow-xl shadow-cyan-950/30 overflow-hidden group hover:border-cyan-400/40 transition-colors text-left">
+              撤下旧三支轮播，单一静态展示，无轮播指示点
+              12:26 规范化：装进今日推荐同款大面板，w-full 撑满 max-w-6xl，mb-8 间距 */}
+          <div className={`relative w-full mx-auto mb-8 rounded-3xl p-6 sm:p-10 border backdrop-blur-2xl shadow-2xl overflow-hidden transition-colors duration-300 ${
+            activeTheme === "dark" ? "border-white/10 bg-[#0e111a]/80 shadow-black/50" : "border-slate-200/90 bg-white/90 shadow-slate-200/60"
+          }`}>
             <div className="flex items-center justify-between px-2 pb-2 mb-2 border-b border-white/[0.08]">
               <div className="w-3.5" />
               <div className="flex items-center space-x-2">
@@ -772,6 +775,10 @@ export default function Home() {
             </div>
           </div>
 
+          {/* 品牌首屏区块（12:26 规范化：装进今日推荐同款大面板，w-full 撑满，mb-8 间距；内容一字不动） */}
+          <div className={`relative w-full mx-auto mb-8 rounded-3xl p-6 sm:p-10 border backdrop-blur-2xl shadow-2xl overflow-hidden transition-colors duration-300 ${
+            activeTheme === "dark" ? "border-white/10 bg-[#0e111a]/80 shadow-black/50" : "border-slate-200/90 bg-white/90 shadow-slate-200/60"
+          }`}>
           {/* 首屏定位胶囊 */}
           <div className="inline-flex items-center google-pill mb-8 select-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5 shadow-sm shadow-emerald-400/50" />
@@ -798,6 +805,7 @@ export default function Home() {
           <p className="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 mb-10 leading-relaxed font-normal">
             爱上 Linux，只需要一行命令。粘贴、回车，剩下的全自动：系统重装、BBR 加速、Docker 部署、160 多个应用一键装齐。曾经高不可攀的服务器，从此任你差遣——这种掌控一切的快感，试过一次，就上头。
           </p>
+          </div>
 
           {/* 终端模拟一键安装框（三栏与下方主栏目同宽：w-full 撑满 max-w-6xl 内容区） */}
           <div className="w-full mx-auto google-card p-6 mb-8 shadow-2xl shadow-black/60 border border-white/10 text-left">
