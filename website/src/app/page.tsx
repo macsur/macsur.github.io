@@ -799,8 +799,8 @@ export default function Home() {
             爱上 Linux，只需要一行命令。粘贴、回车，剩下的全自动：系统重装、BBR 加速、Docker 部署、160 多个应用一键装齐。曾经高不可攀的服务器，从此任你差遣——这种掌控一切的快感，试过一次，就上头。
           </p>
 
-          {/* 终端模拟一键安装框（宽度对齐 max-w-3xl，与 GitHub 龙虎榜卡和 Muse Miracle 卡一致） */}
-          <div className="max-w-3xl mx-auto google-card p-6 shadow-2xl shadow-black/60 border border-white/10 text-left">
+          {/* 终端模拟一键安装框（三栏与下方主栏目同宽：w-full 撑满 max-w-6xl 内容区） */}
+          <div className="w-full mx-auto google-card p-6 mb-8 shadow-2xl shadow-black/60 border border-white/10 text-left">
             {/* 终端顶部操作栏 */}
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
               <div className="flex items-center space-x-2">
@@ -854,7 +854,7 @@ export default function Home() {
             </div>
           </div>
       {/* 🌟 [GitHub 龙虎榜] 专栏入口：第 135 期真热前三已上，本周真热前三 */}
-          <div className="max-w-3xl mx-auto text-left mb-8">
+          <div className="w-full mx-auto text-left mb-8">
             <a
               href="/github-trending/"
               className="group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-md sm:flex-row sm:items-center sm:p-6 dark:border-white/10 dark:bg-[#10131c]"
@@ -878,7 +878,7 @@ export default function Home() {
           </div>
 
           {/* 🌟 [Muse Miracle] 入口：站主亲测实战手记，链接到 /tutorials/。前置到 Hero 视频之上，确保 390px 手机首屏可见 */}
-          <div className="max-w-3xl mx-auto text-left mb-8">
+          <div className="w-full mx-auto text-left mb-8">
             <a
               href="/tutorials/"
               className="group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md sm:flex-row sm:items-center sm:p-6 dark:border-white/10 dark:bg-[#10131c]"
