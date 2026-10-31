@@ -799,8 +799,8 @@ export default function Home() {
             爱上 Linux，只需要一行命令。粘贴、回车，剩下的全自动：系统重装、BBR 加速、Docker 部署、160 多个应用一键装齐。曾经高不可攀的服务器，从此任你差遣——这种掌控一切的快感，试过一次，就上头。
           </p>
 
-          {/* 终端模拟一键安装框 */}
-          <div className="max-w-2xl mx-auto google-card p-6 shadow-2xl shadow-black/60 border border-white/10 text-left">
+          {/* 终端模拟一键安装框（宽度对齐 max-w-3xl，与 GitHub 龙虎榜卡和 Muse Miracle 卡一致） */}
+          <div className="max-w-3xl mx-auto google-card p-6 shadow-2xl shadow-black/60 border border-white/10 text-left">
             {/* 终端顶部操作栏 */}
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
               <div className="flex items-center space-x-2">
