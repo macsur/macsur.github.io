@@ -164,7 +164,7 @@ function applyFallbackNodes(vpnNodes, pickCount = VPN_PICK_COUNT) {
 function formatNodeLabel(node) {
   const country = (node.countryShort || '').trim();
   const prefix = country ? `[${country}] ` : '';
-  return `${prefix}VPNGate OpenVPN 节点（抓取时 ${node.sessions} 会话）`;
+  return `${prefix}OpenVPN 节点（抓取时 ${node.sessions} 会话）`;
 }
 
 /** 把节点组装成彩蛋条目（id 从 7 开始，接在 6 个固定友链之后）。 */
@@ -201,7 +201,7 @@ function validateEasterEggItems(items) {
 function buildEasterEggFile(items) {
   return `/**
  * 🌟 ✦ 量子礼花 · 猜你喜欢 ✦ 彩蛋专属数据
- * 包含：6 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 OpenVPN 节点
+ * 包含：6 个固定精选友情链接 + 3 个来自全球节点严格筛选的 OpenVPN 节点
  * 节点标签与会话数均为抓取时刻的快照，构建后不再变化。
  */
 

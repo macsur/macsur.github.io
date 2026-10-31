@@ -1,6 +1,6 @@
 /**
  * 🌟 ✦ 量子礼花 · 猜你喜欢 ✦ 彩蛋专属数据
- * 包含：6 个固定精选友情链接 + 3 个来自 VPNGate 严格筛选的 OpenVPN 节点
+ * 包含：6 个固定精选友情链接 + 3 个来自全球节点严格筛选的 OpenVPN 节点
  * 节点标签与会话数均为抓取时刻的快照，构建后不再变化。
  */
 
@@ -92,10 +92,10 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 7,
-    "text": "104.28.237.61",
+    "text": "144.126.151.157",
     "url": null,
     "isReal": true,
-    "label": "[US] VPNGate OpenVPN 节点（抓取时 0 会话）",
+    "label": "[US] OpenVPN 节点（抓取时 82 会话）",
     "delay": "0.40s",
     "floatDelay": "1.5s",
     "color": "from-rose-500/25 to-red-600/10",
@@ -104,10 +104,10 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 8,
-    "text": "172.81.132.91",
+    "text": "149.255.16.105",
     "url": null,
     "isReal": true,
-    "label": "[US] VPNGate OpenVPN 节点（抓取时 81 会话）",
+    "label": "[RU] OpenVPN 节点（抓取时 0 会话）",
     "delay": "0.46s",
     "floatDelay": "0.3s",
     "color": "from-amber-500/25 to-orange-600/10",
@@ -116,10 +116,10 @@ export const EASTER_EGG_ITEMS: EasterEggItem[] = [
   },
   {
     "id": 9,
-    "text": "221.118.138.87",
+    "text": "95.170.189.73",
     "url": null,
     "isReal": true,
-    "label": "[JP] VPNGate OpenVPN 节点（抓取时 0 会话）",
+    "label": "[RU] OpenVPN 节点（抓取时 0 会话）",
     "delay": "0.52s",
     "floatDelay": "2.4s",
     "color": "from-emerald-500/25 to-teal-600/10",

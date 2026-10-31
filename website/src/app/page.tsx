@@ -213,14 +213,14 @@ export default function Home() {
   const [isShockwaveActive, setIsShockwaveActive] = useState(false);
   const [burstParticles, setBurstParticles] = useState<Array<{ id: number; x: number; y: number; color: string; size: number }>>([]);
 
-  // 🎆 隐蔽彩蛋状态 (✦ 量子礼花 · 猜你喜欢 ✦：6个固定精选友情链接 + 3个来自 VPNGate 的 OpenVPN 节点)
+  // 🎆 隐蔽彩蛋状态 (✦ 量子礼花 · 猜你喜欢 ✦：6个固定精选友情链接 + 3个来自全球节点的 OpenVPN 节点)
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [copiedEasterId, setCopiedEasterId] = useState<number | null>(null);
 
   // 🔗 友情链接弹窗状态 (最右下角独立文字入口，20 个名额网格布局，与彩蛋完全独立)
   const [showFriendLinks, setShowFriendLinks] = useState(false);
 
-  // 彩蛋数据：6个固定精选链接 + 3个来自 VPNGate 的 OpenVPN 节点
+  // 彩蛋数据：6个固定精选链接 + 3个来自全球节点的 OpenVPN 节点
   const easterEggItems: EasterEggItem[] = useMemo(() => EASTER_EGG_ITEMS, []);
 
   // 键盘 ESC 监听
@@ -1887,7 +1887,7 @@ export default function Home() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    绽放 9 枚全息数据碎片 · 包含 6 个精选导航与 3 个来自 VPNGate 的 OpenVPN 节点（点击即复制）
+                    绽放 9 枚全息数据碎片 · 包含 6 个精选导航与 3 个来自全球节点的 OpenVPN 节点（点击即复制）
                   </p>
                 </div>
               </div>
@@ -1980,7 +1980,7 @@ export default function Home() {
             <div className="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>真实 IP 提取自 VPNGate 全球节点，标签会话数为抓取时快照</span>
+                <span>真实 IP 提取自全球节点，标签会话数为抓取时快照</span>
               </div>
               <div className="flex items-center space-x-3">
                 <button

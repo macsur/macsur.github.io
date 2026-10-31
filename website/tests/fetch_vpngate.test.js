@@ -242,7 +242,7 @@ test('首页彩蛋文案不写死 [US]，也不声称节点是「实时」', () 
 
 test('首页彩蛋文案改为按实际数据描述，不承诺具体国别', () => {
   const easterEggBlock = getEasterEggModalSource();
-  assert.match(easterEggBlock, /3 个来自 VPNGate 的 OpenVPN 节点/);
+  assert.match(easterEggBlock, /3 个来自全球节点的 OpenVPN 节点/);
 });
 
 test('生成器源码声明了「构建期会覆写 easterEggData.ts」这一坑位', () => {

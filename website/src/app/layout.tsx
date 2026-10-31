@@ -14,14 +14,21 @@ export const metadata: Metadata = {
   keywords: ["Linux生态", "Github乐园", "Linux脚本", "应用市场", "Docker管理", "BBRv3", "手风琴菜单", "1Panel", "Deepseek"],
   authors: [{ name: "CODE MATRIX 代码矩阵", url: "https://zttz.eu.org" }],
   metadataBase: new URL("https://zttz.eu.org"),
+  openGraph: {
+    images: [{ url: "/og-image.png?v=20261031", width: 1200, height: 1200, alt: "CODE MATRIX 代码矩阵" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [{ url: "/og-image.png?v=20261031", alt: "CODE MATRIX 代码矩阵" }],
+  },
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico?v=20261031" },
+      { url: "/favicon-32x32.png?v=20261031", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png?v=20261031", sizes: "16x16", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon.png?v=20261031", sizes: "180x180", type: "image/png" },
     ],
   },
 };
@@ -62,8 +69,8 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="scroll-smooth dark" suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20261031" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20261031" />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="bg-[#080b11] text-slate-100 min-h-screen antialiased selection:bg-cyan-500 selection:text-white transition-colors duration-300">
