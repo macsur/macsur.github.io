@@ -95,7 +95,10 @@ function fetchReadmeSnippet(repoPath) {
 async function translateViaUserApi(text, type = 'desc', context = '') {
   if (!text || !text.trim()) return null;
   // 没有可用 Key 时不发起请求，直接交给调用方的内置词库/规则兜底。
-  if (!API_KEY) return null;
+  if (!API_KEY) {
+    console.warn(`⚠️ [translateViaUserApi] 未配置 TRANSLATE_API_KEY，跳过 API 翻译`);
+    return null;
+  }
   return new Promise((resolve) => {
     try {
       let systemPrompt = '';
@@ -142,17 +145,37 @@ async function translateViaUserApi(text, type = 'desc', context = '') {
         });
       });
 
-      req.on('error', () => resolve(null));
+      req.on('error', (e) => {
+        console.warn(`⚠️ [translateViaUserApi] 请求失败: ${e.message}`);
+        resolve(null);
+      });
       req.on('timeout', () => {
+        console.warn(`⚠️ [translateViaUserApi] 请求超时`);
         req.destroy();
         resolve(null);
       });
       req.write(payload);
       req.end();
     } catch (e) {
+      console.warn(`⚠️ [translateViaUserApi] 异常: ${e.message}`);
       resolve(null);
     }
   });
+}
+
+/** 带重试的翻译调用：最多重试 3 次，指数退避 */
+async function translateWithRetry(text, type, context = '', maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const result = await translateViaUserApi(text, type, context);
+    if (result) return result;
+    if (attempt < maxRetries) {
+      const delayMs = attempt * 2000;
+      console.log(`   🔄 第 ${attempt} 次翻译失败，${delayMs / 1000}s 后重试...`);
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+  console.warn(`⚠️ 翻译 ${maxRetries} 次均失败，标记为失败`);
+  return null;
 }
 
 /**
@@ -262,25 +285,31 @@ async function main() {
 
     console.log('🤖 正在对今日 TOP 10 项目内容进行自动化深度中文解析（约500字）与润色...');
 
+    let failCount = 0;
     for (const item of rawList) {
       const readmeSnippet = fetchReadmeSnippet(item.repo);
-      let zhDesc = await translateViaUserApi(`${item.repo}: ${item.enDesc}`, 'long_desc', readmeSnippet);
+      let zhDesc = await translateWithRetry(`${item.repo}: ${item.enDesc}`, 'long_desc', readmeSnippet);
       let zhName = item.name;
 
       if (BUILTIN_ZH_DICTIONARY[item.name]) {
         zhName = BUILTIN_ZH_DICTIONARY[item.name].name;
       } else {
         // 尝试利用 AI 为项目名提炼富有科技感的中文副标题/简称
-        const aiZhName = await translateViaUserApi(item.name + ': ' + item.enDesc, 'title');
+        const aiZhName = await translateWithRetry(item.name + ': ' + item.enDesc, 'title');
         if (aiZhName) {
           zhName = `${item.name} · ${aiZhName.replace(/^[“"']+|[”"']+$/g, '')}`;
         }
       }
 
       if (!zhDesc) {
+        // 翻译彻底失败：标记失败，不用英文静默填充
         const fallback = translateRuleBased(item.name, item.enDesc);
         zhName = fallback.zhName;
         zhDesc = fallback.zhDesc;
+        failCount++;
+        console.warn(`❌ [${item.rank}] ${item.repo} 中文深度解析失败，使用规则兜底（英文原文残留）`);
+      } else {
+        console.log(`✅ [${item.rank}] ${item.repo} 中文深度解析完成 (${zhDesc.length} 字)`);
       }
 
       repos.push({
@@ -306,6 +335,14 @@ async function main() {
   if (repos.length < 5) {
     console.warn(`⚠️ 解析到的趋势项目数量不足 (${repos.length} < 5)，保留上一版本数据以防空白覆盖。`);
     return;
+  }
+
+  // 翻译失败标记：如果超过一半项目翻译失败，警告并记录
+  if (failCount > 0) {
+    console.warn(`\n⚠️ 翻译统计：${repos.length - failCount}/${repos.length} 成功，${failCount}/${repos.length} 失败（使用规则兜底）`);
+  }
+  if (failCount > repos.length / 2) {
+    console.error(`❌ 超过半数项目翻译失败 (${failCount}/${repos.length})，可能存在 API 配置问题`);
   }
 
   // 严格按 UTC+8 计算北京时间，避免 GitHub Actions 云端 Ubuntu (UTC+0) 时间戳错乱
