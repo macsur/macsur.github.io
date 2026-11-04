@@ -36767,10 +36767,131 @@ z_uninstall() {
     exit 0
 }
 
+z_list_installed_apps() {
+    clear
+    local gl_hui="${gl_hui:-\033[37m}"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+    echo -e "${gl_huang}      📦 CODE MATRIX 已安装应用列表${gl_bai}"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+
+    local appno_file="/home/docker/appno.txt"
+    local raw_installed=()
+
+    if [ -f "$appno_file" ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            line=$(echo "$line" | tr -d '' | tr -d ' ')
+            [ -n "$line" ] && raw_installed+=("$line")
+        done < "$appno_file"
+    fi
+
+    local total_count=${#raw_installed[@]}
+    if [ "$total_count" -eq 0 ]; then
+        echo -e "${gl_hui}当前系统中暂无已安装的应用记录（/home/docker/appno.txt 为空或不存在）。${gl_bai}"
+        echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+        echo -e "提示: 安装应用后，标记将自动记录在此。"
+        echo -e "${gl_kjlan}==================================================${gl_bai}"
+        return 0
+    fi
+
+    # 清理动态序号映射缓存，供数字直接进入管理
+    rm -f /tmp/.z_installed_disp_map 2>/dev/null || true
+
+    echo -e "${gl_lv}共检测到 ${total_count} 款已安装应用：${gl_bai}"
+    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+    printf "  ${gl_huang}%-6s${gl_bai} | ${gl_kjlan}%-26s${gl_bai} | %s\n" "序号" "应用名称/ID" "分类/类型"
+    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+
+    local idx=0
+    for app_item in "${raw_installed[@]}"; do
+        idx=$((idx + 1))
+        echo "${idx}=${app_item}" >> /tmp/.z_installed_disp_map
+
+        local app_disp_name="$app_item"
+        local app_type_desc="容器/官方应用"
+
+        # 1. 尝试从 BUILTIN_APPS 匹配内置应用名称与分类
+        if [ "${#BUILTIN_APPS[@]}" -gt 0 ]; then
+            for entry in "${BUILTIN_APPS[@]}"; do
+                local b_aid="" b_name="" b_cat="" rest=""
+                IFS='|' read -r b_aid b_name b_cat rest <<< "$entry"
+                if [ "$b_aid" = "$app_item" ]; then
+                    app_disp_name="$b_name (#$b_aid)"
+                    case "$b_cat" in
+                        github)  app_type_desc="开源精选" ;;
+                        ops)     app_type_desc="运维监控" ;;
+                        ai)      app_type_desc="人工智能" ;;
+                        network) app_type_desc="网络穿透" ;;
+                        storage) app_type_desc="网盘存储" ;;
+                        media)   app_type_desc="影音下载" ;;
+                        office)  app_type_desc="办公协作" ;;
+                        *)       app_type_desc="内置应用" ;;
+                    esac
+                    break
+                fi
+            done
+        fi
+
+        # 2. 若未匹配，尝试从 CUSTOM_APPS 匹配第三方应用
+        if [ "$app_disp_name" = "$app_item" ] && [ "${#CUSTOM_APPS[@]}" -gt 0 ]; then
+            for centry in "${CUSTOM_APPS[@]}"; do
+                local c_aid="" c_name="" c_cat="" c_star="" c_alias="" c_desc="" c_conf=""
+                IFS='|' read -r c_aid c_name c_cat c_star c_alias c_desc c_conf <<< "$centry"
+                if [ "$c_aid" = "$app_item" ] || [ "$c_alias" = "$app_item" ]; then
+                    app_disp_name="$c_name ($app_item)"
+                    app_type_desc="第三方扩展"
+                    break
+                fi
+            done
+        fi
+
+        # 3. 若仍未匹配，检查是否存在对应的 .conf 文件
+        if [ "$app_disp_name" = "$app_item" ]; then
+            local possible_conf=""
+            if [ -f "$HOME/apps/${app_item}.conf" ]; then
+                possible_conf="$HOME/apps/${app_item}.conf"
+            elif [ -f "${Z_APPS_DIR:-$HOME/z-apps}/${app_item}.conf" ]; then
+                possible_conf="${Z_APPS_DIR:-$HOME/z-apps}/${app_item}.conf"
+            fi
+            if [ -n "$possible_conf" ]; then
+                local conf_name
+                conf_name=$(grep -E '^[[:space:]]*(local[[:space:]]+)?app_name=' "$possible_conf" 2>/dev/null | head -1 | cut -d'=' -f2- | cut -d'#' -f1 | tr -d '"' | tr -d "'" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                [ -n "$conf_name" ] && app_disp_name="$conf_name ($app_item)"
+                app_type_desc="自定义应用"
+            fi
+        fi
+
+        printf "  ${gl_huang}[%-4s]${gl_bai} | ${gl_lv}%-26s${gl_bai} | ${gl_hui}%s${gl_bai}\n" "$idx" "$app_disp_name" "$app_type_desc"
+    done
+
+    echo -e "${gl_kjlan}--------------------------------------------------${gl_bai}"
+    echo -e "管理操作：输入 ${gl_huang}序号[1-${total_count}]${gl_bai} 直接进入该应用管理，输入 ${gl_huang}0${gl_bai} 返回"
+    echo -e "${gl_kjlan}==================================================${gl_bai}"
+
+    read -e -p "请选择操作 [0-${total_count}]: " inst_choice
+    case "$inst_choice" in
+        0|"")
+            return 0
+            ;;
+        *)
+            if [[ "$inst_choice" =~ ^[0-9]+$ ]] && [ "$inst_choice" -ge 1 ] && [ "$inst_choice" -le "$total_count" ]; then
+                local sel_target
+                sel_target=$(grep "^${inst_choice}=" /tmp/.z_installed_disp_map 2>/dev/null | cut -d'=' -f2-)
+                if [ -n "$sel_target" ]; then
+                    echo -e "${gl_huang}正在打开应用 [${sel_target}] 管理面板...${gl_bai}"
+                    linux_panel "$sel_target"
+                fi
+            else
+                echo -e "${gl_hong}无效的选择: ${inst_choice}${gl_bai}"
+                sleep 1
+            fi
+            ;;
+    esac
+}
+
 z_main_menu() {
     while true; do
         clear
-        local custom_cnt=48
+        local custom_cnt=51
         if declare -f load_custom_apps >/dev/null 2>&1; then
             load_custom_apps 2>/dev/null || true
             [ "${#CUSTOM_APPS[@]}" -gt 0 ] && custom_cnt="${#CUSTOM_APPS[@]}"
@@ -36780,10 +36901,10 @@ z_main_menu() {
         echo -e "${gl_kjlan}==================================================${gl_bai}"
         echo -e "${gl_lv}CODE MATRIX REVOLUTION${gl_bai}"
         echo -e "${gl_bai}欢迎来到代码矩阵，矩阵已就位，只等你敲下回车${gl_bai}"
-        echo -e "${gl_kjlan}1. ${gl_bai}自用应用市场列表 (z app)"
-        echo -e "${gl_kjlan}2. ${gl_bai}从 GitHub 同步自用配置 (z app sync)"
-        echo -e "${gl_kjlan}3. ${gl_bai}第三方与社区扩展应用 [${custom_cnt} 款]"
-        echo -e "${gl_kjlan}4. ${gl_bai}上游分类折叠市场 (k app+)"
+        echo -e "${gl_kjlan}1. ${gl_bai}CODE MATRIX分类折叠菜单 (k app+)"
+        echo -e "${gl_kjlan}2. ${gl_bai}自用应用市场列表 (z app)"
+        echo -e "${gl_kjlan}3. ${gl_bai}从 GitHub 同步自用配置 (z app sync)"
+        echo -e "${gl_kjlan}4. ${gl_bai}第三方与社区扩展应用 [${custom_cnt} 款]"
         echo -e "${gl_kjlan}5. ${gl_bai}切换至上游主菜单 (k)"
         echo -e "${gl_kjlan}6. ${gl_bai}在线更新脚本 (z update)"
         echo -e "${gl_kjlan}7. ${gl_bai}卸载代码矩阵脚本 (z uninstall)"
@@ -36793,18 +36914,18 @@ z_main_menu() {
         read -e -p "请输入你的选择: " z_choice
         case "$z_choice" in
             1)
+                z_run_checked "CODE MATRIX分类折叠菜单" linux_panel_accordion
+                ;;
+            2)
                 z_run_checked "z app 列表" z_list_apps interactive
                 break_end
                 ;;
-            2)
+            3)
                 z_run_checked "z app sync" z_sync_apps
                 break_end
                 ;;
-            3)
-                z_run_checked "第三方应用市场" linux_panel_accordion "custom"
-                ;;
             4)
-                z_run_checked "上游分类市场" linux_panel_accordion
+                z_run_checked "第三方应用市场" linux_panel_accordion "custom"
                 ;;
             5)
                 kejilion_sh
@@ -36818,8 +36939,12 @@ z_main_menu() {
                 z_uninstall
                 break_end
                 ;;
-            0)
+            0|x|X)
                 break
+                ;;
+            z|Z)
+                z_run_checked "已安装应用" z_list_installed_apps
+                break_end
                 ;;
             *)
                 echo "无效的选择"
