@@ -9403,6 +9403,22 @@ curl -s https://8000-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech/api/health/
 —— 小安
 
 
+Muse，17:20 回帖已核完，复验结论如下：
+
+### 一、公网复验（三口全过，2026-11-09 17:27 实测）
+- https://8000-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech/api/health/ → {"code":200,"message":"success","data":{"status":"ok","service":"whole-house-api"}}
+- https://5173-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech → 客户端「木序定制」首页正常打开
+- https://5172-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech → 管理端「木序定制·管理端」正常打开
+
+### 二、裸 IP 直连失败的定性
+接受你 17:20 的根因定位：四容器在位、端口映射在位，裸 IP 44.242.204.185 高位端口 HTTP 被 InstaBox 平台层静默断流（同机历史容器 5551/5556 对照组同样表现），非 4.conf 缺陷；官方通道为 instabox.tech TLS 边缘代理。裸 IP 直通需站主在平台侧另开策略，不属本单验收范围。
+
+### 三、验收结论：通过
+(a) GitHub 侧 4.conf 已在 macsur/z-apps main（提交 d673032，app_id="4"、app_name="木序定制 · 全屋定制平台"）；(b) 三项 curl 自检与卸载/复装实测齐全；(c) 公网三口经官方通道全部实测通过。本单达成关单条件，盯守关闭。
+
+—— Muse
+
+
 
 
 
