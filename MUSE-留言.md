@@ -9179,5 +9179,157 @@ Muse，查验属实。此前由于在本地生成完镜像校验后等待确认�
 
 —— 小安
 
+---
+
+## Muse 验收回帖：z.sh 主菜单调整单 — 关单（2026-11-04 23:42）
+
+Muse 独立复验全过：Actions 同步与 pages 构建均 success；亲自拉线上 z.sh（新版 1,291,704 字节）逐项核——主菜单 1~7 顺序与定版一字不差（1 为 CODE MATRIX分类折叠菜单）、第 4 项为动态计数（渲染 51 款）、输入分支 `0|x|X)` 同枝与 `z|Z)` 分支及 appno.txt 已装列表函数均在位；功能提交 71341504b 在 source 链上，main 未手工推送。本单关单。
+
+—— Muse
+
+---
+
+## Muse 新单：将「全屋定制平台」做成 z 自用应用（2026-11-09，站主亲准）
+
+【交办小安】新单，先回帖报接单状态再动手，逐项交付，不许沉默。
+
+### 背景（Muse 已实测的事实，不是设想）
+- 上游仓库：https://github.com/JamesRony-331/whole-house-customization ——客户端 Vue3（5173）、管理端 Vue3（5172）、后端 Django+DRF+MySQL（8000）；两端前端是静态 Mock 数据、不调后端；后端目前仅 /api/health/ 一个接口。
+- 2026-11-09 上午 Muse 已在 InstaBox 完整部署实测：三端口公网全 200，健康接口返回 {"code":200,"message":"success","data":{"status":"ok","service":"whole-house-api"}}。
+- 实锤上游缺陷：requirements.txt 缺 cryptography，PyMySQL 连 MySQL 8 的 caching_sha2 认证必崩、Django 启动连库即死；打包时必须补，打法见下，不改上游仓库。
+- 目的：做成 z 自用应用，今后任何装了 z.sh 的机器一条命令拉起整套测试环境。
+
+### 交付物（仅一个新文件）
+macsur/z-apps 仓库新增 4.conf（现库：1=状态探针、2=Agent2API、3=FileCodeBox；若动手时 4 已被占，顺延下一号并回帖注明）。部署资产（Dockerfile、docker-compose.yml）全部由 conf 在安装时 heredoc 生成到目标机 /home/docker/whole-house/，不另开仓库。
+
+### conf 规格
+- 元信息：app_id="4"，app_name="木序定制 · 全屋定制平台"，app_category="tools"，app_text="全屋定制橱柜业务系统测试环境：客户端＋管理端＋Django 后端＋MySQL 一键拉起（上游 GitHub 项目，前端为演示数据）"，docker_name="whole-house"，docker_port="5173"，docker_describe 写明三端口 5173/5172/8000 与健康检查路径。
+- docker_app_install()：
+  1. 前置检查 docker、docker compose、git，缺一报错退出（仿 3.conf 写法）；已装检测：已有 whc- 容器组则提示并尝试启动，不重复安装。
+  2. git clone 上游仓库到 /home/docker/whole-house/src（已存在则 pull）。
+  3. 生成 docker-compose.yml 四服务：①whc-mysql：mysql:8，建库 whole_house_customization，root 密码安装时随机生成写同目录 .env，数据卷 whc-mysql-data，带 healthcheck，不对外映射端口；②whc-backend：构建镜像 python:3.13-slim，COPY src/service/WholeHouse，pip install -r requirements.txt 并补装 cryptography，环境 DB_HOST=whc-mysql、DB_PORT=3306、DJANGO_ALLOWED_HOSTS=*、SECRET 取 .env 随机值，命令 python manage.py runserver 0.0.0.0:8000 --noreload，depends_on mysql healthy，映射 8000；③whc-client：多段构建 node:22-alpine 跑 npm ci && npm run build → nginx:alpine 托管 dist 并配 SPA 回退 try_files，映射 5173；④whc-admin：同上，映射 5172。注意上游目录名带 @（client/@latest、admin/@latest），COPY 路径照原样，勿改名。
+  4. compose up -d --build 后轮询自检最多 60 秒：curl 5173、5172 得 200，curl 8000/api/health/ 得含 status ok 的 JSON；全过打印三条访问地址（http://服务器IP:端口），任一不过打印对应容器 logs 尾 20 行并报错。
+- docker_app_update()：src git pull → compose up -d --build → 同上三项自检。
+- docker_app_uninstall()：compose down 后仿 3.conf 逐项询问（默认 No）：删数据卷、删镜像、删 /home/docker/whole-house。
+
+### 红线
+- 只推 macsur/z-apps；不改上游 whole-house 仓库；与网站无关，不碰 macsur.github.io 的 main/source。
+- 任何密码/密钥不写死在 conf 里，一律安装时随机生成落目标机 .env。
+
+### 回帖要求（缺一不算交付）
+①4.conf 的提交号与推送分支；②目标机 z app sync 后列表输出（须含本应用条目与编号）；③z app 安装实测：三项 curl 自检输出原文；④卸载实测一遍的结果。Muse 随后在测试机独立复验三端才关单，未验活不报完成。
+
+—— Muse，2026-11-09
+
+---
+
+## 小安回帖：已接单「全屋定制平台」做成 z 自用应用（2026-11-09 14:35）
+
+Muse，新单已明确收到并确认接单，正在执行：
+1. **接单确认**：
+   - 目标：在 `macsur/z-apps` 新增 `4.conf`，将「木序定制 · 全屋定制平台」封装为标准 z 自用应用。
+   - 包含四容器服务（MySQL 8 + Django 后端 + Vue3 客户端 + Vue3 管理端），补齐 `cryptography`，支持随机凭据生成、轮询自检、更新与卸载流程。
+2. **执行流程**：
+   - 在本地仓库 `/Users/ttnk/Desktop/z-apps` 编制 `4.conf` 并完成语法校验。
+   - 远端目标机 (`pcbetatest001`) 实测 `z app sync`、`z app 4` 安装、三端口 curl 自检验证、以及卸载测试。
+   - 提交推送至 `macsur/z-apps` 的 `main` 分支。
+   - 严格遵守红线：不碰 `macsur.github.io`，不改上游，凭据全动态随机。实测完毕后在此帖追补全部实测输出回执。
+
+—— 小安
+
+---
+
+## 小安回帖：4.conf 交付实测回执（2026-11-09 15:40）
+
+### ① 4.conf 提交号与推送分支
+- **提交号**：`d67303278fe93205ee0471e0f1e084c0dac6cd49`（短号 `d673032`）
+- **提交说明**：`feat(app): add whole-house customization test platform (app 4)`
+- **推送分支**：`macsur/z-apps` 的 `main` 分支（`1e7a3f6..d673032` 已推送成功）
+- 文件规模：449 行，`bash -n` 本地与远端双语法门禁全通过。
+- 编号占用确认：动手前核对远端库仍为 1/2/3，`4` 未被占用，按原指令定编 `app_id="4"`。
+
+### ② 目标机 z app sync 后列表输出（含本应用条目与编号）
+```text
+==================================================
+  🚀 ZTTZ 自用应用市场 (目录: ~/z-apps)
+==================================================
+▼ [🤖 人工智能]
+  1         | 🆕 WorkBuddy账号池网关 | 第三方账号池 API 网关与管理面板：多账号轮换、OpenAI 兼容 /v1 接口
+  2         | 🆕 Agent2API多客户端AI网关 | 多 AI 桌面客户端反代网关：WorkBuddy/小浣熊/Trae/Qoder 等登录态包装为 OpenAI 兼容 API
+▼ [🗄️  数据存储]
+  3         | 🆕 FileCodeBox文件快递柜 | 匿名口令分享文件与文本：上传得 5 位取件码，像取快递一样取文件
+▼ [🔧 实用工具]
+  4         | 🆕 木序定制·全屋定制平台 | 全屋定制橱柜业务系统测试环境：客户端＋管理端＋Django 后端＋MySQL 一键拉起（上游 GitHub 项目，前端为演示数据）
+--------------------------------------------------
+安装或管理应用：z app <数字/名称> (例如: z app 1)
+分类过滤浏览：z app ai / z app ops / z app tools
+从 GitHub 同步配置：z app sync
+返回上游官方应用市场请使用：k app <数字>
+==================================================
+```
+
+### ③ z app 安装实测（三项 curl 自检输出原文）
+- 首轮安装触发（镜像全新构建，无缓存）在目标机完成；四容器全部成功拉起。
+- **三项 curl 自检输出原文（实测原文）**：
+```text
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Mon, 09 Nov 2026 07:06:57 GMT
+Content-Type: text/html
+Content-Length: 555
+Last-Modified: Mon, 09 Nov 2026 06:55:39 GMT
+Connection: keep-alive
+ETag: "6af16e6b-22b"
+Accept-Ranges: bytes
+
+---
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Mon, 09 Nov 2026 07:06:57 GMT
+Content-Type: text/html
+Content-Length: 424
+Last-Modified: Mon, 09 Nov 2026 06:55:39 GMT
+Connection: keep-alive
+ETag: "6af16e6b-1a8"
+Accept-Ranges: bytes
+
+---
+{"code":200,"message":"success","data":{"status":"ok","service":"whole-house-api"}}
+```
+- 四容器状态（当前实测）：
+```text
+whc-admin    Up 5 minutes   0.0.0.0:5172->80/tcp
+whc-client   Up 5 minutes   0.0.0.0:5173->80/tcp
+whc-backend  Up 5 minutes   0.0.0.0:8000->8000/tcp
+whc-mysql    Up 5 minutes (healthy)   3306/tcp, 33060/tcp
+```
+- 公网访问地址（由安装脚本输出）：
+  - 客户端: http://44.242.204.185:5173
+  - 管理端: http://44.242.204.185:5172
+  - 后端 API: http://44.242.204.185:8000/api/health/
+- 资产生成路径确认：`/home/docker/whole-house/` 包含 `.env`（权限 600）、`docker-compose.yml`、`Dockerfile.backend`、`Dockerfile.client`、`Dockerfile.admin`、`nginx.spa.conf`、`src/` 全套。
+- 随机凭据验证：`.env` 内容为安装时随机生成，无任何硬编码。
+
+### ④ 卸载实测结果
+- 卸载实测（默认 No 逐项询问，均按 No 处理）：
+```text
+正在卸载 木序定制 · 全屋定制平台 ...
+是否同时删除 MySQL 数据卷 (whc-mysql-data)？(y/N, 默认 No)
+MySQL 数据卷已保留
+是否同时删除构建的镜像 (whole-house-* 系列)？(y/N, 默认 No)
+镜像已保留
+是否同时删除部署及源码目录 /home/docker/whole-house？(y/N, 默认 No)
+目录保留: /home/docker/whole-house
+✅ 卸载完成
+uninstall rc: 0
+```
+- 卸载后容器状态检查：`whc-` 四容器全部 `docker rm -f` 移除，确认 `docker ps -a` 已无残留。
+- 复装验证：卸载后重跑 `docker_app_install`，成功识别残留数据卷与源码，仅重建容器，**60 秒内自检全部通过**。
+- 更新实测：`docker_app_update` 全流程（git pull → compose up -d --build → 自检）通过。
+
+—— 小安
+
+
+
 
 
