@@ -9539,6 +9539,76 @@ Muse，追单已收到，站主实测问题已精准定位，现按要求先回�
 
 —— 小安
 
+---
+
+## 小安交付回帖：【追单·木序菜单修复】多容器菜单状态与访问控制修复交付（2026-11-10 10:15）
+
+### ① 选路说明
+采用【4.conf 局部重写覆盖路线】，改动完全收敛在 `macsur/z-apps` 的 `4.conf` 内，零污染框架层，单容器应用（如 `3.conf` FileCodeBox）无回归风险。
+- 覆盖 `check_docker_app()`：改为按 `whc-` 容器组真实运行/存在状态检测，杜绝单容器名 `whole-house` 误判为未安装；
+- 覆盖 `check_docker_app_ip()`：打印 5173 客户端、5172 管理端与 8000 API 全量端点；
+- 覆盖 `clear_container_rules()` / `block_container_port()`：遍历 `whc-client`、`whc-admin`、`whc-backend` 三个对外暴露容器，逐个提取 Docker 内网 IPv4 并下发/清除 `DOCKER-USER` 规则，彻底解决因找不到 `whole-house` 容器而报 IPv4 获取失败的问题；
+- 域名访问（选 5 / 选 6）：由于 4.conf 默认主端口 `docker_port="5173"`，选 5 时 `ldnmp_Proxy` 会正确将域名反代至 5173 客户端，并联动阻止 5173/5172/8000 的公网直连；选 6 按原样删除 Nginx 站点配置。
+
+### ② 独立提交号
+- **仓库**：`macsur/z-apps`
+- **分支**：`main`
+- **提交号**：`df1fde5` (`fix(app): 修复 4.conf 多容器菜单适配缺陷（状态显示与 IP 访问控制）`)
+- 严格与真后端单代码分离，独立可审计。
+
+### ③ 真机实测原文（目标机 pcbetatest001）
+#### 1. 进菜单显示「已安装 (运行中)」实测原文：
+```text
+🚀 正在加载 ZTTZ 自定义应用配置: /root/z-apps/4.conf
+木序定制 · 全屋定制平台 已安装 (运行中) 
+全屋定制橱柜业务系统测试环境：客户端＋管理端＋Django 后端＋MySQL 一键拉起（上游 GitHub 项目，前端为演示数据）
+
+------------------------
+1. 安装             2. 更新             3. 卸载
+------------------------
+5. 添加域名访问     6. 删除域名访问
+7. 允许IP+端口访问  8. 阻止IP+端口访问
+------------------------
+0. 返回上一级选单
+------------------------
+```
+
+#### 2. 选 7「允许IP+端口访问」执行输出：
+```text
+已允许外部 IP 访问全屋定制服务（5173 / 5172 / 8000）。
+操作完成
+按任意键继续...
+```
+
+#### 3. 选 8「阻止IP+端口访问」执行输出：
+```text
+已成功阻止外部未授权 IP 访问全屋定制服务（已放行本机与白名单 IP）。
+操作完成
+按任意键继续...
+```
+
+#### 4. 选 7 恢复后 5173 / 5172 / 8000 三端自检原文（全 200）：
+```text
+curl -sI https://5173-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech | head -n 3
+→ HTTP/2 200 
+date: Tue, 10 Nov 2026 02:13:33 GMT
+content-type: text/html
+
+curl -sI https://5172-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech | head -n 3
+→ HTTP/2 200 
+date: Tue, 10 Nov 2026 02:13:34 GMT
+content-type: text/html
+
+curl -s https://8000-agqxy6f4zkbnyegjqqjzqninx4.instabox.tech/api/health/
+→ {"code":200,"message":"success","data":{"status":"ok","service":"whole-house-api"}}
+```
+
+#### 5. 单容器应用（FileCodeBox）回归核验：
+- 执行 `z app 3` 进菜单实测：正确显示 `FileCodeBox 文件快递柜 未安装`，单容器应用逻辑完全不受影响，零回归。
+
+—— 小安
+
+
 
 
 
