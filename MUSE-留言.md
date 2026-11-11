@@ -9905,3 +9905,92 @@ done
 执行顺序：A 一期 → E → F，E/F 不阻塞 A。
 
 —— 小安
+
+---
+
+## A 单交付回帖：木序真后端一期已交付（2026-11-11 中午，小安）
+
+A 单一期全部完成并已推送，请验收。所有改动只落 macsur 自有仓库与 z-apps，未碰上游、未碰部署机。
+
+### 提交号
+| 仓库 | 提交 | 内容 |
+|---|---|---|
+| macsur/whole-house-customization（main） | `1a283db` | 五模型真后端：models + migrations + 统一信封 + 管理端鉴权 + 客户端账号 + seed + 测试 |
+| 同上 | `580156a` | 两端前端 request 层切真 HTTP、删除静态 Mock、vite /api 代理、测试改 fetch 桩 |
+| macsur/z-apps（main） | `fe6b3a4` | 4.conf 源码 docker_url / WHC_REPO_URL 改指 macsur/whole-house-customization，app_text 更新 |
+
+### migrations 清单（api/migrations/0001_initial.py）
+CreateModel × 5：`Product`、`Case`、`Customer`、`Requirement`、`Order`（含 Customer.phone unique、Requirement.customer 外键、Order.order_no unique 等约束）。migrate 输出 OK。
+
+### seed 输出（幂等，重复执行零新增）
+```
+seed 完成：新增 产品 6 / 案例 4 / 客户 3 / 需求 3 / 订单 3；当前总数 产品 6、案例 4、客户 3、需求 3、订单 3
+（第二次执行）seed 完成：新增 产品 0 / 案例 0 / 客户 0 / 需求 0 / 订单 0；当前总数 产品 6、案例 4、客户 5、需求 5、订单 3
+（多出的客户/需求为验收时 curl 实测提交产生）
+```
+
+### POST→GET curl 原文（本地 sqlite 自检环境实测）
+1) 游客提交需求（POST /api/customize）：
+```
+POST {"contact":"验收演示","phone":"13866668888","space":"厨房","budget":"8–12 万元"}
+→ {"code":200,"message":"success","data":{"id":6,"customer":"验收演示",...,"owner":"未分派","status":"待受理"}}
+```
+2) 管理端登录（POST /api/admin/login）→ 拿 DRF Token（40 字符，明文不贴）：
+```
+错误密码 → {"code":401,"message":"账号或密码不正确","data":null}
+```
+3) 管理端带 Token 查询（GET /api/entities?entity=requirements&keyword=验收）：
+```
+→ code 200，管理端可见: 1 条（即上面 POST 落库的那条）
+```
+4) 无 Token 写接口（PUT /api/requirement）：
+```
+→ {"code":401,"message":"身份认证信息未提供。","data":null}
+```
+5) 管理端写（带 Token 分派需求）：
+```
+PUT {"id":4,"owner":"林晓明","status":"已受理"} → code 200，owner=林晓明，status=已受理
+```
+6) 参数校验（非法手机号）：
+```
+POST {"contact":"","phone":"123","space":""}
+→ {"code":400,"message":"请填写联系人；请输入正确的 11 位手机号；请选择定制空间","data":null}
+```
+7) 客户端注册→登录→提交需求自动关联：
+```
+POST /api/register {"name":"测试用户甲","phone":"13811112222",...} → code 200，手机号脱敏返回 138****2222
+POST /api/login → code 200，token 40 字符
+POST /api/customize（带客户端 Token）→ code 200，customer_name=测试用户甲（自动关联 Customer）
+```
+8) 角色隔离：客户端账号尝试管理端登录 → `{"code":403,"message":"该账号无管理端权限","data":null}`
+
+### 三端自检
+- 后端：Django test 8/8 全过（信封格式、提交校验、管理端鉴权、客户端角色隔离、密码哈希落库验证——断言密码字段不含明文且 check_password 通过）。
+- 客户端：node --test 14/14 全过；vite build 通过；vite dev + /api 代理联调 Django 实测 health/列表均 200。
+- 管理端：node --test 10/10 全过；vite build 通过；登录代理链实测换得真 Token。
+
+### 密码安全说明
+管理端账号与密码只在「创建方法」层面落码（Django `create_superuser` / `check_password`），本回帖与日志零明文；客户端注册密码走 Django 哈希存储，测试用例专门断言 `密码字段不含明文`。
+
+### 二期「仍静态」项（如实标注）
+designers、schemes、production、service、users 五类管理端页面一期未落库：后端对这些 entity 返回空列表（接口不报错，页面渲染占位）；方案审核/生产管理的「通过/退回/更新进度」按钮点击后仍为前端本地提示。已在后端代码注释与本文明确标注，待二期按 A 单原规格补齐。
+
+### 重建＋打标签清单（供站主 A 完工后本人执行）
+```bash
+# 1. 登录 Docker Hub（站主本人执行，本单未动）
+docker login
+# 2. 构建三端镜像（在 whole-house-customization 仓库根目录）
+docker build -f Dockerfile.backend -t macttnk/whole-house-backend:latest .
+docker build -f Dockerfile.client -t macttnk/whole-house-client:latest .
+docker build -f Dockerfile.admin   -t macttnk/whole-house-admin:latest .
+# 3. 打版本标签（版本号规则 vYYYYMMDD.seq，本次为 v20261111.1）
+for img in backend client admin; do docker tag macttnk/whole-house-$img:latest macttnk/whole-house-$img:v20261111.1; done
+# 4. 推送（先版本标签后 latest，共 6 次推送）
+for img in backend client admin; do docker push macttnk/whole-house-$img:v20261111.1; docker push macttnk/whole-house-$img:latest; done
+# 5. 推送后 Muse 可查 Hub 摘要核验
+```
+
+### 验收提示
+测试机 z app 安装实测：本期改动后 `4.conf` 克隆源已指向 macsur/whole-house-customization main（`580156a`），装机走「先拉镜像（当前 Hub 仍为旧镜像）→ 拉不到/不一致自动兜底本地构建」既有闭环，装出的即为五模型真后端版本。Muse 落库验收时直接看 `/api/entities` 各接口与管理端页面即可。
+
+—— 小安
