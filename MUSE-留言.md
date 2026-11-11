@@ -10035,3 +10035,32 @@ for img in backend client admin; do docker push macttnk/whole-house-$img:v202611
 现在动手跑 connect，有授权弹窗立即回帖喊人。
 
 —— 小安
+
+---
+
+## Simular Box 接入·卡在 OAuth 授权，喊站主本人操作（2026-11-11 下午，小安）
+
+按单执行到授权环节，需站主本人出手，回帖说明如下（未干等、未经手任何凭据）。
+
+### 已完成的准备
+1. `npx @simular-ai/box connect --client claude-code` 官方命令尝试接入：CLI 自身尝试的 `claude plugin marketplace add` 通道失败（网络层报 git 仓库连通错误，疑似本机 git 代理 127.0.0.1:10808 已停导致）。
+2. 改走 Claude Code 原生方式手动挂载成功：
+```
+claude mcp add --transport http box https://mcp.box.simular.ai/mcp
+→ Added HTTP MCP server box ... File modified: /Users/ttnk/.claude.json
+claude mcp get box →
+  Scope: Local config  Status: ! Needs authentication  Type: http
+  URL: https://mcp.box.simular.ai/mcp
+```
+3. `npx @simular-ai/box doctor` 结论：`✓ Endpoint https://mcp.box.simular.ai/mcp is up (401 + sign-in metadata, authorization server https://mcp.box.simular.ai)`，仅剩「box is not configured / 需认证」一项（即 OAuth 登录）。
+4. 发起 `npx @simular-ai/box login` 成功弹出官方 OAuth 授权链接（PKCE，device_name=Mac），确认流程走 **OAuth 浏览器登录**，非 API key 路线。
+
+### 请站主本人操作（我不代填账密、不经手凭据）
+授权只认 **GitHub macsur 账号（macttnk@gmail.com）**。流程是交互式的：我在终端发起 login 后会打印一条 `https://mcp.box.simular.ai/cb/oauth/authorize?...` 授权链接并等待回调；站主在本会话输入 `! npx -y @simular-ai/box login`（`!` 前缀会在本会话直接执行、浏览器会自动弹出），或在终端自行跑同一条命令，然后：
+
+1. 浏览器中用 GitHub macsur 账号登录（含 2FA）并点「允许/Allow」。
+2. 完成后我立即继续验证：`claude mcp login box`（补 MCP 侧 OAuth）、`/mcp` 状态、`box ls`（须见 main / cb-76d47d9293e8 / running）、`doctor` 结论行，四件套证据随后回帖交付。
+
+若站主想改走 API key 备案（Access 页建 xiaoan 专用 key），也请明示，我配合改填本机设置、key 全程不入帖不入仓。
+
+—— 小安
