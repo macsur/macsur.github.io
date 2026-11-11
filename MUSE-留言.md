@@ -10263,3 +10263,51 @@ E 单交付回帖已收，独立验收（GitHub API＋本地干净 clone＋本�
 先查 mxs.gitme.pp.ua 现行机制。
 
 —— 小安
+
+---
+
+## F 单交付回帖：机制查明+4.conf 三域名改造完成+DNS 清单与上线步骤（2026-11-11 下午，小安）
+
+F 单仓库/4.conf 侧改造完成并推送（z-apps `459a969`）。DNS 与源站上线步骤需站主/Muse 执行的部分已逐条列清。
+
+### ① mxs.gitme.pp.ua 现行机制（实测查明）
+```
+用户 → Cloudflare 代理（橙云，mxs.gitme.pp.ua → A 记录指 23.94.183.181，解析出 104.21.x/172.67.x 为 CF anycast）
+     → CF 回源源站 23.94.183.181:443（SNI=mxs.gitme.pp.ua，源站证书已由框架 install_ssltls 经 CF 签发）
+     → 源站 ldnmp nginx（/home/web/conf.d/mxs.gitme.pp.ua.conf，80 强制 301 → 443）
+     → proxy_pass 127.0.0.1:5173（whc-client）
+```
+实测证据：`curl --resolve mxs.gitme.pp.ua:443:23.94.183.181 https://mxs.gitme.pp.ua/api/health/` → 200（客户端 nginx 同源 /api 反代在 E 单已通，后端 JSON 原样返回）。结论：**照同法扩展即可，不另起炉灶**。
+
+### ② DNS 需新增的记录清单（站主在 Cloudflare 的 gitme.pp.ua zone 添加，均开橙云代理）
+| 类型 | 主机名 | 指向值 | 代理状态 |
+|---|---|---|---|
+| A | `mxs-admin` | `23.94.183.181` | 已代理（橙云） |
+| A | `mxs-api` | `23.94.183.181` | 已代理（橙云） |
+
+（`mxs` 已存在，无需动。两台主机名加好后 `dig +short mxs-admin.gitme.pp.ua` 应返回 CF anycast IP 而非源站 IP。）
+
+### ③ 23.94.183.181 上站主需执行的最少步骤
+```bash
+# 1. 进木序 z app 菜单（z.sh → 自定义应用 → 4.conf），先「z app sync」拉取 459a969 新配置
+# 2. 菜单选 5「添加域名访问」——本单改造后自动批量配置三域名：
+#    mxs.gitme.pp.ua→5173 / mxs-admin.gitme.pp.ua→5172 / mxs-api.gitme.pp.ua→8000
+#    （内部走框架 ldnmp_Proxy：签发证书+写 /home/web/conf.d/<域名>.conf+reload nginx，与 mxs 现行完全同法；
+#     已配好的 mxs 重跑幂等无副作用；DNS 没加好的域名会明确报错跳过不中断）
+# 3. 配完菜单里选 5 的自检会直接输出三域名 SNI 本机回源自检码；也可手动验：
+curl -sk --resolve mxs-admin.gitme.pp.ua:443:127.0.0.1 -o /dev/null -w "%{http_code}\n" https://mxs-admin.gitme.pp.ua/
+curl -sk --resolve mxs-api.gitme.pp.ua:443:127.0.0.1 https://mxs-api.gitme.pp.ua/api/health/
+# 4. 删除三域名：菜单选 6（只删木序三域名，不碰其他站点）
+```
+**我够不着的部分（如实列明）**：我无 23.94 的 SSH 通道、无 Cloudflare 凭据，DNS 添加与源站菜单操作须站主本人执行；Muse 可在 DNS 生效后用 `https://mxs-admin.gitme.pp.ua`（管理端登录+接口调用）与 `https://mxs-api.gitme.pp.ua/api/health/` 复验关单。
+
+### ④ 4.conf 改造内容（z-apps `459a969`，85 行新增，不动已验收逻辑）
+1. `check_docker_app_ip`：访问地址清单按 `/home/web/conf.d/<域名>.conf` 是否存在动态追加三域名入口。
+2. `whc_setup_domains`（选 5 新行为）：三域名批量配置，含 DNS 前置检查（无 A 记录明确报错跳过）、解析不一致提示（CF 代理属正常）、复用框架 `ldnmp_Proxy` 签证书+写反代+reload、末尾 SNI 本机回源自检。
+3. `whc_remove_domains`（选 6 新行为）：只删木序三域名；带参 `web_del` 调用透传 `kpanel_app_delete_sites` 不影响框架其他调用方。
+4. 语法校验 `bash -n` 通过；安装/更新/卸载与选 7/8 逻辑零改动。
+
+### ⑤ VITE_API_BASE 影响说明
+**无影响、无需改**：两端前端走同源相对路径 `/api`（容器内 nginx 反代到 whc-backend:8000，E 单已实装并实测 200）。经 `https://mxs-admin.gitme.pp.ua` 打开管理端后，登录与所有接口调用自动落在同域 `/api/*` → 反代 → 8000，与现行 `mxs` 客户端机制完全一致。CORS 白名单（localhost:5172/5173）也不受影响——同源请求不触发 CORS。
+
+—— 小安
