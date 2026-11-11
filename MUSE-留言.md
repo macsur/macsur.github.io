@@ -10166,3 +10166,69 @@ npx @simular-ai/box rsh main "echo box-ok && ls /workspace && uname -a"
 先动手 E1 后端+前端+compose 持久卷，再测试机实测。
 
 —— 小安
+
+---
+
+## E 单交付回帖：户型图上传（E1）落库+持久卷，E2 测试机全程实测补证（2026-11-11 下午，小安）
+
+E 单全部完成并推送，请验收。提交与 A 分开、独立可审计。
+
+### 提交号
+| 仓库 | 提交 | 内容 |
+|---|---|---|
+| macsur/whole-house-customization（main） | `1860c0c` | E1：Requirement 加 floor_plan_size（0002/0003 migrations）、POST /api/requirements multipart 真上传、持久卷存储、GET /api/floorplan 管理端查看/下载、客户端真 file input+FormData、管理端列表附件标记+详情页查看下载链接、nginx 同源 /api 反代、compose 增 whc-media 卷 |
+| macsur/z-apps（main） | `4fa0356` | 4.conf 同步 E1：内嵌 compose 增 whc-media 卷挂载、内嵌 nginx 增 /api 反代与 client_max_body_size 12m |
+
+### E1 关键口径（与单子逐条对齐）
+- 附件类型 jpg/png/webp/PDF、单文件 ≤10MB；超限报「户型图不能超过 10MB」、类型错报「户型图仅支持 jpg/png/webp 图片或 PDF 文件」，前后端同口径，绝不静默失败。
+- multipart 真上传：客户端提交改为 `POST /api/requirements`（FormData，附件字段 floorPlan）；Requirement 模型附件字段：floor_plan_file（原始文件名）/ floor_plan_path（存储路径）/ floor_plan_type（MIME）/ floor_plan_size（字节）。
+- **持久卷**：compose 新增 `whc-media` 卷挂载 `whc-backend:/data/media`（与 whc-mysql-data 同级命名卷），容器重建/z app 更新不丢。
+- 管理端：需求列表新增「附件」列（📎 有 / —）；详情页「户型文件」显示文件名+大小，可点查看（新窗）与下载；经 `GET /api/floorplan?requirement=<id>`（需真登录，未登录 401）。
+- 关联口径：注册即在 Customer 表按手机号建/关联一条客户记录（User.username=手机号 ↔ Customer.phone=手机号）；已登录用户提交需求自动关联其客户身份；游客仍可不登录提交（游客提交也幂等建档）。
+
+### 测试机实测原文（pcbetatest001，instabox 通道执行；源码已同步至 1860c0c 并 up -d --build 重建三容器）
+1. migrate+seed：
+```
+Applying api.0002_requirement_floor_plan_size... OK / 0003... OK
+seed 完成：新增 产品 6 / 案例 4 / 客户 3 / 需求 3 / 订单 3
+```
+2. E2 注册新用户：
+```
+POST /api/register {"name":"E2实测用户","phone":"13899990001",...}
+→ {"code":200,"data":{"id":1,"token":"8942…(40字符)","name":"E2实测用户","phone":"138****0001"}}
+```
+3. E1 带图提交需求：
+```
+POST /api/requirements -F contact=E2实测用户 -F phone=13899990001 -F space=厨房 -F floorPlan=@/tmp/fp-test.png
+→ {"code":200,"data":{"id":4,"customer":"E2实测用户",...,"floor_plan_file":"fp-test.png","floor_plan_type":"image/png","floor_plan_size":25,"has_attachment":true}}
+```
+4. 附件落持久卷（独立挂卷核验）：
+```
+docker run --rm -v whole-house_whc-media:/data alpine ls /data/floorplans/
+→ floorplan_5f68bb8775934d46b229681959dd4d0e.png
+库内字段：fp-test.png | floorplans/floorplan_5f68…png | image/png | 25
+```
+5. 管理端可见+下载（测试机验收管理员 xiaoan_test，密码随机生成仅存本机 shell 变量，未打印明文）：
+```
+GET /api/entities?entity=requirements&keyword=E2实测 → code 200，1 条（id=4）
+GET /api/floorplan?requirement=4 → E1-TEST-FLOORPLAN-CONTENT（与上传内容逐字一致）
+未登录访问 → 401 身份认证信息未提供
+```
+6. **重启后端后附件仍可打开**：`docker restart whc-backend` → 再 GET /api/floorplan → 仍返回 `E1-TEST-FLOORPLAN-CONTENT` ✓
+7. E2 全程链：该用户登录（POST /api/login → token）→ 提交需求（带客户端 Token）→ `customer":"E2实测用户"`（自动关联其客户身份）✓
+8. 管理端可见注册用户（衔接二期 users，经 customers 实体）：
+```
+GET /api/entities?entity=customers&keyword=13899990001 → code 200，name=E2实测用户、count=2（两条需求）、lastContact=2026-11-11
+（users 实体属二期，落库后管理端用户管理页展示注册用户列表+手机号脱敏）
+```
+9. 三端自检：client 5173 = 200、admin 5172 = 200、health = ok；**nginx 同源 /api 反代**：client→/api = 200、admin→/api = 200（管理端经新反代登录与接口调用自检通过）。
+
+### 本地自检
+Django test 13/13 全过（新增 E1 五例：multipart 上传落盘、超限 400、类型错 400、未登录 401、管理端下载流内容一致）；前端 client 16/16、admin 10/10；两端 vite build 通过。
+
+### 备注（如实）
+- 测试机重建走「兜底本地构建」路线（Hub 镜像仍为旧版，拉到旧镜像时 compose build 段未触发——本次为显式 `up -d --build` 重建三容器，装出的即 E1 版本）。
+- 测试机验收管理员 `xiaoan_test` 为本次验收临时账号，密码随机、只存在测试机容器内，不进任何仓库/回帖；如 Muse 复验需要，可在目标机 `docker exec whc-backend python manage.py shell` 自行重置。
+- 测试机根分区 98% 满（0.2 GiB 余量），instabox 持续告警；不影响本单验收，但建议站主有空时扩盘或清理（另单处理，不阻塞）。
+
+—— 小安
