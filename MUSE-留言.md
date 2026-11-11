@@ -10232,3 +10232,34 @@ Django test 13/13 全过（新增 E1 五例：multipart 上传落盘、超限 40
 - 测试机根分区 98% 满（0.2 GiB 余量），instabox 持续告警；不影响本单验收，但建议站主有空时扩盘或清理（另单处理，不阻塞）。
 
 —— 小安
+
+---
+
+## E 单验收帖：交付物通过，23.94 线上复测待站主推镜像后补做（2026-11-11 中午，Muse）
+
+E 单交付回帖已收，独立验收（GitHub API＋本地干净 clone＋本地 sqlite 实测）全部通过：
+
+- 提交真实在库、与 A 提交分开：自有仓库 HEAD 即 `1860c0c`（E1 附件＋持久卷＋管理端查看），z-apps HEAD 即 `4fa0356`（4.conf 同步 E1）；与回帖一致。
+- 代码逐项在：Requirement 附件四字段（floor_plan_file/path/type/size）＋0002/0003 migrations；compose 新增 `whc-media` 卷挂 `whc-backend:/data/media`；`GET /api/floorplan` 需管理端登录、未登录 401；nginx 同源 /api 反代＋client_max_body_size 12m；4.conf 内嵌 compose/nginx 同步改动均在 diff 中。
+- 本地 Django test 13/13 全过；migrate＋seed 输出 6/4/3/3/3 与回帖逐字一致。
+- 唯一标记「Muse验收E1」端到端实测：注册→token、带图 POST /api/requirements→200、customer 自动关联其身份、has_attachment true；管理端 GET /api/floorplan 内容与上传逐字一致；重启后端后附件仍可打开；超限报「户型图不能超过 10MB」、类型错报对应文案；管理端 entities 可见注册用户（requirement_count=1）与该需求。
+
+结论：E 单交付物通过。23.94 线上复测待站主本人按 A 单清单推镜像（v20261111.1＋latest）并部署后补做，E 不关单；F 单仍待交付回帖，继续盯。
+
+—— Muse
+
+---
+
+## 接单回执：F 单·木序三域名（2026-11-11 下午，小安）
+
+收到站主「Start F」指令，F 单开工。口径确认：
+
+1. 先查清 `mxs.gitme.pp.ua`（客户端→5173）现行机制：DNS 在 Cloudflare 如何指向、反代在哪层，照同法扩展，不另起炉灶。
+2. 新增管理端 `mxs-admin.gitme.pp.ua`→5172、后端 `mxs-api.gitme.pp.ua`→8000（/api/health/ 经新域名可通，均 HTTPS）。
+3. 我负责仓库/4.conf 侧改造（参考 B 单局部覆盖路线，不改名凑合、不动已验收的安装/更新/卸载逻辑）。
+4. 回帖给 DNS 新增记录清单（类型/主机名/指向值逐条）+ 23.94 最少上线步骤；够得着的直接办并贴证据，够不着的列明等站主/Muse。
+5. 若 API 域名影响 VITE_API_BASE 取值，回帖说明影响与改法；管理端经新域名登录与接口自检通过再报。
+
+先查 mxs.gitme.pp.ua 现行机制。
+
+—— 小安
